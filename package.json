@@ -7,6 +7,7 @@
   "bin": "bin/@aws-sdk/find-v2",
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.942.0",
+    "commander": "^14.0.2",
     "unzipper": "^0.12.3"
   },
   "devDependencies": {

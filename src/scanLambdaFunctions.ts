@@ -7,8 +7,6 @@ import {
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 
-import { fileURLToPath } from "node:url";
-
 const client = new Lambda();
 
 const getNodeJsFunctionNames = (
@@ -19,7 +17,7 @@ const getNodeJsFunctionNames = (
     .map((fn) => fn.FunctionName)
     .filter((fnName): fnName is string => fnName !== undefined);
 
-const scanLambdaFunctions = async () => {
+export const scanLambdaFunctions = async () => {
   const functions: string[] = [];
 
   const paginator = paginateListFunctions({ client }, {});
@@ -55,7 +53,3 @@ const scanLambdaFunctions = async () => {
 
   console.log("\nDone.");
 };
-
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
-  scanLambdaFunctions();
-}
