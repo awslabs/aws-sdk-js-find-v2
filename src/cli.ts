@@ -2,6 +2,12 @@ import { Command } from "commander";
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
+/**
+ * Creates and configures the CLI program with available commands.
+ *
+ * @returns The configured Commander program instance
+ * @internal
+ */
 export const createProgram = (): Command => {
   const program = new Command();
 
