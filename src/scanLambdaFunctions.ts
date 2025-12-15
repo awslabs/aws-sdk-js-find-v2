@@ -25,13 +25,12 @@ export const scanLambdaFunctions = async () => {
     functions.push(...getNodeJsFunctionNames(page.Functions));
   }
 
-  const listFunctionsLength = functions.length;
-  if (listFunctionsLength === 0) {
+  const functionsLength = functions.length;
+  if (functionsLength === 0) {
     console.log("No functions found.");
     process.exit(0);
   }
 
-  const functionsLength = functions.length;
   console.log(`Note about output:`);
   console.log(
     `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`
