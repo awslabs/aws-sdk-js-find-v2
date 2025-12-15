@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-import "../../dist/cli.js";
+import { createProgram } from "../../dist/cli.js";
+
+createProgram().parse();

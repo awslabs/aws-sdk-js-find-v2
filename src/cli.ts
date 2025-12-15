@@ -2,8 +2,6 @@ import { Command } from "commander";
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
-import { fileURLToPath } from "node:url";
-
 export const createProgram = (): Command => {
   const program = new Command();
 
@@ -20,7 +18,3 @@ export const createProgram = (): Command => {
     });
   return program;
 };
-
-if (fileURLToPath(import.meta.url) === process.argv[1]) {
-  createProgram().parse();
-}
