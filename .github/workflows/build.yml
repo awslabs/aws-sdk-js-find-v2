@@ -21,6 +21,8 @@ jobs:
           cache: "yarn"
       - name: install
         run: yarn
+      - name: lint
+        run: yarn lint
       - name: format
         run: yarn format --check
       - name: build
