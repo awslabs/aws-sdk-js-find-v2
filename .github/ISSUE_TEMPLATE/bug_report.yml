@@ -18,7 +18,7 @@ body:
       description: |
         A clear and concise description of what the bug is. A bug is **unintended**. A feature not being implemented is **not a bug**.
       placeholder: |
-        eg: CLI does falses detects JS SDK v2 in <environment> when <criteria>.
+        eg: CLI falsely detects JS SDK v2 in <environment> when <criteria>.
     validations:
       required: true
 
