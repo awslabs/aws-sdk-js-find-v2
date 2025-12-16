@@ -380,6 +380,7 @@ __metadata:
     aws-sdk: "npm:^2.1692.0"
     commander: "npm:^14.0.2"
     esbuild: "npm:~0.27.1"
+    node-stream-zip: "npm:^1.15.0"
     oxfmt: "npm:^0.18.0"
     oxlint: "npm:^1.33.0"
     rolldown: "npm:1.0.0-beta.54"
@@ -4564,6 +4565,13 @@ __metadata:
   version: 2.0.27
   resolution: "node-releases@npm:2.0.27"
   checksum: 10c0/f1e6583b7833ea81880627748d28a3a7ff5703d5409328c216ae57befbced10ce2c991bea86434e8ec39003bd017f70481e2e5f8c1f7e0a7663241f81d6e00e2
+  languageName: node
+  linkType: hard
+
+"node-stream-zip@npm:^1.15.0":
+  version: 1.15.0
+  resolution: "node-stream-zip@npm:1.15.0"
+  checksum: 10c0/429fce95d7e90e846adbe096c61d2ea8d18defc155c0345d25d0f98dd6fc72aeb95039318484a4e0a01dc3814b6d0d1ae0fe91847a29669dff8676ec064078c9
   languageName: node
   linkType: hard
 
