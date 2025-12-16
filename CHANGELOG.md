@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.1.0
+
+### Minor Changes
+
+- List Lambda region from client in output ([5c2d5f4e4667eceeac8848f53623a95e6503078e](https://github.com/awslabs/aws-sdk-js-find-v2/commit/5c2d5f4e4667eceeac8848f53623a95e6503078e))
+
 ## 0.0.3
 
 ### Patch Changes
