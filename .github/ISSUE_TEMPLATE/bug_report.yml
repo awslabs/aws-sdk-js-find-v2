@@ -1,0 +1,68 @@
+name: Bug Report
+description: A generic bug report about @aws-sdk/find-v2.
+title: "[Bug?]: "
+labels: ["bug", "triage"]
+
+body:
+  - type: checkboxes
+    id: selfservice
+    attributes:
+      label: Self-service
+      description: "Fixing bugs is always a great way to give back to open-source projects, and we're more than happy to answer questions and provide context."
+      options:
+        - label: "I'd be willing to implement a fix"
+
+  - type: textarea
+    attributes:
+      label: Describe the bug
+      description: |
+        A clear and concise description of what the bug is. A bug is **unintended**. A feature not being implemented is **not a bug**.
+      placeholder: |
+        eg: CLI falsely detects JS SDK v2 in <environment> when <criteria>.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Steps to reproduce
+      description: The _minimal_ steps to reproduce your issue.
+      placeholder: |
+        Please share code or minimal repo, and steps to reproduce the behavior.
+        Like an example setup of using JS SDK v2, and the command you ran.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Observed behavior
+      description: A clear and concise description of what happens.
+      placeholder: |
+        eg: The @aws-sdk/find-v2 CLI returned error with the following stack trace:
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Expected behavior
+      description: A clear and concise description of what you were expecting to happen.
+      placeholder: |
+        eg: The @aws-sdk/find-v2 CLI should have run successfully, and/or return specific output.
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Environment
+      render: shell
+      description: |
+        Run `npx @aws-sdk/find-v2 --version` and paste the result into the form
+      placeholder: |
+        0.0.1
+    validations:
+      required: true
+
+  - type: textarea
+    attributes:
+      label: Additional context
+      description: |
+        Add any other context about the problem here. Or a screenshot if applicable.
