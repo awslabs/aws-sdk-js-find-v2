@@ -22,7 +22,7 @@ export type LambdaFunctionContents = {
  * @returns Promise<LambdaFunctionContents> - Resolves to an object containing the extracted contents.
  */
 export const getLambdaFunctionContents = async (
-  zipPath: string
+  zipPath: string,
 ): Promise<LambdaFunctionContents> => {
   const directory = await unzipper.Open.file(zipPath);
 
@@ -44,9 +44,7 @@ export const getLambdaFunctionContents = async (
 
   let indexFile;
   for (const path of ["index.js", "index.mjs", "index.cjs"]) {
-    indexFile = directory.files.find(
-      (f) => f.path === path && f.type === "File"
-    );
+    indexFile = directory.files.find((f) => f.path === path && f.type === "File");
     if (indexFile) break;
   }
 

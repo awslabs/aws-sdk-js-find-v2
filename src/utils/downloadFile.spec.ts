@@ -35,7 +35,7 @@ describe(downloadFile.name, () => {
     });
 
     await expect(downloadFile(mockUrl, mockOutputPath)).rejects.toThrow(
-      `Failed to download '${mockUrl}'. Received ${mockStatus} with '${mockStatusText}'.`
+      `Failed to download '${mockUrl}'. Received ${mockStatus} with '${mockStatusText}'.`,
     );
     expect(writeFile).not.toHaveBeenCalled();
   });
@@ -47,7 +47,7 @@ describe(downloadFile.name, () => {
     });
 
     await expect(downloadFile(mockUrl, mockOutputPath)).rejects.toThrow(
-      `Response body is null for '${mockUrl}'`
+      `Response body is null for '${mockUrl}'`,
     );
     expect(writeFile).not.toHaveBeenCalled();
   });

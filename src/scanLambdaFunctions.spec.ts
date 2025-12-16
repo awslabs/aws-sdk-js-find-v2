@@ -87,13 +87,13 @@ describe(scanLambdaFunctions.name, () => {
 
     expect(console.log).toHaveBeenCalledWith("Note about output:");
     expect(console.log).toHaveBeenCalledWith(
-      `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`
+      `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`,
     );
     expect(console.log).toHaveBeenCalledWith(
-      `- ${JS_SDK_V2_MARKER.N} means "aws-sdk" is not found in Lambda function.`
+      `- ${JS_SDK_V2_MARKER.N} means "aws-sdk" is not found in Lambda function.`,
     );
     expect(console.log).toHaveBeenCalledWith(
-      `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`
+      `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`,
     );
     expect(console.log).toHaveBeenCalledWith("Reading 1 function.");
     expect(console.log).toHaveBeenCalledWith("\nDone.");

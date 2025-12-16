@@ -27,37 +27,32 @@ const inputpath = {
 const getFileExtension = (moduleSystem: ModuleSystem) =>
   moduleSystem === ModuleSystem.cjs ? "js" : "mjs";
 
-const getOutputFileName = (
-  bundler: string,
-  version: Version,
-  moduleSystem: ModuleSystem
-) => [bundler, version, getFileExtension(moduleSystem)].join(".");
+const getOutputFileName = (bundler: string, version: Version, moduleSystem: ModuleSystem) =>
+  [bundler, version, getFileExtension(moduleSystem)].join(".");
 
 const getWebpackCommand = (version: Version, moduleSystem: ModuleSystem) =>
   `npx webpack ${inputpath[version]} --output-filename ${getOutputFileName(
     "webpack",
     version,
-    moduleSystem
-  )} --output-library-type ${
-    moduleSystem === ModuleSystem.cjs ? "commonjs2" : "module"
-  }`;
+    moduleSystem,
+  )} --output-library-type ${moduleSystem === ModuleSystem.cjs ? "commonjs2" : "module"}`;
 
 const getEsbuildCommand = (version: Version, moduleSystem: ModuleSystem) =>
   `npx esbuild --bundle --minify ${inputpath[version]} --outfile=${join(
     fixturesFilepath,
-    getOutputFileName("esbuild", version, moduleSystem)
+    getOutputFileName("esbuild", version, moduleSystem),
   )} --format=${moduleSystem}`;
 
 const getRollupCommand = (version: Version, moduleSystem: ModuleSystem) =>
   `npx rollup ${inputpath[version]} --file=${join(
     fixturesFilepath,
-    getOutputFileName("rollup", version, moduleSystem)
+    getOutputFileName("rollup", version, moduleSystem),
   )} --format=${moduleSystem} -c`;
 
 const getRolldownCommand = (version: Version, moduleSystem: ModuleSystem) =>
   `npx rolldown ${inputpath[version]} --file=${join(
     fixturesFilepath,
-    getOutputFileName("rolldown", version, moduleSystem)
+    getOutputFileName("rolldown", version, moduleSystem),
   )} --format=${moduleSystem} -c`;
 
 for (const version of Object.values(Version)) {
