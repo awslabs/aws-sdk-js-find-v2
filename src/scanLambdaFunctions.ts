@@ -10,7 +10,7 @@ const getNodeJsFunctionNames = (functions: FunctionConfiguration[] | undefined) 
     .filter((fnName): fnName is string => fnName !== undefined);
 
 export const scanLambdaFunctions = async (region?: string) => {
-  const client = new Lambda(region ? { region } : {});
+  const client = new Lambda({ region });
   const functions: string[] = [];
 
   const paginator = paginateListFunctions({ client }, {});

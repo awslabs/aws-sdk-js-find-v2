@@ -7,9 +7,13 @@ vi.mock("./scanLambdaFunction.ts");
 
 const mockPaginateListFunctions = vi.hoisted(() => vi.fn());
 const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
+const mockLambdaConstructor = vi.hoisted(() => vi.fn());
 
 vi.mock("@aws-sdk/client-lambda", () => ({
   Lambda: class {
+    constructor(config?: any) {
+      mockLambdaConstructor(config);
+    }
     config = {
       region: vi.fn().mockResolvedValue("us-east-1"),
     };
@@ -113,5 +117,21 @@ describe(scanLambdaFunctions.name, () => {
     await scanLambdaFunctions();
 
     expect(console.log).toHaveBeenCalledWith('Reading 2 functions from "us-east-1" region.');
+  });
+
+  it("creates Lambda client with specified region", async () => {
+    mockPaginateListFunctions.mockReturnValue([{ Functions: [] }]);
+
+    await scanLambdaFunctions("us-west-2");
+
+    expect(mockLambdaConstructor).toHaveBeenCalledWith({ region: "us-west-2" });
+  });
+
+  it("creates Lambda client with undefined region when not specified", async () => {
+    mockPaginateListFunctions.mockReturnValue([{ Functions: [] }]);
+
+    await scanLambdaFunctions();
+
+    expect(mockLambdaConstructor).toHaveBeenCalledWith({ region: undefined });
   });
 });
