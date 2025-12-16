@@ -9,7 +9,11 @@ const mockPaginateListFunctions = vi.hoisted(() => vi.fn());
 const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
 
 vi.mock("@aws-sdk/client-lambda", () => ({
-  Lambda: vi.fn(),
+  Lambda: class {
+    config = {
+      region: vi.fn().mockResolvedValue("us-east-1"),
+    };
+  },
   paginateListFunctions: mockPaginateListFunctions,
 }));
 
@@ -45,7 +49,7 @@ describe(scanLambdaFunctions.name, () => {
 
     await scanLambdaFunctions();
 
-    expect(console.log).toHaveBeenCalledWith("Reading 2 functions.");
+    expect(console.log).toHaveBeenCalledWith('Reading 2 functions from "us-east-1" region.');
     expect(mockScanLambdaFunction).toHaveBeenCalledTimes(2);
     expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "node-fn-1");
     expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "node-fn-2");
@@ -95,7 +99,7 @@ describe(scanLambdaFunctions.name, () => {
     expect(console.log).toHaveBeenCalledWith(
       `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`,
     );
-    expect(console.log).toHaveBeenCalledWith("Reading 1 function.");
+    expect(console.log).toHaveBeenCalledWith('Reading 1 function from "us-east-1" region.');
     expect(console.log).toHaveBeenCalledWith("\nDone.");
   });
 
@@ -108,6 +112,6 @@ describe(scanLambdaFunctions.name, () => {
 
     await scanLambdaFunctions();
 
-    expect(console.log).toHaveBeenCalledWith("Reading 2 functions.");
+    expect(console.log).toHaveBeenCalledWith('Reading 2 functions from "us-east-1" region.');
   });
 });
