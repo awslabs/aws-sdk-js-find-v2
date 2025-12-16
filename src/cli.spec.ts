@@ -54,6 +54,25 @@ describe("CLI", () => {
       await program.parseAsync(["node", "cli", "lambda"]);
 
       expect(scanLambdaFunctions).toHaveBeenCalledTimes(1);
+      expect(scanLambdaFunctions).toHaveBeenCalledWith(undefined);
+    });
+
+    it("should pass region option to scanLambdaFunctions with --region", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
+
+      expect(scanLambdaFunctions).toHaveBeenCalledWith("us-west-2");
+    });
+
+    it("should pass region option to scanLambdaFunctions with -r", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
+
+      expect(scanLambdaFunctions).toHaveBeenCalledWith("eu-west-1");
     });
 
     it("should not call scanLambdaFunctions when no command is provided", async () => {
