@@ -39,7 +39,8 @@ export const scanLambdaFunction = async (client: Lambda, functionName: string) =
           console.log(`${JS_SDK_V2_MARKER.Y} ${functionName}`);
           return;
         }
-      } catch (error) { // oxlint-disable-line no-unused-vars
+        // oxlint-disable-next-line no-unused-vars
+      } catch (error) {
         // Parsing failure for package.json which is rare, continue.
       }
     }
