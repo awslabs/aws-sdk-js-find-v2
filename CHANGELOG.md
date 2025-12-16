@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.0.2
+
+### Patch Changes
+
+- Set up release scripts ([bbc9183563a6be76fb66e7664e50cf63a7328437](https://github.com/awslabs/aws-sdk-js-find-v2/commit/bbc9183563a6be76fb66e7664e50cf63a7328437))
+
 ## 0.0.1
 
 ### Initial Release
