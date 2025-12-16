@@ -39,7 +39,7 @@ Note about output:
 - [N] means "aws-sdk" is not found in Lambda function.
 - [?] means script was not able to proceed, and it emits reason.
 
-Reading 4 functions.
+Reading 4 functions from "us-east-2" region.
 [N] fn-without-aws-sdk-in-bundle
 [Y] fn-with-aws-sdk-in-bundle
 [Y] fn-with-aws-sdk-in-package-json-deps

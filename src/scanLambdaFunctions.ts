@@ -4,6 +4,7 @@ import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 
 const client = new Lambda();
+const region = await client.config.region();
 
 const getNodeJsFunctionNames = (functions: FunctionConfiguration[] | undefined) =>
   (functions ?? [])
@@ -34,7 +35,9 @@ export const scanLambdaFunctions = async () => {
     `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`,
   );
 
-  console.log(`Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""}.`);
+  console.log(
+    `Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""} from "${region}" region.`,
+  );
 
   for (const functionName of functions) {
     await scanLambdaFunction(client, functionName);
