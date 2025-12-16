@@ -1,5 +1,12 @@
 # @aws-sdk/find-v2
 
+## 0.1.1
+
+### Patch Changes
+
+- Adds region option to lambda command ([c22eea0109e3dae099e4b476018087a35267c965](https://github.com/awslabs/aws-sdk-js-find-v2/commit/c22eea0109e3dae099e4b476018087a35267c965))
+- Use oxlint for linting source code ([311bafa131f1a9dddf306284bec15ec181133b3b](https://github.com/awslabs/aws-sdk-js-find-v2/commit/311bafa131f1a9dddf306284bec15ec181133b3b))
+
 ## 0.1.0
 
 ### Minor Changes
