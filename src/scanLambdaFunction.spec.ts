@@ -47,7 +47,7 @@ describe(scanLambdaFunction.name, () => {
     await scanLambdaFunction(mockClient, functionName);
 
     expect(console.log).toHaveBeenCalledWith(
-      `${JS_SDK_V2_MARKER.UNKNOWN} ${functionName}: Code location not found.`
+      `${JS_SDK_V2_MARKER.UNKNOWN} ${functionName}: Code location not found.`,
     );
   });
 
@@ -65,7 +65,7 @@ describe(scanLambdaFunction.name, () => {
 
     expect(mockDownloadFile).toHaveBeenCalledWith(
       codeLocation,
-      expect.stringMatching(new RegExp(functionName + ".zip$"))
+      expect.stringMatching(new RegExp(functionName + ".zip$")),
     );
     expect(console.log).toHaveBeenCalledWith(`${JS_SDK_V2_MARKER.Y} ${functionName}`);
     expect(mockRm).toHaveBeenCalled();
@@ -131,9 +131,8 @@ describe(scanLambdaFunction.name, () => {
     mockDownloadFile.mockRejectedValue(new Error("Download failed"));
 
     await expect(scanLambdaFunction(mockClient, functionName)).rejects.toThrow("Download failed");
-    expect(mockRm).toHaveBeenCalledWith(
-      expect.stringContaining(`${functionName}.zip`),
-      { force: true }
-    );
+    expect(mockRm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+      force: true,
+    });
   });
 });

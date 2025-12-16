@@ -1,17 +1,11 @@
-import {
-  Lambda,
-  paginateListFunctions,
-  type FunctionConfiguration,
-} from "@aws-sdk/client-lambda";
+import { Lambda, paginateListFunctions, type FunctionConfiguration } from "@aws-sdk/client-lambda";
 
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 
 const client = new Lambda();
 
-const getNodeJsFunctionNames = (
-  functions: FunctionConfiguration[] | undefined
-) =>
+const getNodeJsFunctionNames = (functions: FunctionConfiguration[] | undefined) =>
   (functions ?? [])
     .filter((fn) => fn.Runtime?.startsWith("nodejs"))
     .map((fn) => fn.FunctionName)
@@ -33,18 +27,14 @@ export const scanLambdaFunctions = async () => {
 
   console.log(`Note about output:`);
   console.log(
-    `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`
+    `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`,
   );
+  console.log(`- ${JS_SDK_V2_MARKER.N} means "aws-sdk" is not found in Lambda function.`);
   console.log(
-    `- ${JS_SDK_V2_MARKER.N} means "aws-sdk" is not found in Lambda function.`
-  );
-  console.log(
-    `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`
+    `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`,
   );
 
-  console.log(
-    `Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""}.`
-  );
+  console.log(`Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""}.`);
 
   for (const functionName of functions) {
     await scanLambdaFunction(client, functionName);

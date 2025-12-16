@@ -22,9 +22,7 @@ export const getDependencyReleaseLine = (changesets, dependenciesUpdated) => {
 
 export const getReleaseLine = (changeset, _type) => {
   const { commit, summary } = changeset;
-  const [firstLine, ...futureLines] = summary
-    .split("\n")
-    .map((l) => l.trimEnd());
+  const [firstLine, ...futureLines] = summary.split("\n").map((l) => l.trimEnd());
 
   return `- ${firstLine} (${getGithubCommitWithLink(commit)})${
     futureLines.length > 0 ? futureLines.map((l) => `  ${l}`).join("\n") : ""

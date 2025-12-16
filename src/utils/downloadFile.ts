@@ -13,7 +13,7 @@ export const downloadFile = async (url: string, outputPath: string) => {
 
   if (!response.ok) {
     throw new Error(
-      `Failed to download '${url}'. Received ${response.status} with '${response.statusText}'.`
+      `Failed to download '${url}'. Received ${response.status} with '${response.statusText}'.`,
     );
   }
 

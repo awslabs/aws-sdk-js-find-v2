@@ -6,13 +6,11 @@ import { hasSdkV2InBundle } from "./hasSdkV2InBundle";
 describe("hasSdkV2InBundle", () => {
   const fixturesDir = join(__dirname, "__fixtures__");
   const files = readdirSync(fixturesDir).filter((file) =>
-    statSync(join(fixturesDir, file)).isFile()
+    statSync(join(fixturesDir, file)).isFile(),
   );
 
   if (files.length === 0) {
-    throw new Error(
-      "No fixture files found. Run 'npm run test:generate:bundles' first."
-    );
+    throw new Error("No fixture files found. Run 'npm run test:generate:bundles' first.");
   }
 
   files.forEach((file) => {

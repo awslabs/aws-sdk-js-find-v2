@@ -11,15 +11,10 @@ import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-export const scanLambdaFunction = async (
-  client: Lambda,
-  functionName: string
-) => {
+export const scanLambdaFunction = async (client: Lambda, functionName: string) => {
   const response = await client.getFunction({ FunctionName: functionName });
   if (!response.Code?.Location) {
-    console.log(
-      `${JS_SDK_V2_MARKER.UNKNOWN} ${functionName}: Code location not found.`
-    );
+    console.log(`${JS_SDK_V2_MARKER.UNKNOWN} ${functionName}: Code location not found.`);
     return;
   }
   const zipPath = join(tmpdir(), `${functionName}.zip`);
