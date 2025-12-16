@@ -19,8 +19,9 @@ export const createProgram = (): Command => {
   program
     .command("lambda")
     .description("Scans Lambda Node.js Functions for JavaScript SDK v2.")
-    .action(async () => {
-      await scanLambdaFunctions();
+    .option("-r, --region <region>", "AWS region to scan")
+    .action(async (options) => {
+      await scanLambdaFunctions(options.region);
     });
   return program;
 };
