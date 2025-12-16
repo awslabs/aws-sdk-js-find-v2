@@ -3,6 +3,12 @@ name: test-generate-bundles
 on:
   pull_request:
     branches: [main]
+    paths:
+      - scripts/generateBundles.ts
+      - rolldown.config.mjs
+      - rollup.config.mjs
+      - webpack.config.mjs
+      - yarn.lock
 
 jobs:
   test-generate-bundles:
