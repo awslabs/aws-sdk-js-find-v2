@@ -32,8 +32,11 @@ export const getLambdaFunctionContents = async (
     // Skip 'node_modules' directory, as it's not the customer source code.
     if (zipEntry.name.includes("node_modules/")) continue;
 
-    // Skip anything which is not `package.json`
+    // Skip anything which is not 'package.json'
     if (!zipEntry.name.endsWith(PACKAGE_JSON_FILENAME)) continue;
+
+    // Skip if 'package.json' is not a file
+    if (!zipEntry.isFile) continue;
 
     const packageJsonContent = await zip.entryData(zipEntry.name);
     packageJsonContents.push(packageJsonContent.toString());
@@ -44,21 +47,14 @@ export const getLambdaFunctionContents = async (
     return { packageJsonContents };
   }
 
-  let indexFile;
   for (const path of ["index.js", "index.mjs", "index.cjs"]) {
-    try {
-      indexFile = await zip.entryData(path);
-      break;
-    } catch {
-      // File doesn't exist, try next
-    }
+    if (!zipEntries[path]) continue;
+    if (!zipEntries[path].isFile) continue;
+    const bundleContent = await zip.entryData(path);
+    await zip.close();
+    return { bundleContent: bundleContent.toString() };
   }
 
   await zip.close();
-
-  if (indexFile) {
-    return { bundleContent: indexFile.toString() };
-  }
-
   return {};
 };
