@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.0.3
+
+### Patch Changes
+
+- Use oxfmt for formatting source code ([96ca08da8a984e6a55339cb5ba3d394f9f60fe39](https://github.com/awslabs/aws-sdk-js-find-v2/commit/96ca08da8a984e6a55339cb5ba3d394f9f60fe39))
+
 ## 0.0.2
 
 ### Patch Changes
