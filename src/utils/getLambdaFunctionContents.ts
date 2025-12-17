@@ -27,7 +27,15 @@ export const getLambdaFunctionContents = async (
   const zip = new StreamZip.async({ file: zipPath });
 
   const packageJsonContents = [];
-  const zipEntries = await zip.entries();
+
+  let zipEntries: Record<string, StreamZip.ZipEntry> = {};
+  try {
+    zipEntries = await zip.entries();
+  } catch {
+    // Continue with empty object, if zip entries can't be read.
+    // ToDo: add warning when logging is supported in future.
+  }
+
   for (const zipEntry of Object.values(zipEntries)) {
     // Skip 'node_modules' directory, as it's not the customer source code.
     if (zipEntry.name.includes("node_modules/")) continue;
@@ -38,8 +46,13 @@ export const getLambdaFunctionContents = async (
     // Skip if 'package.json' is not a file
     if (!zipEntry.isFile) continue;
 
-    const packageJsonContent = await zip.entryData(zipEntry.name);
-    packageJsonContents.push(packageJsonContent.toString());
+    try {
+      const packageJsonContent = await zip.entryData(zipEntry.name);
+      packageJsonContents.push(packageJsonContent.toString());
+    } catch {
+      // Continue without adding package.json file, if entry data can't be read.
+      // ToDo: add warning when logging is supported in future.
+    }
   }
 
   if (packageJsonContents.length !== 0) {
@@ -50,9 +63,14 @@ export const getLambdaFunctionContents = async (
   for (const path of ["index.js", "index.mjs", "index.cjs"]) {
     if (!zipEntries[path]) continue;
     if (!zipEntries[path].isFile) continue;
-    const bundleContent = await zip.entryData(path);
-    await zip.close();
-    return { bundleContent: bundleContent.toString() };
+    try {
+      const bundleContent = await zip.entryData(path);
+      await zip.close();
+      return { bundleContent: bundleContent.toString() };
+    } catch {
+      // Continue processing next index file, if entry data can't be read.
+      // ToDo: add warning when logging is supported in future.
+    }
   }
 
   await zip.close();

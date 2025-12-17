@@ -26,14 +26,68 @@ describe(getLambdaFunctionContents.name, () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockZip.entryData.mockResolvedValue(Buffer.from(mockPackageJson));
   });
 
   afterEach(() => {
     expect(mockZip.close).toHaveBeenCalled();
   });
 
+  it("returns empty object when zip entries can't be read", async () => {
+    mockZip.entries.mockRejectedValue(new Error("zip entries error"));
+    const result = await getLambdaFunctionContents(mockZipPath);
+
+    expect(result).toEqual({});
+    expect(mockZip.entryData).not.toHaveBeenCalled();
+  });
+
+  describe("returns empty object when entry data can't be read", () => {
+    it("with only package.json", async () => {
+      mockZip.entries.mockResolvedValue({
+        "package.json": { name: "package.json", isFile: true },
+      });
+      mockZip.entryData.mockRejectedValue(new Error("zip entry data error"));
+
+      const result = await getLambdaFunctionContents(mockZipPath);
+
+      expect(result).toEqual({});
+      expect(mockZip.entryData).toHaveBeenCalledOnce();
+      expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
+    });
+
+    it("with only index.js", async () => {
+      mockZip.entries.mockResolvedValue({
+        "index.js": { name: "index.js", isFile: true },
+      });
+      mockZip.entryData.mockRejectedValue(new Error("zip entry data error"));
+
+      const result = await getLambdaFunctionContents(mockZipPath);
+
+      expect(result).toEqual({});
+      expect(mockZip.entryData).toHaveBeenCalledOnce();
+      expect(mockZip.entryData).toHaveBeenCalledWith("index.js");
+    });
+
+    it("with both package.json and index.js", async () => {
+      mockZip.entries.mockResolvedValue({
+        "package.json": { name: "package.json", isFile: true },
+        "index.js": { name: "index.js", isFile: true },
+      });
+      mockZip.entryData.mockRejectedValue(new Error("zip entry data error"));
+
+      const result = await getLambdaFunctionContents(mockZipPath);
+
+      expect(result).toEqual({});
+      expect(mockZip.entryData).toHaveBeenCalledTimes(2);
+      expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
+      expect(mockZip.entryData).toHaveBeenNthCalledWith(2, "index.js");
+    });
+  });
+
   describe("when package.json present", () => {
+    beforeEach(() => {
+      mockZip.entryData.mockResolvedValue(Buffer.from(mockPackageJson));
+    });
+
     it("returns packageJsonContents from package.json", async () => {
       mockZip.entries.mockResolvedValue({
         "package.json": { name: "package.json", isFile: true },
@@ -50,7 +104,10 @@ describe(getLambdaFunctionContents.name, () => {
     it("skips node_modules directory", async () => {
       mockZip.entries.mockResolvedValue({
         "package.json": { name: "package.json", isFile: true },
-        "node_modules/package.json": { name: "node_modules/package.json", isFile: true },
+        "node_modules/package.json": {
+          name: "node_modules/package.json",
+          isFile: true,
+        },
       });
 
       const result = await getLambdaFunctionContents(mockZipPath);
@@ -79,7 +136,10 @@ describe(getLambdaFunctionContents.name, () => {
       };
       mockZip.entries.mockResolvedValue({
         "package.json": { name: "package.json", isFile: true },
-        "packages/app/package.json": { name: "packages/app/package.json", isFile: true },
+        "packages/app/package.json": {
+          name: "packages/app/package.json",
+          isFile: true,
+        },
       });
       mockZip.entryData.mockResolvedValueOnce(Buffer.from(mockPackageJsons.root));
       mockZip.entryData.mockResolvedValueOnce(Buffer.from(mockPackageJsons.app));
