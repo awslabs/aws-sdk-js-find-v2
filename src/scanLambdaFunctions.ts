@@ -1,4 +1,5 @@
 import { Lambda, paginateListFunctions, type FunctionConfiguration } from "@aws-sdk/client-lambda";
+import { cpus } from "node:os";
 
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
@@ -38,9 +39,20 @@ export const scanLambdaFunctions = async (region?: string) => {
     `Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""} from "${clientRegion}" region.`,
   );
 
-  for (const functionName of functions) {
-    await scanLambdaFunction(client, functionName);
-  }
+  const concurrency = cpus().length;
+  let index = 0;
+
+  const worker = async () => {
+    while (index < functions.length) {
+      await scanLambdaFunction(client, functions[index++]);
+    }
+  };
+
+  await Promise.all(
+    Array(concurrency)
+      .fill(0)
+      .map(() => worker()),
+  );
 
   console.log("\nDone.");
 };
