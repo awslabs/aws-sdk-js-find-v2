@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- Process lambda functions concurrently in a worker pool ([c6d2a2c69104b28bd5cf3ea4f4bf5abae7a42daa](https://github.com/awslabs/aws-sdk-js-find-v2/commit/c6d2a2c69104b28bd5cf3ea4f4bf5abae7a42daa))
+- Process lambda functions concurrently using p-limit ([c6d2a2c69104b28bd5cf3ea4f4bf5abae7a42daa](https://github.com/awslabs/aws-sdk-js-find-v2/commit/c6d2a2c69104b28bd5cf3ea4f4bf5abae7a42daa))
 
 ## 0.2.0
 
