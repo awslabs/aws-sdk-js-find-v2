@@ -40,7 +40,7 @@ export const scanLambdaFunctions = async (region?: string) => {
     `Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""} from "${clientRegion}" region.`,
   );
 
-  const limit = pLimit(cpus().length || 1);
+  const limit = pLimit(Math.min(functionsLength, cpus().length || 1));
   await Promise.all(functions.map((fn) => limit(() => scanLambdaFunction(client, fn))));
 
   console.log("\nDone.");

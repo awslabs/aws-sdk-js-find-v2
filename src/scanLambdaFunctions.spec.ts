@@ -150,9 +150,14 @@ describe(scanLambdaFunctions.name, () => {
   });
 
   describe("concurrency with p-limit", () => {
-    it("creates p-limit with CPU count as concurrency", async () => {
+    it("uses CPU count as concurrency when it's less than functions.length", async () => {
       mockCpus.mockReturnValue([{}, {}]); // 2 CPUs
-      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x" }];
+      const functions = [
+        { FunctionName: "fn-1", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-2", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-3", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-4", Runtime: "nodejs18.x" },
+      ];
       mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
 
       await scanLambdaFunctions();
@@ -160,7 +165,18 @@ describe(scanLambdaFunctions.name, () => {
       expect(mockPLimit).toHaveBeenCalledWith(2);
     });
 
-    it("processes all functions through p-limit", async () => {
+    it("uses concurrency of 1 when CPU count is not available", async () => {
+      mockCpus.mockReturnValue([]);
+      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x" }];
+      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+
+      await scanLambdaFunctions();
+
+      expect(mockPLimit).toHaveBeenCalledWith(1);
+    });
+
+    it("uses functions.length as concurrency when less than CPU count", async () => {
+      mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs
       const functions = [
         { FunctionName: "fn-1", Runtime: "nodejs18.x" },
         { FunctionName: "fn-2", Runtime: "nodejs18.x" },
@@ -169,19 +185,7 @@ describe(scanLambdaFunctions.name, () => {
 
       await scanLambdaFunctions();
 
-      expect(mockScanLambdaFunction).toHaveBeenCalledTimes(2);
-      expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-1");
-      expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-2");
-    });
-
-    it("uses concurrency of 1 when cpus() returns empty array", async () => {
-      mockCpus.mockReturnValue([]);
-      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x" }];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
-
-      await scanLambdaFunctions();
-
-      expect(mockPLimit).toHaveBeenCalledWith(1);
+      expect(mockPLimit).toHaveBeenCalledWith(2);
     });
   });
 });
