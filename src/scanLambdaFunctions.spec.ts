@@ -152,13 +152,13 @@ describe(scanLambdaFunctions.name, () => {
         { FunctionName: "fn-4", Runtime: "nodejs18.x" },
       ];
       mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
-      
+
       let activeWorkers = 0;
       let maxConcurrentWorkers = 0;
       mockScanLambdaFunction.mockImplementation(async () => {
         activeWorkers++;
         maxConcurrentWorkers = Math.max(maxConcurrentWorkers, activeWorkers);
-        await new Promise(resolve => setTimeout(resolve, 10));
+        await new Promise((resolve) => setTimeout(resolve, 10));
         activeWorkers--;
       });
 
