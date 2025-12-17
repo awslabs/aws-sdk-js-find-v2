@@ -5,11 +5,13 @@ import { JS_SDK_V2_MARKER } from "./constants.ts";
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./scanLambdaFunction.ts");
 vi.mock("node:os");
+vi.mock("p-limit");
 
 const mockPaginateListFunctions = vi.hoisted(() => vi.fn());
 const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
 const mockLambdaConstructor = vi.hoisted(() => vi.fn());
 const mockCpus = vi.hoisted(() => vi.fn());
+const mockPLimit = vi.hoisted(() => vi.fn());
 
 vi.mock("@aws-sdk/client-lambda", () => ({
   Lambda: class {
@@ -31,12 +33,17 @@ vi.mock("node:os", () => ({
   cpus: mockCpus,
 }));
 
+vi.mock("p-limit", () => ({
+  default: mockPLimit,
+}));
+
 describe(scanLambdaFunctions.name, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     console.log = vi.fn();
     process.exit = vi.fn() as any;
     mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs by default
+    mockPLimit.mockImplementation(() => (fn: () => Promise<void>) => fn());
   });
 
   it("exits early when no functions found", async () => {
@@ -142,34 +149,18 @@ describe(scanLambdaFunctions.name, () => {
     expect(mockLambdaConstructor).toHaveBeenCalledWith({ region: undefined });
   });
 
-  describe("worker pool", () => {
-    it("processes functions concurrently based on CPU count", async () => {
+  describe("concurrency with p-limit", () => {
+    it("creates p-limit with CPU count as concurrency", async () => {
       mockCpus.mockReturnValue([{}, {}]); // 2 CPUs
-      const functions = [
-        { FunctionName: "fn-1", Runtime: "nodejs18.x" },
-        { FunctionName: "fn-2", Runtime: "nodejs18.x" },
-        { FunctionName: "fn-3", Runtime: "nodejs18.x" },
-        { FunctionName: "fn-4", Runtime: "nodejs18.x" },
-      ];
+      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x" }];
       mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
-
-      let activeWorkers = 0;
-      let maxConcurrentWorkers = 0;
-      mockScanLambdaFunction.mockImplementation(async () => {
-        activeWorkers++;
-        maxConcurrentWorkers = Math.max(maxConcurrentWorkers, activeWorkers);
-        await new Promise((resolve) => setTimeout(resolve, 10));
-        activeWorkers--;
-      });
 
       await scanLambdaFunctions();
 
-      expect(mockScanLambdaFunction).toHaveBeenCalledTimes(4);
-      expect(maxConcurrentWorkers).toBe(2);
+      expect(mockPLimit).toHaveBeenCalledWith(2);
     });
 
-    it("processes all functions when there are more workers than functions", async () => {
-      mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs
+    it("processes all functions through p-limit", async () => {
       const functions = [
         { FunctionName: "fn-1", Runtime: "nodejs18.x" },
         { FunctionName: "fn-2", Runtime: "nodejs18.x" },
@@ -181,19 +172,6 @@ describe(scanLambdaFunctions.name, () => {
       expect(mockScanLambdaFunction).toHaveBeenCalledTimes(2);
       expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-1");
       expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-2");
-    });
-
-    it("handles single CPU system", async () => {
-      mockCpus.mockReturnValue([{}]); // 1 CPU
-      const functions = [
-        { FunctionName: "fn-1", Runtime: "nodejs18.x" },
-        { FunctionName: "fn-2", Runtime: "nodejs18.x" },
-      ];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
-
-      await scanLambdaFunctions();
-
-      expect(mockScanLambdaFunction).toHaveBeenCalledTimes(2);
     });
   });
 });
