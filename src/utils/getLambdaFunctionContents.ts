@@ -1,4 +1,4 @@
-import StreamZip from "node-stream-zip";
+import { type ZipEntry, StreamZipAsync } from "node-stream-zip";
 const PACKAGE_JSON_FILENAME = "package.json";
 
 export type LambdaFunctionContents = {
@@ -24,11 +24,11 @@ export type LambdaFunctionContents = {
 export const getLambdaFunctionContents = async (
   zipPath: string,
 ): Promise<LambdaFunctionContents> => {
-  const zip = new StreamZip.async({ file: zipPath });
+  const zip = new StreamZipAsync({ file: zipPath });
 
   const packageJsonContents = [];
 
-  let zipEntries: Record<string, StreamZip.ZipEntry> = {};
+  let zipEntries: Record<string, ZipEntry> = {};
   try {
     zipEntries = await zip.entries();
   } catch {

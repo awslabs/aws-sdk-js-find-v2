@@ -10,12 +10,10 @@ const { mockZip } = vi.hoisted(() => ({
 }));
 
 vi.mock("node-stream-zip", () => ({
-  default: {
-    async: class {
-      entries = mockZip.entries;
-      entryData = mockZip.entryData;
-      close = mockZip.close;
-    },
+  StreamZipAsync: class {
+    entries = mockZip.entries;
+    entryData = mockZip.entryData;
+    close = mockZip.close;
   },
 }));
 
