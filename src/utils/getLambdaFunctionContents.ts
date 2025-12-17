@@ -1,4 +1,4 @@
-import unzipper from "unzipper";
+import StreamZip from "node-stream-zip";
 const PACKAGE_JSON_FILENAME = "package.json";
 
 export type LambdaFunctionContents = {
@@ -24,34 +24,55 @@ export type LambdaFunctionContents = {
 export const getLambdaFunctionContents = async (
   zipPath: string,
 ): Promise<LambdaFunctionContents> => {
-  const directory = await unzipper.Open.file(zipPath);
+  const zip = new StreamZip.async({ file: zipPath });
 
   const packageJsonContents = [];
-  for (const file of directory.files) {
+
+  let zipEntries: Record<string, StreamZip.ZipEntry> = {};
+  try {
+    zipEntries = await zip.entries();
+  } catch {
+    // Continue with empty object, if zip entries can't be read.
+    // ToDo: add warning when logging is supported in future.
+  }
+
+  for (const zipEntry of Object.values(zipEntries)) {
     // Skip 'node_modules' directory, as it's not the customer source code.
-    if (file.path.includes("node_modules/")) continue;
+    if (zipEntry.name.includes("node_modules/")) continue;
 
-    // Skip anything which is not `package.json`
-    if (!file.path.endsWith(PACKAGE_JSON_FILENAME)) continue;
+    // Skip anything which is not 'package.json'
+    if (!zipEntry.name.endsWith(PACKAGE_JSON_FILENAME)) continue;
 
-    const packageJsonContent = await file.buffer();
-    packageJsonContents.push(packageJsonContent.toString());
+    // Skip if 'package.json' is not a file
+    if (!zipEntry.isFile) continue;
+
+    try {
+      const packageJsonContent = await zip.entryData(zipEntry.name);
+      packageJsonContents.push(packageJsonContent.toString());
+    } catch {
+      // Continue without adding package.json file, if entry data can't be read.
+      // ToDo: add warning when logging is supported in future.
+    }
   }
 
   if (packageJsonContents.length !== 0) {
+    await zip.close();
     return { packageJsonContents };
   }
 
-  let indexFile;
   for (const path of ["index.js", "index.mjs", "index.cjs"]) {
-    indexFile = directory.files.find((f) => f.path === path && f.type === "File");
-    if (indexFile) break;
+    if (!zipEntries[path]) continue;
+    if (!zipEntries[path].isFile) continue;
+    try {
+      const bundleContent = await zip.entryData(path);
+      await zip.close();
+      return { bundleContent: bundleContent.toString() };
+    } catch {
+      // Continue processing next index file, if entry data can't be read.
+      // ToDo: add warning when logging is supported in future.
+    }
   }
 
-  if (indexFile) {
-    const bundleContent = await indexFile.buffer();
-    return { bundleContent: bundleContent.toString() };
-  }
-
+  await zip.close();
   return {};
 };

@@ -8,7 +8,7 @@
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.942.0",
     "commander": "^14.0.2",
-    "unzipper": "^0.12.3"
+    "node-stream-zip": "^1.15.0"
   },
   "devDependencies": {
     "@aws-sdk/client-sts": "^3.946.0",
@@ -20,7 +20,6 @@
     "@tsconfig/node-ts": "^23.6.2",
     "@tsconfig/node20": "^20.1.8",
     "@types/node": "^20.14.8",
-    "@types/unzipper": "^0.10.11",
     "aws-sdk": "^2.1692.0",
     "esbuild": "~0.27.1",
     "oxfmt": "^0.18.0",
