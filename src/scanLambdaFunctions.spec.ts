@@ -173,5 +173,15 @@ describe(scanLambdaFunctions.name, () => {
       expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-1");
       expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-2");
     });
+
+    it("uses concurrency of 1 when cpus() returns empty array", async () => {
+      mockCpus.mockReturnValue([]);
+      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x" }];
+      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+
+      await scanLambdaFunctions();
+
+      expect(mockPLimit).toHaveBeenCalledWith(1);
+    });
   });
 });
