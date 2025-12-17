@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.2.0
+
+### Minor Changes
+
+- Use node-stream-zip for unzipping ([1c61269bff719c039911fe2a019fe422158393b6](https://github.com/awslabs/aws-sdk-js-find-v2/commit/1c61269bff719c039911fe2a019fe422158393b6))
+
 ## 0.1.1
 
 ### Patch Changes
