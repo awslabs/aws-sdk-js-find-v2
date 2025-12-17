@@ -1,4 +1,6 @@
 import { Lambda, paginateListFunctions, type FunctionConfiguration } from "@aws-sdk/client-lambda";
+import { cpus } from "node:os";
+import pLimit from "p-limit";
 
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
@@ -38,9 +40,8 @@ export const scanLambdaFunctions = async (region?: string) => {
     `Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""} from "${clientRegion}" region.`,
   );
 
-  for (const functionName of functions) {
-    await scanLambdaFunction(client, functionName);
-  }
+  const limit = pLimit(Math.min(functionsLength, cpus().length || 1));
+  await Promise.all(functions.map((fn) => limit(() => scanLambdaFunction(client, fn))));
 
   console.log("\nDone.");
 };

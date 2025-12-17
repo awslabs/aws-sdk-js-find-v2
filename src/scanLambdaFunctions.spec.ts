@@ -4,10 +4,14 @@ import { JS_SDK_V2_MARKER } from "./constants.ts";
 
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./scanLambdaFunction.ts");
+vi.mock("node:os");
+vi.mock("p-limit");
 
 const mockPaginateListFunctions = vi.hoisted(() => vi.fn());
 const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
 const mockLambdaConstructor = vi.hoisted(() => vi.fn());
+const mockCpus = vi.hoisted(() => vi.fn());
+const mockPLimit = vi.hoisted(() => vi.fn());
 
 vi.mock("@aws-sdk/client-lambda", () => ({
   Lambda: class {
@@ -25,11 +29,21 @@ vi.mock("./scanLambdaFunction.ts", () => ({
   scanLambdaFunction: mockScanLambdaFunction,
 }));
 
+vi.mock("node:os", () => ({
+  cpus: mockCpus,
+}));
+
+vi.mock("p-limit", () => ({
+  default: mockPLimit,
+}));
+
 describe(scanLambdaFunctions.name, () => {
   beforeEach(() => {
     vi.clearAllMocks();
     console.log = vi.fn();
     process.exit = vi.fn() as any;
+    mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs by default
+    mockPLimit.mockImplementation(() => (fn: () => Promise<void>) => fn());
   });
 
   it("exits early when no functions found", async () => {
@@ -133,5 +147,45 @@ describe(scanLambdaFunctions.name, () => {
     await scanLambdaFunctions();
 
     expect(mockLambdaConstructor).toHaveBeenCalledWith({ region: undefined });
+  });
+
+  describe("concurrency with p-limit", () => {
+    it("uses CPU count as concurrency when it's less than functions.length", async () => {
+      mockCpus.mockReturnValue([{}, {}]); // 2 CPUs
+      const functions = [
+        { FunctionName: "fn-1", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-2", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-3", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-4", Runtime: "nodejs18.x" },
+      ];
+      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+
+      await scanLambdaFunctions();
+
+      expect(mockPLimit).toHaveBeenCalledWith(2);
+    });
+
+    it("uses concurrency of 1 when CPU count is not available", async () => {
+      mockCpus.mockReturnValue([]);
+      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x" }];
+      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+
+      await scanLambdaFunctions();
+
+      expect(mockPLimit).toHaveBeenCalledWith(1);
+    });
+
+    it("uses functions.length as concurrency when less than CPU count", async () => {
+      mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs
+      const functions = [
+        { FunctionName: "fn-1", Runtime: "nodejs18.x" },
+        { FunctionName: "fn-2", Runtime: "nodejs18.x" },
+      ];
+      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+
+      await scanLambdaFunctions();
+
+      expect(mockPLimit).toHaveBeenCalledWith(2);
+    });
   });
 });
