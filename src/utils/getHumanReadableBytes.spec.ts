@@ -2,11 +2,9 @@ import { describe, it, expect } from "vitest";
 import { getHumanReadableBytes } from "./getHumanReadableBytes";
 
 describe("getHumanReadableBytes", () => {
-  it("returns '0 Bytes' for 0", () => {
-    expect(getHumanReadableBytes(0)).toBe("0 Bytes");
-  });
-
   it.each([
+    [-1, "0 Bytes"],
+    [0, "0 Bytes"],
     [1, "1 Bytes"],
     [1024, "1 KB"],
     [1024 ** 2, "1 MB"],
