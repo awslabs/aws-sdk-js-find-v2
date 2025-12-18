@@ -18,13 +18,13 @@ describe(getDownloadConfirmation.name, () => {
 
   it.each(["y", "Y", "yes", "YES", "Yes", " yes "])("returns true for '%s'", async (answer) => {
     mockQuestion.mockResolvedValue(answer);
-    expect(await getDownloadConfirmation(5, 1024)).toBe(true);
+    expect(await getDownloadConfirmation(5, 1024, 512)).toBe(true);
     expect(mockClose).toHaveBeenCalled();
   });
 
   it.each(["n", "N", "no", "", " no "])("returns false for '%s'", async (answer) => {
     mockQuestion.mockResolvedValue(answer);
-    expect(await getDownloadConfirmation(5, 1024)).toBe(false);
+    expect(await getDownloadConfirmation(5, 1024, 512)).toBe(false);
     expect(mockClose).toHaveBeenCalled();
   });
 });
