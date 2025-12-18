@@ -1,6 +1,17 @@
 import { createInterface } from "node:readline/promises";
 import { getHumanReadableBytes } from "./getHumanReadableBytes.ts";
 
+/**
+ * Prompts user for confirmation before downloading Lambda function code
+ *
+ * @param functionCount - Number of Lambda functions to be processed
+ * @param totalCodeSize - Total size of all function code in bytes
+ * @returns Promise that resolves to boolean indicating user's choice
+ * @description
+ * - Creates interactive readline interface for user input
+ * - Displays summary of operations including function count and total size
+ * - Returns true if user confirms with 'y' or 'yes', false otherwise
+ */
 export const getDownloadConfirmation = async (
   functionCount: number,
   totalCodeSize: number,
