@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
+import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
 
 const { mockZip } = vi.hoisted(() => ({

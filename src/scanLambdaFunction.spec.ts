@@ -1,5 +1,5 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 

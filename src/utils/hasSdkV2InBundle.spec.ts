@@ -1,5 +1,5 @@
-import { describe, it, expect } from "vitest";
-import { readdirSync, readFileSync, statSync } from "fs";
+import { describe, expect, it } from "vitest";
+import { readFileSync, readdirSync, statSync } from "fs";
 import { join } from "path";
 import { hasSdkV2InBundle } from "./hasSdkV2InBundle";
 

@@ -1,5 +1,5 @@
 import { writeFile } from "node:fs/promises";
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { downloadFile } from "./downloadFile.ts";
 
 vi.mock("node:fs/promises");

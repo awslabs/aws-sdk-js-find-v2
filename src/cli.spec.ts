@@ -1,4 +1,4 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createProgram } from "./cli.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import packageJson from "../package.json" with { type: "json" };
