@@ -7,7 +7,7 @@ import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 
-export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions) => {
+export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions = {}) => {
   const client = new Lambda({ region });
   const functions: string[] = [];
 
@@ -16,7 +16,9 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions)
   for await (const page of paginator) {
     const nodeJsFunctions = (page.Functions ?? []).filter((fn) => fn.Runtime?.startsWith("nodejs"));
     totalCodeSize += nodeJsFunctions.reduce((acc, fn) => acc + (fn.CodeSize || 0), totalCodeSize);
-    functions.push(...nodeJsFunctions.map((fn) => fn.FunctionName!));
+    functions.push(
+      ...nodeJsFunctions.map((fn) => fn.FunctionName).filter((fnName) => fnName !== undefined),
+    );
   }
 
   if (functions.length === 0) {
