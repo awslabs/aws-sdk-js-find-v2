@@ -41,7 +41,7 @@ describe("CLI", () => {
       const program = createProgram();
       const lambdaCommand = program.commands.find((cmd) => cmd.name() === "lambda");
       expect(lambdaCommand?.description()).toBe(
-        "Scans Lambda Node.js Functions for JavaScript SDK v2.",
+        "Scans Lambda Node.js Functions for JavaScript SDK v2",
       );
     });
 
@@ -54,25 +54,47 @@ describe("CLI", () => {
       await program.parseAsync(["node", "cli", "lambda"]);
 
       expect(scanLambdaFunctions).toHaveBeenCalledTimes(1);
-      expect(scanLambdaFunctions).toHaveBeenCalledWith(undefined);
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({});
     });
 
-    it("should pass region option to scanLambdaFunctions with --region", async () => {
-      const program = createProgram();
-      program.exitOverride();
+    describe("should pass region option to scanLambdaFunctions", () => {
+      it("with --region", async () => {
+        const program = createProgram();
+        program.exitOverride();
 
-      await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
+        await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
 
-      expect(scanLambdaFunctions).toHaveBeenCalledWith("us-west-2");
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ region: "us-west-2" });
+      });
+
+      it("with -r", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ region: "eu-west-1" });
+      });
     });
 
-    it("should pass region option to scanLambdaFunctions with -r", async () => {
-      const program = createProgram();
-      program.exitOverride();
+    describe("should pass yes option to scanLambdaFunctions", () => {
+      it("with --yes", async () => {
+        const program = createProgram();
+        program.exitOverride();
 
-      await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
+        await program.parseAsync(["node", "cli", "lambda", "--yes"]);
 
-      expect(scanLambdaFunctions).toHaveBeenCalledWith("eu-west-1");
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true });
+      });
+
+      it("with -y", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "-y"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true });
+      });
     });
 
     it("should not call scanLambdaFunctions when no command is provided", async () => {
