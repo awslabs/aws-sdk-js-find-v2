@@ -1,4 +1,4 @@
-import { Lambda, paginateListFunctions } from "@aws-sdk/client-lambda";
+import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
 import { cpus } from "node:os";
@@ -6,20 +6,13 @@ import { cpus } from "node:os";
 import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
+import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 
 export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions = {}) => {
   const client = new Lambda({ region });
-  const functions: string[] = [];
 
-  let totalCodeSize = 0;
-  const paginator = paginateListFunctions({ client }, {});
-  for await (const page of paginator) {
-    const nodeJsFunctions = (page.Functions ?? []).filter((fn) => fn.Runtime?.startsWith("nodejs"));
-    totalCodeSize += nodeJsFunctions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
-    functions.push(
-      ...nodeJsFunctions.map((fn) => fn.FunctionName).filter((fnName) => fnName !== undefined),
-    );
-  }
+  const functions = await getLambdaFunctions(client);
+  const totalCodeSize = functions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
 
   const functionCount = functions.length;
   if (functionCount === 0) {
@@ -51,7 +44,9 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
   );
 
   const limit = pLimit(Math.min(functionCount, cpus().length || 1));
-  await Promise.all(functions.map((fn) => limit(() => scanLambdaFunction(client, fn))));
+  await Promise.all(
+    functions.map((fn) => limit(() => scanLambdaFunction(client, fn.FunctionName!))),
+  );
 
   console.log("\nDone.");
 };

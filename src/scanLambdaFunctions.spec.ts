@@ -5,15 +5,16 @@ import { JS_SDK_V2_MARKER } from "./constants.ts";
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./scanLambdaFunction.ts");
 vi.mock("./utils/getDownloadConfirmation.ts");
+vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("node:os");
 vi.mock("p-limit");
 
-const mockPaginateListFunctions = vi.hoisted(() => vi.fn());
 const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
 const mockLambdaConstructor = vi.hoisted(() => vi.fn());
 const mockCpus = vi.hoisted(() => vi.fn());
 const mockPLimit = vi.hoisted(() => vi.fn());
 const mockGetDownloadConfirmation = vi.hoisted(() => vi.fn());
+const mockGetLambdaFunctions = vi.hoisted(() => vi.fn());
 
 vi.mock("@aws-sdk/client-lambda", () => ({
   Lambda: class {
@@ -24,7 +25,6 @@ vi.mock("@aws-sdk/client-lambda", () => ({
       region: vi.fn().mockResolvedValue("us-east-1"),
     };
   },
-  paginateListFunctions: mockPaginateListFunctions,
 }));
 
 vi.mock("./scanLambdaFunction.ts", () => ({
@@ -33,6 +33,10 @@ vi.mock("./scanLambdaFunction.ts", () => ({
 
 vi.mock("./utils/getDownloadConfirmation.ts", () => ({
   getDownloadConfirmation: mockGetDownloadConfirmation,
+}));
+
+vi.mock("./utils/getLambdaFunctions.ts", () => ({
+  getLambdaFunctions: mockGetLambdaFunctions,
 }));
 
 vi.mock("node:os", () => ({
@@ -54,7 +58,7 @@ describe(scanLambdaFunctions.name, () => {
   });
 
   it("exits early when no functions found", async () => {
-    mockPaginateListFunctions.mockReturnValue([{ Functions: [] }]);
+    mockGetLambdaFunctions.mockResolvedValue([]);
 
     await scanLambdaFunctions();
 
@@ -62,55 +66,9 @@ describe(scanLambdaFunctions.name, () => {
     expect(process.exit).toHaveBeenCalledWith(0);
   });
 
-  it("filters and scans only Node.js functions", async () => {
-    const functions = [
-      { FunctionName: "node-fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
-      { FunctionName: "python-fn", Runtime: "python3.9", CodeSize: 1000 },
-      { FunctionName: "node-fn-2", Runtime: "nodejs20.x", CodeSize: 1000 },
-      { FunctionName: "java-fn", Runtime: "java11", CodeSize: 1000 },
-    ];
-
-    mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
-
-    await scanLambdaFunctions();
-
-    expect(console.log).toHaveBeenCalledWith('Reading 2 functions from "us-east-1" region.');
-    expect(mockScanLambdaFunction).toHaveBeenCalledTimes(2);
-    expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "node-fn-1");
-    expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "node-fn-2");
-  });
-
-  it("handles functions without names", async () => {
-    const functions = [
-      { FunctionName: "valid-fn", Runtime: "nodejs18.x", CodeSize: 1000 },
-      { Runtime: "nodejs18.x", CodeSize: 1000 }, // No FunctionName
-      { FunctionName: undefined, Runtime: "nodejs18.x", CodeSize: 1000 },
-    ];
-
-    mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
-
-    await scanLambdaFunctions();
-
-    expect(mockScanLambdaFunction).toHaveBeenCalledTimes(1);
-    expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "valid-fn");
-  });
-
-  it("processes multiple pages of functions", async () => {
-    const page1 = { Functions: [{ FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 }] };
-    const page2 = { Functions: [{ FunctionName: "fn-2", Runtime: "nodejs20.x", CodeSize: 1000 }] };
-
-    mockPaginateListFunctions.mockReturnValue([page1, page2]);
-
-    await scanLambdaFunctions();
-
-    expect(mockScanLambdaFunction).toHaveBeenCalledTimes(2);
-    expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-1");
-    expect(mockScanLambdaFunction).toHaveBeenCalledWith(expect.any(Object), "fn-2");
-  });
-
   it("displays correct output messages", async () => {
     const functions = [{ FunctionName: "test-fn", Runtime: "nodejs18.x", CodeSize: 1000 }];
-    mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+    mockGetLambdaFunctions.mockResolvedValue(functions);
 
     await scanLambdaFunctions();
 
@@ -133,7 +91,7 @@ describe(scanLambdaFunctions.name, () => {
       { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
       { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 1000 },
     ];
-    mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+    mockGetLambdaFunctions.mockResolvedValue(functions);
 
     await scanLambdaFunctions();
 
@@ -141,7 +99,7 @@ describe(scanLambdaFunctions.name, () => {
   });
 
   it("creates Lambda client with specified region", async () => {
-    mockPaginateListFunctions.mockReturnValue([{ Functions: [] }]);
+    mockGetLambdaFunctions.mockResolvedValue([]);
 
     await scanLambdaFunctions({ region: "us-west-2" });
 
@@ -149,7 +107,7 @@ describe(scanLambdaFunctions.name, () => {
   });
 
   it("creates Lambda client with undefined region when not specified", async () => {
-    mockPaginateListFunctions.mockReturnValue([{ Functions: [] }]);
+    mockGetLambdaFunctions.mockResolvedValue([]);
 
     await scanLambdaFunctions();
 
@@ -162,7 +120,7 @@ describe(scanLambdaFunctions.name, () => {
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 2000 },
       ];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+      mockGetLambdaFunctions.mockResolvedValue(functions);
 
       await scanLambdaFunctions();
 
@@ -171,7 +129,7 @@ describe(scanLambdaFunctions.name, () => {
 
     it("skips confirmation when yes is true", async () => {
       const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 }];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+      mockGetLambdaFunctions.mockResolvedValue(functions);
 
       await scanLambdaFunctions({ yes: true });
 
@@ -183,7 +141,7 @@ describe(scanLambdaFunctions.name, () => {
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 4000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 5000 },
       ];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+      mockGetLambdaFunctions.mockResolvedValue(functions);
       mockGetDownloadConfirmation.mockResolvedValue(false);
 
       await scanLambdaFunctions();
@@ -203,7 +161,7 @@ describe(scanLambdaFunctions.name, () => {
         { FunctionName: "fn-3", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-4", Runtime: "nodejs18.x", CodeSize: 1000 },
       ];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+      mockGetLambdaFunctions.mockResolvedValue(functions);
 
       await scanLambdaFunctions();
 
@@ -213,7 +171,7 @@ describe(scanLambdaFunctions.name, () => {
     it("uses concurrency of 1 when CPU count is not available", async () => {
       mockCpus.mockReturnValue([]);
       const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 }];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+      mockGetLambdaFunctions.mockResolvedValue(functions);
 
       await scanLambdaFunctions();
 
@@ -226,7 +184,7 @@ describe(scanLambdaFunctions.name, () => {
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 1000 },
       ];
-      mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
+      mockGetLambdaFunctions.mockResolvedValue(functions);
 
       await scanLambdaFunctions();
 
