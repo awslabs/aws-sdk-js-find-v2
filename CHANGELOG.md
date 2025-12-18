@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.3.1
+
+### Patch Changes
+
+- Add prompt stating number of functions and download size ([6d1e84bf222847f660b117ede8fd38addce1dcf5](https://github.com/awslabs/aws-sdk-js-find-v2/commit/6d1e84bf222847f660b117ede8fd38addce1dcf5))
+
 ## 0.3.0
 
 ### Minor Changes
