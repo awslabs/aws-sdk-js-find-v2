@@ -2,7 +2,7 @@ import { createInterface } from "node:readline/promises";
 import { getHumanReadableBytes } from "./getHumanReadableBytes.ts";
 
 export const getDownloadConfirmation = async (
-  functionsLength: number,
+  functionCount: number,
   totalCodeSize: number,
 ): Promise<boolean> => {
   const rl = createInterface({
@@ -11,7 +11,7 @@ export const getDownloadConfirmation = async (
   });
 
   const answer = await rl.question(
-    `This script will process ${functionsLength} Lambda Node.js functions,` +
+    `This script will process ${functionCount} Lambda Node.js functions,` +
       `\nand download ${getHumanReadableBytes(totalCodeSize)} of compressed archives over the network.` +
       `\nDo you want to continue? (y/N): `,
   );

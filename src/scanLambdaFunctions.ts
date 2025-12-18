@@ -21,13 +21,14 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
     );
   }
 
-  if (functions.length === 0) {
+  const functionCount = functions.length;
+  if (functionCount === 0) {
     console.log("No functions found.");
     process.exit(0);
   }
 
   if (!yes) {
-    const confirmation = await getDownloadConfirmation(functions.length, totalCodeSize);
+    const confirmation = await getDownloadConfirmation(functionCount, totalCodeSize);
     console.log();
     if (!confirmation) {
       console.log("Exiting.");
@@ -46,10 +47,10 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
 
   const clientRegion = await client.config.region();
   console.log(
-    `Reading ${functions.length} function${functions.length > 1 ? "s" : ""} from "${clientRegion}" region.`,
+    `Reading ${functionCount} function${functionCount > 1 ? "s" : ""} from "${clientRegion}" region.`,
   );
 
-  const limit = pLimit(Math.min(functions.length, cpus().length || 1));
+  const limit = pLimit(Math.min(functionCount, cpus().length || 1));
   await Promise.all(functions.map((fn) => limit(() => scanLambdaFunction(client, fn))));
 
   console.log("\nDone.");
