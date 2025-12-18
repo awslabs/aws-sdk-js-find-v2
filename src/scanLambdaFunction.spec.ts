@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { JS_SDK_V2_MARKER } from "./constants.ts";
 import type { Lambda } from "@aws-sdk/client-lambda";
+
+// oxlint-disable-next-line sort-imports
+import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 
 vi.mock("./utils/downloadFile.ts");

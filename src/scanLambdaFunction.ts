@@ -2,14 +2,15 @@ import {
   type LambdaFunctionContents,
   getLambdaFunctionContents,
 } from "./utils/getLambdaFunctionContents.ts";
-import { JS_SDK_V2_MARKER } from "./constants.ts";
-import type { Lambda } from "@aws-sdk/client-lambda";
-import { downloadFile } from "./utils/downloadFile.ts";
-import { hasSdkV2InBundle } from "./utils/hasSdkV2InBundle.ts";
 
+import type { Lambda } from "@aws-sdk/client-lambda";
 import { join } from "node:path";
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
+
+import { JS_SDK_V2_MARKER } from "./constants.ts";
+import { downloadFile } from "./utils/downloadFile.ts";
+import { hasSdkV2InBundle } from "./utils/hasSdkV2InBundle.ts";
 
 export const scanLambdaFunction = async (client: Lambda, functionName: string) => {
   const response = await client.getFunction({ FunctionName: functionName });

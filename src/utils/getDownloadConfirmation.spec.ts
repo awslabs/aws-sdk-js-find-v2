@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { createInterface } from "node:readline/promises";
+
 import { getDownloadConfirmation } from "./getDownloadConfirmation.ts";
 
 vi.mock("node:readline/promises");

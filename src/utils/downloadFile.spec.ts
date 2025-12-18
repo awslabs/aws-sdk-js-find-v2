@@ -1,6 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { downloadFile } from "./downloadFile.ts";
 import { writeFile } from "node:fs/promises";
+
+// oxlint-disable-next-line https://github.com/oxc-project/oxc/issues/15990
+import { downloadFile } from "./downloadFile.ts";
 
 vi.mock("node:fs/promises");
 

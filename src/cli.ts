@@ -1,4 +1,5 @@
 import { Command } from "commander";
+
 import type { LambdaCommandOptions } from "./constants.ts";
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
