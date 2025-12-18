@@ -1,6 +1,6 @@
-import { writeFile } from "node:fs/promises";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 import { downloadFile } from "./downloadFile.ts";
+import { writeFile } from "node:fs/promises";
 
 vi.mock("node:fs/promises");
 

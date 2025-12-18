@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import { JS_SDK_V2_MARKER } from "./constants.ts";
+import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./scanLambdaFunction.ts");

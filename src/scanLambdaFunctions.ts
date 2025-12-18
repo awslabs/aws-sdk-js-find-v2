@@ -1,12 +1,10 @@
-import { Lambda } from "@aws-sdk/client-lambda";
-import pLimit from "p-limit";
-
-import { cpus } from "node:os";
-
 import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
-import { scanLambdaFunction } from "./scanLambdaFunction.ts";
+import { Lambda } from "@aws-sdk/client-lambda";
+import { cpus } from "node:os";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
+import pLimit from "p-limit";
+import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 
 export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions = {}) => {
   const client = new Lambda({ region });

@@ -1,7 +1,7 @@
 import { Command } from "commander";
+import type { LambdaCommandOptions } from "./constants.ts";
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
-import type { LambdaCommandOptions } from "./constants.ts";
 
 /**
  * Creates and configures the CLI program with available commands.

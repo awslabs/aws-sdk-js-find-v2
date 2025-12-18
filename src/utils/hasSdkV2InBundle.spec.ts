@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { readFileSync, readdirSync, statSync } from "fs";
-import { join } from "path";
 import { hasSdkV2InBundle } from "./hasSdkV2InBundle";
+import { join } from "path";
 
 describe("hasSdkV2InBundle", () => {
   const fixturesDir = join(__dirname, "__fixtures__");

@@ -1,7 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { createProgram } from "./cli.ts";
-import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import packageJson from "../package.json" with { type: "json" };
+import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
 describe("CLI", () => {
   beforeEach(() => {
