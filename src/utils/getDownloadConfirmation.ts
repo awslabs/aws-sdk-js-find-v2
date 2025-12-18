@@ -17,5 +17,5 @@ export const getDownloadConfirmation = async (
   );
   rl.close();
 
-  return ["y", "yes"].includes(answer.toLowerCase());
+  return ["y", "yes"].includes(answer.trim().toLowerCase());
 };
