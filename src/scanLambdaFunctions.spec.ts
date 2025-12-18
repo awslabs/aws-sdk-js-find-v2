@@ -158,12 +158,15 @@ describe(scanLambdaFunctions.name, () => {
 
   describe("download confirmation", () => {
     it("prompts for confirmation when yes is not set", async () => {
-      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 }];
+      const functions = [
+        { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
+        { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 2000 },
+      ];
       mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
 
       await scanLambdaFunctions();
 
-      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(1, 1000);
+      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 3000);
     });
 
     it("skips confirmation when yes is true", async () => {
@@ -176,13 +179,16 @@ describe(scanLambdaFunctions.name, () => {
     });
 
     it("exits when confirmation is declined", async () => {
-      const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 }];
+      const functions = [
+        { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 4000 },
+        { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 5000 },
+      ];
       mockPaginateListFunctions.mockReturnValue([{ Functions: functions }]);
       mockGetDownloadConfirmation.mockResolvedValue(false);
 
       await scanLambdaFunctions();
 
-      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(1, 1000);
+      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
       expect(process.exit).toHaveBeenCalledWith(0);
     });

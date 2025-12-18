@@ -15,7 +15,7 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
   const paginator = paginateListFunctions({ client }, {});
   for await (const page of paginator) {
     const nodeJsFunctions = (page.Functions ?? []).filter((fn) => fn.Runtime?.startsWith("nodejs"));
-    totalCodeSize += nodeJsFunctions.reduce((acc, fn) => acc + (fn.CodeSize || 0), totalCodeSize);
+    totalCodeSize += nodeJsFunctions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
     functions.push(
       ...nodeJsFunctions.map((fn) => fn.FunctionName).filter((fnName) => fnName !== undefined),
     );
