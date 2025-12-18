@@ -1,29 +1,36 @@
-import { Lambda, paginateListFunctions, type FunctionConfiguration } from "@aws-sdk/client-lambda";
-import { cpus } from "node:os";
+import { Lambda, paginateListFunctions } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
-import { JS_SDK_V2_MARKER } from "./constants.ts";
+import { cpus } from "node:os";
+
+import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
+import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 
-const getNodeJsFunctionNames = (functions: FunctionConfiguration[] | undefined) =>
-  (functions ?? [])
-    .filter((fn) => fn.Runtime?.startsWith("nodejs"))
-    .map((fn) => fn.FunctionName)
-    .filter((fnName): fnName is string => fnName !== undefined);
-
-export const scanLambdaFunctions = async (region?: string) => {
+export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions) => {
   const client = new Lambda({ region });
   const functions: string[] = [];
 
+  let totalCodeSize = 0;
   const paginator = paginateListFunctions({ client }, {});
   for await (const page of paginator) {
-    functions.push(...getNodeJsFunctionNames(page.Functions));
+    const nodeJsFunctions = (page.Functions ?? []).filter((fn) => fn.Runtime?.startsWith("nodejs"));
+    totalCodeSize += nodeJsFunctions.reduce((acc, fn) => acc + (fn.CodeSize || 0), totalCodeSize);
+    functions.push(...nodeJsFunctions.map((fn) => fn.FunctionName!));
   }
 
-  const functionsLength = functions.length;
-  if (functionsLength === 0) {
+  if (functions.length === 0) {
     console.log("No functions found.");
     process.exit(0);
+  }
+
+  if (!yes) {
+    const confirmation = await getDownloadConfirmation(functions.length, totalCodeSize);
+    console.log();
+    if (!confirmation) {
+      console.log("Exiting.");
+      process.exit(0);
+    }
   }
 
   console.log(`Note about output:`);
@@ -37,10 +44,10 @@ export const scanLambdaFunctions = async (region?: string) => {
 
   const clientRegion = await client.config.region();
   console.log(
-    `Reading ${functionsLength} function${functionsLength > 1 ? "s" : ""} from "${clientRegion}" region.`,
+    `Reading ${functions.length} function${functions.length > 1 ? "s" : ""} from "${clientRegion}" region.`,
   );
 
-  const limit = pLimit(Math.min(functionsLength, cpus().length || 1));
+  const limit = pLimit(Math.min(functions.length, cpus().length || 1));
   await Promise.all(functions.map((fn) => limit(() => scanLambdaFunction(client, fn))));
 
   console.log("\nDone.");

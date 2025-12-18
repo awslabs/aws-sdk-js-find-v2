@@ -3,3 +3,11 @@ export const JS_SDK_V2_MARKER = {
   N: "[N]",
   UNKNOWN: "[?]",
 };
+
+export interface LambdaCommandOptions {
+  // AWS region to scan
+  region?: string;
+
+  // answer yes for all prompts
+  yes?: boolean;
+}
