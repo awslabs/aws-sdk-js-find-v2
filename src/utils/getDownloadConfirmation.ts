@@ -6,6 +6,7 @@ import { getHumanReadableBytes } from "./getHumanReadableBytes.ts";
  *
  * @param functionCount - Number of Lambda functions to be processed
  * @param codeSizeToDownload - Total size of all function code in bytes
+ * @param codeSizeToSaveOnDisk - Maximum disk space used at any point
  * @returns Promise that resolves to boolean indicating user's choice
  * @description
  * - Creates interactive readline interface for user input
