@@ -11,6 +11,7 @@ describe("getHumanReadableBytes", () => {
     [1024 ** 3, "1 GB"],
     [1024 ** 4, "1 TB"],
     [1024 ** 5, "1 PB"],
+    [1024 ** 6, "1024 PB"],
     [1536, "1.5 KB"],
   ])("converts %i bytes to '%s'", (bytes, expected) => {
     expect(getHumanReadableBytes(bytes)).toBe(expected);
