@@ -124,7 +124,7 @@ describe(scanLambdaFunctions.name, () => {
 
       await scanLambdaFunctions();
 
-      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 3000);
+      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 3000, 3000);
     });
 
     it("skips confirmation when yes is true", async () => {
@@ -146,9 +146,25 @@ describe(scanLambdaFunctions.name, () => {
 
       await scanLambdaFunctions();
 
-      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 9000);
+      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
       expect(process.exit).toHaveBeenCalledWith(0);
+    });
+
+    it("calculates codeSizeToSaveOnDisk as sum of top N largest functions", async () => {
+      mockCpus.mockReturnValue([{}, {}]); // 2 CPUs = concurrency of 2
+      const functions = [
+        { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
+        { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 3000 },
+        { FunctionName: "fn-3", Runtime: "nodejs18.x", CodeSize: 2000 },
+        { FunctionName: "fn-4", Runtime: "nodejs18.x", CodeSize: 500 },
+      ];
+      mockGetLambdaFunctions.mockResolvedValue(functions);
+
+      await scanLambdaFunctions();
+
+      // Total download: 6500, disk: top 2 (3000 + 2000) = 5000
+      expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(4, 6500, 5000);
     });
   });
 

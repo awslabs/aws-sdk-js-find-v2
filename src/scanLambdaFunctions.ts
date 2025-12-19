@@ -12,16 +12,27 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
   const client = new Lambda({ region });
 
   const functions = await getLambdaFunctions(client);
-  const totalCodeSize = functions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
-
   const functionCount = functions.length;
+
+  const concurrency = Math.min(functionCount, cpus().length || 1);
+  const codeSizeToDownload = functions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
+  const codeSizeToSaveOnDisk = functions
+    .map((fn) => fn.CodeSize || 0)
+    .sort((a, b) => b - a)
+    .slice(0, concurrency)
+    .reduce((acc, size) => acc + size, 0);
+
   if (functionCount === 0) {
     console.log("No functions found.");
     process.exit(0);
   }
 
   if (!yes) {
-    const confirmation = await getDownloadConfirmation(functionCount, totalCodeSize);
+    const confirmation = await getDownloadConfirmation(
+      functionCount,
+      codeSizeToDownload,
+      codeSizeToSaveOnDisk,
+    );
     console.log();
     if (!confirmation) {
       console.log("Exiting.");
@@ -43,7 +54,7 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
     `Reading ${functionCount} function${functionCount > 1 ? "s" : ""} from "${clientRegion}" region.`,
   );
 
-  const limit = pLimit(Math.min(functionCount, cpus().length || 1));
+  const limit = pLimit(concurrency);
   await Promise.all(
     functions.map((fn) => limit(() => scanLambdaFunction(client, fn.FunctionName!))),
   );
