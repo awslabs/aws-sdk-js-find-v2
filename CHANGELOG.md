@@ -1,5 +1,12 @@
 # @aws-sdk/find-v2
 
+## 0.3.2
+
+### Patch Changes
+
+- Uses base-1000 conversion for SI units for human readable bytes ([1bce7a58a54cc36352810750e53f6b22acc04e1e](https://github.com/awslabs/aws-sdk-js-find-v2/commit/1bce7a58a54cc36352810750e53f6b22acc04e1e))
+- Share maximum disk space used by lambda command in prompt ([0f0edcbfab11a5984ebb5e74b2b1c9faa3ba96e7](https://github.com/awslabs/aws-sdk-js-find-v2/commit/0f0edcbfab11a5984ebb5e74b2b1c9faa3ba96e7))
+
 ## 0.3.1
 
 ### Patch Changes
