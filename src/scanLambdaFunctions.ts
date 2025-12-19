@@ -14,7 +14,7 @@ export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions 
   const functions = await getLambdaFunctions(client);
   const functionCount = functions.length;
 
-  const concurrency = Math.min(functionCount, cpus().length || 1);
+  const concurrency = Math.min(functionCount, cpus().length - 1 || 1);
   const codeSizeToDownload = functions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
   const codeSizeToSaveOnDisk = functions
     .map((fn) => fn.CodeSize || 0)

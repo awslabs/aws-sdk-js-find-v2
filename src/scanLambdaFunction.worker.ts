@@ -1,13 +1,13 @@
 import { parentPort, workerData } from "node:worker_threads";
-import { getLambdaFunctionContents } from "./utils/getLambdaFunctionContents.ts";
 import { hasSdkV2InBundle } from "./utils/hasSdkV2InBundle.ts";
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 
-const { zipPath } = workerData as { zipPath: string };
+const { packageJsonContents, bundleContent } = workerData as {
+  packageJsonContents: string[] | undefined;
+  bundleContent: string | undefined;
+};
 
-const scan = async () => {
-  const { packageJsonContents, bundleContent } = await getLambdaFunctionContents(zipPath);
-
+const scan = () => {
   if (packageJsonContents?.length) {
     for (const content of packageJsonContents) {
       try {
@@ -25,4 +25,4 @@ const scan = async () => {
   return JS_SDK_V2_MARKER.N;
 };
 
-scan().then((result) => parentPort?.postMessage(result));
+parentPort?.postMessage(scan());

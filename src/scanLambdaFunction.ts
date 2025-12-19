@@ -5,6 +5,7 @@ import { join } from "node:path";
 import { Worker } from "node:worker_threads";
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { downloadFile } from "./utils/downloadFile.ts";
+import { getLambdaFunctionContents } from "./utils/getLambdaFunctionContents.ts";
 
 export const scanLambdaFunction = async (client: Lambda, functionName: string) => {
   const response = await client.getFunction({ FunctionName: functionName });
@@ -16,9 +17,10 @@ export const scanLambdaFunction = async (client: Lambda, functionName: string) =
   const zipPath = join(tmpdir(), `${functionName}.zip`);
   try {
     await downloadFile(response.Code.Location, zipPath);
+    const { packageJsonContents, bundleContent } = await getLambdaFunctionContents(zipPath);
     const result = await new Promise<string>((resolve, reject) => {
       const worker = new Worker(new URL("./scanLambdaFunction.worker.js", import.meta.url), {
-        workerData: { zipPath },
+        workerData: { packageJsonContents, bundleContent },
       });
       worker.on("message", resolve);
       worker.on("error", reject);
