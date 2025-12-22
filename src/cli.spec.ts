@@ -158,6 +158,15 @@ describe("CLI", () => {
           "jobs must be a positive integer",
         );
       });
+
+      it("throws error for decimal value", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await expect(program.parseAsync(["node", "cli", "lambda", "-j", "1.5"])).rejects.toThrow(
+          "jobs must be a positive integer",
+        );
+      });
     });
 
     it("should not call scanLambdaFunctions when no command is provided", async () => {

@@ -28,8 +28,12 @@ export const createProgram = (): Command => {
       "-j, --jobs <count>",
       "number of jobs run at once; defaults to number of CPUs",
       (value) => {
-        const parsed = parseInt(value, 10);
-        if (!Number.isInteger(parsed) || parsed < 1) {
+        const trimmed = value.trim();
+        if (!/^\d+$/.test(trimmed)) {
+          throw new Error("jobs must be a positive integer");
+        }
+        const parsed = Number.parseInt(trimmed, 10);
+        if (parsed < 1) {
           throw new Error("jobs must be a positive integer");
         }
         return parsed;
