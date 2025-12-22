@@ -65,7 +65,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ region: "us-west-2", jobs: cpus().length });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          region: "us-west-2",
+          jobs: cpus().length,
+        });
       });
 
       it("with -r", async () => {
@@ -74,7 +77,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ region: "eu-west-1", jobs: cpus().length });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          region: "eu-west-1",
+          jobs: cpus().length,
+        });
       });
     });
 
