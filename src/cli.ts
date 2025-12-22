@@ -1,4 +1,6 @@
 import { Command } from "commander";
+import { cpus } from "node:os";
+
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import type { LambdaCommandOptions } from "./constants.ts";
@@ -22,6 +24,18 @@ export const createProgram = (): Command => {
     .description("Scans Lambda Node.js Functions for JavaScript SDK v2")
     .option("-r, --region <region>", "AWS region to scan")
     .option("-y, --yes", "answer yes for all prompts")
+    .option(
+      "-j, --jobs <count>",
+      "number of jobs run at once; defaults to number of CPUs",
+      (value) => {
+        const parsed = parseInt(value, 10);
+        if (!Number.isInteger(parsed) || parsed < 1) {
+          throw new Error("jobs must be a positive integer");
+        }
+        return parsed;
+      },
+      cpus().length,
+    )
     .action(async (options: LambdaCommandOptions) => {
       await scanLambdaFunctions(options);
     });

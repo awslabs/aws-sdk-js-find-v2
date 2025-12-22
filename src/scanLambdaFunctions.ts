@@ -1,20 +1,18 @@
 import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
-import { cpus } from "node:os";
-
 import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 
-export const scanLambdaFunctions = async ({ region, yes }: LambdaCommandOptions = {}) => {
+export const scanLambdaFunctions = async ({ region, yes, jobs }: LambdaCommandOptions = {}) => {
   const client = new Lambda({ region });
 
   const functions = await getLambdaFunctions(client);
   const functionCount = functions.length;
 
-  const concurrency = Math.min(functionCount, cpus().length || 1);
+  const concurrency = Math.min(functionCount, jobs || 1);
   const codeSizeToDownload = functions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
   const codeSizeToSaveOnDisk = functions
     .map((fn) => fn.CodeSize || 0)
