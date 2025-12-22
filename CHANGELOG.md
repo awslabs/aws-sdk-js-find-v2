@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.3.3
+
+### Patch Changes
+
+- Add option 'jobs' to control concurrency in lambda command ([26ee57508ea1fac31cd388d312559b0cd1a956f5](https://github.com/awslabs/aws-sdk-js-find-v2/commit/26ee57508ea1fac31cd388d312559b0cd1a956f5))
+
 ## 0.3.2
 
 ### Patch Changes
