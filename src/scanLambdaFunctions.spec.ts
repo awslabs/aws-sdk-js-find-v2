@@ -6,12 +6,10 @@ vi.mock("@aws-sdk/client-lambda");
 vi.mock("./scanLambdaFunction.ts");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
-vi.mock("node:os");
 vi.mock("p-limit");
 
 const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
 const mockLambdaConstructor = vi.hoisted(() => vi.fn());
-const mockCpus = vi.hoisted(() => vi.fn());
 const mockPLimit = vi.hoisted(() => vi.fn());
 const mockGetDownloadConfirmation = vi.hoisted(() => vi.fn());
 const mockGetLambdaFunctions = vi.hoisted(() => vi.fn());
@@ -39,10 +37,6 @@ vi.mock("./utils/getLambdaFunctions.ts", () => ({
   getLambdaFunctions: mockGetLambdaFunctions,
 }));
 
-vi.mock("node:os", () => ({
-  cpus: mockCpus,
-}));
-
 vi.mock("p-limit", () => ({
   default: mockPLimit,
 }));
@@ -52,7 +46,6 @@ describe(scanLambdaFunctions.name, () => {
     vi.clearAllMocks();
     console.log = vi.fn();
     process.exit = vi.fn() as any;
-    mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs by default
     mockPLimit.mockImplementation(() => (fn: () => Promise<void>) => fn());
     mockGetDownloadConfirmation.mockResolvedValue(true);
   });
@@ -122,7 +115,7 @@ describe(scanLambdaFunctions.name, () => {
       ];
       mockGetLambdaFunctions.mockResolvedValue(functions);
 
-      await scanLambdaFunctions();
+      await scanLambdaFunctions({ jobs: 4 });
 
       expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 3000, 3000);
     });
@@ -144,7 +137,7 @@ describe(scanLambdaFunctions.name, () => {
       mockGetLambdaFunctions.mockResolvedValue(functions);
       mockGetDownloadConfirmation.mockResolvedValue(false);
 
-      await scanLambdaFunctions();
+      await scanLambdaFunctions({ jobs: 4 });
 
       expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
@@ -152,7 +145,6 @@ describe(scanLambdaFunctions.name, () => {
     });
 
     it("calculates codeSizeToSaveOnDisk as sum of top N largest functions", async () => {
-      mockCpus.mockReturnValue([{}, {}]); // 2 CPUs = concurrency of 2
       const functions = [
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 3000 },
@@ -161,7 +153,7 @@ describe(scanLambdaFunctions.name, () => {
       ];
       mockGetLambdaFunctions.mockResolvedValue(functions);
 
-      await scanLambdaFunctions();
+      await scanLambdaFunctions({ jobs: 2 });
 
       // Total download: 6500, disk: top 2 (3000 + 2000) = 5000
       expect(mockGetDownloadConfirmation).toHaveBeenCalledWith(4, 6500, 5000);
@@ -169,8 +161,7 @@ describe(scanLambdaFunctions.name, () => {
   });
 
   describe("concurrency with p-limit", () => {
-    it("uses CPU count as concurrency when it's less than functions.length", async () => {
-      mockCpus.mockReturnValue([{}, {}]); // 2 CPUs
+    it("uses jobs as concurrency when less than functions.length", async () => {
       const functions = [
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 1000 },
@@ -179,13 +170,12 @@ describe(scanLambdaFunctions.name, () => {
       ];
       mockGetLambdaFunctions.mockResolvedValue(functions);
 
-      await scanLambdaFunctions();
+      await scanLambdaFunctions({ jobs: 2 });
 
       expect(mockPLimit).toHaveBeenCalledWith(2);
     });
 
-    it("uses concurrency of 1 when CPU count is not available", async () => {
-      mockCpus.mockReturnValue([]);
+    it("uses concurrency of 1 when jobs is not specified", async () => {
       const functions = [{ FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 }];
       mockGetLambdaFunctions.mockResolvedValue(functions);
 
@@ -194,15 +184,14 @@ describe(scanLambdaFunctions.name, () => {
       expect(mockPLimit).toHaveBeenCalledWith(1);
     });
 
-    it("uses functions.length as concurrency when less than CPU count", async () => {
-      mockCpus.mockReturnValue([{}, {}, {}, {}]); // 4 CPUs
+    it("uses functions.length as concurrency when less than jobs", async () => {
       const functions = [
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 1000 },
       ];
       mockGetLambdaFunctions.mockResolvedValue(functions);
 
-      await scanLambdaFunctions();
+      await scanLambdaFunctions({ jobs: 4 });
 
       expect(mockPLimit).toHaveBeenCalledWith(2);
     });

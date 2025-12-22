@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { cpus } from "node:os";
 import { createProgram } from "./cli.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import packageJson from "../package.json" with { type: "json" };
@@ -54,7 +55,7 @@ describe("CLI", () => {
       await program.parseAsync(["node", "cli", "lambda"]);
 
       expect(scanLambdaFunctions).toHaveBeenCalledTimes(1);
-      expect(scanLambdaFunctions).toHaveBeenCalledWith({});
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: cpus().length });
     });
 
     describe("should pass region option to scanLambdaFunctions", () => {
@@ -64,7 +65,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ region: "us-west-2" });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          region: "us-west-2",
+          jobs: cpus().length,
+        });
       });
 
       it("with -r", async () => {
@@ -73,7 +77,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ region: "eu-west-1" });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          region: "eu-west-1",
+          jobs: cpus().length,
+        });
       });
     });
 
@@ -84,7 +91,7 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "--yes"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true, jobs: cpus().length });
       });
 
       it("with -y", async () => {
@@ -93,7 +100,72 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "-y"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true, jobs: cpus().length });
+      });
+    });
+
+    describe("should pass jobs option to scanLambdaFunctions", () => {
+      it("with --jobs", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "--jobs", "4"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: 4 });
+      });
+
+      it("with -j", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "-j", "2"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: 2 });
+      });
+
+      it("defaults to number of CPUs", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: cpus().length });
+      });
+
+      it("throws error for non-integer value", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await expect(program.parseAsync(["node", "cli", "lambda", "-j", "abc"])).rejects.toThrow(
+          "jobs must be a positive integer",
+        );
+      });
+
+      it("throws error for zero", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await expect(program.parseAsync(["node", "cli", "lambda", "-j", "0"])).rejects.toThrow(
+          "jobs must be a positive integer",
+        );
+      });
+
+      it("throws error for negative value", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await expect(program.parseAsync(["node", "cli", "lambda", "-j", "-1"])).rejects.toThrow(
+          "jobs must be a positive integer",
+        );
+      });
+
+      it("throws error for decimal value", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await expect(program.parseAsync(["node", "cli", "lambda", "-j", "1.5"])).rejects.toThrow(
+          "jobs must be a positive integer",
+        );
       });
     });
 

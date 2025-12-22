@@ -10,4 +10,7 @@ export interface LambdaCommandOptions {
 
   // answer yes for all prompts
   yes?: boolean;
+
+  // number of jobs run at once; defaults to number of CPUs
+  jobs?: number;
 }
