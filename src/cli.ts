@@ -26,7 +26,7 @@ export const createProgram = (): Command => {
     .option("-y, --yes", "answer yes for all prompts")
     .option(
       "-j, --jobs <count>",
-      "number of parallel jobs, defaults to # of CPUs",
+      "number of parallel jobs",
       (value) => {
         const trimmed = value.trim();
         if (!/^\d+$/.test(trimmed)) {
