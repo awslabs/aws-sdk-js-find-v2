@@ -1,0 +1,14 @@
+import { build } from "esbuild";
+import { join } from "node:path";
+import { Extension, Version } from "./utils/constants.js";
+import { getFixturesDir } from "./utils/getFixturesDir.js";
+import { getInputPath } from "./utils/getInputPath.js";
+import { getOutputFilename } from "./utils/getOutputFilename.js";
+
+await build({
+  bundle: true,
+  minify: true,
+  entryPoints: [getInputPath(Version.v2)],
+  outfile: join(getFixturesDir(), getOutputFilename("esbuild", Version.v2, Extension.mjs)),
+  format: "esm",
+});
