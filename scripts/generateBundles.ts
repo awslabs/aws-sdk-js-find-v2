@@ -31,4 +31,5 @@ for (const fileName of jsFiles) {
 }
 
 const limit = pLimit(cpus().length || 1);
+// Promises are reversed, since slower bundlers (webpack, rollup) are added after faster ones (esbuild, rolldown).
 await Promise.all(promises.reverse().map((promise) => limit(promise)));
