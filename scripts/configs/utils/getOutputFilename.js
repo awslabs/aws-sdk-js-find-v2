@@ -1,2 +1,4 @@
-export const getOutputFilename = (bundler, version, extension) =>
-  [bundler, version, extension].join(".");
+import { Extension } from "./constants.js";
+
+export const getOutputFilename = (bundler, version, moduleSystem) =>
+  [bundler, version, Extension[moduleSystem]].join(".");
