@@ -9,6 +9,6 @@ export const ModuleSystem = {
 };
 
 export const Extension = {
-  [ModuleSystem.cjs]: "js",
+  [ModuleSystem.cjs]: "cjs",
   [ModuleSystem.esm]: "mjs",
 };
