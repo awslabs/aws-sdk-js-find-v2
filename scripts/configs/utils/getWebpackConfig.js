@@ -1,15 +1,9 @@
-import { join } from "node:path";
 import TerserPlugin from "terser-webpack-plugin";
 import webpack from "webpack";
 
-const outputPath = join(import.meta.dirname, "src", "utils", "__fixtures__");
-
-export default {
+export const getWebpackConfig = () => ({
   target: "node",
   mode: "production",
-  output: {
-    path: outputPath,
-  },
   optimization: {
     minimizer: [
       new TerserPlugin({
@@ -25,4 +19,4 @@ export default {
   experiments: {
     outputModule: true,
   },
-};
+});
