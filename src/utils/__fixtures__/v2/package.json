@@ -1,5 +1,6 @@
 {
   "name": "required-by-parcel",
+  "source": "index.js",
   "main": "../parcel.v2.cjs",
   "module": "../parcel.v2.mjs",
   "dependencies": {

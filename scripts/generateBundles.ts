@@ -5,7 +5,7 @@ import { cpus } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
-import { getInputPath } from "./configs/utils/getInputPath.js";
+import { getFixturesDir } from "./configs/utils/getFixturesDir.js";
 import { Version } from "./configs/utils/constants.js";
 
 const execAsync = promisify(exec);
@@ -47,7 +47,7 @@ for (const version of Object.values(Version)) {
     const bundlerName = "parcel";
     try {
       console.log(`[${bundlerName}] Running for '${version}'`);
-      execAsync(`npx parcel build ${getInputPath(version)} --no-cache`);
+      execAsync(`npx parcel build ${join(getFixturesDir(), version)} --no-cache`);
     } catch (error) {
       throw new Error(`[${bundlerName}] failed`, { cause: error });
     }
