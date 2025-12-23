@@ -1,8 +1,10 @@
+import TerserPlugin from "terser-webpack-plugin";
+import webpack from "webpack";
+
 import { Extension, ModuleSystem, Version } from "./utils/constants.js";
 import { getFixturesDir } from "./utils/getFixturesDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
-import { getWebpackConfig } from "./utils/getWebpackConfig.js";
 
 const LibraryType = {
   [ModuleSystem.cjs]: "commonjs2",
@@ -10,7 +12,23 @@ const LibraryType = {
 };
 
 const createConfig = (version, moduleSystem) => ({
-  ...getWebpackConfig(),
+  target: "node",
+  mode: "production",
+  optimization: {
+    minimizer: [
+      new TerserPlugin({
+        extractComments: false,
+      }),
+    ],
+  },
+  plugins: [
+    new webpack.optimize.LimitChunkCountPlugin({
+      maxChunks: 1,
+    }),
+  ],
+  experiments: {
+    outputModule: true,
+  },
   entry: getInputPath(version),
   output: {
     path: getFixturesDir(),
