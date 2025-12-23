@@ -4,10 +4,7 @@ on:
   pull_request:
     branches: [main]
     paths:
-      - scripts/generateBundles.ts
-      - rolldown.config.mjs
-      - rollup.config.mjs
-      - webpack.config.mjs
+      - scripts/**
       - yarn.lock
 
 jobs:
