@@ -1,24 +1,26 @@
 import { join } from "node:path";
 import { defineConfig } from "rolldown";
-import { Extension, Version } from "./utils/constants.js";
+import { Extension, ModuleSystem, Version } from "./utils/constants.js";
 import { getFixturesDir } from "./utils/getFixturesDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
-const createConfig = (version, extension, format) =>
+const createConfig = (version, moduleSystem) =>
   defineConfig({
     input: getInputPath(version),
     output: {
-      file: join(getFixturesDir(), getOutputFilename("rolldown", version, extension)),
-      format,
-      ...(version === Version.v3 && { inlineDynamicImports: true }),
+      file: join(getFixturesDir(), getOutputFilename("rolldown", version, Extension[moduleSystem])),
+      format: moduleSystem,
+      inlineDynamicImports: true,
       minify: true,
     },
   });
 
-export default [
-  createConfig(Version.v2, Extension.js, "cjs"),
-  createConfig(Version.v2, Extension.mjs, "esm"),
-  createConfig(Version.v3, Extension.js, "cjs"),
-  createConfig(Version.v3, Extension.mjs, "esm"),
-];
+const configs = [];
+for (const version of Object.values(Version)) {
+  for (const moduleSystem of Object.values(ModuleSystem)) {
+    configs.push(createConfig(version, moduleSystem));
+  }
+}
+
+export default configs;

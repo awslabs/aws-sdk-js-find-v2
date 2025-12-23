@@ -1,22 +1,29 @@
-import { Extension, Version } from "./utils/constants.js";
+import { Extension, ModuleSystem, Version } from "./utils/constants.js";
 import { getFixturesDir } from "./utils/getFixturesDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 import { getWebpackConfig } from "./utils/getWebpackConfig.js";
 
-const createConfig = (version, extension, libraryType) => ({
+const LibraryType = {
+  [ModuleSystem.cjs]: "commonjs2",
+  [ModuleSystem.esm]: "module",
+};
+
+const createConfig = (version, moduleSystem) => ({
   ...getWebpackConfig(),
   entry: getInputPath(version),
   output: {
     path: getFixturesDir(),
-    filename: getOutputFilename("webpack", version, extension),
-    library: { type: libraryType },
+    filename: getOutputFilename("webpack", version, Extension[moduleSystem]),
+    library: { type: LibraryType[moduleSystem] },
   },
 });
 
-export default [
-  createConfig(Version.v2, Extension.js, "commonjs2"),
-  createConfig(Version.v2, Extension.mjs, "module"),
-  createConfig(Version.v3, Extension.js, "commonjs2"),
-  createConfig(Version.v3, Extension.mjs, "module"),
-];
+const configs = [];
+for (const version of Object.values(Version)) {
+  for (const moduleSystem of Object.values(ModuleSystem)) {
+    configs.push(createConfig(version, moduleSystem));
+  }
+}
+
+export default configs;
