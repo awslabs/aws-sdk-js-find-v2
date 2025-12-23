@@ -1,8 +1,7 @@
 {
   "name": "required-by-parcel",
-  "source": "index.mjs",
-  "main": "../parcel.v2.cjs.js",
-  "module": "../parcel.v2.esm.js",
+  "main": "../parcel.v2.cjs",
+  "module": "../parcel.v2.mjs",
   "dependencies": {
     "aws-sdk": "^2.1693.0"
   },
