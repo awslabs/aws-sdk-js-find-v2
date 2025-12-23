@@ -7,10 +7,12 @@
   },
   "targets": {
     "main": {
+      "context": "node",
       "includeNodeModules": true,
       "sourceMap": false
     },
     "module": {
+      "context": "node",
       "includeNodeModules": true,
       "sourceMap": false
     }
