@@ -14,7 +14,6 @@
   "devDependencies": {
     "@aws-sdk/client-sts": "^3.946.0",
     "@changesets/cli": "^2.29.8",
-    "@parcel/bundler-default": "^2.16.3",
     "@rollup/plugin-commonjs": "^29.0.0",
     "@rollup/plugin-json": "^6.1.0",
     "@rollup/plugin-node-resolve": "^16.0.3",

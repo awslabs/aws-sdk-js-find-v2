@@ -16,10 +16,5 @@
       "includeNodeModules": true,
       "sourceMap": false
     }
-  },
-  "@parcel/bundler-default": {
-    "minBundles": 10000000,
-    "minBundleSize": 10000000,
-    "maxParallelRequests": 1
   }
 }
