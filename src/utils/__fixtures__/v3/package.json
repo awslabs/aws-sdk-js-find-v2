@@ -1,0 +1,17 @@
+{
+  "name": "required-by-parcel",
+  "source": "index.mjs",
+  "main": "../parcel.v3.cjs.js",
+  "module": "../parcel.v3.esm.js",
+  "dependencies": {
+    "@aws-sdk/client-sts": "^3.946.0"
+  },
+  "targets": {
+    "main": {
+      "includeNodeModules": true
+    },
+    "module": {
+      "includeNodeModules": true
+    }
+  }
+}

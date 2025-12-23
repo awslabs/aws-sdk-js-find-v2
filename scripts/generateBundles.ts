@@ -5,6 +5,9 @@ import { cpus } from "node:os";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
+import { getInputPath } from "./configs/utils/getInputPath.js";
+import { Version } from "./configs/utils/constants.js";
+
 const execAsync = promisify(exec);
 
 const configDir = join(import.meta.dirname, "configs");
@@ -38,6 +41,18 @@ for (const fileName of jsFiles) {
   });
 }
 
+// Parcel uses configuration from package.json
+for (const version of Object.values(Version)) {
+  promises.push(async () => {
+    const bundlerName = "parcel";
+    try {
+      console.log(`[${bundlerName}] Running for '${version}'`);
+      execAsync(`npx parcel build ${getInputPath(version)} --no-source-maps`);
+    } catch (error) {
+      throw new Error(`[${bundlerName}] failed`, { cause: error });
+    }
+  });
+}
+
 const limit = pLimit(cpus().length || 1);
-// Promises are reversed, since slower bundlers (webpack, rollup) are added after faster ones (esbuild, rolldown).
-await Promise.all(promises.reverse().map((promise) => limit(promise)));
+await Promise.all(promises.map((promise) => limit(promise)));
