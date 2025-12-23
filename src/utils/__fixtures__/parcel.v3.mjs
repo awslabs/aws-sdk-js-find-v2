@@ -1,0 +1,1 @@
+import{STSClient as e,GetCallerIdentityCommand as t}from"@aws-sdk/client-sts";let n=new e,s=async()=>n.send(new t);export{s as handler};
