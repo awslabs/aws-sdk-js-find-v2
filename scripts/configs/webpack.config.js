@@ -14,21 +14,9 @@ const LibraryType = {
 const createConfig = (version, moduleSystem) => ({
   target: "node",
   mode: "production",
-  optimization: {
-    minimizer: [
-      new TerserPlugin({
-        extractComments: false,
-      }),
-    ],
-  },
-  plugins: [
-    new webpack.optimize.LimitChunkCountPlugin({
-      maxChunks: 1,
-    }),
-  ],
-  experiments: {
-    outputModule: true,
-  },
+  optimization: { minimizer: [new TerserPlugin({ extractComments: false })] },
+  plugins: [new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
+  experiments: { outputModule: true },
   entry: getInputPath(version),
   output: {
     path: getFixturesDir(),
