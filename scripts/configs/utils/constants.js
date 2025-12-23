@@ -3,7 +3,12 @@ export const Version = {
   v3: "v3",
 };
 
+export const ModuleSystem = {
+  cjs: "cjs",
+  esm: "esm",
+};
+
 export const Extension = {
-  js: "js",
-  mjs: "mjs",
+  [ModuleSystem.cjs]: "js",
+  [ModuleSystem.esm]: "mjs",
 };
