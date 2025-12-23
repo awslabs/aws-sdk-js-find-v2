@@ -1,5 +1,6 @@
 import { build } from "esbuild";
 import { join } from "node:path";
+
 import { ModuleSystem, Version } from "./utils/constants.js";
 import { getFixturesDir } from "./utils/getFixturesDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
