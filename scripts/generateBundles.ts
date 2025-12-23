@@ -47,7 +47,7 @@ for (const version of Object.values(Version)) {
     const bundlerName = "parcel";
     try {
       console.log(`[${bundlerName}] Running for '${version}'`);
-      execAsync(`npx parcel build ${getInputPath(version)} --no-source-maps`);
+      execAsync(`npx parcel build ${getInputPath(version)}`);
     } catch (error) {
       throw new Error(`[${bundlerName}] failed`, { cause: error });
     }
