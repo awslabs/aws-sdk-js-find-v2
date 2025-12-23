@@ -369,6 +369,7 @@ __metadata:
     "@aws-sdk/client-lambda": "npm:^3.942.0"
     "@aws-sdk/client-sts": "npm:^3.946.0"
     "@changesets/cli": "npm:^2.29.8"
+    "@parcel/bundler-default": "npm:^2.16.3"
     "@rollup/plugin-commonjs": "npm:^29.0.0"
     "@rollup/plugin-json": "npm:^6.1.0"
     "@rollup/plugin-node-resolve": "npm:^16.0.3"
@@ -1640,7 +1641,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@parcel/bundler-default@npm:2.16.3":
+"@parcel/bundler-default@npm:2.16.3, @parcel/bundler-default@npm:^2.16.3":
   version: 2.16.3
   resolution: "@parcel/bundler-default@npm:2.16.3"
   dependencies:
