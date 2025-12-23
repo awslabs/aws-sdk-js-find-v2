@@ -9,13 +9,13 @@
   "targets": {
     "main": {
       "context": "node",
-      "includeNodeModules": true,
+      "includeNodeModules": false,
       "optimize": true,
       "sourceMap": false
     },
     "module": {
       "context": "node",
-      "includeNodeModules": true,
+      "includeNodeModules": false,
       "optimize": true,
       "sourceMap": false
     }
