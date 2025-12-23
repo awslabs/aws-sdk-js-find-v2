@@ -31,4 +31,4 @@ for (const fileName of jsFiles) {
 }
 
 const limit = pLimit(cpus().length || 1);
-await Promise.all(promises.map((promise) => limit(promise)));
+await Promise.all(promises.reverse().map((promise) => limit(promise)));
