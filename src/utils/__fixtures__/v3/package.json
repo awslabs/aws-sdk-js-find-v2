@@ -1,5 +1,6 @@
 {
   "name": "required-by-parcel",
+  "source": "lib/index.js",
   "main": "../parcel.v3.cjs",
   "module": "../parcel.v3.mjs",
   "dependencies": {
@@ -9,11 +10,13 @@
     "main": {
       "context": "node",
       "includeNodeModules": true,
+      "optimize": true,
       "sourceMap": false
     },
     "module": {
       "context": "node",
       "includeNodeModules": true,
+      "optimize": true,
       "sourceMap": false
     }
   }
