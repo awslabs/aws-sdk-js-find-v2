@@ -14,7 +14,7 @@ describe("hasSdkV2InBundle", () => {
   }
 
   files.forEach((file) => {
-    const hasV2 = file.endsWith("v2.js") || file.endsWith("v2.mjs");
+    const hasV2 = file.endsWith("v2.cjs") || file.endsWith("v2.mjs");
     it(`returns '${hasV2 ? "true" : "false"}' for '${file}'`, () => {
       const content = readFileSync(join(fixturesDir, file), "utf-8");
       expect(hasSdkV2InBundle(content)).toBe(hasV2);
