@@ -1,8 +1,8 @@
-import {STSClient as $2qsul$STSClient, GetCallerIdentityCommand as $2qsul$GetCallerIdentityCommand} from "@aws-sdk/client-sts";
+import {STSClient as $89kMf$STSClient, GetCallerIdentityCommand as $89kMf$GetCallerIdentityCommand} from "@aws-sdk/client-sts";
 
 
-const $4411d4be9676e056$var$client = new (0, $2qsul$STSClient)();
-const $4411d4be9676e056$export$c3c52e219617878 = async ()=>$4411d4be9676e056$var$client.send(new (0, $2qsul$GetCallerIdentityCommand)());
+const $a1824f2350e24476$var$client = new (0, $89kMf$STSClient)();
+const $a1824f2350e24476$export$c3c52e219617878 = async ()=>$a1824f2350e24476$var$client.send(new (0, $89kMf$GetCallerIdentityCommand)());
 
 
-export {$4411d4be9676e056$export$c3c52e219617878 as handler};
+export {$a1824f2350e24476$export$c3c52e219617878 as handler};
