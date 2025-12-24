@@ -13,16 +13,8 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - name: corepack
-        run: npm i -g corepack
-      - uses: actions/setup-node@v6
-        with:
-          node-version: 24.x
-          cache: "yarn"
-      - name: install
-        run: yarn
       - name: test generate bundles
-        run: yarn test:generate:bundles
+        run: sh scripts/generateBundles.sh
       - name: check for changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
