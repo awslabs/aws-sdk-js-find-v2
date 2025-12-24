@@ -10,11 +10,13 @@
     "main": {
       "context": "node",
       "includeNodeModules": true,
+      "optimize": true,
       "sourceMap": false
     },
     "module": {
       "context": "node",
       "includeNodeModules": true,
+      "optimize": true,
       "sourceMap": false
     }
   }
