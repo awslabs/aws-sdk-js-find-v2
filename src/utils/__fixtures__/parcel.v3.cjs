@@ -1,1 +1,13 @@
-var $lI8qy$awssdkclientsts=require("@aws-sdk/client-sts");function $parcel$export(e,t,$,c){Object.defineProperty(e,t,{get:$,set:c,enumerable:!0,configurable:!0})}$parcel$export(module.exports,"handler",()=>$43a30e3361dc826b$export$c3c52e219617878);const $43a30e3361dc826b$var$client=new(0,$lI8qy$awssdkclientsts.STSClient),$43a30e3361dc826b$export$c3c52e219617878=async()=>$43a30e3361dc826b$var$client.send(new(0,$lI8qy$awssdkclientsts.GetCallerIdentityCommand));
+var $5GwW3$awssdkclientsts = require("@aws-sdk/client-sts");
+
+
+function $parcel$export(e, n, v, s) {
+  Object.defineProperty(e, n, {get: v, set: s, enumerable: true, configurable: true});
+}
+
+$parcel$export(module.exports, "handler", () => $938e6321027dc68a$export$c3c52e219617878);
+
+const $938e6321027dc68a$var$client = new (0, $5GwW3$awssdkclientsts.STSClient)();
+const $938e6321027dc68a$export$c3c52e219617878 = async ()=>$938e6321027dc68a$var$client.send(new (0, $5GwW3$awssdkclientsts.GetCallerIdentityCommand)());
+
+
