@@ -37,7 +37,7 @@
     "lint": "oxlint src/**/*.ts",
     "format": "oxfmt",
     "test": "vitest",
-    "test:generate:bundles": "node scripts/generateBundles.ts",
+    "test:generate:bundles": "sh scripts/generateBundles.sh",
     "release": "yarn build && changeset publish"
   },
   "repository": {
