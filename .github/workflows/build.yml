@@ -19,6 +19,8 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
           cache: "yarn"
+      - name: system info
+        run: npx envinfo --system | grep -E "OS:|CPU:"
       - name: install
         run: yarn
       - name: lint
