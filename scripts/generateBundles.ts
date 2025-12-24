@@ -15,25 +15,21 @@ for (const fileName of jsFiles) {
 
   if (bundlerName === "esbuild") {
     // esbuild doesn't support config.
-    promises.push(async () => {
-      try {
-        console.log(`[${bundlerName}] Running with code '${fileName}'`);
-        await execAsync(`node ${filePath}`);
-      } catch (error) {
+    console.log(`[${bundlerName}] Running with code '${fileName}'`);
+    promises.push(
+      execAsync(`node ${filePath}`).catch((error) => {
         throw new Error(`[${bundlerName}] failed`, { cause: error });
-      }
-    });
+      }),
+    );
     continue;
   }
 
-  promises.push(async () => {
-    try {
-      console.log(`[${bundlerName}] Running with config '${fileName}'`);
-      await execAsync(`npx ${bundlerName} -c ${filePath}`);
-    } catch (error) {
+  console.log(`[${bundlerName}] Running with config '${fileName}'`);
+  promises.push(
+    execAsync(`npx ${bundlerName} -c ${filePath}`).catch((error) => {
       throw new Error(`[${bundlerName}] failed`, { cause: error });
-    }
-  });
+    }),
+  );
 }
 
-await Promise.all(promises.map((promise) => promise()));
+await Promise.all(promises);
