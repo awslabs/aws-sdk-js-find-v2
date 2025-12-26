@@ -4,7 +4,7 @@ import { downloadFile } from "./downloadFile.ts";
 
 vi.mock("node:fs/promises");
 
-describe(downloadFile.name, () => {
+describe("downloadFile", () => {
   const mockUrl = "https://example.com/file.zip";
   const mockOutputPath = "/tmp/file.zip";
 

@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
+import { beforeEach, describe, it, expect, vi } from "vitest";
 import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
 
 const mockZip = {
@@ -17,7 +17,7 @@ vi.mock("node-stream-zip", () => ({
   },
 }));
 
-describe(getLambdaFunctionContents.name, () => {
+describe("getLambdaFunctionContents", () => {
   const mockZipPath = "/path/to/file.zip";
   const mockPackageJson = '{"name":"test"}';
   const mockBundle = "bundle content";
@@ -26,16 +26,13 @@ describe(getLambdaFunctionContents.name, () => {
     vi.clearAllMocks();
   });
 
-  afterEach(() => {
-    expect(mockZip.close).toHaveBeenCalled();
-  });
-
   it("returns empty object when zip entries can't be read", async () => {
     mockZip.entries.mockRejectedValue(new Error("zip entries error"));
     const result = await getLambdaFunctionContents(mockZipPath);
 
     expect(result).toEqual({});
     expect(mockZip.entryData).not.toHaveBeenCalled();
+    expect(mockZip.close).toHaveBeenCalled();
   });
 
   describe("returns empty object when entry data can't be read", () => {
@@ -50,6 +47,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({});
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("with only index.js", async () => {
@@ -63,6 +61,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({});
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.js");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("with both package.json and index.js", async () => {
@@ -78,6 +77,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
       expect(mockZip.entryData).toHaveBeenNthCalledWith(2, "index.js");
+      expect(mockZip.close).toHaveBeenCalled();
     });
   });
 
@@ -97,6 +97,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({ packageJsonContents: [mockPackageJson] });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("skips node_modules directory", async () => {
@@ -114,6 +115,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
       expect(mockZip.entryData).not.toHaveBeenCalledWith("node_modules/package.json");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("skips package.json directory", async () => {
@@ -125,6 +127,7 @@ describe(getLambdaFunctionContents.name, () => {
 
       expect(result).toEqual({});
       expect(mockZip.entryData).not.toHaveBeenCalled();
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("returns multiple package.json files", async () => {
@@ -150,6 +153,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
       expect(mockZip.entryData).toHaveBeenNthCalledWith(2, "packages/app/package.json");
+      expect(mockZip.close).toHaveBeenCalled();
     });
   });
 
@@ -168,6 +172,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({ bundleContent: mockBundle });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.js");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("returns bundleContent for index.mjs file when index.js not present", async () => {
@@ -180,6 +185,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({ bundleContent: mockBundle });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.mjs");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("returns bundleContent for index.cjs file when index.js/mjs not present", async () => {
@@ -192,6 +198,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({ bundleContent: mockBundle });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.cjs");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("prefers index.js over index.mjs/cjs when all are present", async () => {
@@ -206,6 +213,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({ bundleContent: mockBundle });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.js");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("prefers index.mjs over index.cjs when both are present", async () => {
@@ -219,6 +227,7 @@ describe(getLambdaFunctionContents.name, () => {
       expect(result).toEqual({ bundleContent: mockBundle });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.mjs");
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("skips index.js/mjs/cjs if they're not files", async () => {
@@ -232,6 +241,7 @@ describe(getLambdaFunctionContents.name, () => {
 
       expect(result).toEqual({});
       expect(mockZip.entryData).not.toHaveBeenCalled();
+      expect(mockZip.close).toHaveBeenCalled();
     });
 
     it("returns empty object when no package.json or index.js/mjs/cjs", async () => {
@@ -243,6 +253,7 @@ describe(getLambdaFunctionContents.name, () => {
 
       expect(result).toEqual({});
       expect(mockZip.entryData).not.toHaveBeenCalled();
+      expect(mockZip.close).toHaveBeenCalled();
     });
   });
 });

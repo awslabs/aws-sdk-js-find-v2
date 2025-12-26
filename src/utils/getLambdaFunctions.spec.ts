@@ -8,7 +8,7 @@ vi.mock("@aws-sdk/client-lambda", () => ({
 import type { Paginator } from "@smithy/types";
 import { type ListFunctionsCommandOutput, paginateListFunctions } from "@aws-sdk/client-lambda";
 
-describe(getLambdaFunctions.name, () => {
+describe("getLambdaFunctions", () => {
   const mockClient = {} as any;
 
   it("returns empty array when no functions", async () => {
