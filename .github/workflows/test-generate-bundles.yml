@@ -6,6 +6,7 @@ on:
     paths:
       - scripts/**
       - yarn.lock
+      - .github/workflows/test-generate-bundles.yml
 
 jobs:
   test-generate-bundles:
