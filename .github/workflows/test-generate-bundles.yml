@@ -6,9 +6,12 @@ on:
     paths:
       - scripts/**
       - yarn.lock
+      - .github/workflows/test-generate-bundles.yml
 
 jobs:
   test-generate-bundles:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
