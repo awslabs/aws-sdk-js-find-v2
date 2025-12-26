@@ -13,7 +13,7 @@ vi.mock("./utils/downloadFile.ts");
 vi.mock("./utils/getLambdaFunctionContents.ts");
 vi.mock("./utils/hasSdkV2InBundle.ts");
 
-describe(scanLambdaFunction.name, () => {
+describe("scanLambdaFunction", () => {
   const mockClient = {
     getFunction: vi.fn(),
   } as unknown as Lambda;

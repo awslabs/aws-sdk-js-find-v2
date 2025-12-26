@@ -17,7 +17,7 @@ vi.mock("node-stream-zip", () => ({
   },
 }));
 
-describe(getLambdaFunctionContents.name, () => {
+describe("getLambdaFunctionContents", () => {
   const mockZipPath = "/path/to/file.zip";
   const mockPackageJson = '{"name":"test"}';
   const mockBundle = "bundle content";

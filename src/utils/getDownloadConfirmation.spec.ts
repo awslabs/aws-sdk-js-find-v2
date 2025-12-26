@@ -4,7 +4,7 @@ import { getDownloadConfirmation } from "./getDownloadConfirmation.ts";
 
 vi.mock("node:readline/promises");
 
-describe(getDownloadConfirmation.name, () => {
+describe("getDownloadConfirmation", () => {
   const mockClose = vi.fn();
   const mockQuestion = vi.fn();
 

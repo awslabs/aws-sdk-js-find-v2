@@ -14,7 +14,7 @@ vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("p-limit");
 
-describe(scanLambdaFunctions.name, () => {
+describe("scanLambdaFunctions", () => {
   beforeEach(() => {
     vi.clearAllMocks();
 
