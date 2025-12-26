@@ -1,5 +1,10 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Lambda } from "@aws-sdk/client-lambda";
+import pLimit from "p-limit";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
+import { scanLambdaFunction } from "./scanLambdaFunction.ts";
+import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
+import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 
 vi.mock("@aws-sdk/client-lambda");
@@ -8,38 +13,17 @@ vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("p-limit");
 
-const mockScanLambdaFunction = vi.hoisted(() => vi.fn());
-const mockLambdaConstructor = vi.hoisted(() => vi.fn());
-const mockPLimit = vi.hoisted(() => vi.fn());
-const mockGetDownloadConfirmation = vi.hoisted(() => vi.fn());
-const mockGetLambdaFunctions = vi.hoisted(() => vi.fn());
+const mockLambdaConstructor = vi.fn();
+vi.mocked(Lambda, true).mockImplementation(function (this: any, config?: any) {
+  mockLambdaConstructor(config);
+  this.config = { region: vi.fn().mockResolvedValue("us-east-1") };
+  return this;
+} as any);
 
-vi.mock("@aws-sdk/client-lambda", () => ({
-  Lambda: class {
-    constructor(config?: any) {
-      mockLambdaConstructor(config);
-    }
-    config = {
-      region: vi.fn().mockResolvedValue("us-east-1"),
-    };
-  },
-}));
-
-vi.mock("./scanLambdaFunction.ts", () => ({
-  scanLambdaFunction: mockScanLambdaFunction,
-}));
-
-vi.mock("./utils/getDownloadConfirmation.ts", () => ({
-  getDownloadConfirmation: mockGetDownloadConfirmation,
-}));
-
-vi.mock("./utils/getLambdaFunctions.ts", () => ({
-  getLambdaFunctions: mockGetLambdaFunctions,
-}));
-
-vi.mock("p-limit", () => ({
-  default: mockPLimit,
-}));
+const mockScanLambdaFunction = vi.mocked(scanLambdaFunction);
+const mockGetDownloadConfirmation = vi.mocked(getDownloadConfirmation);
+const mockGetLambdaFunctions = vi.mocked(getLambdaFunctions);
+const mockPLimit = vi.mocked(pLimit);
 
 describe(scanLambdaFunctions.name, () => {
   beforeEach(() => {
