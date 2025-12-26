@@ -1,16 +1,17 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
 import { rm } from "node:fs/promises";
 import { beforeEach, describe, expect, it, vi } from "vitest";
+
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 import { downloadFile } from "./utils/downloadFile.ts";
 import { getLambdaFunctionContents } from "./utils/getLambdaFunctionContents.ts";
 import { hasSdkV2InBundle } from "./utils/hasSdkV2InBundle.ts";
 
-vi.mock("node:fs/promises", () => ({ rm: vi.fn() }));
-vi.mock("./utils/downloadFile.ts", () => ({ downloadFile: vi.fn() }));
-vi.mock("./utils/getLambdaFunctionContents.ts", () => ({ getLambdaFunctionContents: vi.fn() }));
-vi.mock("./utils/hasSdkV2InBundle.ts", () => ({ hasSdkV2InBundle: vi.fn() }));
+vi.mock("node:fs/promises");
+vi.mock("./utils/downloadFile.ts");
+vi.mock("./utils/getLambdaFunctionContents.ts");
+vi.mock("./utils/hasSdkV2InBundle.ts");
 
 describe(scanLambdaFunction.name, () => {
   const mockClient = {
@@ -41,7 +42,6 @@ describe(scanLambdaFunction.name, () => {
 
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       packageJsonContents: ['{"dependencies":{"aws-sdk":"^2.0.0"}}'],
-      bundleContent: null,
     });
 
     await scanLambdaFunction(mockClient, functionName);
