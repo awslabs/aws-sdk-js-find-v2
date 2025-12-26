@@ -1,0 +1,21 @@
+name: CodeQL
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  analyze:
+    runs-on: ubuntu-latest
+    permissions:
+      security-events: write
+    steps:
+      - uses: actions/checkout@v6
+      - uses: github/codeql-action/init@v4
+        with:
+          languages: javascript-typescript, actions
+          config: |
+            paths-ignore:
+              - src/utils/__fixtures__/*.cjs
+              - src/utils/__fixtures__/*.mjs
+      - uses: github/codeql-action/analyze@v4
