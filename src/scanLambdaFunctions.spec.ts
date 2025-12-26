@@ -100,7 +100,7 @@ describe(scanLambdaFunctions.name, () => {
 
       await scanLambdaFunctions({ jobs: 4 });
 
-      expect(vi.mocked(getDownloadConfirmation)).toHaveBeenCalledWith(2, 3000, 3000);
+      expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 3000, 3000);
     });
 
     it("skips confirmation when yes is true", async () => {
@@ -111,7 +111,7 @@ describe(scanLambdaFunctions.name, () => {
 
       await scanLambdaFunctions({ yes: true });
 
-      expect(vi.mocked(getDownloadConfirmation)).not.toHaveBeenCalled();
+      expect(getDownloadConfirmation).not.toHaveBeenCalled();
     });
 
     it("exits when confirmation is declined", async () => {
@@ -124,7 +124,7 @@ describe(scanLambdaFunctions.name, () => {
 
       await scanLambdaFunctions({ jobs: 4 });
 
-      expect(vi.mocked(getDownloadConfirmation)).toHaveBeenCalledWith(2, 9000, 9000);
+      expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
       expect(process.exit).toHaveBeenCalledWith(0);
     });
@@ -141,7 +141,7 @@ describe(scanLambdaFunctions.name, () => {
       await scanLambdaFunctions({ jobs: 2 });
 
       // Total download: 6500, disk: top 2 (3000 + 2000) = 5000
-      expect(vi.mocked(getDownloadConfirmation)).toHaveBeenCalledWith(4, 6500, 5000);
+      expect(getDownloadConfirmation).toHaveBeenCalledWith(4, 6500, 5000);
     });
   });
 
