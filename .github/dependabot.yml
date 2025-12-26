@@ -5,3 +5,7 @@ updates:
     schedule:
       interval: "monthly"
     versioning-strategy: "lockfile-only"
+    groups:
+      all-dependencies:
+        patterns:
+          - "*"
