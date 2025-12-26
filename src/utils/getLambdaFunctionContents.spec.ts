@@ -1,13 +1,11 @@
 import { afterEach, beforeEach, describe, it, expect, vi } from "vitest";
 import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
 
-const { mockZip } = vi.hoisted(() => ({
-  mockZip: {
-    entries: vi.fn(),
-    entryData: vi.fn(),
-    close: vi.fn(),
-  },
-}));
+const mockZip = {
+  entries: vi.fn(),
+  entryData: vi.fn(),
+  close: vi.fn(),
+};
 
 vi.mock("node-stream-zip", () => ({
   default: {

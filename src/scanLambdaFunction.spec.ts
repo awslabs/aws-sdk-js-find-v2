@@ -1,33 +1,17 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { describe, it, expect, vi, beforeEach } from "vitest";
-import { scanLambdaFunction } from "./scanLambdaFunction.ts";
-import { JS_SDK_V2_MARKER } from "./constants.ts";
+import { rm } from "node:fs/promises";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 
+import { JS_SDK_V2_MARKER } from "./constants.ts";
+import { scanLambdaFunction } from "./scanLambdaFunction.ts";
+import { downloadFile } from "./utils/downloadFile.ts";
+import { getLambdaFunctionContents } from "./utils/getLambdaFunctionContents.ts";
+import { hasSdkV2InBundle } from "./utils/hasSdkV2InBundle.ts";
+
+vi.mock("node:fs/promises");
 vi.mock("./utils/downloadFile.ts");
 vi.mock("./utils/getLambdaFunctionContents.ts");
 vi.mock("./utils/hasSdkV2InBundle.ts");
-vi.mock("node:fs/promises");
-
-const mockDownloadFile = vi.hoisted(() => vi.fn());
-const mockGetLambdaFunctionContents = vi.hoisted(() => vi.fn());
-const mockHasSdkV2InBundle = vi.hoisted(() => vi.fn());
-const mockRm = vi.hoisted(() => vi.fn());
-
-vi.mock("./utils/downloadFile.ts", () => ({
-  downloadFile: mockDownloadFile,
-}));
-
-vi.mock("./utils/getLambdaFunctionContents.ts", () => ({
-  getLambdaFunctionContents: mockGetLambdaFunctionContents,
-}));
-
-vi.mock("./utils/hasSdkV2InBundle.ts", () => ({
-  hasSdkV2InBundle: mockHasSdkV2InBundle,
-}));
-
-vi.mock("node:fs/promises", () => ({
-  rm: mockRm,
-}));
 
 describe(scanLambdaFunction.name, () => {
   const mockClient = {
@@ -56,19 +40,18 @@ describe(scanLambdaFunction.name, () => {
       Code: { Location: codeLocation },
     });
 
-    mockGetLambdaFunctionContents.mockResolvedValue({
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       packageJsonContents: ['{"dependencies":{"aws-sdk":"^2.0.0"}}'],
-      bundleContent: null,
     });
 
     await scanLambdaFunction(mockClient, functionName);
 
-    expect(mockDownloadFile).toHaveBeenCalledWith(
+    expect(downloadFile).toHaveBeenCalledWith(
       codeLocation,
       expect.stringMatching(new RegExp(functionName + ".zip$")),
     );
     expect(console.log).toHaveBeenCalledWith(`${JS_SDK_V2_MARKER.Y} ${functionName}`);
-    expect(mockRm).toHaveBeenCalled();
+    expect(rm).toHaveBeenCalled();
   });
 
   it("detects aws-sdk in bundle content when not in package.json", async () => {
@@ -76,16 +59,16 @@ describe(scanLambdaFunction.name, () => {
       Code: { Location: codeLocation },
     });
 
-    mockGetLambdaFunctionContents.mockResolvedValue({
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       packageJsonContents: ['{"dependencies":{}}'],
       bundleContent: "some bundle content",
     });
 
-    mockHasSdkV2InBundle.mockReturnValue(true);
+    vi.mocked(hasSdkV2InBundle).mockReturnValue(true);
 
     await scanLambdaFunction(mockClient, functionName);
 
-    expect(mockHasSdkV2InBundle).toHaveBeenCalledWith("some bundle content");
+    expect(hasSdkV2InBundle).toHaveBeenCalledWith("some bundle content");
     expect(console.log).toHaveBeenCalledWith(`${JS_SDK_V2_MARKER.Y} ${functionName}`);
   });
 
@@ -94,12 +77,12 @@ describe(scanLambdaFunction.name, () => {
       Code: { Location: codeLocation },
     });
 
-    mockGetLambdaFunctionContents.mockResolvedValue({
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       packageJsonContents: ['{"dependencies":{}}'],
       bundleContent: "some bundle content",
     });
 
-    mockHasSdkV2InBundle.mockReturnValue(false);
+    vi.mocked(hasSdkV2InBundle).mockReturnValue(false);
 
     await scanLambdaFunction(mockClient, functionName);
 
@@ -111,12 +94,12 @@ describe(scanLambdaFunction.name, () => {
       Code: { Location: codeLocation },
     });
 
-    mockGetLambdaFunctionContents.mockResolvedValue({
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       packageJsonContents: ["invalid json"],
       bundleContent: "some bundle content",
     });
 
-    mockHasSdkV2InBundle.mockReturnValue(false);
+    vi.mocked(hasSdkV2InBundle).mockReturnValue(false);
 
     await scanLambdaFunction(mockClient, functionName);
 
@@ -128,10 +111,10 @@ describe(scanLambdaFunction.name, () => {
       Code: { Location: codeLocation },
     });
 
-    mockDownloadFile.mockRejectedValue(new Error("Download failed"));
+    vi.mocked(downloadFile).mockRejectedValue(new Error("Download failed"));
 
     await expect(scanLambdaFunction(mockClient, functionName)).rejects.toThrow("Download failed");
-    expect(mockRm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
       force: true,
     });
   });
