@@ -17,7 +17,5 @@ jobs:
         with:
           languages: javascript-typescript, actions
           config: |
-            paths-ignore:
-              - src/utils/__fixtures__/*.cjs
-              - src/utils/__fixtures__/*.mjs
+            paths-ignore: [ "src/utils/__fixtures__/*.{cjs,mjs}" ]
       - uses: github/codeql-action/analyze@v4
