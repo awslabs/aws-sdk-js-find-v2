@@ -9,6 +9,8 @@ on:
 
 jobs:
   test-generate-bundles:
+    permissions:
+      contents: read
     runs-on: ubuntu-latest
 
     steps:
