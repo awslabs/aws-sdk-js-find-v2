@@ -40,7 +40,9 @@ describe("getLambdaFunctionScanOutput", () => {
   it("detects aws-sdk in package.json dependencies", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      packageJsonContents: ['{"dependencies":{"aws-sdk":"^2.0.0"}}'],
+      packageJsonFiles: [
+        { path: "package.json", content: '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
+      ],
     });
 
     const result = await getLambdaFunctionScanOutput(mockClient, { functionName, region });
@@ -49,7 +51,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       ContainsAwsSdkJsV2: true,
-      AwsSdkJsV2Location: "Defined in package.json dependencies.",
+      AwsSdkJsV2Location: "Defined in dependencies of 'package.json'",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
     expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
@@ -61,8 +63,8 @@ describe("getLambdaFunctionScanOutput", () => {
   it("detects aws-sdk in bundle content when not in package.json", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      packageJsonContents: ['{"dependencies":{}}'],
-      bundleContent: "some bundle content",
+      packageJsonFiles: [{ path: "package.json", content: '{"dependencies":{}}' }],
+      bundleFile: { path: "index.js", content: "some bundle content" },
     });
     vi.mocked(hasSdkV2InBundle).mockReturnValue(true);
 
@@ -72,7 +74,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       ContainsAwsSdkJsV2: true,
-      AwsSdkJsV2Location: "Bundled in index file.",
+      AwsSdkJsV2Location: "Bundled in 'index.js'",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
     expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
@@ -84,8 +86,8 @@ describe("getLambdaFunctionScanOutput", () => {
   it("returns false when aws-sdk not found", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      packageJsonContents: ['{"dependencies":{}}'],
-      bundleContent: "some bundle content",
+      packageJsonFiles: [{ path: "package.json", content: '{"dependencies":{}}' }],
+      bundleFile: { path: "index.js", content: "some bundle content" },
     });
     vi.mocked(hasSdkV2InBundle).mockReturnValue(false);
 
@@ -106,7 +108,7 @@ describe("getLambdaFunctionScanOutput", () => {
   it("returns error for invalid package.json", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      packageJsonContents: ["invalid json"],
+      packageJsonFiles: [{ path: "package.json", content: "invalid json" }],
     });
 
     const result = await getLambdaFunctionScanOutput(mockClient, { functionName, region });
@@ -116,7 +118,7 @@ describe("getLambdaFunctionScanOutput", () => {
       Region: region,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error:
-        "Error parsing package.json: Unexpected token 'i', \"invalid json\" is not valid JSON",
+        "Error parsing 'package.json': Unexpected token 'i', \"invalid json\" is not valid JSON",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
     expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
