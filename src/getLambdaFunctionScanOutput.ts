@@ -1,5 +1,4 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { JS_SDK_V2_MARKER } from "./constants.ts";
 import { downloadFile } from "./utils/downloadFile.ts";
 import {
   getLambdaFunctionContents,
