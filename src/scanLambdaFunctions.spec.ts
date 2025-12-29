@@ -6,7 +6,6 @@ import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
-import { JS_SDK_V2_MARKER } from "./constants.ts";
 
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./getLambdaFunctionScanOutput.ts");
@@ -35,43 +34,22 @@ describe("scanLambdaFunctions", () => {
 
     await scanLambdaFunctions();
 
-    expect(console.log).toHaveBeenCalledWith("No functions found.");
+    expect(console.log).toHaveBeenCalledWith("[]");
     expect(process.exit).toHaveBeenCalledWith(0);
     expect(getLambdaFunctionScanOutput).not.toHaveBeenCalled();
   });
 
-  it("displays correct output messages", async () => {
+  it("outputs JSON result", async () => {
     const functions = [
       { FunctionName: "test-fn", Runtime: "nodejs18.x", CodeSize: 1000 },
     ] as FunctionConfiguration[];
+    const scanOutput = { FunctionName: "test-fn", Region: "us-east-1", ContainsAwsSdkJsV2: false };
     vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
+    vi.mocked(getLambdaFunctionScanOutput).mockResolvedValue(scanOutput);
 
     await scanLambdaFunctions();
 
-    expect(console.log).toHaveBeenCalledWith("Note about output:");
-    expect(console.log).toHaveBeenCalledWith(
-      `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`,
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      `- ${JS_SDK_V2_MARKER.N} means "aws-sdk" is not found in Lambda function.`,
-    );
-    expect(console.log).toHaveBeenCalledWith(
-      `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`,
-    );
-    expect(console.log).toHaveBeenCalledWith('Reading 1 function from "us-east-1" region.');
-    expect(console.log).toHaveBeenCalledWith("\nDone.");
-  });
-
-  it("uses correct plural form for multiple functions", async () => {
-    const functions = [
-      { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
-      { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 1000 },
-    ] as FunctionConfiguration[];
-    vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
-
-    await scanLambdaFunctions();
-
-    expect(console.log).toHaveBeenCalledWith('Reading 2 functions from "us-east-1" region.');
+    expect(console.log).toHaveBeenCalledWith(JSON.stringify([scanOutput], null, 2));
   });
 
   it("creates Lambda client with specified region", async () => {

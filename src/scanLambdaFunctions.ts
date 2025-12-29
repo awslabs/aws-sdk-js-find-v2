@@ -1,7 +1,7 @@
 import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
-import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
+import { type LambdaCommandOptions } from "./constants.ts";
 import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
@@ -21,7 +21,7 @@ export const scanLambdaFunctions = async ({ region, yes, jobs }: LambdaCommandOp
     .reduce((acc, size) => acc + size, 0);
 
   if (functionCount === 0) {
-    console.log("No functions found.");
+    console.log("[]");
     process.exit(0);
   }
 

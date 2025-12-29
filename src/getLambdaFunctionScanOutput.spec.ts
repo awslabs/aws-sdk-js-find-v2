@@ -52,7 +52,9 @@ describe("getLambdaFunctionScanOutput", () => {
       AwsSdkJsV2Location: "Defined in package.json dependencies.",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), { force: true });
+    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+      force: true,
+    });
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
   });
 
@@ -73,7 +75,9 @@ describe("getLambdaFunctionScanOutput", () => {
       AwsSdkJsV2Location: "Bundled in index file.",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), { force: true });
+    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+      force: true,
+    });
     expect(hasSdkV2InBundle).toHaveBeenCalledWith("some bundle content");
   });
 
@@ -93,7 +97,9 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: false,
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), { force: true });
+    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+      force: true,
+    });
     expect(hasSdkV2InBundle).toHaveBeenCalledWith("some bundle content");
   });
 
@@ -112,7 +118,9 @@ describe("getLambdaFunctionScanOutput", () => {
       AwsSdkJsV2Error: "Error parsing package.json.",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), { force: true });
+    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+      force: true,
+    });
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
   });
 
@@ -124,7 +132,9 @@ describe("getLambdaFunctionScanOutput", () => {
       "Download failed",
     );
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), { force: true });
+    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
+      force: true,
+    });
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
   });
 });
