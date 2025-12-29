@@ -68,6 +68,22 @@ describe("scanLambdaFunctions", () => {
     expect(Lambda).toHaveBeenCalledWith({ region: undefined });
   });
 
+  it("creates Lambda client with specified profile", async () => {
+    vi.mocked(getLambdaFunctions).mockResolvedValue([]);
+
+    await scanLambdaFunctions({ profile: "dev" });
+
+    expect(Lambda).toHaveBeenCalledWith({ profile: "dev" });
+  });
+
+  it("creates Lambda client with undefined profile when not specified", async () => {
+    vi.mocked(getLambdaFunctions).mockResolvedValue([]);
+
+    await scanLambdaFunctions();
+
+    expect(Lambda).toHaveBeenCalledWith({ profile: undefined });
+  });
+
   describe("download confirmation", () => {
     it("prompts for confirmation when yes is not set", async () => {
       const functions = [
