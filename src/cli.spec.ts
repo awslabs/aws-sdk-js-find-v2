@@ -5,6 +5,11 @@ import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import packageJson from "../package.json" with { type: "json" };
 
 describe("CLI", () => {
+  const mockOptions = {
+    yes: false,
+    jobs: cpus().length,
+  };
+
   beforeEach(() => {
     vi.clearAllMocks();
     vi.mock("./scanLambdaFunctions.ts", () => ({
@@ -55,7 +60,7 @@ describe("CLI", () => {
       await program.parseAsync(["node", "cli", "lambda"]);
 
       expect(scanLambdaFunctions).toHaveBeenCalledTimes(1);
-      expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: cpus().length });
+      expect(scanLambdaFunctions).toHaveBeenCalledWith(mockOptions);
     });
 
     describe("should pass region option to scanLambdaFunctions", () => {
@@ -66,8 +71,8 @@ describe("CLI", () => {
         await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
 
         expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
           region: "us-west-2",
-          jobs: cpus().length,
         });
       });
 
@@ -78,8 +83,8 @@ describe("CLI", () => {
         await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
 
         expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
           region: "eu-west-1",
-          jobs: cpus().length,
         });
       });
     });
@@ -92,8 +97,8 @@ describe("CLI", () => {
         await program.parseAsync(["node", "cli", "lambda", "--profile", "dev"]);
 
         expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
           profile: "dev",
-          jobs: cpus().length,
         });
       });
 
@@ -104,8 +109,8 @@ describe("CLI", () => {
         await program.parseAsync(["node", "cli", "lambda", "-p", "prod"]);
 
         expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
           profile: "prod",
-          jobs: cpus().length,
         });
       });
     });
@@ -117,7 +122,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "--yes"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true, jobs: cpus().length });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
+          yes: true,
+        });
       });
 
       it("with -y", async () => {
@@ -126,7 +134,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "-y"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ yes: true, jobs: cpus().length });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
+          yes: true,
+        });
       });
     });
 
@@ -137,7 +148,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "--jobs", "4"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: 4 });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
+          jobs: 4,
+        });
       });
 
       it("with -j", async () => {
@@ -146,7 +160,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "-j", "2"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: 2 });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
+          jobs: 2,
+        });
       });
 
       it("defaults to number of CPUs", async () => {
@@ -155,7 +172,10 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({ jobs: cpus().length });
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
+          jobs: cpus().length,
+        });
       });
 
       it("throws error for non-integer value", async () => {
