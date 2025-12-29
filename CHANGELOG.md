@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.4.2
+
+### Patch Changes
+
+- Display file path in location and errors ([75c8dc8008d43d82117937448dc9efcd5e4df38c](https://github.com/awslabs/aws-sdk-js-find-v2/commit/75c8dc8008d43d82117937448dc9efcd5e4df38c))
+
 ## 0.4.1
 
 ### Patch Changes
