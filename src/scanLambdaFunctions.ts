@@ -2,7 +2,7 @@ import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
 import { JS_SDK_V2_MARKER, type LambdaCommandOptions } from "./constants.ts";
-import { scanLambdaFunction } from "./scanLambdaFunction.ts";
+import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 
@@ -54,7 +54,7 @@ export const scanLambdaFunctions = async ({ region, yes, jobs }: LambdaCommandOp
 
   const limit = pLimit(concurrency);
   await Promise.all(
-    functions.map((fn) => limit(() => scanLambdaFunction(client, fn.FunctionName!))),
+    functions.map((fn) => limit(() => getLambdaFunctionScanOutput(client, fn.FunctionName!))),
   );
 
   console.log("\nDone.");

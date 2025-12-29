@@ -2,14 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type FunctionConfiguration, Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
-import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
-import { scanLambdaFunction } from "./scanLambdaFunction.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
+import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
+import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import { JS_SDK_V2_MARKER } from "./constants.ts";
 
 vi.mock("@aws-sdk/client-lambda");
-vi.mock("./scanLambdaFunction.ts");
+vi.mock("./getLambdaFunctionScanOutput.ts");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("p-limit");
@@ -37,7 +37,7 @@ describe("scanLambdaFunctions", () => {
 
     expect(console.log).toHaveBeenCalledWith("No functions found.");
     expect(process.exit).toHaveBeenCalledWith(0);
-    expect(scanLambdaFunction).not.toHaveBeenCalled();
+    expect(getLambdaFunctionScanOutput).not.toHaveBeenCalled();
   });
 
   it("displays correct output messages", async () => {
