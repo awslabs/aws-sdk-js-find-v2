@@ -14,11 +14,14 @@ export interface ScanLambdaFunctionsOptions {
 
   // number of jobs run at once; defaults to number of CPUs
   jobs?: number;
+
+  // AWS profile to use from credentials or config file.
+  profile?: string;
 }
 
 export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions = {}) => {
-  const { region, yes, jobs } = options;
-  const client = new Lambda({ region });
+  const { region, yes, jobs, profile } = options;
+  const client = new Lambda({ region, profile });
 
   const functions = await getLambdaFunctions(client);
   const functionCount = functions.length;
