@@ -21,7 +21,10 @@ export interface ScanLambdaFunctionsOptions {
 
 export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions = {}) => {
   const { region, yes, jobs, profile } = options;
-  const client = new Lambda({ region, profile });
+  const client = new Lambda({
+    ...(region && { region }),
+    ...(profile && { profile }),
+  });
 
   const functions = await getLambdaFunctions(client);
   const functionCount = functions.length;

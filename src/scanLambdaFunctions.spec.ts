@@ -65,7 +65,7 @@ describe("scanLambdaFunctions", () => {
 
     await scanLambdaFunctions();
 
-    expect(Lambda).toHaveBeenCalledWith({ region: undefined });
+    expect(Lambda).toHaveBeenCalledWith({});
   });
 
   it("creates Lambda client with specified profile", async () => {
@@ -81,7 +81,7 @@ describe("scanLambdaFunctions", () => {
 
     await scanLambdaFunctions();
 
-    expect(Lambda).toHaveBeenCalledWith({ profile: undefined });
+    expect(Lambda).toHaveBeenCalledWith({});
   });
 
   describe("download confirmation", () => {
