@@ -1,12 +1,23 @@
 import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
-import { type LambdaCommandOptions } from "./constants.ts";
 import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 
-export const scanLambdaFunctions = async ({ region, yes, jobs }: LambdaCommandOptions = {}) => {
+export interface ScanLambdaFunctionsOptions {
+  // AWS region to scan
+  region?: string;
+
+  // answer yes for all prompts
+  yes?: boolean;
+
+  // number of jobs run at once; defaults to number of CPUs
+  jobs?: number;
+}
+
+export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions = {}) => {
+  const { region, yes, jobs } = options;
   const client = new Lambda({ region });
 
   const functions = await getLambdaFunctions(client);

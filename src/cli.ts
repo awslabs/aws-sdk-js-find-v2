@@ -2,8 +2,7 @@ import { Command } from "commander";
 import { cpus } from "node:os";
 
 import packageJson from "../package.json" with { type: "json" };
-import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
-import type { LambdaCommandOptions } from "./constants.ts";
+import { scanLambdaFunctions, type ScanLambdaFunctionsOptions } from "./scanLambdaFunctions.ts";
 
 /**
  * Creates and configures the CLI program with available commands.
@@ -40,7 +39,7 @@ export const createProgram = (): Command => {
       },
       cpus().length,
     )
-    .action(async (options: LambdaCommandOptions) => {
+    .action(async (options: ScanLambdaFunctionsOptions) => {
       await scanLambdaFunctions(options);
     });
   return program;
