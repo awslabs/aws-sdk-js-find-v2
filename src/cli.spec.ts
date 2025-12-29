@@ -91,7 +91,7 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "--profile", "dev"]);
 
-        expect(vi.mocked(scanLambdaFunctions).mock.calls[0][0]).toEqual({
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
           profile: "dev",
           jobs: cpus().length,
         });
@@ -103,7 +103,7 @@ describe("CLI", () => {
 
         await program.parseAsync(["node", "cli", "lambda", "-p", "prod"]);
 
-        expect(vi.mocked(scanLambdaFunctions).mock.calls[0][0]).toEqual({
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
           profile: "prod",
           jobs: cpus().length,
         });
