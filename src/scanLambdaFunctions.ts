@@ -19,12 +19,15 @@ export interface ScanLambdaFunctionsOptions {
   // AWS profile to use from credentials or config file.
   profile?: string;
 
+  // output type to produce
+  output: LambdaCommandOutputType;
+
   // maximum number of jobs to run concurrently; caller must provide this value
   jobs: number;
 }
 
 export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) => {
-  const { yes, region, profile, jobs } = options;
+  const { yes, region, profile, output, jobs } = options;
   const client = new Lambda({
     ...(region && { region }),
     ...(profile && { profile }),
@@ -62,7 +65,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
   const clientRegion = await client.config.region();
 
   const limit = pLimit(concurrency);
-  const output = await Promise.all(
+  const scanOutput = await Promise.all(
     functions.map((fn) =>
       limit(() =>
         getLambdaFunctionScanOutput(client, {
@@ -73,5 +76,5 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     ),
   );
 
-  printLambdaCommandOutput(output, LambdaCommandOutputType.json);
+  printLambdaCommandOutput(scanOutput, output);
 };
