@@ -21,8 +21,9 @@ export const createProgram = (): Command => {
   program
     .command("lambda")
     .description("Scans Lambda Node.js Functions for JavaScript SDK v2")
-    .option("-r, --region <region>", "AWS region to scan")
     .option("-y, --yes", "answer yes for all prompts")
+    .option("-r, --region <region>", "AWS region to scan")
+    .option("-p, --profile <profile>", "AWS profile to use")
     .option(
       "-j, --jobs <count>",
       "number of parallel jobs",

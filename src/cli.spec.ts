@@ -84,6 +84,32 @@ describe("CLI", () => {
       });
     });
 
+    describe("should pass profile option to scanLambdaFunctions", () => {
+      it("with --profile", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "--profile", "dev"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          profile: "dev",
+          jobs: cpus().length,
+        });
+      });
+
+      it("with -p", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "-p", "prod"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          profile: "prod",
+          jobs: cpus().length,
+        });
+      });
+    });
+
     describe("should pass yes option to scanLambdaFunctions", () => {
       it("with --yes", async () => {
         const program = createProgram();
