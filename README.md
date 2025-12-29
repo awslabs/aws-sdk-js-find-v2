@@ -32,20 +32,31 @@ Commands:
 Run `lambda` command to scan Lambda Node.js Functions for JavaScript SDK v2.
 
 ```console
-$ npx @aws-sdk/find-v2 lambda
-
-Note about output:
-- [Y] means "aws-sdk" is found in Lambda function, and migration is recommended.
-- [N] means "aws-sdk" is not found in Lambda function.
-- [?] means script was not able to proceed, and it emits reason.
-
-Reading 4 functions from "us-east-2" region.
-[N] fn-without-aws-sdk-in-bundle
-[Y] fn-with-aws-sdk-in-bundle
-[Y] fn-with-aws-sdk-in-package-json-deps
-[N] fn-without-aws-sdk-in-package-json-deps
-
-Done.
+$ npx @aws-sdk/find-v2 lambda --yes
+[
+  {
+    "FunctionName": "fn-without-aws-sdk-in-bundle",
+    "Region": "us-east-2",
+    "ContainsAwsSdkJsV2": false
+  },
+  {
+    "FunctionName": "fn-with-aws-sdk-in-bundle",
+    "Region": "us-east-2",
+    "ContainsAwsSdkJsV2": true,
+    "AwsSdkJsV2Location": "Bundled in index file."
+  },
+  {
+    "FunctionName": "fn-with-aws-sdk-in-package-json-deps",
+    "Region": "us-east-2",
+    "ContainsAwsSdkJsV2": true,
+    "AwsSdkJsV2Location": "Defined in package.json dependencies."
+  },
+  {
+    "FunctionName": "fn-without-aws-sdk-in-package-json-deps",
+    "Region": "us-east-2",
+    "ContainsAwsSdkJsV2": false
+  }
+]
 ```
 
 This script requires AWS Managed Policy [AWSLambda_ReadOnlyAccess][].
