@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.4.0
+
+### Minor Changes
+
+- Return lambda command result in JSON format ([7f4b999f0066cb8cd0490b0d0f05e489401af097](https://github.com/awslabs/aws-sdk-js-find-v2/commit/7f4b999f0066cb8cd0490b0d0f05e489401af097))
+
 ## 0.3.3
 
 ### Patch Changes
