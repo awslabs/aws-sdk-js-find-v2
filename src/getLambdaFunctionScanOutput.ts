@@ -79,8 +79,11 @@ export const getLambdaFunctionScanOutput = async (
           output.AwsSdkJsV2Location = "Defined in package.json dependencies.";
           return output;
         }
-      } catch {
-        output.AwsSdkJsV2Error = "Error parsing package.json.";
+      } catch (error) {
+        output.AwsSdkJsV2Error =
+          error instanceof Error
+            ? `Error parsing package.json: ${error.message}`
+            : "Error parsing package.json";
         return output;
       }
     }

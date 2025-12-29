@@ -115,7 +115,8 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       ContainsAwsSdkJsV2: null,
-      AwsSdkJsV2Error: "Error parsing package.json.",
+      AwsSdkJsV2Error:
+        "Error parsing package.json: Unexpected token 'i', \"invalid json\" is not valid JSON",
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
     expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
