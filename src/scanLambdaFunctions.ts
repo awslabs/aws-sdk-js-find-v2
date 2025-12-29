@@ -1,9 +1,9 @@
 import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
-import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
+import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
 
 export interface ScanLambdaFunctionsOptions {
   // AWS region to scan

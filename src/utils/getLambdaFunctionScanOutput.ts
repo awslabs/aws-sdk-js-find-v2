@@ -1,10 +1,10 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { downloadFile } from "./utils/downloadFile.ts";
+import { downloadFile } from "./downloadFile.ts";
 import {
   getLambdaFunctionContents,
   type LambdaFunctionContents,
-} from "./utils/getLambdaFunctionContents.ts";
-import { hasSdkV2InBundle } from "./utils/hasSdkV2InBundle.ts";
+} from "./getLambdaFunctionContents.ts";
+import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
