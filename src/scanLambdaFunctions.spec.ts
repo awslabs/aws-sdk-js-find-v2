@@ -14,6 +14,8 @@ vi.mock("./utils/getLambdaFunctionScanOutput.ts");
 vi.mock("p-limit");
 
 describe("scanLambdaFunctions", () => {
+  const mockOptions = { jobs: 1 };
+
   beforeEach(() => {
     vi.clearAllMocks();
 
@@ -32,7 +34,7 @@ describe("scanLambdaFunctions", () => {
   it("exits early when no functions found", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
-    await scanLambdaFunctions();
+    await scanLambdaFunctions(mockOptions);
 
     expect(console.log).toHaveBeenCalledWith("[]");
     expect(process.exit).toHaveBeenCalledWith(0);
@@ -47,7 +49,7 @@ describe("scanLambdaFunctions", () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
     vi.mocked(getLambdaFunctionScanOutput).mockResolvedValue(scanOutput);
 
-    await scanLambdaFunctions();
+    await scanLambdaFunctions(mockOptions);
 
     expect(console.log).toHaveBeenCalledWith(JSON.stringify([scanOutput], null, 2));
   });
@@ -55,7 +57,7 @@ describe("scanLambdaFunctions", () => {
   it("creates Lambda client with specified region", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
-    await scanLambdaFunctions({ region: "us-west-2" });
+    await scanLambdaFunctions({ ...mockOptions, region: "us-west-2" });
 
     expect(Lambda).toHaveBeenCalledWith({ region: "us-west-2" });
   });
@@ -63,7 +65,7 @@ describe("scanLambdaFunctions", () => {
   it("creates Lambda client with undefined region when not specified", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
-    await scanLambdaFunctions();
+    await scanLambdaFunctions(mockOptions);
 
     expect(Lambda).toHaveBeenCalledWith({});
   });
@@ -71,7 +73,7 @@ describe("scanLambdaFunctions", () => {
   it("creates Lambda client with specified profile", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
-    await scanLambdaFunctions({ profile: "dev" });
+    await scanLambdaFunctions({ ...mockOptions, profile: "dev" });
 
     expect(Lambda).toHaveBeenCalledWith({ profile: "dev" });
   });
@@ -79,7 +81,7 @@ describe("scanLambdaFunctions", () => {
   it("creates Lambda client with undefined profile when not specified", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
-    await scanLambdaFunctions();
+    await scanLambdaFunctions(mockOptions);
 
     expect(Lambda).toHaveBeenCalledWith({});
   });
@@ -92,7 +94,7 @@ describe("scanLambdaFunctions", () => {
       ] as FunctionConfiguration[];
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
 
-      await scanLambdaFunctions({ jobs: 4 });
+      await scanLambdaFunctions({ ...mockOptions, jobs: 4 });
 
       expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 3000, 3000);
     });
@@ -103,7 +105,7 @@ describe("scanLambdaFunctions", () => {
       ] as FunctionConfiguration[];
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
 
-      await scanLambdaFunctions({ yes: true });
+      await scanLambdaFunctions({ ...mockOptions, yes: true });
 
       expect(getDownloadConfirmation).not.toHaveBeenCalled();
     });
@@ -116,7 +118,7 @@ describe("scanLambdaFunctions", () => {
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
       vi.mocked(getDownloadConfirmation).mockResolvedValue(false);
 
-      await scanLambdaFunctions({ jobs: 4 });
+      await scanLambdaFunctions({ ...mockOptions, jobs: 4 });
 
       expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
@@ -132,7 +134,7 @@ describe("scanLambdaFunctions", () => {
       ] as FunctionConfiguration[];
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
 
-      await scanLambdaFunctions({ jobs: 2 });
+      await scanLambdaFunctions({ ...mockOptions, jobs: 2 });
 
       // Total download: 6500, disk: top 2 (3000 + 2000) = 5000
       expect(getDownloadConfirmation).toHaveBeenCalledWith(4, 6500, 5000);
@@ -149,7 +151,7 @@ describe("scanLambdaFunctions", () => {
       ] as FunctionConfiguration[];
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
 
-      await scanLambdaFunctions({ jobs: 2 });
+      await scanLambdaFunctions({ ...mockOptions, jobs: 2 });
 
       expect(pLimit).toHaveBeenCalledWith(2);
     });
@@ -160,7 +162,7 @@ describe("scanLambdaFunctions", () => {
       ] as FunctionConfiguration[];
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
 
-      await scanLambdaFunctions();
+      await scanLambdaFunctions(mockOptions);
 
       expect(pLimit).toHaveBeenCalledWith(1);
     });
@@ -172,7 +174,7 @@ describe("scanLambdaFunctions", () => {
       ] as FunctionConfiguration[];
       vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
 
-      await scanLambdaFunctions({ jobs: 4 });
+      await scanLambdaFunctions({ ...mockOptions, jobs: 4 });
 
       expect(pLimit).toHaveBeenCalledWith(2);
     });

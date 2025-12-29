@@ -16,10 +16,10 @@ export interface ScanLambdaFunctionsOptions {
   profile?: string;
 
   // number of jobs run at once; defaults to number of CPUs
-  jobs?: number;
+  jobs: number;
 }
 
-export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions = {}) => {
+export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) => {
   const { yes, region, profile, jobs } = options;
   const client = new Lambda({
     ...(region && { region }),
