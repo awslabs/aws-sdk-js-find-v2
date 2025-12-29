@@ -66,33 +66,32 @@ export const getLambdaFunctionScanOutput = async (
     await rm(zipPath, { force: true });
   }
 
-  const { packageJsonContents, bundleContent } = lambdaFunctionContents;
+  const { packageJsonFiles, bundleFile } = lambdaFunctionContents;
 
   // Search for "aws-sdk" in package.json dependencies if present.
-  if (packageJsonContents && packageJsonContents.length > 0) {
-    for (const packageJsonContent of packageJsonContents) {
+  if (packageJsonFiles && packageJsonFiles.length > 0) {
+    for (const { path: packageJsonPath, content: packageJsonContent } of packageJsonFiles) {
       try {
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
         if ("aws-sdk" in dependencies) {
           output.ContainsAwsSdkJsV2 = true;
-          output.AwsSdkJsV2Location = "Defined in package.json dependencies.";
+          output.AwsSdkJsV2Location = `Defined in dependencies of '${packageJsonPath}'`;
           return output;
         }
       } catch (error) {
+        const errorPrefix = `Error parsing '${packageJsonPath}'`;
         output.AwsSdkJsV2Error =
-          error instanceof Error
-            ? `Error parsing package.json: ${error.message}`
-            : "Error parsing package.json";
+          error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
         return output;
       }
     }
   }
 
   // Check for code of "aws-sdk" in bundle, if not found in package.json dependencies.
-  if (bundleContent && hasSdkV2InBundle(bundleContent)) {
+  if (bundleFile && hasSdkV2InBundle(bundleFile.content)) {
     output.ContainsAwsSdkJsV2 = true;
-    output.AwsSdkJsV2Location = "Bundled in index file.";
+    output.AwsSdkJsV2Location = `Bundled in '${bundleFile.path}'`;
     return output;
   }
 

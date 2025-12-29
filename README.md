@@ -43,13 +43,13 @@ $ npx @aws-sdk/find-v2 lambda --yes
     "FunctionName": "fn-with-aws-sdk-in-bundle",
     "Region": "us-east-2",
     "ContainsAwsSdkJsV2": true,
-    "AwsSdkJsV2Location": "Bundled in index file."
+    "AwsSdkJsV2Location": "Bundled in 'index.js'"
   },
   {
     "FunctionName": "fn-with-aws-sdk-in-package-json-deps",
     "Region": "us-east-2",
     "ContainsAwsSdkJsV2": true,
-    "AwsSdkJsV2Location": "Defined in package.json dependencies."
+    "AwsSdkJsV2Location": "Defined in dependencies of 'package.json'"
   },
   {
     "FunctionName": "fn-without-aws-sdk-in-package-json-deps",

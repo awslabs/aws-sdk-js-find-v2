@@ -1,17 +1,25 @@
 import StreamZip from "node-stream-zip";
 const PACKAGE_JSON_FILENAME = "package.json";
 
-export type LambdaFunctionContents = {
+export interface FileInfo {
+  // Path of the file within the zip archive.
+  path: string;
+
+  // Contents of the file.
+  content: string;
+}
+
+export interface LambdaFunctionContents {
   /**
    * String contents of all package.json files from Lambda Function.
    */
-  packageJsonContents?: string[];
+  packageJsonFiles?: FileInfo[];
 
   /**
    * String contents of the index.js bundle file, if present.
    */
-  bundleContent?: string;
-};
+  bundleFile?: FileInfo;
+}
 
 /**
  * Extracts the contents of a Lambda Function zip file.
@@ -26,7 +34,7 @@ export const getLambdaFunctionContents = async (
 ): Promise<LambdaFunctionContents> => {
   const zip = new StreamZip.async({ file: zipPath });
 
-  const packageJsonContents = [];
+  const packageJsonFiles = [];
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
   try {
@@ -48,16 +56,19 @@ export const getLambdaFunctionContents = async (
 
     try {
       const packageJsonContent = await zip.entryData(zipEntry.name);
-      packageJsonContents.push(packageJsonContent.toString());
+      packageJsonFiles.push({
+        path: zipEntry.name,
+        content: packageJsonContent.toString(),
+      });
     } catch {
       // Continue without adding package.json file, if entry data can't be read.
       // ToDo: add warning when logging is supported in future.
     }
   }
 
-  if (packageJsonContents.length !== 0) {
+  if (packageJsonFiles.length !== 0) {
     await zip.close();
-    return { packageJsonContents };
+    return { packageJsonFiles };
   }
 
   for (const path of ["index.js", "index.mjs", "index.cjs"]) {
@@ -66,7 +77,12 @@ export const getLambdaFunctionContents = async (
     try {
       const bundleContent = await zip.entryData(path);
       await zip.close();
-      return { bundleContent: bundleContent.toString() };
+      return {
+        bundleFile: {
+          path,
+          content: bundleContent.toString(),
+        },
+      };
     } catch {
       // Continue processing next index file, if entry data can't be read.
       // ToDo: add warning when logging is supported in future.
