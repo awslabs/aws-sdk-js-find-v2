@@ -4,6 +4,10 @@ import pLimit from "p-limit";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
+import {
+  LambdaCommandOutputType,
+  printLambdaCommandOutput,
+} from "./utils/printLambdaCommandOutput.ts";
 
 export interface ScanLambdaFunctionsOptions {
   // answer yes for all prompts
@@ -69,5 +73,5 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     ),
   );
 
-  console.log(JSON.stringify(output, null, 2));
+  printLambdaCommandOutput(output, LambdaCommandOutputType.json);
 };
