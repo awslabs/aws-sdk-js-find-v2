@@ -7,7 +7,7 @@ import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput
 
 export interface ScanLambdaFunctionsOptions {
   // answer yes for all prompts
-  yes?: boolean;
+  yes: boolean;
 
   // AWS region to scan
   region?: string;

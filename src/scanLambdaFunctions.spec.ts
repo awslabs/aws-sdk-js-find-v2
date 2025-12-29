@@ -14,7 +14,10 @@ vi.mock("./utils/getLambdaFunctionScanOutput.ts");
 vi.mock("p-limit");
 
 describe("scanLambdaFunctions", () => {
-  const mockOptions = { jobs: 1 };
+  const mockOptions = {
+    yes: false,
+    jobs: 1,
+  };
 
   beforeEach(() => {
     vi.clearAllMocks();
