@@ -4,13 +4,13 @@ import pLimit from "p-limit";
 
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
-import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
+import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
 vi.mock("@aws-sdk/client-lambda");
-vi.mock("./getLambdaFunctionScanOutput.ts");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
+vi.mock("./utils/getLambdaFunctionScanOutput.ts");
 vi.mock("p-limit");
 
 describe("scanLambdaFunctions", () => {
