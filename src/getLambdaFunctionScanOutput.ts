@@ -11,11 +11,45 @@ import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 
-export const getLambdaFunctionScanOutput = async (client: Lambda, functionName: string) => {
+export interface LambdaFunctionScanOptions {
+  // The name of the Lambda function
+  functionName: string;
+
+  // AWS region the Lambda function is deployed to
+  region: string;
+}
+
+export interface LambdaFunctionScanOutput {
+  // The name of the Lambda function
+  FunctionName: string;
+
+  // AWS region the Lambda function is deployed to
+  Region: string;
+
+  // Whether the Lambda function contains AWS SDK for JavaScript v2
+  ContainsAwsSdkJsV2: boolean | null;
+
+  // The location of AWS SDK for JavaScript v2 in the Lambda function, if present.
+  AwsSdkJsV2Location?: string;
+
+  // The error message if there was an error scanning the Lambda function.
+  AwsSdkJsV2Error?: string;
+}
+
+export const getLambdaFunctionScanOutput = async (
+  client: Lambda,
+  { functionName, region }: LambdaFunctionScanOptions,
+): Promise<LambdaFunctionScanOutput> => {
+  const output: LambdaFunctionScanOutput = {
+    FunctionName: functionName,
+    Region: region,
+    ContainsAwsSdkJsV2: null,
+  };
+
   const response = await client.getFunction({ FunctionName: functionName });
   if (!response.Code?.Location) {
-    console.log(`${JS_SDK_V2_MARKER.UNKNOWN} ${functionName}: Code location not found.`);
-    return;
+    output.AwsSdkJsV2Error = "Function Code location not found.";
+    return output;
   }
   const zipPath = join(tmpdir(), `${functionName}.zip`);
 
@@ -36,22 +70,25 @@ export const getLambdaFunctionScanOutput = async (client: Lambda, functionName: 
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
         if ("aws-sdk" in dependencies) {
-          console.log(`${JS_SDK_V2_MARKER.Y} ${functionName}`);
-          return;
+          output.ContainsAwsSdkJsV2 = true;
+          output.AwsSdkJsV2Location = "Defined in package.json dependencies.";
+          return output;
         }
-        // oxlint-disable-next-line no-unused-vars
-      } catch (error) {
-        // Parsing failure for package.json which is rare, continue.
+      } catch {
+        output.AwsSdkJsV2Error = "Error parsing package.json.";
+        return output;
       }
     }
   }
 
   // Check for code of "aws-sdk" in bundle, if not found in package.json dependencies.
   if (bundleContent && hasSdkV2InBundle(bundleContent)) {
-    console.log(`${JS_SDK_V2_MARKER.Y} ${functionName}`);
-    return;
+    output.ContainsAwsSdkJsV2 = true;
+    output.AwsSdkJsV2Location = "Bundled in index file.";
+    return output;
   }
 
   // "aws-sdk" dependency/code not found.
-  console.log(`${JS_SDK_V2_MARKER.N} ${functionName}`);
+  output.ContainsAwsSdkJsV2 = false;
+  return output;
 };

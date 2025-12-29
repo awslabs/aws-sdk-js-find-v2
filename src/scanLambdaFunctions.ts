@@ -38,24 +38,19 @@ export const scanLambdaFunctions = async ({ region, yes, jobs }: LambdaCommandOp
     }
   }
 
-  console.log(`Note about output:`);
-  console.log(
-    `- ${JS_SDK_V2_MARKER.Y} means "aws-sdk" is found in Lambda function, and migration is recommended.`,
-  );
-  console.log(`- ${JS_SDK_V2_MARKER.N} means "aws-sdk" is not found in Lambda function.`);
-  console.log(
-    `- ${JS_SDK_V2_MARKER.UNKNOWN} means script was not able to proceed, and it emits reason.\n`,
-  );
-
   const clientRegion = await client.config.region();
-  console.log(
-    `Reading ${functionCount} function${functionCount > 1 ? "s" : ""} from "${clientRegion}" region.`,
-  );
 
   const limit = pLimit(concurrency);
-  await Promise.all(
-    functions.map((fn) => limit(() => getLambdaFunctionScanOutput(client, fn.FunctionName!))),
+  const output = await Promise.all(
+    functions.map((fn) =>
+      limit(() =>
+        getLambdaFunctionScanOutput(client, {
+          functionName: fn.FunctionName!,
+          region: clientRegion,
+        }),
+      ),
+    ),
   );
 
-  console.log("\nDone.");
+  console.log(JSON.stringify(output, null, 2));
 };
