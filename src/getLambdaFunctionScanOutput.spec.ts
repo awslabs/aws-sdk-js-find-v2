@@ -124,13 +124,18 @@ describe("getLambdaFunctionScanOutput", () => {
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
   });
 
-  it("cleans up zip file even when error occurs", async () => {
+  it("returns error when download fails", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(downloadFile).mockRejectedValue(new Error("Download failed"));
 
-    await expect(getLambdaFunctionScanOutput(mockClient, { functionName, region })).rejects.toThrow(
-      "Download failed",
-    );
+    const result = await getLambdaFunctionScanOutput(mockClient, { functionName, region });
+
+    expect(result).toEqual({
+      FunctionName: functionName,
+      Region: region,
+      ContainsAwsSdkJsV2: null,
+      AwsSdkJsV2Error: "Error downloading or reading Lambda function code: Download failed",
+    });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
     expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
       force: true,

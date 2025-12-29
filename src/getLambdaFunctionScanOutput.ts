@@ -56,6 +56,12 @@ export const getLambdaFunctionScanOutput = async (
   try {
     await downloadFile(response.Code.Location, zipPath);
     lambdaFunctionContents = await getLambdaFunctionContents(zipPath);
+  } catch (error) {
+    output.AwsSdkJsV2Error =
+      error instanceof Error
+        ? `Error downloading or reading Lambda function code: ${error.message}`
+        : "Error downloading or reading Lambda function code.";
+    return output;
   } finally {
     await rm(zipPath, { force: true });
   }
