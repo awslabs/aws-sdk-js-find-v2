@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.4.1
+
+### Patch Changes
+
+- Adds an option to pass AWS profile to Lambda command ([46659011a892ca16a23aa71827248f3c92a926ca](https://github.com/awslabs/aws-sdk-js-find-v2/commit/46659011a892ca16a23aa71827248f3c92a926ca))
+
 ## 0.4.0
 
 ### Minor Changes
