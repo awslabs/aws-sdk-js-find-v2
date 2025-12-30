@@ -8,6 +8,7 @@ import packageJson from "../package.json" with { type: "json" };
 describe("CLI", () => {
   const mockOptions = {
     yes: false,
+    node: ">=20",
     jobs: cpus().length,
     output: LambdaCommandOutputType.json,
   };
@@ -186,6 +187,18 @@ describe("CLI", () => {
         await expect(program.parseAsync(["node", "cli", "lambda", "-j", "1.5"])).rejects.toThrow(
           "jobs must be a positive integer",
         );
+      });
+    });
+
+    it("should pass node option to scanLambdaFunctions", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await program.parseAsync(["node", "cli", "lambda", "--node", ">=18"]);
+
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({
+        ...mockOptions,
+        node: ">=18",
       });
     });
 
