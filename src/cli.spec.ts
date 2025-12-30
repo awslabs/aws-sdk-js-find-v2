@@ -8,6 +8,7 @@ import packageJson from "../package.json" with { type: "json" };
 describe("CLI", () => {
   const mockOptions = {
     yes: false,
+    node: ">=20",
     jobs: cpus().length,
     output: LambdaCommandOutputType.json,
   };
@@ -187,6 +188,27 @@ describe("CLI", () => {
           "jobs must be a positive integer",
         );
       });
+    });
+
+    it("should pass node option to scanLambdaFunctions", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await program.parseAsync(["node", "cli", "lambda", "--node", ">=18"]);
+
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({
+        ...mockOptions,
+        node: ">=18",
+      });
+    });
+
+    it("throws error for invalid node semver range", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await expect(
+        program.parseAsync(["node", "cli", "lambda", "--node", "invalid"]),
+      ).rejects.toThrow("Invalid semver range: invalid");
     });
 
     describe("should pass output option to scanLambdaFunctions", () => {

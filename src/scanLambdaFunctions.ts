@@ -4,6 +4,7 @@ import pLimit from "p-limit";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
+import { getLambdaNodeJsMatchingVersions } from "./utils/getLambdaNodeJsMatchingVersions.ts";
 import {
   LambdaCommandOutputType,
   printLambdaCommandOutput,
@@ -12,6 +13,9 @@ import {
 export interface ScanLambdaFunctionsOptions {
   // answer yes for all prompts
   yes: boolean;
+
+  // Semver range string to select Lambda Node.js major versions
+  node: string;
 
   // AWS region to scan
   region?: string;
@@ -27,13 +31,19 @@ export interface ScanLambdaFunctionsOptions {
 }
 
 export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) => {
-  const { yes, region, profile, output, jobs } = options;
+  const { yes, node, region, profile, output, jobs } = options;
   const client = new Lambda({
     ...(region && { region }),
     ...(profile && { profile }),
   });
 
-  const functions = await getLambdaFunctions(client);
+  const lambdaNodeJsMajorVersions = getLambdaNodeJsMatchingVersions(node);
+  if (lambdaNodeJsMajorVersions.length === 0) {
+    printLambdaCommandOutput([], output);
+    return;
+  }
+
+  const functions = await getLambdaFunctions(client, lambdaNodeJsMajorVersions);
   const functionCount = functions.length;
 
   const concurrency = Math.min(functionCount, jobs || 1);
@@ -45,8 +55,8 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     .reduce((acc, size) => acc + size, 0);
 
   if (functionCount === 0) {
-    console.log("[]");
-    process.exit(0);
+    printLambdaCommandOutput([], output);
+    return;
   }
 
   if (!yes) {
@@ -58,7 +68,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     console.log();
     if (!confirmation) {
       console.log("Exiting.");
-      process.exit(0);
+      return;
     }
   }
 
@@ -71,6 +81,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
         getLambdaFunctionScanOutput(client, {
           functionName: fn.FunctionName!,
           region: clientRegion,
+          runtime: fn.Runtime!,
         }),
       ),
     ),

@@ -5,6 +5,7 @@ import pLimit from "p-limit";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
+import { getLambdaNodeJsMatchingVersions } from "./utils/getLambdaNodeJsMatchingVersions.ts";
 import {
   LambdaCommandOutputType,
   printLambdaCommandOutput,
@@ -15,12 +16,14 @@ vi.mock("@aws-sdk/client-lambda");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("./utils/getLambdaFunctionScanOutput.ts");
+vi.mock("./utils/getLambdaNodeJsMatchingVersions.ts");
 vi.mock("./utils/printLambdaCommandOutput.ts");
 vi.mock("p-limit");
 
 describe("scanLambdaFunctions", () => {
   const mockOptions = {
     yes: false,
+    node: ">=18",
     jobs: 1,
     output: LambdaCommandOutputType.json,
   };
@@ -29,10 +32,10 @@ describe("scanLambdaFunctions", () => {
     vi.clearAllMocks();
 
     console.log = vi.fn();
-    process.exit = vi.fn() as any;
 
     vi.mocked(pLimit).mockImplementation(() => (fn: () => Promise<void>) => fn());
     vi.mocked(getDownloadConfirmation).mockResolvedValue(true);
+    vi.mocked(getLambdaNodeJsMatchingVersions).mockReturnValue(["18", "20", "22"]);
     vi.mocked(Lambda).mockImplementation(function () {
       return {
         config: { region: vi.fn().mockResolvedValue("us-east-1") },
@@ -40,13 +43,21 @@ describe("scanLambdaFunctions", () => {
     });
   });
 
+  it("exits early when no Node.js versions match", async () => {
+    vi.mocked(getLambdaNodeJsMatchingVersions).mockReturnValue([]);
+
+    await scanLambdaFunctions(mockOptions);
+
+    expect(printLambdaCommandOutput).toHaveBeenCalledWith([], LambdaCommandOutputType.json);
+    expect(getLambdaFunctions).not.toHaveBeenCalled();
+  });
+
   it("exits early when no functions found", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
     await scanLambdaFunctions(mockOptions);
 
-    expect(console.log).toHaveBeenCalledWith("[]");
-    expect(process.exit).toHaveBeenCalledWith(0);
+    expect(printLambdaCommandOutput).toHaveBeenCalledWith([], LambdaCommandOutputType.json);
     expect(getLambdaFunctionScanOutput).not.toHaveBeenCalled();
   });
 
@@ -134,7 +145,6 @@ describe("scanLambdaFunctions", () => {
 
       expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
-      expect(process.exit).toHaveBeenCalledWith(0);
     });
 
     it("calculates codeSizeToSaveOnDisk as sum of top N largest functions", async () => {

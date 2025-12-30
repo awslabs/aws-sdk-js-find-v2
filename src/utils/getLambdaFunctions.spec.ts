@@ -10,6 +10,7 @@ import { type ListFunctionsCommandOutput, paginateListFunctions } from "@aws-sdk
 
 describe("getLambdaFunctions", () => {
   const mockClient = {} as any;
+  const mockVersions = ["18", "20"];
 
   it("returns empty array when no functions", async () => {
     vi.mocked(paginateListFunctions).mockReturnValue(
@@ -18,7 +19,7 @@ describe("getLambdaFunctions", () => {
       })() as Paginator<ListFunctionsCommandOutput>,
     );
 
-    const result = await getLambdaFunctions(mockClient);
+    const result = await getLambdaFunctions(mockClient, mockVersions);
     expect(result).toEqual([]);
   });
 
@@ -37,7 +38,7 @@ describe("getLambdaFunctions", () => {
       })() as Paginator<ListFunctionsCommandOutput>,
     );
 
-    const result = await getLambdaFunctions(mockClient);
+    const result = await getLambdaFunctions(mockClient, mockVersions);
     expect(result).toEqual([
       { FunctionName: "fn1", Runtime: "nodejs18.x" },
       { FunctionName: "fn3", Runtime: "nodejs20.x" },
@@ -51,18 +52,34 @@ describe("getLambdaFunctions", () => {
       })() as Paginator<ListFunctionsCommandOutput>,
     );
 
-    const result = await getLambdaFunctions(mockClient);
+    const result = await getLambdaFunctions(mockClient, mockVersions);
     expect(result).toEqual([]);
   });
 
   it("handles undefined Runtime in Functions", async () => {
     vi.mocked(paginateListFunctions).mockReturnValue(
       (async function* () {
-        yield { FunctionName: "fn1" };
+        yield { Functions: [{ FunctionName: "fn1" }] };
       })() as Paginator<ListFunctionsCommandOutput>,
     );
 
-    const result = await getLambdaFunctions(mockClient);
+    const result = await getLambdaFunctions(mockClient, mockVersions);
     expect(result).toEqual([]);
+  });
+
+  it("excludes functions with versions not in filter list", async () => {
+    vi.mocked(paginateListFunctions).mockReturnValue(
+      (async function* () {
+        yield {
+          Functions: [
+            { FunctionName: "fn1", Runtime: "nodejs16.x" },
+            { FunctionName: "fn2", Runtime: "nodejs18.x" },
+          ],
+        };
+      })() as Paginator<ListFunctionsCommandOutput>,
+    );
+
+    const result = await getLambdaFunctions(mockClient, ["18"]);
+    expect(result).toEqual([{ FunctionName: "fn2", Runtime: "nodejs18.x" }]);
   });
 });

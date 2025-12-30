@@ -24,7 +24,7 @@ export const printLambdaCommandOutput = (
 
   // Output as table
   const table = new Table({
-    head: ["FunctionName", "Region", "ContainsAwsSdkJsV2"],
+    head: ["FunctionName", "Region", "Runtime", "ContainsAwsSdkJsV2"],
     style: { head: ["bold"] },
   });
   for (const scanOutput of output) {
@@ -43,7 +43,7 @@ export const printLambdaCommandOutput = (
       notes += ` ${scanOutput.AwsSdkJsV2Location}`;
     }
 
-    table.push([scanOutput.FunctionName, scanOutput.Region, notes]);
+    table.push([scanOutput.FunctionName, scanOutput.Region, scanOutput.Runtime, notes]);
   }
   console.log(table.toString());
 };
