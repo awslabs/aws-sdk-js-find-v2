@@ -65,55 +65,27 @@ describe("CLI", () => {
       expect(scanLambdaFunctions).toHaveBeenCalledWith(mockOptions);
     });
 
-    describe("should pass region option to scanLambdaFunctions", () => {
-      it("with --region", async () => {
-        const program = createProgram();
-        program.exitOverride();
+    it("should pass region option to scanLambdaFunctions", async () => {
+      const program = createProgram();
+      program.exitOverride();
 
-        await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
+      await program.parseAsync(["node", "cli", "lambda", "--region", "us-west-2"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({
-          ...mockOptions,
-          region: "us-west-2",
-        });
-      });
-
-      it("with -r", async () => {
-        const program = createProgram();
-        program.exitOverride();
-
-        await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
-
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({
-          ...mockOptions,
-          region: "eu-west-1",
-        });
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({
+        ...mockOptions,
+        region: "us-west-2",
       });
     });
 
-    describe("should pass profile option to scanLambdaFunctions", () => {
-      it("with --profile", async () => {
-        const program = createProgram();
-        program.exitOverride();
+    it("should pass profile option to scanLambdaFunctions", async () => {
+      const program = createProgram();
+      program.exitOverride();
 
-        await program.parseAsync(["node", "cli", "lambda", "--profile", "dev"]);
+      await program.parseAsync(["node", "cli", "lambda", "--profile", "dev"]);
 
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({
-          ...mockOptions,
-          profile: "dev",
-        });
-      });
-
-      it("with -p", async () => {
-        const program = createProgram();
-        program.exitOverride();
-
-        await program.parseAsync(["node", "cli", "lambda", "-p", "prod"]);
-
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({
-          ...mockOptions,
-          profile: "prod",
-        });
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({
+        ...mockOptions,
+        profile: "dev",
       });
     });
 

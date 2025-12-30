@@ -23,8 +23,8 @@ export const createProgram = (): Command => {
     .command("lambda")
     .description("Scans Lambda Node.js Functions for JavaScript SDK v2")
     .option("-y, --yes", "answer yes for all prompts", false)
-    .option("-r, --region <region>", "AWS region to scan")
-    .option("-p, --profile <profile>", "AWS profile to use")
+    .option("--region <region>", "AWS region to scan")
+    .option("--profile <profile>", "AWS profile to use")
     .addOption(
       new Option("-o, --output <output>", "Output format")
         .choices(Object.values(LambdaCommandOutputType))
