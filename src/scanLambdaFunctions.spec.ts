@@ -5,18 +5,24 @@ import pLimit from "p-limit";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
+import {
+  LambdaCommandOutputType,
+  printLambdaCommandOutput,
+} from "./utils/printLambdaCommandOutput.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("./utils/getLambdaFunctionScanOutput.ts");
+vi.mock("./utils/printLambdaCommandOutput.ts");
 vi.mock("p-limit");
 
 describe("scanLambdaFunctions", () => {
   const mockOptions = {
     yes: false,
     jobs: 1,
+    output: LambdaCommandOutputType.json,
   };
 
   beforeEach(() => {
@@ -44,7 +50,7 @@ describe("scanLambdaFunctions", () => {
     expect(getLambdaFunctionScanOutput).not.toHaveBeenCalled();
   });
 
-  it("outputs JSON result", async () => {
+  it("calls printLambdaCommandOutput with scan results", async () => {
     const functions = [
       { FunctionName: "test-fn", Runtime: "nodejs18.x", CodeSize: 1000 },
     ] as FunctionConfiguration[];
@@ -54,7 +60,7 @@ describe("scanLambdaFunctions", () => {
 
     await scanLambdaFunctions(mockOptions);
 
-    expect(console.log).toHaveBeenCalledWith(JSON.stringify([scanOutput], null, 2));
+    expect(printLambdaCommandOutput).toHaveBeenCalledWith([scanOutput], LambdaCommandOutputType.json);
   });
 
   it("creates Lambda client with specified region", async () => {
