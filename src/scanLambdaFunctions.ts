@@ -15,7 +15,7 @@ export interface ScanLambdaFunctionsOptions {
   // AWS profile to use from credentials or config file.
   profile?: string;
 
-  // number of jobs run at once; defaults to number of CPUs
+  // maximum number of jobs to run concurrently; caller must provide this value
   jobs: number;
 }
 
