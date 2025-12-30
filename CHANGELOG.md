@@ -1,5 +1,12 @@
 # @aws-sdk/find-v2
 
+## 0.4.3
+
+### Patch Changes
+
+- Explicitly set option 'yes' to false in Lambda command ([4c9831b681fa9ec58ebd2f9c73e0fdc07d75b7bd](https://github.com/awslabs/aws-sdk-js-find-v2/commit/4c9831b681fa9ec58ebd2f9c73e0fdc07d75b7bd))
+- Add 'output' option to Lambda command ([af4daf29bc5f219df77e96eac56aae5b38229191](https://github.com/awslabs/aws-sdk-js-find-v2/commit/af4daf29bc5f219df77e96eac56aae5b38229191))
+
 ## 0.4.2
 
 ### Patch Changes
