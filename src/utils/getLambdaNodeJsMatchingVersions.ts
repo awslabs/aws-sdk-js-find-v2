@@ -8,12 +8,12 @@ export const LambdaNodeJsMajorVersions = ["10", "12", "14", "16", "18", "20", "2
  * @param semverRange - A valid semver range string (e.g., ">=18")
  * @returns Array of matching Node.js major version strings supported by Lambda
  */
-export const getLambdaNodeJsMajorVersions = (semverRange: string): string[] => {
-  const identifiers = [];
+export const getLambdaNodeJsMatchingVersions = (semverRange: string): string[] => {
+  const matchingVersions = [];
   for (const nodejsVersion of LambdaNodeJsMajorVersions) {
     if (satisfies(nodejsVersion, semverRange)) {
-      identifiers.push(nodejsVersion);
+      matchingVersions.push(nodejsVersion);
     }
   }
-  return identifiers;
+  return matchingVersions;
 };

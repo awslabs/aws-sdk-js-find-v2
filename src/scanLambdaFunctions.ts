@@ -4,7 +4,7 @@ import pLimit from "p-limit";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
-import { getLambdaNodeJsMajorVersions } from "./utils/getLambdaNodeJsMajorVersions.ts";
+import { getLambdaNodeJsMatchingVersions } from "./utils/getLambdaNodeJsMatchingVersions.ts";
 import {
   LambdaCommandOutputType,
   printLambdaCommandOutput,
@@ -37,7 +37,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     ...(profile && { profile }),
   });
 
-  const lambdaNodeJsMajorVersions = getLambdaNodeJsMajorVersions(node);
+  const lambdaNodeJsMajorVersions = getLambdaNodeJsMatchingVersions(node);
   if (lambdaNodeJsMajorVersions.length === 0) {
     printLambdaCommandOutput([], output);
     return;

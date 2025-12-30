@@ -1,7 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { getLambdaNodeJsMajorVersions } from "./getLambdaNodeJsMajorVersions";
+import { getLambdaNodeJsMatchingVersions } from "./getLambdaNodeJsMatchingVersions";
 
-describe("getLambdaNodeJsMajorVersions", () => {
+describe("getLambdaNodeJsMatchingVersions", () => {
   it.each([
     [">=18", ["18", "20", "22", "24"]],
     ["<18", ["10", "12", "14", "16"]],
@@ -9,6 +9,6 @@ describe("getLambdaNodeJsMajorVersions", () => {
     ["18", ["18"]],
     [">=99", []],
   ])("returns matching versions for '%s'", (semverRange, expected) => {
-    expect(getLambdaNodeJsMajorVersions(semverRange)).toEqual(expected);
+    expect(getLambdaNodeJsMatchingVersions(semverRange)).toEqual(expected);
   });
 });
