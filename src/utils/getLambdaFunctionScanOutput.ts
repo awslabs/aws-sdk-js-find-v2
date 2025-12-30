@@ -16,6 +16,9 @@ export interface LambdaFunctionScanOptions {
 
   // AWS region the Lambda function is deployed to
   region: string;
+
+  // Lambda Function's Node.js runtime
+  runtime: string;
 }
 
 export interface LambdaFunctionScanOutput {
@@ -24,6 +27,9 @@ export interface LambdaFunctionScanOutput {
 
   // AWS region the Lambda function is deployed to
   Region: string;
+
+  // Lambda Function's Node.js runtime
+  Runtime: string;
 
   // Whether the Lambda function contains AWS SDK for JavaScript v2
   ContainsAwsSdkJsV2: boolean | null;
@@ -37,11 +43,12 @@ export interface LambdaFunctionScanOutput {
 
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
-  { functionName, region }: LambdaFunctionScanOptions,
+  { functionName, region, runtime }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
     Region: region,
+    Runtime: runtime,
     ContainsAwsSdkJsV2: null,
   };
 

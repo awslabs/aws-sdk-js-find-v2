@@ -20,16 +20,18 @@ describe("printLambdaCommandOutput", () => {
   });
 
   const mockOutput: LambdaFunctionScanOutput[] = [
-    { FunctionName: "fn1", Region: "us-east-1", ContainsAwsSdkJsV2: false },
+    { FunctionName: "fn1", Region: "us-east-1", Runtime: "nodejs20.x", ContainsAwsSdkJsV2: false },
     {
       FunctionName: "fn2",
       Region: "us-west-2",
+      Runtime: "nodejs18.x",
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Location: "Bundled in 'index.js'",
     },
     {
       FunctionName: "fn3",
       Region: "eu-west-1",
+      Runtime: "nodejs16.x",
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error occurred",
     },
@@ -42,9 +44,19 @@ describe("printLambdaCommandOutput", () => {
 
   it("outputs table when outputType is table", () => {
     printLambdaCommandOutput(mockOutput, LambdaCommandOutputType.table);
-    expect(mockPush).toHaveBeenCalledWith(["fn1", "us-east-1", "No."]);
-    expect(mockPush).toHaveBeenCalledWith(["fn2", "us-west-2", "Yes. Bundled in 'index.js'"]);
-    expect(mockPush).toHaveBeenCalledWith(["fn3", "eu-west-1", "N/A. Error occurred"]);
+    expect(mockPush).toHaveBeenCalledWith(["fn1", "us-east-1", "nodejs20.x", "No."]);
+    expect(mockPush).toHaveBeenCalledWith([
+      "fn2",
+      "us-west-2",
+      "nodejs18.x",
+      "Yes. Bundled in 'index.js'",
+    ]);
+    expect(mockPush).toHaveBeenCalledWith([
+      "fn3",
+      "eu-west-1",
+      "nodejs16.x",
+      "N/A. Error occurred",
+    ]);
     expect(consoleSpy).toHaveBeenCalledWith("table-output");
   });
 });
