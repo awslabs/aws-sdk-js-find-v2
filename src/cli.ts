@@ -1,4 +1,5 @@
 import { Command, Option } from "commander";
+import { satisfies } from "compare-versions";
 import { cpus } from "node:os";
 
 import packageJson from "../package.json" with { type: "json" };
@@ -26,6 +27,14 @@ export const createProgram = (): Command => {
     .option(
       "--node <semver>",
       "Semver range string to select Lambda Node.js major versions",
+      (value) => {
+        try {
+          satisfies("0", value);
+        } catch {
+          throw new Error(`Invalid semver range: ${value}`);
+        }
+        return value;
+      },
       ">=20",
     )
     .option("--region <region>", "AWS region to scan")

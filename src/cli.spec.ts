@@ -202,6 +202,15 @@ describe("CLI", () => {
       });
     });
 
+    it("throws error for invalid node semver range", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await expect(
+        program.parseAsync(["node", "cli", "lambda", "--node", "invalid"]),
+      ).rejects.toThrow("Invalid semver range: invalid");
+    });
+
     describe("should pass output option to scanLambdaFunctions", () => {
       it("with --output", async () => {
         const program = createProgram();
