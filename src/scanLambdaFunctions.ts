@@ -6,21 +6,21 @@ import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
 
 export interface ScanLambdaFunctionsOptions {
+  // answer yes for all prompts
+  yes: boolean;
+
   // AWS region to scan
   region?: string;
 
-  // answer yes for all prompts
-  yes?: boolean;
-
-  // number of jobs run at once; defaults to number of CPUs
-  jobs?: number;
-
   // AWS profile to use from credentials or config file.
   profile?: string;
+
+  // maximum number of jobs to run concurrently; caller must provide this value
+  jobs: number;
 }
 
-export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions = {}) => {
-  const { region, yes, jobs, profile } = options;
+export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) => {
+  const { yes, region, profile, jobs } = options;
   const client = new Lambda({
     ...(region && { region }),
     ...(profile && { profile }),
