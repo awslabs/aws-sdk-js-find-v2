@@ -18,7 +18,7 @@ export const getLambdaFunctions = async (client: Lambda, lambdaNodeJsMajorVersio
   const paginator = paginateListFunctions({ client }, {});
   for await (const page of paginator) {
     functions.push(
-      ...(page.Functions ?? []).filter((fn) => lambdaNodeJsIdentifiers.includes(fn.Runtime!)),
+      ...(page.Functions ?? []).filter((fn) => lambdaNodeJsIdentifiers.includes(fn.Runtime ?? "")),
     );
   }
 
