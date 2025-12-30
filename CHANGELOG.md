@@ -1,5 +1,12 @@
 # @aws-sdk/find-v2
 
+## 0.5.0
+
+### Minor Changes
+
+- Remove shorthand syntax for AWS specific options ([d7f983a91e264ea0b37615e7ac202e58d5bdab09](https://github.com/awslabs/aws-sdk-js-find-v2/commit/d7f983a91e264ea0b37615e7ac202e58d5bdab09))
+- Add option to select lambda node versions ([80067e1fe224bcd0ace8aaf77b67913babca6c4e](https://github.com/awslabs/aws-sdk-js-find-v2/commit/80067e1fe224bcd0ace8aaf77b67913babca6c4e))
+
 ## 0.4.3
 
 ### Patch Changes
