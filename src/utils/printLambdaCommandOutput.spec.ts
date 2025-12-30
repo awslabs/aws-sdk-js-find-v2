@@ -10,7 +10,7 @@ vi.mock("cli-table3", () => ({
   },
 }));
 
-import { printLambdaCommandOutput, LambdaCommandOutputType } from "./printLambdaCommandOutput";
+import { printLambdaCommandOutput, LambdaCommandOutputType } from "./printLambdaCommandOutput.ts";
 
 describe("printLambdaCommandOutput", () => {
   const consoleSpy = vi.spyOn(console, "log").mockImplementation(() => {});
