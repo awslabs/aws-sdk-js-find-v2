@@ -381,6 +381,7 @@ __metadata:
     aws-sdk: "npm:^2.1692.0"
     cli-table3: "npm:^0.6.5"
     commander: "npm:^14.0.2"
+    compare-versions: "npm:^6.1.1"
     esbuild: "npm:~0.27.1"
     node-stream-zip: "npm:^1.15.0"
     oxfmt: "npm:^0.18.0"
@@ -5127,6 +5128,13 @@ __metadata:
   version: 1.0.1
   resolution: "commondir@npm:1.0.1"
   checksum: 10c0/33a124960e471c25ee19280c9ce31ccc19574b566dc514fe4f4ca4c34fa8b0b57cf437671f5de380e11353ea9426213fca17687dd2ef03134fea2dbc53809fd6
+  languageName: node
+  linkType: hard
+
+"compare-versions@npm:^6.1.1":
+  version: 6.1.1
+  resolution: "compare-versions@npm:6.1.1"
+  checksum: 10c0/415205c7627f9e4f358f571266422980c9fe2d99086be0c9a48008ef7c771f32b0fbe8e97a441ffedc3910872f917a0675fe0fe3c3b6d331cda6d8690be06338
   languageName: node
   linkType: hard
 

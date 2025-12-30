@@ -23,6 +23,11 @@ export const createProgram = (): Command => {
     .command("lambda")
     .description("Scans Lambda Node.js Functions for JavaScript SDK v2")
     .option("-y, --yes", "answer yes for all prompts", false)
+    .option(
+      "--node <semver>",
+      "Semver range string to select Lambda Node.js major versions",
+      ">=20",
+    )
     .option("--region <region>", "AWS region to scan")
     .option("--profile <profile>", "AWS profile to use")
     .addOption(

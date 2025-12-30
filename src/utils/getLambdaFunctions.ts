@@ -10,11 +10,16 @@ import { type Lambda, paginateListFunctions } from "@aws-sdk/client-lambda";
  * - Filters results to only include Node.js runtimes
  * - Returns empty array if no functions found
  */
-export const getLambdaFunctions = async (client: Lambda) => {
+export const getLambdaFunctions = async (client: Lambda, lambdaNodeJsMajorVersions: string[]) => {
   const functions = [];
+  const lambdaNodeJsIdentifiers = lambdaNodeJsMajorVersions.map((version) => `nodejs${version}.x`);
+
   const paginator = paginateListFunctions({ client }, {});
   for await (const page of paginator) {
-    functions.push(...(page.Functions ?? []).filter((fn) => fn.Runtime?.startsWith("nodejs")));
+    functions.push(
+      ...(page.Functions ?? []).filter((fn) => lambdaNodeJsIdentifiers.includes(fn.Runtime!)),
+    );
   }
+
   return functions;
 };

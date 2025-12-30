@@ -9,6 +9,7 @@
     "@aws-sdk/client-lambda": "^3.942.0",
     "cli-table3": "^0.6.5",
     "commander": "^14.0.2",
+    "compare-versions": "^6.1.1",
     "node-stream-zip": "^1.15.0",
     "p-limit": "^7.2.0"
   },
