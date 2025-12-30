@@ -5,6 +5,7 @@ import pLimit from "p-limit";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
+import { getLambdaNodeJsMajorVersions } from "./utils/getLambdaNodeJsMajorVersions.ts";
 import {
   LambdaCommandOutputType,
   printLambdaCommandOutput,
@@ -15,12 +16,14 @@ vi.mock("@aws-sdk/client-lambda");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("./utils/getLambdaFunctionScanOutput.ts");
+vi.mock("./utils/getLambdaNodeJsMajorVersions.ts");
 vi.mock("./utils/printLambdaCommandOutput.ts");
 vi.mock("p-limit");
 
 describe("scanLambdaFunctions", () => {
   const mockOptions = {
     yes: false,
+    node: ">=18",
     jobs: 1,
     output: LambdaCommandOutputType.json,
   };
@@ -33,6 +36,7 @@ describe("scanLambdaFunctions", () => {
 
     vi.mocked(pLimit).mockImplementation(() => (fn: () => Promise<void>) => fn());
     vi.mocked(getDownloadConfirmation).mockResolvedValue(true);
+    vi.mocked(getLambdaNodeJsMajorVersions).mockReturnValue(["18", "20", "22"]);
     vi.mocked(Lambda).mockImplementation(function () {
       return {
         config: { region: vi.fn().mockResolvedValue("us-east-1") },
