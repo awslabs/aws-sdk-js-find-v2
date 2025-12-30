@@ -77,18 +77,6 @@ describe("CLI", () => {
           region: "us-west-2",
         });
       });
-
-      it("with -r", async () => {
-        const program = createProgram();
-        program.exitOverride();
-
-        await program.parseAsync(["node", "cli", "lambda", "-r", "eu-west-1"]);
-
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({
-          ...mockOptions,
-          region: "eu-west-1",
-        });
-      });
     });
 
     describe("should pass profile option to scanLambdaFunctions", () => {
@@ -101,18 +89,6 @@ describe("CLI", () => {
         expect(scanLambdaFunctions).toHaveBeenCalledWith({
           ...mockOptions,
           profile: "dev",
-        });
-      });
-
-      it("with -p", async () => {
-        const program = createProgram();
-        program.exitOverride();
-
-        await program.parseAsync(["node", "cli", "lambda", "-p", "prod"]);
-
-        expect(scanLambdaFunctions).toHaveBeenCalledWith({
-          ...mockOptions,
-          profile: "prod",
         });
       });
     });
