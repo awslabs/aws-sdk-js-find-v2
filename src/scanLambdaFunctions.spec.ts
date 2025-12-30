@@ -32,7 +32,6 @@ describe("scanLambdaFunctions", () => {
     vi.clearAllMocks();
 
     console.log = vi.fn();
-    process.exit = vi.fn() as any;
 
     vi.mocked(pLimit).mockImplementation(() => (fn: () => Promise<void>) => fn());
     vi.mocked(getDownloadConfirmation).mockResolvedValue(true);
@@ -44,13 +43,21 @@ describe("scanLambdaFunctions", () => {
     });
   });
 
+  it("exits early when no Node.js versions match", async () => {
+    vi.mocked(getLambdaNodeJsMajorVersions).mockReturnValue([]);
+
+    await scanLambdaFunctions(mockOptions);
+
+    expect(printLambdaCommandOutput).toHaveBeenCalledWith([], LambdaCommandOutputType.json);
+    expect(getLambdaFunctions).not.toHaveBeenCalled();
+  });
+
   it("exits early when no functions found", async () => {
     vi.mocked(getLambdaFunctions).mockResolvedValue([]);
 
     await scanLambdaFunctions(mockOptions);
 
-    expect(console.log).toHaveBeenCalledWith("[]");
-    expect(process.exit).toHaveBeenCalledWith(0);
+    expect(printLambdaCommandOutput).toHaveBeenCalledWith([], LambdaCommandOutputType.json);
     expect(getLambdaFunctionScanOutput).not.toHaveBeenCalled();
   });
 
@@ -138,7 +145,6 @@ describe("scanLambdaFunctions", () => {
 
       expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
-      expect(process.exit).toHaveBeenCalledWith(0);
     });
 
     it("calculates codeSizeToSaveOnDisk as sum of top N largest functions", async () => {

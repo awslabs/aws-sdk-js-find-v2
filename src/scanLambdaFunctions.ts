@@ -38,6 +38,11 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
   });
 
   const lambdaNodeJsMajorVersions = getLambdaNodeJsMajorVersions(node);
+  if (lambdaNodeJsMajorVersions.length === 0) {
+    printLambdaCommandOutput([], output);
+    return;
+  }
+
   const functions = await getLambdaFunctions(client, lambdaNodeJsMajorVersions);
   const functionCount = functions.length;
 
@@ -50,8 +55,8 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     .reduce((acc, size) => acc + size, 0);
 
   if (functionCount === 0) {
-    console.log("[]");
-    process.exit(0);
+    printLambdaCommandOutput([], output);
+    return;
   }
 
   if (!yes) {
@@ -63,7 +68,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     console.log();
     if (!confirmation) {
       console.log("Exiting.");
-      process.exit(0);
+      return;
     }
   }
 
