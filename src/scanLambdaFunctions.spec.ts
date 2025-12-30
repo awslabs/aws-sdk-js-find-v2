@@ -60,7 +60,10 @@ describe("scanLambdaFunctions", () => {
 
     await scanLambdaFunctions(mockOptions);
 
-    expect(printLambdaCommandOutput).toHaveBeenCalledWith([scanOutput], LambdaCommandOutputType.json);
+    expect(printLambdaCommandOutput).toHaveBeenCalledWith(
+      [scanOutput],
+      LambdaCommandOutputType.json,
+    );
   });
 
   it("creates Lambda client with specified region", async () => {
