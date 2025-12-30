@@ -59,7 +59,7 @@ describe("getLambdaFunctions", () => {
   it("handles undefined Runtime in Functions", async () => {
     vi.mocked(paginateListFunctions).mockReturnValue(
       (async function* () {
-        yield { FunctionName: "fn1" };
+        yield { Functions: [{ FunctionName: "fn1" }] };
       })() as Paginator<ListFunctionsCommandOutput>,
     );
 
