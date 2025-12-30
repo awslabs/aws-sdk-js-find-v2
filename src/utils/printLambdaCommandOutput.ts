@@ -1,4 +1,5 @@
 import type { LambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
+import Table from "cli-table3";
 
 export const LambdaCommandOutputType = {
   // prints output as JSON
@@ -22,7 +23,10 @@ export const printLambdaCommandOutput = (
   }
 
   // Output as table
-  const tableOutput: Record<string, { Region: string; ContainsAwsSdkJsV2: string }> = {};
+  const table = new Table({
+    head: ["FunctionName", "Region", "ContainsAwsSdkJsV2"],
+    style: { head: ["bold"] },
+  });
   for (const scanOutput of output) {
     let notes =
       scanOutput.ContainsAwsSdkJsV2 === null
@@ -34,14 +38,12 @@ export const printLambdaCommandOutput = (
     if (scanOutput.AwsSdkJsV2Error !== undefined) {
       notes += ` ${scanOutput.AwsSdkJsV2Error}`;
     }
+
     if (scanOutput.AwsSdkJsV2Location !== undefined) {
       notes += ` ${scanOutput.AwsSdkJsV2Location}`;
     }
 
-    tableOutput[scanOutput.FunctionName] = {
-      Region: scanOutput.Region,
-      ContainsAwsSdkJsV2: notes,
-    };
+    table.push([scanOutput.FunctionName, scanOutput.Region, notes]);
   }
-  console.table(tableOutput);
+  console.log(table.toString());
 };

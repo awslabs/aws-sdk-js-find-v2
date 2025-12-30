@@ -32,31 +32,18 @@ Commands:
 Run `lambda` command to scan Lambda Node.js Functions for JavaScript SDK v2.
 
 ```console
-$ npx @aws-sdk/find-v2 lambda --yes
-[
-  {
-    "FunctionName": "fn-without-aws-sdk-in-bundle",
-    "Region": "us-east-2",
-    "ContainsAwsSdkJsV2": false
-  },
-  {
-    "FunctionName": "fn-with-aws-sdk-in-bundle",
-    "Region": "us-east-2",
-    "ContainsAwsSdkJsV2": true,
-    "AwsSdkJsV2Location": "Bundled in 'index.js'"
-  },
-  {
-    "FunctionName": "fn-with-aws-sdk-in-package-json-deps",
-    "Region": "us-east-2",
-    "ContainsAwsSdkJsV2": true,
-    "AwsSdkJsV2Location": "Defined in dependencies of 'package.json'"
-  },
-  {
-    "FunctionName": "fn-without-aws-sdk-in-package-json-deps",
-    "Region": "us-east-2",
-    "ContainsAwsSdkJsV2": false
-  }
-]
+$ npx @aws-sdk/find-v2 lambda --yes --output table
+┌─────────────────────────────────────────┬───────────┬────────────────────────────────────────────────┐
+│ FunctionName                            │ Region    │ ContainsAwsSdkJsV2                             │
+├─────────────────────────────────────────┼───────────┼────────────────────────────────────────────────┤
+│ fn-without-aws-sdk-in-bundle            │ us-east-2 │ No.                                            │
+├─────────────────────────────────────────┼───────────┼────────────────────────────────────────────────┤
+│ fn-with-aws-sdk-in-bundle               │ us-east-2 │ Yes. Bundled in 'index.js'                     │
+├─────────────────────────────────────────┼───────────┼────────────────────────────────────────────────┤
+│ fn-with-aws-sdk-in-package-json-deps    │ us-east-2 │ Yes. Defined in dependencies of 'package.json' │
+├─────────────────────────────────────────┼───────────┼────────────────────────────────────────────────┤
+│ fn-without-aws-sdk-in-package-json-deps │ us-east-2 │ No.                                            │
+└─────────────────────────────────────────┴───────────┴────────────────────────────────────────────────┘
 ```
 
 This script requires AWS Managed Policy [AWSLambda_ReadOnlyAccess][].
