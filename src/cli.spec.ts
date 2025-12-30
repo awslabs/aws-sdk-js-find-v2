@@ -2,12 +2,14 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { cpus } from "node:os";
 import { createProgram } from "./cli.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
+import { LambdaCommandOutputType } from "./utils/printLambdaCommandOutput.ts";
 import packageJson from "../package.json" with { type: "json" };
 
 describe("CLI", () => {
   const mockOptions = {
     yes: false,
     jobs: cpus().length,
+    output: LambdaCommandOutputType.json,
   };
 
   beforeEach(() => {
@@ -212,6 +214,47 @@ describe("CLI", () => {
         await expect(program.parseAsync(["node", "cli", "lambda", "-j", "1.5"])).rejects.toThrow(
           "jobs must be a positive integer",
         );
+      });
+    });
+
+    describe("should pass output option to scanLambdaFunctions", () => {
+      it("with --output", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "--output", "table"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith({
+          ...mockOptions,
+          output: LambdaCommandOutputType.table,
+        });
+      });
+
+      it("with -o", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda", "-o", "json"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith(mockOptions);
+      });
+
+      it("defaults to json", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await program.parseAsync(["node", "cli", "lambda"]);
+
+        expect(scanLambdaFunctions).toHaveBeenCalledWith(mockOptions);
+      });
+
+      it("throws error for invalid output type", async () => {
+        const program = createProgram();
+        program.exitOverride();
+
+        await expect(
+          program.parseAsync(["node", "cli", "lambda", "-o", "invalid"]),
+        ).rejects.toThrow();
       });
     });
 

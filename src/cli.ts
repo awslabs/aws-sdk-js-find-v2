@@ -1,8 +1,9 @@
-import { Command } from "commander";
+import { Command, Option } from "commander";
 import { cpus } from "node:os";
 
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions, type ScanLambdaFunctionsOptions } from "./scanLambdaFunctions.ts";
+import { LambdaCommandOutputType } from "./utils/printLambdaCommandOutput.ts";
 
 /**
  * Creates and configures the CLI program with available commands.
@@ -24,6 +25,11 @@ export const createProgram = (): Command => {
     .option("-y, --yes", "answer yes for all prompts", false)
     .option("-r, --region <region>", "AWS region to scan")
     .option("-p, --profile <profile>", "AWS profile to use")
+    .addOption(
+      new Option("-o, --output <output>", "Output format")
+        .choices(Object.values(LambdaCommandOutputType))
+        .default(LambdaCommandOutputType.json),
+    )
     .option(
       "-j, --jobs <count>",
       "number of parallel jobs",
