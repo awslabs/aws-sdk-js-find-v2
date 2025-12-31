@@ -8,16 +8,18 @@ import { getOutputFilename } from "./utils/getOutputFilename.js";
 
 const promises = [];
 for (const version of Object.values(Version)) {
-  for (const moduleSystem of Object.values(ModuleSystem)) {
-    promises.push(
-      build({
-        bundle: true,
-        minify: true,
-        entryPoints: [getInputPath(version)],
-        outfile: join(getOutputDir(version), getOutputFilename("esbuild", true, moduleSystem)),
-        format: moduleSystem,
-      }),
-    );
+  for (const minify of [true, false]) {
+    for (const moduleSystem of Object.values(ModuleSystem)) {
+      promises.push(
+        build({
+          bundle: true,
+          minify,
+          entryPoints: [getInputPath(version)],
+          outfile: join(getOutputDir(version), getOutputFilename("esbuild", minify, moduleSystem)),
+          format: moduleSystem,
+        }),
+      );
+    }
   }
 }
 

@@ -10,11 +10,12 @@ const LibraryType = {
   [ModuleSystem.esm]: "module",
 };
 
-const createConfig = (version, moduleSystem) => ({
+const createConfig = (version, minify, moduleSystem) => ({
   target: "node",
   mode: "production",
   devtool: false,
   optimization: {
+    minimize: minify,
     minimizer: [new rspack.SwcJsMinimizerRspackPlugin({ extractComments: false })],
   },
   plugins: [new rspack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
@@ -22,15 +23,17 @@ const createConfig = (version, moduleSystem) => ({
   entry: getInputPath(version),
   output: {
     path: getOutputDir(version),
-    filename: getOutputFilename("rspack", true, moduleSystem),
+    filename: getOutputFilename("rspack", minify, moduleSystem),
     library: { type: LibraryType[moduleSystem] },
   },
 });
 
 const configs = [];
 for (const version of Object.values(Version)) {
-  for (const moduleSystem of Object.values(ModuleSystem)) {
-    configs.push(createConfig(version, moduleSystem));
+  for (const minify of [true, false]) {
+    for (const moduleSystem of Object.values(ModuleSystem)) {
+      configs.push(createConfig(version, minify, moduleSystem));
+    }
   }
 }
 

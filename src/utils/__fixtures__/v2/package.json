@@ -1,8 +1,10 @@
 {
   "name": "required-by-parcel",
   "source": "index.js",
-  "main": "build/parcel.min.cjs",
-  "module": "build/parcel.min.mjs",
+  "main": "build/parcel.cjs",
+  "module": "build/parcel.mjs",
+  "main-min": "build/parcel.min.cjs",
+  "module-min": "build/parcel.min.mjs",
   "dependencies": {
     "aws-sdk": "^2.1692.0"
   },
@@ -10,10 +12,20 @@
     "main": {
       "context": "node",
       "includeNodeModules": true,
+      "sourceMap": false
+    },
+    "main-min": {
+      "context": "node",
+      "includeNodeModules": true,
       "optimize": true,
       "sourceMap": false
     },
     "module": {
+      "context": "node",
+      "includeNodeModules": true,
+      "sourceMap": false
+    },
+    "module-min": {
       "context": "node",
       "includeNodeModules": true,
       "optimize": true,
