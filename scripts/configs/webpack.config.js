@@ -2,7 +2,7 @@ import TerserPlugin from "terser-webpack-plugin";
 import webpack from "webpack";
 
 import { ModuleSystem, Version } from "./utils/constants.js";
-import { getFixturesDir } from "./utils/getFixturesDir.js";
+import { getOutputDir } from "./utils/getOutputDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
@@ -19,7 +19,7 @@ const createConfig = (version, moduleSystem) => ({
   experiments: { outputModule: true },
   entry: getInputPath(version),
   output: {
-    path: getFixturesDir(),
+    path: getOutputDir(version),
     filename: getOutputFilename("webpack", version, moduleSystem),
     library: { type: LibraryType[moduleSystem] },
   },

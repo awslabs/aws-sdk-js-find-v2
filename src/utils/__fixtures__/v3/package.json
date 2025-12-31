@@ -1,8 +1,8 @@
 {
   "name": "required-by-parcel",
   "source": "index.js",
-  "main": "../parcel.v3.cjs",
-  "module": "../parcel.v3.mjs",
+  "main": "build/parcel.v3.cjs",
+  "module": "build/parcel.v3.mjs",
   "dependencies": {
     "@aws-sdk/client-sts": "^3.946.0"
   },
