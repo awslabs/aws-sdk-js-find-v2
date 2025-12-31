@@ -17,6 +17,9 @@ export interface ScanLambdaFunctionsOptions {
   // Semver range string to select Lambda Node.js major versions
   node: string;
 
+  // Semver range string to check for AWS SDK for JavaScript v2
+  sdk: string;
+
   // AWS region to scan
   region?: string;
 
@@ -31,7 +34,7 @@ export interface ScanLambdaFunctionsOptions {
 }
 
 export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) => {
-  const { yes, node, region, profile, output, jobs } = options;
+  const { yes, node, sdk, region, profile, output, jobs } = options;
   const client = new Lambda({
     ...(region && { region }),
     ...(profile && { profile }),
@@ -82,6 +85,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
           functionName: fn.FunctionName!,
           region: clientRegion,
           runtime: fn.Runtime!,
+          sdkVersionRange: sdk,
         }),
       ),
     ),
