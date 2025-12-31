@@ -20,7 +20,7 @@ const createConfig = (version, moduleSystem) => ({
   entry: getInputPath(version),
   output: {
     path: getOutputDir(version),
-    filename: getOutputFilename("webpack", moduleSystem),
+    filename: getOutputFilename("webpack", true, moduleSystem),
     library: { type: LibraryType[moduleSystem] },
   },
 });

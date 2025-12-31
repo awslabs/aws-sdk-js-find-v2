@@ -13,7 +13,7 @@ const createConfig = (version, moduleSystem) => ({
   plugins: [resolve({ preferBuiltins: true }), commonjs(), terser(), json()],
   input: getInputPath(version),
   output: {
-    file: join(getOutputDir(version), getOutputFilename("rollup", moduleSystem)),
+    file: join(getOutputDir(version), getOutputFilename("rollup", true, moduleSystem)),
     format: moduleSystem,
     inlineDynamicImports: true,
   },

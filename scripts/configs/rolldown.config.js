@@ -10,7 +10,7 @@ const createConfig = (version, moduleSystem) =>
   defineConfig({
     input: getInputPath(version),
     output: {
-      file: join(getOutputDir(version), getOutputFilename("rolldown", moduleSystem)),
+      file: join(getOutputDir(version), getOutputFilename("rolldown", true, moduleSystem)),
       format: moduleSystem,
       inlineDynamicImports: true,
       minify: true,
