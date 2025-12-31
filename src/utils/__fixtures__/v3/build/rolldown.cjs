@@ -7485,6 +7485,7 @@ var init_cbor$1 = __esmMin((() => {
 //#region node_modules/@smithy/core/dist-es/submodules/cbor/parseCborBody.js
 var dateToTag, loadSmithyRpcV2CborErrorCode;
 var init_parseCborBody = __esmMin((() => {
+	init_protocols$1();
 	init_cbor_types();
 	dateToTag = (date$1) => {
 		return tag({
