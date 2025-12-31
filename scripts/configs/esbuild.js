@@ -2,7 +2,7 @@ import { build } from "esbuild";
 import { join } from "node:path";
 
 import { ModuleSystem, Version } from "./utils/constants.js";
-import { getFixturesDir } from "./utils/getFixturesDir.js";
+import { getOutputDir } from "./utils/getOutputDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
@@ -14,7 +14,7 @@ for (const version of Object.values(Version)) {
         bundle: true,
         minify: true,
         entryPoints: [getInputPath(version)],
-        outfile: join(getFixturesDir(), getOutputFilename("esbuild", version, moduleSystem)),
+        outfile: join(getOutputDir(version), getOutputFilename("esbuild", moduleSystem)),
         format: moduleSystem,
       }),
     );

@@ -5,7 +5,7 @@ import terser from "@rollup/plugin-terser";
 import json from "@rollup/plugin-json";
 
 import { ModuleSystem, Version } from "./utils/constants.js";
-import { getFixturesDir } from "./utils/getFixturesDir.js";
+import { getOutputDir } from "./utils/getOutputDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
@@ -13,7 +13,7 @@ const createConfig = (version, moduleSystem) => ({
   plugins: [resolve({ preferBuiltins: true }), commonjs(), terser(), json()],
   input: getInputPath(version),
   output: {
-    file: join(getFixturesDir(), getOutputFilename("rollup", version, moduleSystem)),
+    file: join(getOutputDir(version), getOutputFilename("rollup", moduleSystem)),
     format: moduleSystem,
     inlineDynamicImports: true,
   },

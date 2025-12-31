@@ -4,20 +4,24 @@ import { join } from "path";
 import { hasSdkV2InBundle } from "./hasSdkV2InBundle";
 
 describe("hasSdkV2InBundle", () => {
-  const fixturesDir = join(__dirname, "__fixtures__");
-  const files = readdirSync(fixturesDir).filter((file) =>
-    statSync(join(fixturesDir, file)).isFile(),
-  );
+  describe.each([
+    [true, "v2"],
+    [false, "v3"],
+  ])("should return %b for '%s'", (output, version) => {
+    const bundlesDir = join(__dirname, "__fixtures__", version, "build");
+    const files = readdirSync(bundlesDir).filter((file) =>
+      statSync(join(bundlesDir, file)).isFile(),
+    );
 
-  if (files.length === 0) {
-    throw new Error("No fixture files found. Run 'npm run test:generate:bundles' first.");
-  }
+    if (files.length === 0) {
+      throw new Error("No fixture files found. Run 'npm run test:generate:bundles' first.");
+    }
 
-  files.forEach((file) => {
-    const hasV2 = file.endsWith("v2.cjs") || file.endsWith("v2.mjs");
-    it(`returns '${hasV2 ? "true" : "false"}' for '${file}'`, () => {
-      const content = readFileSync(join(fixturesDir, file), "utf-8");
-      expect(hasSdkV2InBundle(content)).toBe(hasV2);
+    files.forEach((file) => {
+      it(`in '${file}'`, () => {
+        const content = readFileSync(join(bundlesDir, file), "utf-8");
+        expect(hasSdkV2InBundle(content)).toBe(output);
+      });
     });
   });
 });
