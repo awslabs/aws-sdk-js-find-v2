@@ -14,7 +14,7 @@ for (const version of Object.values(Version)) {
         bundle: true,
         minify: true,
         entryPoints: [getInputPath(version)],
-        outfile: join(getOutputDir(version), getOutputFilename("esbuild", version, moduleSystem)),
+        outfile: join(getOutputDir(version), getOutputFilename("esbuild", moduleSystem)),
         format: moduleSystem,
       }),
     );

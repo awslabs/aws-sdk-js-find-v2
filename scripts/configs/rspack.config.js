@@ -22,7 +22,7 @@ const createConfig = (version, moduleSystem) => ({
   entry: getInputPath(version),
   output: {
     path: getOutputDir(version),
-    filename: getOutputFilename("rspack", version, moduleSystem),
+    filename: getOutputFilename("rspack", moduleSystem),
     library: { type: LibraryType[moduleSystem] },
   },
 });
