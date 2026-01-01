@@ -6,21 +6,23 @@ import { getOutputDir } from "./utils/getOutputDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
-const createConfig = (version, moduleSystem) =>
+const createConfig = (version, minify, moduleSystem) =>
   defineConfig({
     input: getInputPath(version),
     output: {
-      file: join(getOutputDir(version), getOutputFilename("rolldown", moduleSystem)),
+      file: join(getOutputDir(version), getOutputFilename("rolldown", minify, moduleSystem)),
       format: moduleSystem,
       inlineDynamicImports: true,
-      minify: true,
+      minify,
     },
   });
 
 const configs = [];
 for (const version of Object.values(Version)) {
-  for (const moduleSystem of Object.values(ModuleSystem)) {
-    configs.push(createConfig(version, moduleSystem));
+  for (const minify of [true, false]) {
+    for (const moduleSystem of Object.values(ModuleSystem)) {
+      configs.push(createConfig(version, minify, moduleSystem));
+    }
   }
 }
 

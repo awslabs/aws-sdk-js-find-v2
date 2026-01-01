@@ -1,4 +1,4 @@
 import { Extension } from "./constants.js";
 
-export const getOutputFilename = (bundler, moduleSystem) =>
-  [bundler, Extension[moduleSystem]].join(".");
+export const getOutputFilename = (bundler, minify, moduleSystem) =>
+  [bundler, ...(minify ? ["min"] : []), Extension[moduleSystem]].join(".");

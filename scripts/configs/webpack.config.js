@@ -11,24 +11,29 @@ const LibraryType = {
   [ModuleSystem.esm]: "module",
 };
 
-const createConfig = (version, moduleSystem) => ({
+const createConfig = (version, minify, moduleSystem) => ({
   target: "node",
   mode: "production",
-  optimization: { minimizer: [new TerserPlugin({ extractComments: false })] },
+  optimization: {
+    minimize: minify,
+    minimizer: [new TerserPlugin({ extractComments: false })],
+  },
   plugins: [new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
   experiments: { outputModule: true },
   entry: getInputPath(version),
   output: {
     path: getOutputDir(version),
-    filename: getOutputFilename("webpack", moduleSystem),
+    filename: getOutputFilename("webpack", minify, moduleSystem),
     library: { type: LibraryType[moduleSystem] },
   },
 });
 
 const configs = [];
 for (const version of Object.values(Version)) {
-  for (const moduleSystem of Object.values(ModuleSystem)) {
-    configs.push(createConfig(version, moduleSystem));
+  for (const minify of [true, false]) {
+    for (const moduleSystem of Object.values(ModuleSystem)) {
+      configs.push(createConfig(version, minify, moduleSystem));
+    }
   }
 }
 

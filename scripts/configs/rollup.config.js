@@ -9,20 +9,23 @@ import { getOutputDir } from "./utils/getOutputDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
-const createConfig = (version, moduleSystem) => ({
-  plugins: [resolve({ preferBuiltins: true }), commonjs(), terser(), json()],
+const createConfig = (version, minify, moduleSystem) => ({
+  plugins: [resolve({ preferBuiltins: true }), commonjs(), ...(minify ? [terser()] : []), json()],
   input: getInputPath(version),
   output: {
-    file: join(getOutputDir(version), getOutputFilename("rollup", moduleSystem)),
+    file: join(getOutputDir(version), getOutputFilename("rollup", minify, moduleSystem)),
     format: moduleSystem,
     inlineDynamicImports: true,
+    minify,
   },
 });
 
 const configs = [];
 for (const version of Object.values(Version)) {
-  for (const moduleSystem of Object.values(ModuleSystem)) {
-    configs.push(createConfig(version, moduleSystem));
+  for (const minify of [true, false]) {
+    for (const moduleSystem of Object.values(ModuleSystem)) {
+      configs.push(createConfig(version, minify, moduleSystem));
+    }
   }
 }
 
