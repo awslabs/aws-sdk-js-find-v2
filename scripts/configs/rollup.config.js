@@ -16,6 +16,7 @@ const createConfig = (version, minify, moduleSystem) => ({
     file: join(getOutputDir(version), getOutputFilename("rollup", minify, moduleSystem)),
     format: moduleSystem,
     inlineDynamicImports: true,
+    minify,
   },
 });
 

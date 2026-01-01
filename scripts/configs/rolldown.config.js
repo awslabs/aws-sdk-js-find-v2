@@ -13,6 +13,7 @@ const createConfig = (version, minify, moduleSystem) =>
       file: join(getOutputDir(version), getOutputFilename("rolldown", minify, moduleSystem)),
       format: moduleSystem,
       inlineDynamicImports: true,
+      minify,
     },
   });
 
