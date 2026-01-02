@@ -355,4 +355,82 @@ describe("getLambdaFunctionScanOutput", () => {
       AwsSdkJsV2Error: "Error reading bundle 'index.js' for aws-sdk@2.x",
     });
   });
+
+  it("uses version from node_modules/aws-sdk/package.json when dependency is a range", async () => {
+    vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
+      packageJsonFiles: [
+        { path: "package.json", content: '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
+      ],
+      awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": '{"version":"2.1692.0"}' },
+    });
+
+    const result = await getLambdaFunctionScanOutput(mockClient, {
+      functionName,
+      region,
+      runtime,
+      sdkVersionRange: "<2.1692.0",
+    });
+
+    expect(result.ContainsAwsSdkJsV2).toBe(false);
+  });
+
+  it("uses version from nested node_modules/aws-sdk/package.json", async () => {
+    vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
+      packageJsonFiles: [
+        { path: "subdir/package.json", content: '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
+      ],
+      awsSdkPackageJsonMap: {
+        "subdir/node_modules/aws-sdk/package.json": '{"version":"2.1000.0"}',
+      },
+    });
+
+    const result = await getLambdaFunctionScanOutput(mockClient, {
+      functionName,
+      region,
+      runtime,
+      sdkVersionRange: "<2.1000.0",
+    });
+
+    expect(result.ContainsAwsSdkJsV2).toBe(false);
+  });
+
+  it("falls back to root node_modules when nested not found", async () => {
+    vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
+      packageJsonFiles: [
+        { path: "subdir/package.json", content: '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
+      ],
+      awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": '{"version":"2.500.0"}' },
+    });
+
+    const result = await getLambdaFunctionScanOutput(mockClient, {
+      functionName,
+      region,
+      runtime,
+      sdkVersionRange: "<2.500.0",
+    });
+
+    expect(result.ContainsAwsSdkJsV2).toBe(false);
+  });
+
+  it("ignores invalid aws-sdk package.json in node_modules", async () => {
+    vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
+      packageJsonFiles: [
+        { path: "package.json", content: '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
+      ],
+      awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": "invalid json" },
+    });
+
+    const result = await getLambdaFunctionScanOutput(mockClient, {
+      functionName,
+      region,
+      runtime,
+      sdkVersionRange,
+    });
+
+    expect(result.ContainsAwsSdkJsV2).toBe(true);
+  });
 });
