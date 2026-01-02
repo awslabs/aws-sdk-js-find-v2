@@ -52,7 +52,7 @@ export const getLambdaFunctionContents = async (
   }
 
   for (const zipEntry of Object.values(zipEntries)) {
-    // Skip 'node_modules' directory, except when it's not aws-sdk package.json.
+    // Skip 'node_modules' directory, except for aws-sdk package.json file.
     if (zipEntry.name.includes(`${NODE_MODULES}/`)) {
       if (zipEntry.name.endsWith(join(NODE_MODULES, AWS_SDK, PACKAGE_JSON)) && zipEntry.isFile) {
         const packageJsonContent = await zip.entryData(zipEntry.name);
