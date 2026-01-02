@@ -96,6 +96,7 @@ describe("getLambdaFunctionContents", () => {
 
       expect(result).toEqual({
         packageJsonFiles: [{ path: "package.json", content: mockPackageJson }],
+        awsSdkPackageJsonMap: {},
       });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
@@ -115,6 +116,7 @@ describe("getLambdaFunctionContents", () => {
 
       expect(result).toEqual({
         packageJsonFiles: [{ path: "package.json", content: mockPackageJson }],
+        awsSdkPackageJsonMap: {},
       });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
@@ -156,11 +158,56 @@ describe("getLambdaFunctionContents", () => {
           { path: "package.json", content: mockPackageJsons.root },
           { path: "packages/app/package.json", content: mockPackageJsons.app },
         ],
+        awsSdkPackageJsonMap: {},
       });
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
       expect(mockZip.entryData).toHaveBeenNthCalledWith(2, "packages/app/package.json");
       expect(mockZip.close).toHaveBeenCalled();
+    });
+
+    it("populates awsSdkPackageJsonMap for aws-sdk package.json", async () => {
+      const awsSdkPackageJson = '{"name":"aws-sdk","version":"2.1692.0"}';
+      mockZip.entries.mockResolvedValue({
+        "node_modules/aws-sdk/package.json": {
+          name: "node_modules/aws-sdk/package.json",
+          isFile: true,
+        },
+        "package.json": { name: "package.json", isFile: true },
+      });
+      mockZip.entryData.mockResolvedValueOnce(Buffer.from(awsSdkPackageJson));
+      mockZip.entryData.mockResolvedValueOnce(Buffer.from(mockPackageJson));
+
+      const result = await getLambdaFunctionContents(mockZipPath);
+
+      expect(result).toEqual({
+        packageJsonFiles: [{ path: "package.json", content: mockPackageJson }],
+        awsSdkPackageJsonMap: {
+          "node_modules/aws-sdk/package.json": awsSdkPackageJson,
+        },
+      });
+    });
+
+    it("populates awsSdkPackageJsonMap for nested aws-sdk package.json", async () => {
+      const awsSdkPackageJson = '{"name":"aws-sdk","version":"2.1692.0"}';
+      mockZip.entries.mockResolvedValue({
+        "packages/app/node_modules/aws-sdk/package.json": {
+          name: "packages/app/node_modules/aws-sdk/package.json",
+          isFile: true,
+        },
+        "package.json": { name: "package.json", isFile: true },
+      });
+      mockZip.entryData.mockResolvedValueOnce(Buffer.from(awsSdkPackageJson));
+      mockZip.entryData.mockResolvedValueOnce(Buffer.from(mockPackageJson));
+
+      const result = await getLambdaFunctionContents(mockZipPath);
+
+      expect(result).toEqual({
+        packageJsonFiles: [{ path: "package.json", content: mockPackageJson }],
+        awsSdkPackageJsonMap: {
+          "packages/app/node_modules/aws-sdk/package.json": awsSdkPackageJson,
+        },
+      });
     });
   });
 
