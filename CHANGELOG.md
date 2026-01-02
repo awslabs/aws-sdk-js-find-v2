@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.6.0
+
+### Minor Changes
+
+- Add option to select JS SDK v2 version range ([f1d7f1cd7fd2ec1135cffafad0f8fb98b6785fd7](https://github.com/awslabs/aws-sdk-js-find-v2/commit/f1d7f1cd7fd2ec1135cffafad0f8fb98b6785fd7))
+
 ## 0.5.0
 
 ### Minor Changes
