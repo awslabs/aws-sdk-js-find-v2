@@ -7,7 +7,7 @@ var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __esmMin = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
 var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var __export = (all, symbols) => {
+var __exportAll = (all, symbols) => {
 	let target = {};
 	for (var name in all) {
 		__defProp(target, name, {
@@ -356,7 +356,7 @@ var require_dist_cjs$50 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/@aws/lambda-invoke-store/dist-es/invoke-store.js
-var invoke_store_exports = /* @__PURE__ */ __export({
+var invoke_store_exports = /* @__PURE__ */ __exportAll({
 	InvokeStore: () => InvokeStore,
 	InvokeStoreBase: () => InvokeStoreBase
 });
@@ -2374,10 +2374,10 @@ var require_dist_cjs$37 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/protocols/collect-stream-body.js
-var import_dist_cjs$145, collectBody;
+var import_dist_cjs$145, collectBody$1;
 var init_collect_stream_body = __esmMin((() => {
 	import_dist_cjs$145 = require_dist_cjs$37();
-	collectBody = async (streamBody = new Uint8Array(), context) => {
+	collectBody$1 = async (streamBody = new Uint8Array(), context) => {
 		if (streamBody instanceof Uint8Array) return import_dist_cjs$145.Uint8ArrayBlobAdapter.mutate(streamBody);
 		if (!streamBody) return import_dist_cjs$145.Uint8ArrayBlobAdapter.mutate(new Uint8Array());
 		const fromContext = context.streamCollector(streamBody);
@@ -2994,7 +2994,7 @@ var init_TypeRegistry = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/schema/index.js
-var schema_exports = /* @__PURE__ */ __export({
+var schema_exports = /* @__PURE__ */ __exportAll({
 	ErrorSchema: () => ErrorSchema,
 	ListSchema: () => ListSchema,
 	MapSchema: () => MapSchema,
@@ -3394,7 +3394,7 @@ var init_date_utils = __esmMin((() => {
 
 //#endregion
 //#region node_modules/tslib/tslib.es6.mjs
-var tslib_es6_exports = /* @__PURE__ */ __export({
+var tslib_es6_exports = /* @__PURE__ */ __exportAll({
 	__addDisposableResource: () => __addDisposableResource,
 	__assign: () => __assign,
 	__asyncDelegator: () => __asyncDelegator,
@@ -4183,7 +4183,7 @@ var init_NumericValue = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/serde/index.js
-var serde_exports = /* @__PURE__ */ __export({
+var serde_exports = /* @__PURE__ */ __exportAll({
 	LazyJsonString: () => LazyJsonString,
 	NumericValue: () => NumericValue,
 	_parseEpochTimestamp: () => _parseEpochTimestamp,
@@ -4394,9 +4394,7 @@ var init_EventStreamSerde = __esmMin((() => {
 			let eventType = unionMember;
 			let explicitPayloadMember = null;
 			let explicitPayloadContentType;
-			const isKnownSchema = (() => {
-				return unionSchema.getSchema()[4].includes(unionMember);
-			})();
+			const isKnownSchema = unionSchema.getSchema()[4].includes(unionMember);
 			const additionalHeaders = {};
 			if (!isKnownSchema) {
 				const [type, value] = event[unionMember];
@@ -4446,7 +4444,7 @@ var init_EventStreamSerde = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/event-streams/index.js
-var event_streams_exports = /* @__PURE__ */ __export({ EventStreamSerde: () => EventStreamSerde });
+var event_streams_exports = /* @__PURE__ */ __exportAll({ EventStreamSerde: () => EventStreamSerde });
 var init_event_streams = __esmMin((() => {
 	init_EventStreamSerde();
 }));
@@ -4685,7 +4683,7 @@ var init_HttpBindingProtocol = __esmMin((() => {
 			const ns = NormalizedSchema.of(operationSchema.output);
 			const dataObject = {};
 			if (response.statusCode >= 300) {
-				const bytes = await collectBody(response.body, context);
+				const bytes = await collectBody$1(response.body, context);
 				if (bytes.byteLength > 0) Object.assign(dataObject, await deserializer.read(15, bytes));
 				await this.handleError(operationSchema, context, response, dataObject, this.deserializeMetadata(response));
 				throw new Error("@smithy/core/protocols - HTTP Protocol error handler failed to throw.");
@@ -4697,12 +4695,12 @@ var init_HttpBindingProtocol = __esmMin((() => {
 			}
 			const nonHttpBindingMembers = await this.deserializeHttpMessage(ns, context, response, dataObject);
 			if (nonHttpBindingMembers.length) {
-				const bytes = await collectBody(response.body, context);
+				const bytes = await collectBody$1(response.body, context);
 				if (bytes.byteLength > 0) {
 					const dataFromBody = await deserializer.read(ns, bytes);
 					for (const member$1 of nonHttpBindingMembers) dataObject[member$1] = dataFromBody[member$1];
 				}
-			} else if (nonHttpBindingMembers.discardResponseBody) await collectBody(response.body, context);
+			} else if (nonHttpBindingMembers.discardResponseBody) await collectBody$1(response.body, context);
 			dataObject.$metadata = this.deserializeMetadata(response);
 			return dataObject;
 		}
@@ -4724,7 +4722,7 @@ var init_HttpBindingProtocol = __esmMin((() => {
 					});
 					else dataObject[memberName] = (0, import_dist_cjs$138.sdkStreamMixin)(response.body);
 					else if (response.body) {
-						const bytes = await collectBody(response.body, context);
+						const bytes = await collectBody$1(response.body, context);
 						if (bytes.byteLength > 0) dataObject[memberName] = await deserializer.read(memberSchema, bytes);
 					}
 				} else if (memberTraits.httpHeader) {
@@ -4819,7 +4817,7 @@ var init_RpcProtocol = __esmMin((() => {
 			const ns = NormalizedSchema.of(operationSchema.output);
 			const dataObject = {};
 			if (response.statusCode >= 300) {
-				const bytes = await collectBody(response.body, context);
+				const bytes = await collectBody$1(response.body, context);
 				if (bytes.byteLength > 0) Object.assign(dataObject, await deserializer.read(15, bytes));
 				await this.handleError(operationSchema, context, response, dataObject, this.deserializeMetadata(response));
 				throw new Error("@smithy/core/protocols - RPC Protocol error handler failed to throw.");
@@ -4836,7 +4834,7 @@ var init_RpcProtocol = __esmMin((() => {
 				initialResponseContainer: dataObject
 			});
 			else {
-				const bytes = await collectBody(response.body, context);
+				const bytes = await collectBody$1(response.body, context);
 				if (bytes.byteLength > 0) Object.assign(dataObject, await deserializer.read(ns, bytes));
 			}
 			dataObject.$metadata = this.deserializeMetadata(response);
@@ -5159,7 +5157,7 @@ var init_HttpInterceptingShapeSerializer = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/protocols/index.js
-var protocols_exports$1 = /* @__PURE__ */ __export({
+var protocols_exports$1 = /* @__PURE__ */ __exportAll({
 	FromStringShapeDeserializer: () => FromStringShapeDeserializer,
 	HttpBindingProtocol: () => HttpBindingProtocol,
 	HttpInterceptingShapeDeserializer: () => HttpInterceptingShapeDeserializer,
@@ -5169,7 +5167,7 @@ var protocols_exports$1 = /* @__PURE__ */ __export({
 	RpcProtocol: () => RpcProtocol,
 	SerdeContext: () => SerdeContext,
 	ToStringShapeSerializer: () => ToStringShapeSerializer,
-	collectBody: () => collectBody,
+	collectBody: () => collectBody$1,
 	determineTimestampFormat: () => determineTimestampFormat,
 	extendedEncodeURIComponent: () => extendedEncodeURIComponent,
 	requestBuilder: () => requestBuilder,
@@ -5334,7 +5332,7 @@ var init_util_identity_and_auth = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/index.js
-var dist_es_exports$1 = /* @__PURE__ */ __export({
+var dist_es_exports$1 = /* @__PURE__ */ __exportAll({
 	DefaultIdentityProviderConfig: () => DefaultIdentityProviderConfig,
 	EXPIRATION_MS: () => EXPIRATION_MS,
 	HttpApiKeyAuthSigner: () => HttpApiKeyAuthSigner,
@@ -6034,10 +6032,10 @@ var require_dist_cjs$32 = /* @__PURE__ */ __commonJSMin(((exports) => {
 
 //#endregion
 //#region node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
-var state, emitWarningIfUnsupportedVersion;
+var state, emitWarningIfUnsupportedVersion$3;
 var init_emitWarningIfUnsupportedVersion = __esmMin((() => {
 	state = { warningEmitted: false };
-	emitWarningIfUnsupportedVersion = (version$1) => {
+	emitWarningIfUnsupportedVersion$3 = (version$1) => {
 		if (version$1 && !state.warningEmitted && parseInt(version$1.substring(1, version$1.indexOf("."))) < 20) {
 			state.warningEmitted = true;
 			process.emitWarning(`NodeDeprecationWarning: The AWS SDK for JavaScript (v3) will
@@ -6080,8 +6078,8 @@ var init_setTokenFeature = __esmMin((() => {}));
 
 //#endregion
 //#region node_modules/@aws-sdk/core/dist-es/submodules/client/index.js
-var client_exports = /* @__PURE__ */ __export({
-	emitWarningIfUnsupportedVersion: () => emitWarningIfUnsupportedVersion,
+var client_exports = /* @__PURE__ */ __exportAll({
+	emitWarningIfUnsupportedVersion: () => emitWarningIfUnsupportedVersion$3,
 	setCredentialFeature: () => setCredentialFeature,
 	setFeature: () => setFeature,
 	setTokenFeature: () => setTokenFeature,
@@ -6912,7 +6910,7 @@ var init_aws_sdk = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/index.js
-var httpAuthSchemes_exports = /* @__PURE__ */ __export({
+var httpAuthSchemes_exports = /* @__PURE__ */ __exportAll({
 	AWSSDKSigV4Signer: () => AWSSDKSigV4Signer,
 	AwsSdkSigV4ASigner: () => AwsSdkSigV4ASigner,
 	AwsSdkSigV4Signer: () => AwsSdkSigV4Signer,
@@ -10715,7 +10713,7 @@ var init_AwsQueryProtocol = __esmMin((() => {
 			const ns = NormalizedSchema.of(operationSchema.output);
 			const dataObject = {};
 			if (response.statusCode >= 300) {
-				const bytes$1 = await collectBody(response.body, context);
+				const bytes$1 = await collectBody$1(response.body, context);
 				if (bytes$1.byteLength > 0) Object.assign(dataObject, await deserializer.read(15, bytes$1));
 				await this.handleError(operationSchema, context, response, dataObject, this.deserializeMetadata(response));
 			}
@@ -10726,7 +10724,7 @@ var init_AwsQueryProtocol = __esmMin((() => {
 			}
 			const shortName = operationSchema.name.split("#")[1] ?? operationSchema.name;
 			const awsQueryResultKey = ns.isStructSchema() && this.useNestedResult() ? shortName + "Result" : void 0;
-			const bytes = await collectBody(response.body, context);
+			const bytes = await collectBody$1(response.body, context);
 			if (bytes.byteLength > 0) Object.assign(dataObject, await deserializer.read(ns, bytes, awsQueryResultKey));
 			return {
 				$metadata: this.deserializeMetadata(response),
@@ -11150,7 +11148,7 @@ var init_AwsRestXmlProtocol = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@aws-sdk/core/dist-es/submodules/protocols/index.js
-var protocols_exports = /* @__PURE__ */ __export({
+var protocols_exports = /* @__PURE__ */ __exportAll({
 	AwsEc2QueryProtocol: () => AwsEc2QueryProtocol,
 	AwsJson1_0Protocol: () => AwsJson1_0Protocol,
 	AwsJson1_1Protocol: () => AwsJson1_1Protocol,
@@ -11199,7 +11197,7 @@ var init_protocols = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@aws-sdk/core/dist-es/index.js
-var dist_es_exports = /* @__PURE__ */ __export({
+var dist_es_exports = /* @__PURE__ */ __exportAll({
 	AWSSDKSigV4Signer: () => AWSSDKSigV4Signer,
 	AwsEc2QueryProtocol: () => AwsEc2QueryProtocol,
 	AwsJson1_0Protocol: () => AwsJson1_0Protocol,
@@ -11223,7 +11221,7 @@ var dist_es_exports = /* @__PURE__ */ __export({
 	_toNum: () => _toNum,
 	_toStr: () => _toStr,
 	awsExpectUnion: () => awsExpectUnion,
-	emitWarningIfUnsupportedVersion: () => emitWarningIfUnsupportedVersion,
+	emitWarningIfUnsupportedVersion: () => emitWarningIfUnsupportedVersion$3,
 	getBearerTokenEnvKey: () => getBearerTokenEnvKey,
 	loadRestJsonErrorCode: () => loadRestJsonErrorCode,
 	loadRestXmlErrorCode: () => loadRestXmlErrorCode,
@@ -13973,7 +13971,7 @@ var init_runtimeConfig$2 = __esmMin((() => {
 		const defaultsMode = (0, import_dist_cjs$94.resolveDefaultsModeConfig)(config);
 		const defaultConfigProvider = () => defaultsMode().then(import_dist_cjs$92.loadConfigsForDefaultMode);
 		const clientSharedValues = getRuntimeConfig$5(config);
-		emitWarningIfUnsupportedVersion(process.version);
+		emitWarningIfUnsupportedVersion$3(process.version);
 		const loaderConfig = {
 			profile: config?.profile,
 			logger: clientSharedValues.logger
@@ -14743,7 +14741,7 @@ var init_models_0$2 = __esmMin((() => {}));
 
 //#endregion
 //#region node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/index.js
-var sso_oidc_exports = /* @__PURE__ */ __export({
+var sso_oidc_exports = /* @__PURE__ */ __exportAll({
 	$Command: () => import_dist_cjs$72.Command,
 	AccessDeniedException: () => AccessDeniedException$1,
 	AccessDeniedException$: () => AccessDeniedException$$1,
@@ -16475,7 +16473,7 @@ var init_runtimeConfig$1 = __esmMin((() => {
 		const defaultsMode = (0, import_dist_cjs$61.resolveDefaultsModeConfig)(config);
 		const defaultConfigProvider = () => defaultsMode().then(import_dist_cjs$59.loadConfigsForDefaultMode);
 		const clientSharedValues = getRuntimeConfig$3(config);
-		emitWarningIfUnsupportedVersion(process.version);
+		emitWarningIfUnsupportedVersion$3(process.version);
 		const loaderConfig = {
 			profile: config?.profile,
 			logger: clientSharedValues.logger
@@ -16928,7 +16926,7 @@ var init_models_0$1 = __esmMin((() => {}));
 
 //#endregion
 //#region node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/index.js
-var signin_exports = /* @__PURE__ */ __export({
+var signin_exports = /* @__PURE__ */ __exportAll({
 	$Command: () => import_dist_cjs$39.Command,
 	AccessDeniedException: () => AccessDeniedException,
 	AccessDeniedException$: () => AccessDeniedException$,
@@ -17753,7 +17751,7 @@ var init_runtimeConfig = __esmMin((() => {
 		const defaultsMode = (0, import_dist_cjs$28.resolveDefaultsModeConfig)(config);
 		const defaultConfigProvider = () => defaultsMode().then(import_dist_cjs$26.loadConfigsForDefaultMode);
 		const clientSharedValues = getRuntimeConfig$1(config);
-		emitWarningIfUnsupportedVersion(process.version);
+		emitWarningIfUnsupportedVersion$3(process.version);
 		const loaderConfig = {
 			profile: config?.profile,
 			logger: clientSharedValues.logger
@@ -18425,7 +18423,7 @@ var init_models_0 = __esmMin((() => {}));
 
 //#endregion
 //#region node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/defaultStsRoleAssumers.js
-var import_dist_cjs$1, getAccountIdFromAssumedRoleUser, resolveRegion, getDefaultRoleAssumer, getDefaultRoleAssumerWithWebIdentity, isH2;
+var import_dist_cjs$1, getAccountIdFromAssumedRoleUser, resolveRegion, getDefaultRoleAssumer$1, getDefaultRoleAssumerWithWebIdentity$1, isH2;
 var init_defaultStsRoleAssumers = __esmMin((() => {
 	init_client();
 	import_dist_cjs$1 = require_dist_cjs$9();
@@ -18445,7 +18443,7 @@ var init_defaultStsRoleAssumers = __esmMin((() => {
 		credentialProviderLogger?.debug?.("@aws-sdk/client-sts::resolveRegion", "accepting first of:", `${region} (credential provider clientConfig)`, `${parentRegion} (contextual client)`, `${stsDefaultRegion} (STS default: AWS_REGION, profile region, or us-east-1)`);
 		return resolvedRegion;
 	};
-	getDefaultRoleAssumer = (stsOptions, STSClient$2) => {
+	getDefaultRoleAssumer$1 = (stsOptions, STSClient$2) => {
 		let stsClient;
 		let closureSourceCreds;
 		return async (sourceCreds, params) => {
@@ -18482,7 +18480,7 @@ var init_defaultStsRoleAssumers = __esmMin((() => {
 			return credentials;
 		};
 	};
-	getDefaultRoleAssumerWithWebIdentity = (stsOptions, STSClient$2) => {
+	getDefaultRoleAssumerWithWebIdentity$1 = (stsOptions, STSClient$2) => {
 		let stsClient;
 		return async (params) => {
 			if (!stsClient) {
@@ -18524,7 +18522,7 @@ var init_defaultStsRoleAssumers = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/defaultRoleAssumers.js
-var getCustomizableStsClientCtor, getDefaultRoleAssumer$1, getDefaultRoleAssumerWithWebIdentity$1, decorateDefaultCredentialProvider;
+var getCustomizableStsClientCtor, getDefaultRoleAssumer, getDefaultRoleAssumerWithWebIdentity, decorateDefaultCredentialProvider;
 var init_defaultRoleAssumers = __esmMin((() => {
 	init_defaultStsRoleAssumers();
 	init_STSClient();
@@ -18537,18 +18535,18 @@ var init_defaultRoleAssumers = __esmMin((() => {
 			}
 		};
 	};
-	getDefaultRoleAssumer$1 = (stsOptions = {}, stsPlugins) => getDefaultRoleAssumer(stsOptions, getCustomizableStsClientCtor(STSClient$1, stsPlugins));
-	getDefaultRoleAssumerWithWebIdentity$1 = (stsOptions = {}, stsPlugins) => getDefaultRoleAssumerWithWebIdentity(stsOptions, getCustomizableStsClientCtor(STSClient$1, stsPlugins));
+	getDefaultRoleAssumer = (stsOptions = {}, stsPlugins) => getDefaultRoleAssumer$1(stsOptions, getCustomizableStsClientCtor(STSClient$1, stsPlugins));
+	getDefaultRoleAssumerWithWebIdentity = (stsOptions = {}, stsPlugins) => getDefaultRoleAssumerWithWebIdentity$1(stsOptions, getCustomizableStsClientCtor(STSClient$1, stsPlugins));
 	decorateDefaultCredentialProvider = (provider) => (input) => provider({
-		roleAssumer: getDefaultRoleAssumer$1(input),
-		roleAssumerWithWebIdentity: getDefaultRoleAssumerWithWebIdentity$1(input),
+		roleAssumer: getDefaultRoleAssumer(input),
+		roleAssumerWithWebIdentity: getDefaultRoleAssumerWithWebIdentity(input),
 		...input
 	});
 }));
 
 //#endregion
 //#region node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/index.js
-var sts_exports = /* @__PURE__ */ __export({
+var sts_exports = /* @__PURE__ */ __exportAll({
 	AssumeRole$: () => AssumeRole$,
 	AssumeRoleCommand: () => AssumeRoleCommand,
 	AssumeRoleRequest$: () => AssumeRoleRequest$,
@@ -18582,8 +18580,8 @@ var sts_exports = /* @__PURE__ */ __export({
 	Tag$: () => Tag$,
 	__Client: () => import_dist_cjs$16.Client,
 	decorateDefaultCredentialProvider: () => decorateDefaultCredentialProvider,
-	getDefaultRoleAssumer: () => getDefaultRoleAssumer$1,
-	getDefaultRoleAssumerWithWebIdentity: () => getDefaultRoleAssumerWithWebIdentity$1
+	getDefaultRoleAssumer: () => getDefaultRoleAssumer,
+	getDefaultRoleAssumerWithWebIdentity: () => getDefaultRoleAssumerWithWebIdentity
 });
 var init_sts = __esmMin((() => {
 	init_STSClient();
