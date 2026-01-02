@@ -1,7 +1,7 @@
 //#region rolldown:runtime
 var __defProp = Object.defineProperty;
 var __esmMin = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
-var __export = (all, symbols) => {
+var __exportAll = (all, symbols) => {
 	let target = {};
 	for (var name in all) {
 		__defProp(target, name, {
@@ -232,7 +232,7 @@ const getSmithyContext = (context) => context[SMITHY_CONTEXT_KEY] || (context[SM
 
 //#endregion
 //#region node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
-const normalizeProvider = (input) => {
+const normalizeProvider$1 = (input) => {
 	if (typeof input === "function") return input;
 	const promisified = Promise.resolve(input);
 	return () => promisified;
@@ -304,7 +304,7 @@ const getHttpAuthSchemeEndpointRuleSetPlugin = (config, { httpAuthSchemeParamete
 
 //#endregion
 //#region node_modules/@smithy/middleware-serde/dist-es/serdePlugin.js
-const serializerMiddlewareOption = {
+const serializerMiddlewareOption$1 = {
 	name: "serializerMiddleware",
 	step: "serialize",
 	tags: ["SERIALIZER"],
@@ -351,7 +351,7 @@ const getHttpSigningPlugin = (config) => ({ applyToStack: (clientStack) => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/normalizeProvider.js
-const normalizeProvider$1 = (input) => {
+const normalizeProvider = (input) => {
 	if (typeof input === "function") return input;
 	const promisified = Promise.resolve(input);
 	return () => promisified;
@@ -398,9 +398,9 @@ const fromBase64 = (input) => {
 
 //#endregion
 //#region node_modules/@smithy/util-utf8/dist-es/fromUtf8.browser.js
-var fromUtf8;
+var fromUtf8$2;
 var init_fromUtf8_browser = __esmMin((() => {
-	fromUtf8 = (input) => new TextEncoder().encode(input);
+	fromUtf8$2 = (input) => new TextEncoder().encode(input);
 }));
 
 //#endregion
@@ -409,7 +409,7 @@ var toUint8Array;
 var init_toUint8Array = __esmMin((() => {
 	init_fromUtf8_browser();
 	toUint8Array = (data) => {
-		if (typeof data === "string") return fromUtf8(data);
+		if (typeof data === "string") return fromUtf8$2(data);
 		if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT);
 		return new Uint8Array(data);
 	};
@@ -439,7 +439,7 @@ var init_dist_es = __esmMin((() => {
 init_dist_es();
 function toBase64(_input) {
 	let input;
-	if (typeof _input === "string") input = fromUtf8(_input);
+	if (typeof _input === "string") input = fromUtf8$2(_input);
 	else input = _input;
 	const isArrayLike = typeof input === "object" && typeof input.length === "number";
 	const isUint8Array = typeof input === "object" && typeof input.byteOffset === "number" && typeof input.byteLength === "number";
@@ -470,7 +470,7 @@ var Uint8ArrayBlobAdapter = class Uint8ArrayBlobAdapter extends Uint8Array {
 	static fromString(source, encoding = "utf-8") {
 		if (typeof source === "string") {
 			if (encoding === "base64") return Uint8ArrayBlobAdapter.mutate(fromBase64(source));
-			return Uint8ArrayBlobAdapter.mutate(fromUtf8(source));
+			return Uint8ArrayBlobAdapter.mutate(fromUtf8$2(source));
 		}
 		throw new Error(`Unsupported conversion from ${typeof source} to Uint8ArrayBlobAdapter.`);
 	}
@@ -807,7 +807,7 @@ const deserializerMiddlewareOption = {
 	tags: ["DESERIALIZER"],
 	override: true
 };
-const serializerMiddlewareOption$1 = {
+const serializerMiddlewareOption = {
 	name: "serializerMiddleware",
 	step: "serialize",
 	tags: ["SERIALIZER"],
@@ -815,7 +815,7 @@ const serializerMiddlewareOption$1 = {
 };
 function getSchemaSerdePlugin(config) {
 	return { applyToStack: (commandStack) => {
-		commandStack.add(schemaSerializationMiddleware(config), serializerMiddlewareOption$1);
+		commandStack.add(schemaSerializationMiddleware(config), serializerMiddlewareOption);
 		commandStack.add(schemaDeserializationMiddleware(config), deserializerMiddlewareOption);
 		config.protocol.setSerdeContext(config);
 	} };
@@ -1480,9 +1480,7 @@ var init_EventStreamSerde = __esmMin((() => {
 			let eventType = unionMember;
 			let explicitPayloadMember = null;
 			let explicitPayloadContentType;
-			const isKnownSchema = (() => {
-				return unionSchema.getSchema()[4].includes(unionMember);
-			})();
+			const isKnownSchema = unionSchema.getSchema()[4].includes(unionMember);
 			const additionalHeaders = {};
 			if (!isKnownSchema) {
 				const [type, value] = event[unionMember];
@@ -1521,7 +1519,7 @@ var init_EventStreamSerde = __esmMin((() => {
 			}
 			const messageSerialization = serializer.flush();
 			return {
-				body: typeof messageSerialization === "string" ? (this.serdeContext?.utf8Decoder ?? fromUtf8)(messageSerialization) : messageSerialization,
+				body: typeof messageSerialization === "string" ? (this.serdeContext?.utf8Decoder ?? fromUtf8$2)(messageSerialization) : messageSerialization,
 				eventType,
 				explicitPayloadContentType,
 				additionalHeaders
@@ -1532,7 +1530,7 @@ var init_EventStreamSerde = __esmMin((() => {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/event-streams/index.js
-var event_streams_exports = /* @__PURE__ */ __export({ EventStreamSerde: () => EventStreamSerde });
+var event_streams_exports = /* @__PURE__ */ __exportAll({ EventStreamSerde: () => EventStreamSerde });
 var init_event_streams = __esmMin((() => {
 	init_EventStreamSerde();
 }));
@@ -1774,7 +1772,7 @@ var FromStringShapeDeserializer = class extends SerdeContext {
 
 //#endregion
 //#region node_modules/@smithy/core/dist-es/setFeature.js
-function setFeature(context, feature, value) {
+function setFeature$1(context, feature, value) {
 	if (!context.__smithy_context) context.__smithy_context = { features: {} };
 	else if (!context.__smithy_context.features) context.__smithy_context.features = {};
 	context.__smithy_context.features[feature] = value;
@@ -1853,7 +1851,7 @@ function isValidUserAgentAppId(appId) {
 	return typeof appId === "string" && appId.length <= 50;
 }
 function resolveUserAgentConfig(input) {
-	const normalizedAppIdProvider = normalizeProvider$1(input.userAgentAppId ?? DEFAULT_UA_APP_ID);
+	const normalizedAppIdProvider = normalizeProvider(input.userAgentAppId ?? DEFAULT_UA_APP_ID);
 	const { customUserAgent } = input;
 	return Object.assign(input, {
 		customUserAgent: typeof customUserAgent === "string" ? [[customUserAgent]] : customUserAgent,
@@ -2572,7 +2570,7 @@ function setCredentialFeature(credentials, feature, value) {
 
 //#endregion
 //#region node_modules/@aws-sdk/core/dist-es/submodules/client/setFeature.js
-function setFeature$1(context, feature, value) {
+function setFeature(context, feature, value) {
 	if (!context.__aws_sdk_context) context.__aws_sdk_context = { features: {} };
 	else if (!context.__aws_sdk_context.features) context.__aws_sdk_context.features = {};
 	context.__aws_sdk_context.features[feature] = value;
@@ -2806,7 +2804,7 @@ var HeaderFormatter = class {
 	format(headers) {
 		const chunks = [];
 		for (const headerName of Object.keys(headers)) {
-			const bytes = fromUtf8(headerName);
+			const bytes = fromUtf8$2(headerName);
 			chunks.push(Uint8Array.from([bytes.byteLength]), bytes, this.formatHeaderValue(headers[headerName]));
 		}
 		const out = new Uint8Array(chunks.reduce((carry, bytes) => carry + bytes.byteLength, 0));
@@ -2844,7 +2842,7 @@ var HeaderFormatter = class {
 				binBytes.set(header.value, 3);
 				return binBytes;
 			case "string":
-				const utf8Bytes = fromUtf8(header.value);
+				const utf8Bytes = fromUtf8$2(header.value);
 				const strView = new DataView(new ArrayBuffer(3 + utf8Bytes.byteLength));
 				strView.setUint8(0, 7);
 				strView.setUint16(1, utf8Bytes.byteLength, false);
@@ -2987,8 +2985,8 @@ var SignatureV4Base = class {
 		this.sha256 = sha256;
 		this.uriEscapePath = uriEscapePath;
 		this.applyChecksum = typeof applyChecksum === "boolean" ? applyChecksum : true;
-		this.regionProvider = normalizeProvider(region);
-		this.credentialProvider = normalizeProvider(credentials);
+		this.regionProvider = normalizeProvider$1(region);
+		this.credentialProvider = normalizeProvider$1(credentials);
 	}
 	createCanonicalRequest(request, canonicalHeaders, payloadHash) {
 		const sortedHeaders = Object.keys(canonicalHeaders).sort();
@@ -3185,8 +3183,8 @@ const resolveAwsSdkSigV4Config = (config) => {
 	config.credentials = inputCredentials;
 	const { signingEscapePath = true, systemClockOffset = config.systemClockOffset || 0, sha256 } = config;
 	let signer;
-	if (config.signer) signer = normalizeProvider$1(config.signer);
-	else if (config.regionInfoProvider) signer = () => normalizeProvider$1(config.region)().then(async (region) => [await config.regionInfoProvider(region, {
+	if (config.signer) signer = normalizeProvider(config.signer);
+	else if (config.regionInfoProvider) signer = () => normalizeProvider(config.region)().then(async (region) => [await config.regionInfoProvider(region, {
 		useFipsEndpoint: await config.useFipsEndpoint(),
 		useDualstackEndpoint: await config.useDualstackEndpoint()
 	}) || {}, region]).then(([regionInfo, region]) => {
@@ -3207,7 +3205,7 @@ const resolveAwsSdkSigV4Config = (config) => {
 		authScheme = Object.assign({}, {
 			name: "sigv4",
 			signingName: config.signingName || config.defaultSigningName,
-			signingRegion: await normalizeProvider$1(config.region)(),
+			signingRegion: await normalizeProvider(config.region)(),
 			properties: {}
 		}, authScheme);
 		const signingRegion = authScheme.signingRegion;
@@ -3234,7 +3232,7 @@ function normalizeCredentialProvider(config, { credentials, credentialDefaultPro
 	let credentialsProvider;
 	if (credentials) if (!credentials?.memoized) credentialsProvider = memoizeIdentityProvider(credentials, isIdentityExpired, doesIdentityRequireRefresh);
 	else credentialsProvider = credentials;
-	else if (credentialDefaultProvider) credentialsProvider = normalizeProvider$1(credentialDefaultProvider(Object.assign({}, config, { parentClientConfig: config })));
+	else if (credentialDefaultProvider) credentialsProvider = normalizeProvider(credentialDefaultProvider(Object.assign({}, config, { parentClientConfig: config })));
 	else credentialsProvider = async () => {
 		throw new Error("@aws-sdk/core::resolveAwsSdkSigV4Config - `credentials` not provided and no credentialDefaultProvider was configured.");
 	};
@@ -4346,33 +4344,33 @@ var AwsQueryProtocol = class extends RpcProtocol {
 //#region node_modules/@aws-sdk/middleware-user-agent/dist-es/check-features.js
 const ACCOUNT_ID_ENDPOINT_REGEX = /\d{12}\.ddb/;
 async function checkFeatures(context, config, args) {
-	if (args.request?.headers?.["smithy-protocol"] === "rpc-v2-cbor") setFeature$1(context, "PROTOCOL_RPC_V2_CBOR", "M");
+	if (args.request?.headers?.["smithy-protocol"] === "rpc-v2-cbor") setFeature(context, "PROTOCOL_RPC_V2_CBOR", "M");
 	if (typeof config.retryStrategy === "function") {
 		const retryStrategy = await config.retryStrategy();
-		if (typeof retryStrategy.acquireInitialRetryToken === "function") if (retryStrategy.constructor?.name?.includes("Adaptive")) setFeature$1(context, "RETRY_MODE_ADAPTIVE", "F");
-		else setFeature$1(context, "RETRY_MODE_STANDARD", "E");
-		else setFeature$1(context, "RETRY_MODE_LEGACY", "D");
+		if (typeof retryStrategy.acquireInitialRetryToken === "function") if (retryStrategy.constructor?.name?.includes("Adaptive")) setFeature(context, "RETRY_MODE_ADAPTIVE", "F");
+		else setFeature(context, "RETRY_MODE_STANDARD", "E");
+		else setFeature(context, "RETRY_MODE_LEGACY", "D");
 	}
 	if (typeof config.accountIdEndpointMode === "function") {
 		const endpointV2 = context.endpointV2;
-		if (String(endpointV2?.url?.hostname).match(ACCOUNT_ID_ENDPOINT_REGEX)) setFeature$1(context, "ACCOUNT_ID_ENDPOINT", "O");
+		if (String(endpointV2?.url?.hostname).match(ACCOUNT_ID_ENDPOINT_REGEX)) setFeature(context, "ACCOUNT_ID_ENDPOINT", "O");
 		switch (await config.accountIdEndpointMode?.()) {
 			case "disabled":
-				setFeature$1(context, "ACCOUNT_ID_MODE_DISABLED", "Q");
+				setFeature(context, "ACCOUNT_ID_MODE_DISABLED", "Q");
 				break;
 			case "preferred":
-				setFeature$1(context, "ACCOUNT_ID_MODE_PREFERRED", "P");
+				setFeature(context, "ACCOUNT_ID_MODE_PREFERRED", "P");
 				break;
 			case "required":
-				setFeature$1(context, "ACCOUNT_ID_MODE_REQUIRED", "R");
+				setFeature(context, "ACCOUNT_ID_MODE_REQUIRED", "R");
 				break;
 		}
 	}
 	const identity = context.__smithy_context?.selectedHttpAuthScheme?.identity;
 	if (identity?.$source) {
 		const credentials = identity;
-		if (credentials.accountId) setFeature$1(context, "RESOLVED_ACCOUNT_ID", "T");
-		for (const [key, value] of Object.entries(credentials.$source ?? {})) setFeature$1(context, key, value);
+		if (credentials.accountId) setFeature(context, "RESOLVED_ACCOUNT_ID", "T");
+		for (const [key, value] of Object.entries(credentials.$source ?? {})) setFeature(context, key, value);
 	}
 }
 
@@ -4655,7 +4653,7 @@ const resolveParams = async (commandInput, instructionsSupplier, clientConfig) =
 //#region node_modules/@smithy/middleware-endpoint/dist-es/endpointMiddleware.js
 const endpointMiddleware = ({ config, instructions }) => {
 	return (next, context) => async (args) => {
-		if (config.isCustomEndpoint) setFeature(context, "ENDPOINT_OVERRIDE", "N");
+		if (config.isCustomEndpoint) setFeature$1(context, "ENDPOINT_OVERRIDE", "N");
 		const endpoint = await getEndpointFromInstructions(args.input, { getEndpointParameterInstructions() {
 			return instructions;
 		} }, { ...config }, context);
@@ -4690,7 +4688,7 @@ const endpointMiddlewareOptions = {
 	name: "endpointV2Middleware",
 	override: true,
 	relation: "before",
-	toMiddleware: serializerMiddlewareOption.name
+	toMiddleware: serializerMiddlewareOption$1.name
 };
 const getEndpointPlugin = (config, instructions) => ({ applyToStack: (clientStack) => {
 	clientStack.addRelativeTo(endpointMiddleware({
@@ -4704,14 +4702,14 @@ const getEndpointPlugin = (config, instructions) => ({ applyToStack: (clientStac
 const resolveEndpointConfig = (input) => {
 	const tls = input.tls ?? true;
 	const { endpoint, useDualstackEndpoint, useFipsEndpoint } = input;
-	const customEndpointProvider = endpoint != null ? async () => toEndpointV1(await normalizeProvider(endpoint)()) : void 0;
+	const customEndpointProvider = endpoint != null ? async () => toEndpointV1(await normalizeProvider$1(endpoint)()) : void 0;
 	const isCustomEndpoint = !!endpoint;
 	const resolvedConfig = Object.assign(input, {
 		endpoint: customEndpointProvider,
 		tls,
 		isCustomEndpoint,
-		useDualstackEndpoint: normalizeProvider(useDualstackEndpoint ?? false),
-		useFipsEndpoint: normalizeProvider(useFipsEndpoint ?? false)
+		useDualstackEndpoint: normalizeProvider$1(useDualstackEndpoint ?? false),
+		useFipsEndpoint: normalizeProvider$1(useFipsEndpoint ?? false)
 	});
 	let configuredEndpointPromise = void 0;
 	resolvedConfig.serviceConfiguredEndpoint = async () => {
@@ -5046,12 +5044,12 @@ const asSdkError = (error) => {
 //#region node_modules/@smithy/middleware-retry/dist-es/configurations.js
 const resolveRetryConfig = (input) => {
 	const { retryStrategy, retryMode: _retryMode, maxAttempts: _maxAttempts } = input;
-	const maxAttempts = normalizeProvider(_maxAttempts ?? DEFAULT_MAX_ATTEMPTS);
+	const maxAttempts = normalizeProvider$1(_maxAttempts ?? DEFAULT_MAX_ATTEMPTS);
 	return Object.assign(input, {
 		maxAttempts,
 		retryStrategy: async () => {
 			if (retryStrategy) return retryStrategy;
-			if (await normalizeProvider(_retryMode)() === RETRY_MODES.ADAPTIVE) return new AdaptiveRetryStrategy(maxAttempts);
+			if (await normalizeProvider$1(_retryMode)() === RETRY_MODES.ADAPTIVE) return new AdaptiveRetryStrategy(maxAttempts);
 			return new StandardRetryStrategy(maxAttempts);
 		}
 	});
@@ -5152,7 +5150,7 @@ const getRetryAfterHint = (response) => {
 const defaultSTSHttpAuthSchemeParametersProvider = async (config, context, input) => {
 	return {
 		operation: getSmithyContext(context).operation,
-		region: await normalizeProvider(config.region)() || (() => {
+		region: await normalizeProvider$1(config.region)() || (() => {
 			throw new Error("expected `region` to be configured for `aws.auth#sigv4`");
 		})()
 	};
@@ -5189,7 +5187,7 @@ const defaultSTSHttpAuthSchemeProvider = (authParameters) => {
 const resolveStsAuthConfig = (input) => Object.assign(input, { stsClientCtor: STSClient });
 const resolveHttpAuthSchemeConfig = (config) => {
 	const config_1 = resolveAwsSdkSigV4Config(resolveStsAuthConfig(config));
-	return Object.assign(config_1, { authSchemePreference: normalizeProvider(config.authSchemePreference ?? []) });
+	return Object.assign(config_1, { authSchemePreference: normalizeProvider$1(config.authSchemePreference ?? []) });
 };
 
 //#endregion
@@ -5235,12 +5233,12 @@ const fromUtf8$1 = (input) => new TextEncoder().encode(input);
 
 //#endregion
 //#region node_modules/@aws-crypto/util/build/module/convertToBuffer.js
-var fromUtf8$2 = typeof Buffer !== "undefined" && Buffer.from ? function(input) {
+var fromUtf8 = typeof Buffer !== "undefined" && Buffer.from ? function(input) {
 	return Buffer.from(input, "utf8");
 } : fromUtf8$1;
 function convertToBuffer(data) {
 	if (data instanceof Uint8Array) return data;
-	if (typeof data === "string") return fromUtf8$2(data);
+	if (typeof data === "string") return fromUtf8(data);
 	if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT);
 	return new Uint8Array(data);
 }
@@ -5305,7 +5303,7 @@ function locateWindow() {
 
 //#endregion
 //#region node_modules/@aws-crypto/sha256-browser/build/module/webCryptoSha256.js
-var Sha256$1 = function() {
+var Sha256$2 = function() {
 	function Sha256$3(secret) {
 		this.toHash = new Uint8Array(0);
 		this.secret = secret;
@@ -5648,7 +5646,7 @@ var RawSha256 = function() {
 
 //#endregion
 //#region node_modules/@aws-crypto/sha256-js/build/module/jsSha256.js
-var Sha256$2 = function() {
+var Sha256$1 = function() {
 	function Sha256$3(secret) {
 		this.secret = secret;
 		this.hash = new RawSha256();
@@ -5740,8 +5738,8 @@ function supportsSubtleCrypto(subtle) {
 //#region node_modules/@aws-crypto/sha256-browser/build/module/crossPlatformSha256.js
 var Sha256 = function() {
 	function Sha256$3(secret) {
-		if (supportsWebCrypto(locateWindow())) this.hash = new Sha256$1(secret);
-		else this.hash = new Sha256$2(secret);
+		if (supportsWebCrypto(locateWindow())) this.hash = new Sha256$2(secret);
+		else this.hash = new Sha256$1(secret);
 	}
 	Sha256$3.prototype.update = function(data, encoding) {
 		this.hash.update(convertToBuffer(data));
@@ -6230,7 +6228,7 @@ const getRuntimeConfig$1 = (config) => {
 		},
 		serviceId: config?.serviceId ?? "STS",
 		urlParser: config?.urlParser ?? parseUrl,
-		utf8Decoder: config?.utf8Decoder ?? fromUtf8,
+		utf8Decoder: config?.utf8Decoder ?? fromUtf8$2,
 		utf8Encoder: config?.utf8Encoder ?? toUtf8
 	};
 };
