@@ -384,7 +384,7 @@ __metadata:
     compare-versions: "npm:^6.1.1"
     esbuild: "npm:~0.27.1"
     node-stream-zip: "npm:^1.15.0"
-    oxfmt: "npm:^0.18.0"
+    oxfmt: "npm:^0.21.0"
     oxlint: "npm:^1.33.0"
     p-limit: "npm:^7.2.0"
     parcel: "npm:^2.16.3"
@@ -1698,58 +1698,58 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@oxfmt/darwin-arm64@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/darwin-arm64@npm:0.18.0"
+"@oxfmt/darwin-arm64@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/darwin-arm64@npm:0.21.0"
   conditions: os=darwin & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxfmt/darwin-x64@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/darwin-x64@npm:0.18.0"
+"@oxfmt/darwin-x64@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/darwin-x64@npm:0.21.0"
   conditions: os=darwin & cpu=x64
   languageName: node
   linkType: hard
 
-"@oxfmt/linux-arm64-gnu@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/linux-arm64-gnu@npm:0.18.0"
+"@oxfmt/linux-arm64-gnu@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/linux-arm64-gnu@npm:0.21.0"
   conditions: os=linux & cpu=arm64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxfmt/linux-arm64-musl@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/linux-arm64-musl@npm:0.18.0"
+"@oxfmt/linux-arm64-musl@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/linux-arm64-musl@npm:0.21.0"
   conditions: os=linux & cpu=arm64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxfmt/linux-x64-gnu@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/linux-x64-gnu@npm:0.18.0"
+"@oxfmt/linux-x64-gnu@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/linux-x64-gnu@npm:0.21.0"
   conditions: os=linux & cpu=x64 & libc=glibc
   languageName: node
   linkType: hard
 
-"@oxfmt/linux-x64-musl@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/linux-x64-musl@npm:0.18.0"
+"@oxfmt/linux-x64-musl@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/linux-x64-musl@npm:0.21.0"
   conditions: os=linux & cpu=x64 & libc=musl
   languageName: node
   linkType: hard
 
-"@oxfmt/win32-arm64@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/win32-arm64@npm:0.18.0"
+"@oxfmt/win32-arm64@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/win32-arm64@npm:0.21.0"
   conditions: os=win32 & cpu=arm64
   languageName: node
   linkType: hard
 
-"@oxfmt/win32-x64@npm:0.18.0":
-  version: 0.18.0
-  resolution: "@oxfmt/win32-x64@npm:0.18.0"
+"@oxfmt/win32-x64@npm:0.21.0":
+  version: 0.21.0
+  resolution: "@oxfmt/win32-x64@npm:0.21.0"
   conditions: os=win32 & cpu=x64
   languageName: node
   linkType: hard
@@ -7500,18 +7500,18 @@ __metadata:
   languageName: node
   linkType: hard
 
-"oxfmt@npm:^0.18.0":
-  version: 0.18.0
-  resolution: "oxfmt@npm:0.18.0"
+"oxfmt@npm:^0.21.0":
+  version: 0.21.0
+  resolution: "oxfmt@npm:0.21.0"
   dependencies:
-    "@oxfmt/darwin-arm64": "npm:0.18.0"
-    "@oxfmt/darwin-x64": "npm:0.18.0"
-    "@oxfmt/linux-arm64-gnu": "npm:0.18.0"
-    "@oxfmt/linux-arm64-musl": "npm:0.18.0"
-    "@oxfmt/linux-x64-gnu": "npm:0.18.0"
-    "@oxfmt/linux-x64-musl": "npm:0.18.0"
-    "@oxfmt/win32-arm64": "npm:0.18.0"
-    "@oxfmt/win32-x64": "npm:0.18.0"
+    "@oxfmt/darwin-arm64": "npm:0.21.0"
+    "@oxfmt/darwin-x64": "npm:0.21.0"
+    "@oxfmt/linux-arm64-gnu": "npm:0.21.0"
+    "@oxfmt/linux-arm64-musl": "npm:0.21.0"
+    "@oxfmt/linux-x64-gnu": "npm:0.21.0"
+    "@oxfmt/linux-x64-musl": "npm:0.21.0"
+    "@oxfmt/win32-arm64": "npm:0.21.0"
+    "@oxfmt/win32-x64": "npm:0.21.0"
     tinypool: "npm:2.0.0"
   dependenciesMeta:
     "@oxfmt/darwin-arm64":
@@ -7532,7 +7532,7 @@ __metadata:
       optional: true
   bin:
     oxfmt: bin/oxfmt
-  checksum: 10c0/06092dcdaef5e4ca8bb37f3e63347da24f6db916056281de06ec699b297dc0d9351a3c618ea921e899a4efc3dedbce5a36f484b46b6d556f558cd1bffa0f2f3a
+  checksum: 10c0/133255f1d0dae3c2a9f92e0efad27a570f079ecdee6df5314e7c18b1e60519f111e39bafeeb890eee822113e57b054a37c8ed3b49954f34ef415556719aa22a2
   languageName: node
   linkType: hard
 
