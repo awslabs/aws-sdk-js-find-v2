@@ -319,7 +319,7 @@ const getSigningKey = async (sha256Constructor, credentials, shortDate, region, 
         return signingKeyCache[cacheKey];
     }
     cacheQueue.push(cacheKey);
-    while (cacheQueue.length > MAX_CACHE_SIZE) {
+    while (cacheQueue.length > /* inlined export .MAX_CACHE_SIZE */ (50)) {
         delete signingKeyCache[cacheQueue.shift()];
     }
     let key = `AWS4${credentials.secretAccessKey}`;
@@ -741,7 +741,7 @@ class SignatureV4 extends SignatureV4Base {
         this.validateResolvedCredentials(credentials);
         const region = signingRegion ?? (await this.regionProvider());
         const { longDate, shortDate } = this.formatDate(signingDate);
-        if (expiresIn > MAX_PRESIGNED_TTL) {
+        if (expiresIn > /* inlined export .MAX_PRESIGNED_TTL */ (604800)) {
             return Promise.reject("Signature version 4 presigned URLs" + " must have an expiration date less than one week in" + " the future");
         }
         const scope = createScope(shortDate, region, signingService ?? this.service);
@@ -5784,14 +5784,12 @@ var parseKnownFiles = __webpack_require__(8444);
 var getConfigFilepath = __webpack_require__(2432);
 // EXTERNAL MODULE: ./node_modules/@smithy/types/dist-es/profile.js
 var dist_es_profile = __webpack_require__(5578);
-// EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/constants.js
-var constants = __webpack_require__(9094);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getSsoSessionData.js
 
 
 const getSsoSessionData = (data) => Object.entries(data)
-    .filter(([key]) => key.startsWith(dist_es_profile/* .IniSectionType.SSO_SESSION */.I.SSO_SESSION + constants/* .CONFIG_PREFIX_SEPARATOR */.Q))
-    .reduce((acc, [key, value]) => ({ ...acc, [key.substring(key.indexOf(constants/* .CONFIG_PREFIX_SEPARATOR */.Q) + 1)]: value }), {});
+    .filter(([key]) => key.startsWith(dist_es_profile/* .IniSectionType.SSO_SESSION */.I.SSO_SESSION + /* inlined export .CONFIG_PREFIX_SEPARATOR */ (".")))
+    .reduce((acc, [key, value]) => ({ ...acc, [key.substring(key.indexOf(/* inlined export .CONFIG_PREFIX_SEPARATOR */ (".")) + 1)]: value }), {});
 
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseIni.js
 var parseIni = __webpack_require__(1476);
@@ -5939,7 +5937,7 @@ const fromSso = (init = {}) => async ({ callerClientConfig } = {}) => {
     validateTokenKey("expiresAt", ssoToken.expiresAt);
     const { accessToken, expiresAt } = ssoToken;
     const existingToken = { token: accessToken, expiration: new Date(expiresAt) };
-    if (existingToken.expiration.getTime() - Date.now() > EXPIRE_WINDOW_MS) {
+    if (existingToken.expiration.getTime() - Date.now() > /* inlined export .EXPIRE_WINDOW_MS */ (300000)) {
         return existingToken;
     }
     if (Date.now() - lastRefreshAttemptTime.getTime() < 30 * 1000) {
@@ -6461,8 +6459,8 @@ var middleware_content_length_dist_es = __webpack_require__(649);
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
 var dist_es_configurations = __webpack_require__(3326);
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 2 modules
-var retryMiddleware = __webpack_require__(6903);
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 3 modules
+var retryMiddleware = __webpack_require__(9608);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 13 modules
@@ -6707,7 +6705,7 @@ const runtimeConfig_getRuntimeConfig = (config) => {
         retryMode: config?.retryMode ??
             (0,configLoader/* .loadConfig */.Z)({
                 ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L0,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
             }, config),
         sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
         streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
@@ -7352,11 +7350,11 @@ const userAgentMiddleware = (options) => (next, context) => async (args) => {
     const prefix = (0,dist_es/* .getUserAgentPrefix */.vL)();
     const sdkUserAgentValue = (prefix ? [prefix] : [])
         .concat([...defaultUserAgent, ...userAgent, ...customUserAgent])
-        .join(SPACE);
+        .join(/* inlined export .SPACE */ (" "));
     const normalUAValue = [
         ...defaultUserAgent.filter((section) => section.startsWith("aws-sdk-")),
         ...customUserAgent,
-    ].join(SPACE);
+    ].join(/* inlined export .SPACE */ (" "));
     if (options.runtime !== "browser") {
         if (normalUAValue) {
             headers[X_AMZ_USER_AGENT] = headers[X_AMZ_USER_AGENT]
@@ -7375,11 +7373,11 @@ const userAgentMiddleware = (options) => (next, context) => async (args) => {
 };
 const escapeUserAgent = (userAgentPair) => {
     const name = userAgentPair[0]
-        .split(UA_NAME_SEPARATOR)
-        .map((part) => part.replace(UA_NAME_ESCAPE_REGEX, UA_ESCAPE_CHAR))
-        .join(UA_NAME_SEPARATOR);
-    const version = userAgentPair[1]?.replace(UA_VALUE_ESCAPE_REGEX, UA_ESCAPE_CHAR);
-    const prefixSeparatorIndex = name.indexOf(UA_NAME_SEPARATOR);
+        .split(/* inlined export .UA_NAME_SEPARATOR */ ("/"))
+        .map((part) => part.replace(UA_NAME_ESCAPE_REGEX, /* inlined export .UA_ESCAPE_CHAR */ ("-")))
+        .join(/* inlined export .UA_NAME_SEPARATOR */ ("/"));
+    const version = userAgentPair[1]?.replace(UA_VALUE_ESCAPE_REGEX, /* inlined export .UA_ESCAPE_CHAR */ ("-"));
+    const prefixSeparatorIndex = name.indexOf(/* inlined export .UA_NAME_SEPARATOR */ ("/"));
     const prefix = name.substring(0, prefixSeparatorIndex);
     let uaName = name.substring(prefixSeparatorIndex + 1);
     if (prefix === "api") {
@@ -7449,8 +7447,8 @@ var middleware_content_length_dist_es = __webpack_require__(649);
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
 var dist_es_configurations = __webpack_require__(3326);
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 2 modules
-var retryMiddleware = __webpack_require__(6903);
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 3 modules
+var retryMiddleware = __webpack_require__(9608);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 13 modules
@@ -7693,7 +7691,7 @@ const runtimeConfig_getRuntimeConfig = (config) => {
         retryMode: config?.retryMode ??
             (0,configLoader/* .loadConfig */.Z)({
                 ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L0,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
             }, config),
         sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
         streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
@@ -8073,8 +8071,8 @@ var middleware_content_length_dist_es = __webpack_require__(649);
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
 var dist_es_configurations = __webpack_require__(3326);
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 2 modules
-var retryMiddleware = __webpack_require__(6903);
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 3 modules
+var retryMiddleware = __webpack_require__(9608);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 13 modules
@@ -8317,7 +8315,7 @@ const runtimeConfig_getRuntimeConfig = (config) => {
         retryMode: config?.retryMode ??
             (0,configLoader/* .loadConfig */.Z)({
                 ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L0,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
             }, config),
         sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
         streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
@@ -9317,8 +9315,8 @@ var middleware_content_length_dist_es = __webpack_require__(649);
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
 var dist_es_configurations = __webpack_require__(3326);
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 2 modules
-var retryMiddleware = __webpack_require__(6903);
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 3 modules
+var retryMiddleware = __webpack_require__(9608);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 13 modules
@@ -9562,7 +9560,7 @@ const runtimeConfig_getRuntimeConfig = (config) => {
         retryMode: config?.retryMode ??
             (0,configLoader/* .loadConfig */.Z)({
                 ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L0,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
             }, config),
         sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
         streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
@@ -12632,8 +12630,6 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(9614);
-// EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/constants.js
-var constants = __webpack_require__(9094);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointUrlConfig.js
 
 const ENV_ENDPOINT_URL = "AWS_ENDPOINT_URL";
@@ -12651,10 +12647,10 @@ const getEndpointUrlConfig = (serviceId) => ({
     },
     configFileSelector: (profile, config) => {
         if (config && profile.services) {
-            const servicesSection = config[["services", profile.services].join(constants/* .CONFIG_PREFIX_SEPARATOR */.Q)];
+            const servicesSection = config[["services", profile.services].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."))];
             if (servicesSection) {
                 const servicePrefixParts = serviceId.split(" ").map((w) => w.toLowerCase());
-                const endpointUrl = servicesSection[[servicePrefixParts.join("_"), CONFIG_ENDPOINT_URL].join(constants/* .CONFIG_PREFIX_SEPARATOR */.Q)];
+                const endpointUrl = servicesSection[[servicePrefixParts.join("_"), CONFIG_ENDPOINT_URL].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."))];
                 if (endpointUrl)
                     return endpointUrl;
             }
@@ -13114,14 +13110,12 @@ class DefaultRateLimiter {
     }
 }
 
-// EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/constants.js
-var constants = __webpack_require__(7072);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/util-retry/dist-es/defaultRetryBackoffStrategy.js
 
 const getDefaultRetryBackoffStrategy = () => {
-    let delayBase = constants/* .DEFAULT_RETRY_DELAY_BASE */.bp;
+    let delayBase = /* inlined export .DEFAULT_RETRY_DELAY_BASE */ (100);
     const computeNextBackoffDelay = (attempts) => {
-        return Math.floor(Math.min(constants/* .MAXIMUM_RETRY_DELAY */.G8, Math.random() * 2 ** attempts * delayBase));
+        return Math.floor(Math.min(/* inlined export .MAXIMUM_RETRY_DELAY */ (20000), Math.random() * 2 ** attempts * delayBase));
     };
     const setDelayBase = (delay) => {
         delayBase = delay;
@@ -13136,7 +13130,7 @@ const getDefaultRetryBackoffStrategy = () => {
 
 const createDefaultRetryToken = ({ retryDelay, retryCount, retryCost, }) => {
     const getRetryCount = () => retryCount;
-    const getRetryDelay = () => Math.min(constants/* .MAXIMUM_RETRY_DELAY */.G8, retryDelay);
+    const getRetryDelay = () => Math.min(/* inlined export .MAXIMUM_RETRY_DELAY */ (20000), retryDelay);
     const getRetryCost = () => retryCost;
     return {
         getRetryCount,
@@ -13152,8 +13146,8 @@ const createDefaultRetryToken = ({ retryDelay, retryCount, retryCost, }) => {
 
 class StandardRetryStrategy {
     maxAttempts;
-    mode = config/* .RETRY_MODES.STANDARD */.cm.STANDARD;
-    capacity = constants/* .INITIAL_RETRY_TOKENS */.Df;
+    mode = config/* .RETRY_MODES.STANDARD */.c.STANDARD;
+    capacity = /* inlined export .INITIAL_RETRY_TOKENS */ (500);
     retryBackoffStrategy = getDefaultRetryBackoffStrategy();
     maxAttemptsProvider;
     constructor(maxAttempts) {
@@ -13162,7 +13156,7 @@ class StandardRetryStrategy {
     }
     async acquireInitialRetryToken(retryTokenScope) {
         return createDefaultRetryToken({
-            retryDelay: constants/* .DEFAULT_RETRY_DELAY_BASE */.bp,
+            retryDelay: /* inlined export .DEFAULT_RETRY_DELAY_BASE */ (100),
             retryCount: 0,
         });
     }
@@ -13170,7 +13164,7 @@ class StandardRetryStrategy {
         const maxAttempts = await this.getMaxAttempts();
         if (this.shouldRetry(token, errorInfo, maxAttempts)) {
             const errorType = errorInfo.errorType;
-            this.retryBackoffStrategy.setDelayBase(errorType === "THROTTLING" ? constants/* .THROTTLING_RETRY_DELAY_BASE */.jh : constants/* .DEFAULT_RETRY_DELAY_BASE */.bp);
+            this.retryBackoffStrategy.setDelayBase(errorType === "THROTTLING" ? /* inlined export .THROTTLING_RETRY_DELAY_BASE */ (500) : /* inlined export .DEFAULT_RETRY_DELAY_BASE */ (100));
             const delayFromErrorType = this.retryBackoffStrategy.computeNextBackoffDelay(token.getRetryCount());
             const retryDelay = errorInfo.retryAfterHint
                 ? Math.max(errorInfo.retryAfterHint.getTime() - Date.now() || 0, delayFromErrorType)
@@ -13186,7 +13180,7 @@ class StandardRetryStrategy {
         throw new Error("No retry token available");
     }
     recordSuccess(token) {
-        this.capacity = Math.max(constants/* .INITIAL_RETRY_TOKENS */.Df, this.capacity + (token.getRetryCost() ?? constants/* .NO_RETRY_INCREMENT */.XP));
+        this.capacity = Math.max(/* inlined export .INITIAL_RETRY_TOKENS */ (500), this.capacity + (token.getRetryCost() ?? /* inlined export .NO_RETRY_INCREMENT */ (1)));
     }
     getCapacity() {
         return this.capacity;
@@ -13196,8 +13190,8 @@ class StandardRetryStrategy {
             return await this.maxAttemptsProvider();
         }
         catch (error) {
-            console.warn(`Max attempts provider could not resolve. Using default of ${config/* .DEFAULT_MAX_ATTEMPTS */.Gz}`);
-            return config/* .DEFAULT_MAX_ATTEMPTS */.Gz;
+            console.warn(`Max attempts provider could not resolve. Using default of ${/* inlined export .DEFAULT_MAX_ATTEMPTS */ (3)}`);
+            return /* inlined export .DEFAULT_MAX_ATTEMPTS */ (3);
         }
     }
     shouldRetry(tokenToRenew, errorInfo, maxAttempts) {
@@ -13207,7 +13201,7 @@ class StandardRetryStrategy {
             this.isRetryableError(errorInfo.errorType));
     }
     getCapacityCost(errorType) {
-        return errorType === "TRANSIENT" ? constants/* .TIMEOUT_RETRY_COST */.Rn : constants/* .RETRY_COST */.XS;
+        return errorType === "TRANSIENT" ? /* inlined export .TIMEOUT_RETRY_COST */ (10) : /* inlined export .RETRY_COST */ (5);
     }
     isRetryableError(errorType) {
         return errorType === "THROTTLING" || errorType === "TRANSIENT";
@@ -13222,7 +13216,7 @@ class AdaptiveRetryStrategy {
     maxAttemptsProvider;
     rateLimiter;
     standardRetryStrategy;
-    mode = config/* .RETRY_MODES.ADAPTIVE */.cm.ADAPTIVE;
+    mode = config/* .RETRY_MODES.ADAPTIVE */.c.ADAPTIVE;
     constructor(maxAttemptsProvider, options) {
         this.maxAttemptsProvider = maxAttemptsProvider;
         const { rateLimiter } = options ?? {};
@@ -13269,11 +13263,11 @@ const NODE_MAX_ATTEMPT_CONFIG_OPTIONS = {
         }
         return maxAttempt;
     },
-    default: config/* .DEFAULT_MAX_ATTEMPTS */.Gz,
+    default: /* inlined export .DEFAULT_MAX_ATTEMPTS */ (3),
 };
 const resolveRetryConfig = (input) => {
     const { retryStrategy, retryMode: _retryMode, maxAttempts: _maxAttempts } = input;
-    const maxAttempts = (0,normalizeProvider/* .normalizeProvider */.t)(_maxAttempts ?? config/* .DEFAULT_MAX_ATTEMPTS */.Gz);
+    const maxAttempts = (0,normalizeProvider/* .normalizeProvider */.t)(_maxAttempts ?? /* inlined export .DEFAULT_MAX_ATTEMPTS */ (3));
     return Object.assign(input, {
         maxAttempts,
         retryStrategy: async () => {
@@ -13281,7 +13275,7 @@ const resolveRetryConfig = (input) => {
                 return retryStrategy;
             }
             const retryMode = await (0,normalizeProvider/* .normalizeProvider */.t)(_retryMode)();
-            if (retryMode === config/* .RETRY_MODES.ADAPTIVE */.cm.ADAPTIVE) {
+            if (retryMode === config/* .RETRY_MODES.ADAPTIVE */.c.ADAPTIVE) {
                 return new AdaptiveRetryStrategy(maxAttempts);
             }
             return new StandardRetryStrategy(maxAttempts);
@@ -13293,12 +13287,12 @@ const CONFIG_RETRY_MODE = "retry_mode";
 const NODE_RETRY_MODE_CONFIG_OPTIONS = {
     environmentVariableSelector: (env) => env[ENV_RETRY_MODE],
     configFileSelector: (profile) => profile[CONFIG_RETRY_MODE],
-    default: config/* .DEFAULT_RETRY_MODE */.L0,
+    default: config/* .DEFAULT_RETRY_MODE */.L,
 };
 
 
 },
-6903(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+9608(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -13315,8 +13309,17 @@ var httpResponse = __webpack_require__(4094);
 var dist_es = __webpack_require__(9819);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
-// EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/constants.js
-var constants = __webpack_require__(7072);
+;// CONCATENATED MODULE: ./node_modules/@smithy/util-retry/dist-es/constants.js
+const DEFAULT_RETRY_DELAY_BASE = 100;
+const MAXIMUM_RETRY_DELAY = 20 * 1000;
+const THROTTLING_RETRY_DELAY_BASE = 500;
+const INITIAL_RETRY_TOKENS = 500;
+const RETRY_COST = 5;
+const TIMEOUT_RETRY_COST = 10;
+const NO_RETRY_INCREMENT = 1;
+const INVOCATION_ID_HEADER = "amz-sdk-invocation-id";
+const REQUEST_HEADER = "amz-sdk-request";
+
 // EXTERNAL MODULE: ./node_modules/@smithy/uuid/dist-es/v4.js + 1 modules
 var v4 = __webpack_require__(3983);
 // EXTERNAL MODULE: external "stream"
@@ -13357,12 +13360,12 @@ const retryMiddleware = (options) => (next, context) => async (args) => {
         const { request } = args;
         const isRequest = httpRequest/* .HttpRequest.isInstance */.K.isInstance(request);
         if (isRequest) {
-            request.headers[constants/* .INVOCATION_ID_HEADER */.l5] = (0,v4.v4)();
+            request.headers[INVOCATION_ID_HEADER] = (0,v4.v4)();
         }
         while (true) {
             try {
                 if (isRequest) {
-                    request.headers[constants/* .REQUEST_HEADER */.ok] = `attempt=${attempts + 1}; max=${maxAttempts}`;
+                    request.headers[REQUEST_HEADER] = `attempt=${attempts + 1}; max=${maxAttempts}`;
                 }
                 const { response, output } = await next(args);
                 retryStrategy.recordSuccess(retryToken);
@@ -14692,14 +14695,6 @@ const isServerError = (error) => {
 
 
 },
-9094(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
-__webpack_require__.d(__webpack_exports__, {
-  Q: () => (CONFIG_PREFIX_SEPARATOR)
-});
-const CONFIG_PREFIX_SEPARATOR = ".";
-
-
-},
 3297(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 __webpack_require__.d(__webpack_exports__, {
   Z: () => (externalDataInterceptor)
@@ -14838,21 +14833,19 @@ __webpack_require__.d(__webpack_exports__, {
 var external_path_ = __webpack_require__(6928);
 // EXTERNAL MODULE: ./node_modules/@smithy/types/dist-es/profile.js
 var profile = __webpack_require__(5578);
-// EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/constants.js
-var constants = __webpack_require__(9094);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getConfigData.js
 
 
 const getConfigData = (data) => Object.entries(data)
     .filter(([key]) => {
-    const indexOfSeparator = key.indexOf(constants/* .CONFIG_PREFIX_SEPARATOR */.Q);
+    const indexOfSeparator = key.indexOf(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."));
     if (indexOfSeparator === -1) {
         return false;
     }
     return Object.values(profile/* .IniSectionType */.I).includes(key.substring(0, indexOfSeparator));
 })
     .reduce((acc, [key, value]) => {
-    const indexOfSeparator = key.indexOf(constants/* .CONFIG_PREFIX_SEPARATOR */.Q);
+    const indexOfSeparator = key.indexOf(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."));
     const updatedKey = key.substring(0, indexOfSeparator) === profile/* .IniSectionType.PROFILE */.I.PROFILE ? key.substring(indexOfSeparator + 1) : key;
     acc[updatedKey] = value;
     return acc;
@@ -14922,7 +14915,6 @@ __webpack_require__.d(__webpack_exports__, {
   A: () => (parseIni)
 });
 /* import */ var _smithy_types__rspack_import_0 = __webpack_require__(5578);
-/* import */ var _constants__rspack_import_1 = __webpack_require__(9094);
 
 
 const prefixKeyRegex = /^([\w-]+)\s(["'])?([\w-@\+\.%:/]+)\2$/;
@@ -14942,7 +14934,7 @@ const parseIni = (iniData) => {
             if (matches) {
                 const [, prefix, , name] = matches;
                 if (Object.values(_smithy_types__rspack_import_0/* .IniSectionType */.I).includes(prefix)) {
-                    currentSection = [prefix, name].join(_constants__rspack_import_1/* .CONFIG_PREFIX_SEPARATOR */.Q);
+                    currentSection = [prefix, name].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."));
                 }
             }
             else {
@@ -14967,7 +14959,7 @@ const parseIni = (iniData) => {
                         currentSubSection = undefined;
                     }
                     map[currentSection] = map[currentSection] || {};
-                    const key = currentSubSection ? [currentSubSection, name].join(_constants__rspack_import_1/* .CONFIG_PREFIX_SEPARATOR */.Q) : name;
+                    const key = currentSubSection ? [currentSubSection, name].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ (".")) : name;
                     map[currentSection][key] = value;
                 }
             }
@@ -16442,9 +16434,8 @@ const normalizeProvider = (input) => {
 },
 7355(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 __webpack_require__.d(__webpack_exports__, {
-  Gz: () => (DEFAULT_MAX_ATTEMPTS),
-  L0: () => (DEFAULT_RETRY_MODE),
-  cm: () => (RETRY_MODES)
+  L: () => (DEFAULT_RETRY_MODE),
+  c: () => (RETRY_MODES)
 });
 var RETRY_MODES;
 (function (RETRY_MODES) {
@@ -16453,30 +16444,6 @@ var RETRY_MODES;
 })(RETRY_MODES || (RETRY_MODES = {}));
 const DEFAULT_MAX_ATTEMPTS = 3;
 const DEFAULT_RETRY_MODE = RETRY_MODES.STANDARD;
-
-
-},
-7072(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
-__webpack_require__.d(__webpack_exports__, {
-  Df: () => (INITIAL_RETRY_TOKENS),
-  G8: () => (MAXIMUM_RETRY_DELAY),
-  Rn: () => (TIMEOUT_RETRY_COST),
-  XP: () => (NO_RETRY_INCREMENT),
-  XS: () => (RETRY_COST),
-  bp: () => (DEFAULT_RETRY_DELAY_BASE),
-  jh: () => (THROTTLING_RETRY_DELAY_BASE),
-  l5: () => (INVOCATION_ID_HEADER),
-  ok: () => (REQUEST_HEADER)
-});
-const DEFAULT_RETRY_DELAY_BASE = 100;
-const MAXIMUM_RETRY_DELAY = 20 * 1000;
-const THROTTLING_RETRY_DELAY_BASE = 500;
-const INITIAL_RETRY_TOKENS = 500;
-const RETRY_COST = 5;
-const TIMEOUT_RETRY_COST = 10;
-const NO_RETRY_INCREMENT = 1;
-const INVOCATION_ID_HEADER = "amz-sdk-invocation-id";
-const REQUEST_HEADER = "amz-sdk-request";
 
 
 },
@@ -16961,8 +16928,8 @@ var middleware_content_length_dist_es = __webpack_require__(649);
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
 var dist_es_configurations = __webpack_require__(3326);
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 2 modules
-var retryMiddleware = __webpack_require__(6903);
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 3 modules
+var retryMiddleware = __webpack_require__(9608);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 13 modules
@@ -17391,7 +17358,7 @@ const runtimeConfig_getRuntimeConfig = (config) => {
         retryMode: config?.retryMode ??
             (0,configLoader/* .loadConfig */.Z)({
                 ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L0,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
             }, config),
         sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
         streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
