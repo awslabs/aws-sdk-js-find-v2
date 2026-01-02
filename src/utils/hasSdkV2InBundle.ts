@@ -45,10 +45,10 @@ export const hasSdkV2InBundle = (bundleContent: string, sdkVersionRange: string)
     }
   }
 
-  // Get version number from `VERSION:'2.X.Y'` or `VERSION:"2.X.Y"` or `VERSION: '2.X.Y'` or `VERSION: "2.X.Y"`
-  const matches = bundleContent.match(/VERSION:(?:'|")(2\.\d+\.\d+)(?:'|")/);
-  if (matches && matches[1]) {
-    const version = matches[1];
+  // Get version number from `VERSION:'2.X.Y'` or `VERSION: '2.X.Y'`, including double quotes and backticks.
+  const matches = bundleContent.match(/VERSION:\s*(['"`])(2\.\d+\.\d+)\1/);
+  if (matches && matches[2]) {
+    const version = matches[2];
     // If version is in the specified range, return true
     if (satisfies(version, sdkVersionRange)) {
       return true;
