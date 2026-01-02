@@ -1,5 +1,6 @@
 import StreamZip from "node-stream-zip";
-const PACKAGE_JSON_FILENAME = "package.json";
+import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
+import { join } from "node:path";
 
 export interface FileInfo {
   // Path of the file within the zip archive.
@@ -14,6 +15,11 @@ export interface LambdaFunctionContents {
    * String contents of all package.json files from Lambda Function.
    */
   packageJsonFiles?: FileInfo[];
+
+  /**
+   * Map with aws-sdk package.json filepath as key and contents as value.
+   */
+  awsSdkPackageJsonMap?: Record<string, string>;
 
   /**
    * String contents of the index.js bundle file, if present.
@@ -35,6 +41,7 @@ export const getLambdaFunctionContents = async (
   const zip = new StreamZip.async({ file: zipPath });
 
   const packageJsonFiles = [];
+  const awsSdkPackageJsonMap: Record<string, string> = {};
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
   try {
@@ -45,11 +52,16 @@ export const getLambdaFunctionContents = async (
   }
 
   for (const zipEntry of Object.values(zipEntries)) {
-    // Skip 'node_modules' directory, as it's not the customer source code.
-    if (zipEntry.name.includes("node_modules/")) continue;
+    // Skip 'node_modules' directory, except when it's not aws-sdk package.json.
+    if (zipEntry.name.includes("node_modules/")) {
+      if (!zipEntry.name.endsWith(join(NODE_MODULES, AWS_SDK, PACKAGE_JSON))) continue;
+      const packageJsonContent = await zip.entryData(zipEntry.name);
+      awsSdkPackageJsonMap[zipEntry.name] = packageJsonContent.toString();
+      continue;
+    }
 
     // Skip anything which is not 'package.json'
-    if (!zipEntry.name.endsWith(PACKAGE_JSON_FILENAME)) continue;
+    if (!zipEntry.name.endsWith(PACKAGE_JSON)) continue;
 
     // Skip if 'package.json' is not a file
     if (!zipEntry.isFile) continue;
@@ -68,7 +80,10 @@ export const getLambdaFunctionContents = async (
 
   if (packageJsonFiles.length !== 0) {
     await zip.close();
-    return { packageJsonFiles };
+    return {
+      packageJsonFiles,
+      ...(awsSdkPackageJsonMap && { awsSdkPackageJsonMap }),
+    };
   }
 
   for (const path of ["index.js", "index.mjs", "index.cjs"]) {

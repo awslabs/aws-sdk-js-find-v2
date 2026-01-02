@@ -11,6 +11,7 @@ import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { AWS_SDK } from "./constants.ts";
 
 export interface LambdaFunctionScanOptions {
   // The name of the Lambda function
@@ -94,20 +95,20 @@ export const getLambdaFunctionScanOutput = async (
 
   const { packageJsonFiles, bundleFile } = lambdaFunctionContents;
 
-  // Search for "aws-sdk" in package.json dependencies if present.
+  // Search for JS SDK v2 in package.json dependencies if present.
   if (packageJsonFiles && packageJsonFiles.length > 0) {
     for (const { path: packageJsonPath, content: packageJsonContent } of packageJsonFiles) {
       try {
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
-        if ("aws-sdk" in dependencies) {
+        if (AWS_SDK in dependencies) {
           try {
-            if (!satisfies(dependencies["aws-sdk"], sdkVersionRange)) {
+            if (!satisfies(dependencies[AWS_SDK], sdkVersionRange)) {
               continue;
             }
           } catch (error) {
             const errorPrefix = `Error checking version range '${sdkVersionRange}' for aws-sdk@${
-              dependencies["aws-sdk"]
+              dependencies[AWS_SDK]
             } in '${packageJsonPath}'`;
             output.AwsSdkJsV2Error =
               error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
@@ -126,7 +127,7 @@ export const getLambdaFunctionScanOutput = async (
     }
   }
 
-  // Check for code of "aws-sdk" in bundle, if not found in package.json dependencies.
+  // Check for signature of JS SDK v2 in bundle, if not found in package.json dependencies.
   if (bundleFile) {
     try {
       if (hasSdkV2InBundle(bundleFile.content, sdkVersionRange)) {
@@ -144,7 +145,7 @@ export const getLambdaFunctionScanOutput = async (
     }
   }
 
-  // "aws-sdk" dependency/code not found.
+  // JS SDK v2 dependency/code not found.
   output.ContainsAwsSdkJsV2 = false;
   return output;
 };
