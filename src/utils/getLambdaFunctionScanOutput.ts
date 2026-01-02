@@ -102,7 +102,7 @@ export const getLambdaFunctionScanOutput = async (
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
         if (AWS_SDK in dependencies) {
-          const awsSdkVersionInPackageJson = dependencies[AWS_SDK];
+          const awsSdkVersionInPackageJson: string = dependencies[AWS_SDK];
 
           const awsSdkPackageJsonPathInNodeModules = join(NODE_MODULES, AWS_SDK, PACKAGE_JSON);
           // Get aws-sdk package.json from basename node_modules or root node_modules.
@@ -112,18 +112,35 @@ export const getLambdaFunctionScanOutput = async (
               ] ?? awsSdkPackageJsonMap[awsSdkPackageJsonPathInNodeModules])
             : undefined;
 
-          // If fixed version is defined in dependencies or aws-sdk package.json is not available.
-          if (validate(awsSdkVersionInPackageJson) || awsSdkPackageJson === undefined) {
-            if (!satisfies(dependencies[AWS_SDK], sdkVersionRange)) {
+          let awsSdkVersionInNodeModules: string | undefined;
+          try {
+            if (awsSdkPackageJson) {
+              awsSdkVersionInNodeModules = JSON.parse(awsSdkPackageJson).version;
+            }
+          } catch {
+            // Skip is JSON can't be parsed.
+            // ToDo: add warning when logging is supported in future.
+          }
+
+          const sdkVersionToCheck =
+            validate(awsSdkVersionInPackageJson) || awsSdkPackageJson === undefined
+              ? // Use version in package.json dependencies, if fixed version is defined or aws-sdk package.json is not available.
+                awsSdkVersionInPackageJson
+              : // Use version from aws-sdk package.json, if defined
+                (awsSdkVersionInNodeModules ?? awsSdkVersionInPackageJson);
+
+          try {
+            if (!satisfies(sdkVersionToCheck, sdkVersionRange)) {
               continue;
             }
+          } catch (error) {
+            const errorPrefix = `Error checking version range '${sdkVersionRange}' for aws-sdk@${
+              dependencies["aws-sdk"]
+            } in '${packageJsonPath}'`;
+            output.AwsSdkJsV2Error =
+              error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
+            return output;
           }
-
-          // Fixed version is not defined in dependencies, check in aws-sdk package.json.
-          else if (!satisfies(JSON.parse(awsSdkPackageJson).version, sdkVersionRange)) {
-            continue;
-          }
-
           output.ContainsAwsSdkJsV2 = true;
           output.AwsSdkJsV2Location = `Defined in dependencies of '${packageJsonPath}'`;
           return output;
