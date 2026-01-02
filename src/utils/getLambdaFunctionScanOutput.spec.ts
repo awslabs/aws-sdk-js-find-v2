@@ -38,7 +38,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Function Code location not found.",
     });
@@ -65,7 +65,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Location: "Defined in dependencies of 'package.json'",
     });
@@ -95,7 +95,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Location: "Bundled in 'index.js'",
     });
@@ -145,7 +145,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: false,
     });
     expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
@@ -171,7 +171,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: false,
     });
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
@@ -194,7 +194,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error:
         "Error parsing 'package.json': Unexpected token 'i', \"invalid json\" is not valid JSON",
@@ -221,7 +221,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error downloading or reading Lambda function code: Download failed",
     });
@@ -247,7 +247,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error downloading or reading Lambda function code",
     });
@@ -275,7 +275,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: `<${sdkVersion}`,
+      SdkVersion: `<${sdkVersion}`,
       ContainsAwsSdkJsV2: false,
     });
   });
@@ -323,7 +323,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error reading bundle 'index.js' for aws-sdk@2.x: Bundle parse error",
     });
@@ -350,7 +350,7 @@ describe("getLambdaFunctionScanOutput", () => {
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdKVersion: sdkVersionRange,
+      SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error reading bundle 'index.js' for aws-sdk@2.x",
     });

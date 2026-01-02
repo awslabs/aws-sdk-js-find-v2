@@ -70,7 +70,7 @@ describe("scanLambdaFunctions", () => {
       FunctionName: "test-fn",
       Region: "us-east-1",
       Runtime: "nodejs18.x",
-      SdKVersion: "*",
+      SdkVersion: "*",
       ContainsAwsSdkJsV2: false,
     };
     vi.mocked(getLambdaFunctions).mockResolvedValue(functions);

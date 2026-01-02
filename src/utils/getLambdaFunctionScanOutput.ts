@@ -37,7 +37,7 @@ export interface LambdaFunctionScanOutput {
   Runtime: string;
 
   // Version of AWS SDK for JavaScript v2 searched for
-  SdKVersion: string;
+  SdkVersion: string;
 
   // Whether the Lambda function contains AWS SDK for JavaScript v2
   ContainsAwsSdkJsV2: boolean | null;
@@ -68,7 +68,7 @@ export const getLambdaFunctionScanOutput = async (
     FunctionName: functionName,
     Region: region,
     Runtime: runtime,
-    SdKVersion: sdkVersionRange,
+    SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,
   };
 

@@ -47,7 +47,7 @@ export const printLambdaCommandOutput = (
       scanOutput.FunctionName,
       scanOutput.Region,
       scanOutput.Runtime,
-      scanOutput.SdKVersion,
+      scanOutput.SdkVersion,
       notes,
     ]);
   }
