@@ -105,7 +105,7 @@ export const getLambdaFunctionScanOutput = async (
           const awsSdkVersionInPackageJson: string = dependencies[AWS_SDK];
 
           const awsSdkPackageJsonPathInNodeModules = join(NODE_MODULES, AWS_SDK, PACKAGE_JSON);
-          // Get aws-sdk package.json from basename node_modules or root node_modules.
+          // Get aws-sdk package.json from nested node_modules or root node_modules.
           const awsSdkPackageJson = awsSdkPackageJsonMap
             ? (awsSdkPackageJsonMap[
                 join(dirname(packageJsonPath), awsSdkPackageJsonPathInNodeModules)
