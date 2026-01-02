@@ -25,7 +25,7 @@
     "@tsconfig/node-ts": "^23.6.2",
     "@tsconfig/node20": "^20.1.8",
     "@types/node": "^20.14.8",
-    "aws-sdk": "^2.1692.0",
+    "aws-sdk": "2.1693.0",
     "esbuild": "~0.27.1",
     "oxfmt": "^0.21.0",
     "oxlint": "^1.33.0",

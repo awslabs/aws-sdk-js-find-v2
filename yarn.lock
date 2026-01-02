@@ -378,7 +378,7 @@ __metadata:
     "@tsconfig/node-ts": "npm:^23.6.2"
     "@tsconfig/node20": "npm:^20.1.8"
     "@types/node": "npm:^20.14.8"
-    aws-sdk: "npm:^2.1692.0"
+    aws-sdk: "npm:2.1693.0"
     cli-table3: "npm:^0.6.5"
     commander: "npm:^14.0.2"
     compare-versions: "npm:^6.1.1"
@@ -4759,7 +4759,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"aws-sdk@npm:^2.1692.0":
+"aws-sdk@npm:2.1693.0":
   version: 2.1693.0
   resolution: "aws-sdk@npm:2.1693.0"
   dependencies:
