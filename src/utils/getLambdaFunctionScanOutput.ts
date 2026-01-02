@@ -118,7 +118,7 @@ export const getLambdaFunctionScanOutput = async (
               awsSdkVersionInNodeModules = JSON.parse(awsSdkPackageJson).version;
             }
           } catch {
-            // Skip is JSON can't be parsed.
+            // Skip if JSON can't be parsed.
             // ToDo: add warning when logging is supported in future.
           }
 
