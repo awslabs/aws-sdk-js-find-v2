@@ -9,6 +9,7 @@ describe("CLI", () => {
   const mockOptions = {
     yes: false,
     node: ">=20",
+    sdk: ">=2.0.0",
     jobs: cpus().length,
     output: LambdaCommandOutputType.json,
   };
@@ -208,6 +209,27 @@ describe("CLI", () => {
 
       await expect(
         program.parseAsync(["node", "cli", "lambda", "--node", "invalid"]),
+      ).rejects.toThrow("Invalid semver range: invalid");
+    });
+
+    it("should pass sdk option to scanLambdaFunctions", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await program.parseAsync(["node", "cli", "lambda", "--sdk", "^2.0.0"]);
+
+      expect(scanLambdaFunctions).toHaveBeenCalledWith({
+        ...mockOptions,
+        sdk: "^2.0.0",
+      });
+    });
+
+    it("throws error for invalid sdk semver range", async () => {
+      const program = createProgram();
+      program.exitOverride();
+
+      await expect(
+        program.parseAsync(["node", "cli", "lambda", "--sdk", "invalid"]),
       ).rejects.toThrow("Invalid semver range: invalid");
     });
 
