@@ -390,10 +390,10 @@ describe("getLambdaFunctionScanOutput", () => {
       functionName,
       region,
       runtime,
-      sdkVersionRange: ">=2.0.0",
+      sdkVersionRange: "<2.1000.0",
     });
 
-    expect(result.ContainsAwsSdkJsV2).toBe(true);
+    expect(result.ContainsAwsSdkJsV2).toBe(false);
   });
 
   it("falls back to root node_modules when nested not found", async () => {

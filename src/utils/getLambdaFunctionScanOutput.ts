@@ -10,7 +10,7 @@ import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { basename, join } from "node:path";
+import { dirname, join } from "node:path";
 import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
 
 export interface LambdaFunctionScanOptions {
@@ -108,7 +108,7 @@ export const getLambdaFunctionScanOutput = async (
           // Get aws-sdk package.json from basename node_modules or root node_modules.
           const awsSdkPackageJson = awsSdkPackageJsonMap
             ? (awsSdkPackageJsonMap[
-                join(basename(packageJsonPath), awsSdkPackageJsonPathInNodeModules)
+                join(dirname(packageJsonPath), awsSdkPackageJsonPathInNodeModules)
               ] ?? awsSdkPackageJsonMap[awsSdkPackageJsonPathInNodeModules])
             : undefined;
 
