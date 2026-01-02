@@ -24,6 +24,7 @@ describe("scanLambdaFunctions", () => {
   const mockOptions = {
     yes: false,
     node: ">=18",
+    sdk: "*",
     jobs: 1,
     output: LambdaCommandOutputType.json,
   };
@@ -65,7 +66,13 @@ describe("scanLambdaFunctions", () => {
     const functions = [
       { FunctionName: "test-fn", Runtime: "nodejs18.x", CodeSize: 1000 },
     ] as FunctionConfiguration[];
-    const scanOutput = { FunctionName: "test-fn", Region: "us-east-1", ContainsAwsSdkJsV2: false };
+    const scanOutput = {
+      FunctionName: "test-fn",
+      Region: "us-east-1",
+      Runtime: "nodejs18.x",
+      SdkVersion: "*",
+      ContainsAwsSdkJsV2: false,
+    };
     vi.mocked(getLambdaFunctions).mockResolvedValue(functions);
     vi.mocked(getLambdaFunctionScanOutput).mockResolvedValue(scanOutput);
 

@@ -1,3 +1,5 @@
+import { satisfies } from "compare-versions";
+
 const AWS_SDK_ENV_VARS = [
   "AWS_CONFIG_FILE",
   // "AWS_CONTAINER_AUTHORIZATION_TOKEN", // Tree shaken by esbuild
@@ -33,13 +35,25 @@ const AWS_SDK_ENV_VARS = [
  * Checks if AWS SDK v2 is present in the provided bundle content by looking for specific environment variables.
  *
  * @param bundleContent - The string content of the bundle to check.
+ * @param sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
  * @returns boolean - Returns true if all AWS SDK v2 environment variables are found in the bundle content, false otherwise.
  */
-export const hasSdkV2InBundle = (bundleContent: string): boolean => {
+export const hasSdkV2InBundle = (bundleContent: string, sdkVersionRange: string): boolean => {
   for (const envVar of AWS_SDK_ENV_VARS) {
     if (!bundleContent.includes(envVar)) {
       return false;
     }
   }
-  return true;
+
+  // Get version number from `VERSION:'2.X.Y'` or `VERSION: '2.X.Y'`, including double quotes and backticks.
+  const matches = bundleContent.match(/VERSION:\s*(['"`])(2\.\d+\.\d+)\1/);
+  if (matches && matches[2]) {
+    const version = matches[2];
+    // If version is in the specified range, return true
+    if (satisfies(version, sdkVersionRange)) {
+      return true;
+    }
+  }
+
+  return false;
 };

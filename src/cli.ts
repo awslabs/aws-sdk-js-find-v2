@@ -37,6 +37,19 @@ export const createProgram = (): Command => {
       },
       ">=20",
     )
+    .option(
+      "--sdk <semver>",
+      "Semver range string to check for AWS SDK for JavaScript v2",
+      (value) => {
+        try {
+          satisfies("0", value);
+        } catch {
+          throw new Error(`Invalid semver range: ${value}`);
+        }
+        return value;
+      },
+      ">=2.0.0",
+    )
     .option("--region <region>", "AWS region to scan")
     .option("--profile <profile>", "AWS profile to use")
     .addOption(

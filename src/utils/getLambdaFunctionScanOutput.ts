@@ -1,4 +1,6 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
+import { satisfies } from "compare-versions";
+
 import { downloadFile } from "./downloadFile.ts";
 import {
   getLambdaFunctionContents,
@@ -19,6 +21,9 @@ export interface LambdaFunctionScanOptions {
 
   // Lambda Function's Node.js runtime
   runtime: string;
+
+  // Semver range string to check for AWS SDK for JavaScript v2
+  sdkVersionRange: string;
 }
 
 export interface LambdaFunctionScanOutput {
@@ -31,6 +36,9 @@ export interface LambdaFunctionScanOutput {
   // Lambda Function's Node.js runtime
   Runtime: string;
 
+  // Version of AWS SDK for JavaScript v2 searched for
+  SdkVersion: string;
+
   // Whether the Lambda function contains AWS SDK for JavaScript v2
   ContainsAwsSdkJsV2: boolean | null;
 
@@ -41,14 +49,26 @@ export interface LambdaFunctionScanOutput {
   AwsSdkJsV2Error?: string;
 }
 
+/**
+ * Scans a Lambda function to detect AWS SDK for JavaScript v2 usage.
+ *
+ * Downloads the function code, extracts it, and checks for v2 SDK in:
+ * 1. package.json dependencies
+ * 2. Bundled index file
+ *
+ * @param client - AWS Lambda client instance
+ * @param options - Scan configuration options
+ * @returns Scan results including SDK v2 detection status and location
+ */
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
-  { functionName, region, runtime }: LambdaFunctionScanOptions,
+  { functionName, region, runtime, sdkVersionRange }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
     Region: region,
     Runtime: runtime,
+    SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,
   };
 
@@ -64,10 +84,9 @@ export const getLambdaFunctionScanOutput = async (
     await downloadFile(response.Code.Location, zipPath);
     lambdaFunctionContents = await getLambdaFunctionContents(zipPath);
   } catch (error) {
+    const errorPrefix = "Error downloading or reading Lambda function code";
     output.AwsSdkJsV2Error =
-      error instanceof Error
-        ? `Error downloading or reading Lambda function code: ${error.message}`
-        : "Error downloading or reading Lambda function code.";
+      error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
     return output;
   } finally {
     await rm(zipPath, { force: true });
@@ -82,6 +101,18 @@ export const getLambdaFunctionScanOutput = async (
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
         if ("aws-sdk" in dependencies) {
+          try {
+            if (!satisfies(dependencies["aws-sdk"], sdkVersionRange)) {
+              continue;
+            }
+          } catch (error) {
+            const errorPrefix = `Error checking version range '${sdkVersionRange}' for aws-sdk@${
+              dependencies["aws-sdk"]
+            } in '${packageJsonPath}'`;
+            output.AwsSdkJsV2Error =
+              error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
+            return output;
+          }
           output.ContainsAwsSdkJsV2 = true;
           output.AwsSdkJsV2Location = `Defined in dependencies of '${packageJsonPath}'`;
           return output;
@@ -96,10 +127,21 @@ export const getLambdaFunctionScanOutput = async (
   }
 
   // Check for code of "aws-sdk" in bundle, if not found in package.json dependencies.
-  if (bundleFile && hasSdkV2InBundle(bundleFile.content)) {
-    output.ContainsAwsSdkJsV2 = true;
-    output.AwsSdkJsV2Location = `Bundled in '${bundleFile.path}'`;
-    return output;
+  if (bundleFile) {
+    try {
+      if (hasSdkV2InBundle(bundleFile.content, sdkVersionRange)) {
+        output.ContainsAwsSdkJsV2 = true;
+        output.AwsSdkJsV2Location = `Bundled in '${bundleFile.path}'`;
+        return output;
+      }
+    } catch (error) {
+      const errorPrefix = `Error reading bundle '${bundleFile.path}' for aws-sdk@${
+        sdkVersionRange
+      }`;
+      output.AwsSdkJsV2Error =
+        error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
+      return output;
+    }
   }
 
   // "aws-sdk" dependency/code not found.
