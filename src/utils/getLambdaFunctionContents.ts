@@ -83,7 +83,7 @@ export const getLambdaFunctionContents = async (
     await zip.close();
     return {
       packageJsonFiles,
-      ...(awsSdkPackageJsonMap && { awsSdkPackageJsonMap }),
+      ...(Object.keys(awsSdkPackageJsonMap).length > 0 && { awsSdkPackageJsonMap }),
     };
   }
 

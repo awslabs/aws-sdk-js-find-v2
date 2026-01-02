@@ -96,7 +96,6 @@ describe("getLambdaFunctionContents", () => {
 
       expect(result).toEqual({
         packageJsonFiles: [{ path: "package.json", content: mockPackageJson }],
-        awsSdkPackageJsonMap: {},
       });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
@@ -116,7 +115,6 @@ describe("getLambdaFunctionContents", () => {
 
       expect(result).toEqual({
         packageJsonFiles: [{ path: "package.json", content: mockPackageJson }],
-        awsSdkPackageJsonMap: {},
       });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
@@ -158,7 +156,6 @@ describe("getLambdaFunctionContents", () => {
           { path: "package.json", content: mockPackageJsons.root },
           { path: "packages/app/package.json", content: mockPackageJsons.app },
         ],
-        awsSdkPackageJsonMap: {},
       });
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
