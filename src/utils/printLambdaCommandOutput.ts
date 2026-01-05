@@ -39,8 +39,9 @@ export const printLambdaCommandOutput = (
       notes += ` ${scanOutput.AwsSdkJsV2Error}`;
     }
 
-    if (scanOutput.AwsSdkJsV2Location !== undefined) {
-      notes += ` ${scanOutput.AwsSdkJsV2Location}`;
+    if (scanOutput.AwsSdkJsV2Locations !== undefined) {
+      const numberOfFiles = scanOutput.AwsSdkJsV2Locations.length;
+      notes += ` In ${numberOfFiles} file${numberOfFiles > 1 ? "s" : ""}. Check 'json' output for details.`;
     }
 
     table.push([

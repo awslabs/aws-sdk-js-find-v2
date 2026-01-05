@@ -1,14 +1,6 @@
 import StreamZip from "node-stream-zip";
-import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
+import { AWS_SDK, NODE_MODULES, PACKAGE_JSON, type FileInfo } from "./constants.ts";
 import { join } from "node:path";
-
-export interface FileInfo {
-  // Path of the file within the zip archive.
-  path: string;
-
-  // Contents of the file.
-  content: string;
-}
 
 export interface LambdaFunctionContents {
   /**

@@ -6,12 +6,13 @@ import {
   getLambdaFunctionContents,
   type LambdaFunctionContents,
 } from "./getLambdaFunctionContents.ts";
-import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
 import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
+import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
+import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 
 export interface LambdaFunctionScanOptions {
   // The name of the Lambda function
@@ -43,8 +44,8 @@ export interface LambdaFunctionScanOutput {
   // Whether the Lambda function contains AWS SDK for JavaScript v2
   ContainsAwsSdkJsV2: boolean | null;
 
-  // The location of AWS SDK for JavaScript v2 in the Lambda function, if present.
-  AwsSdkJsV2Location?: string;
+  // Locations of AWS SDK for JavaScript v2 in the Lambda function source code, if present.
+  AwsSdkJsV2Locations?: string[];
 
   // The error message if there was an error scanning the Lambda function.
   AwsSdkJsV2Error?: string;
@@ -93,9 +94,24 @@ export const getLambdaFunctionScanOutput = async (
     await rm(zipPath, { force: true });
   }
 
-  const { packageJsonFiles, awsSdkPackageJsonMap, bundleFile } = lambdaFunctionContents;
+  const { packageJsonFiles, awsSdkPackageJsonMap, codeFiles } = lambdaFunctionContents;
 
-  // Search for JS SDK v2 in package.json dependencies if present.
+  const filesWithSdkV2 = [];
+
+  // Search for JS SDK v2 occurrence in source code
+  for (const fileInfo of codeFiles) {
+    if (await hasSdkV2InFile(fileInfo)) {
+      filesWithSdkV2.push(fileInfo);
+    }
+  }
+
+  // JS SDK v2 not found in souce code.
+  if (filesWithSdkV2.length === 0) {
+    output.ContainsAwsSdkJsV2 = false;
+    return output;
+  }
+
+  // Search for JS SDK v2 version from package.json
   if (packageJsonFiles && packageJsonFiles.length > 0) {
     for (const { path: packageJsonPath, content: packageJsonContent } of packageJsonFiles) {
       try {
@@ -142,7 +158,7 @@ export const getLambdaFunctionScanOutput = async (
             return output;
           }
           output.ContainsAwsSdkJsV2 = true;
-          output.AwsSdkJsV2Location = `Defined in dependencies of '${packageJsonPath}'`;
+          output.AwsSdkJsV2Locations = filesWithSdkV2.map((fileInfo) => fileInfo.path);
           return output;
         }
       } catch (error) {
@@ -154,21 +170,23 @@ export const getLambdaFunctionScanOutput = async (
     }
   }
 
-  // Check for signature of JS SDK v2 in bundle, if not found in package.json dependencies.
-  if (bundleFile) {
-    try {
-      if (hasSdkV2InBundle(bundleFile.content, sdkVersionRange)) {
-        output.ContainsAwsSdkJsV2 = true;
-        output.AwsSdkJsV2Location = `Bundled in '${bundleFile.path}'`;
+  // Treat detected files as bundle files and check for version range
+  else {
+    for (const fileInfo of filesWithSdkV2) {
+      try {
+        if (hasSdkV2InBundle(fileInfo.content, sdkVersionRange)) {
+          output.ContainsAwsSdkJsV2 = true;
+          output.AwsSdkJsV2Locations = filesWithSdkV2.map((fileInfo) => fileInfo.path);
+          return output;
+        }
+      } catch (error) {
+        const errorPrefix = `Error reading bundle '${fileInfo.path}' for aws-sdk@${
+          sdkVersionRange
+        }`;
+        output.AwsSdkJsV2Error =
+          error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
         return output;
       }
-    } catch (error) {
-      const errorPrefix = `Error reading bundle '${bundleFile.path}' for aws-sdk@${
-        sdkVersionRange
-      }`;
-      output.AwsSdkJsV2Error =
-        error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
-      return output;
     }
   }
 
