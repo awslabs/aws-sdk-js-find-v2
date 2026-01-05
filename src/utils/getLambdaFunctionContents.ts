@@ -22,9 +22,14 @@ export interface LambdaFunctionContents {
   awsSdkPackageJsonMap?: Record<string, string>;
 
   /**
-   * String contents of the index.js bundle file, if present.
+   * String contents of the JavaScript files.
    */
-  bundleFile?: FileInfo;
+  javascriptFiles?: FileInfo[];
+
+  /**
+   * String contents of the TypeScript files.
+   */
+  typescriptFiles?: FileInfo[];
 }
 
 /**
@@ -41,6 +46,8 @@ export const getLambdaFunctionContents = async (
   const zip = new StreamZip.async({ file: zipPath });
 
   const packageJsonFiles = [];
+  const javascriptFiles = [];
+  const typescriptFiles = [];
   const awsSdkPackageJsonMap: Record<string, string> = {};
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
@@ -61,50 +68,60 @@ export const getLambdaFunctionContents = async (
       continue;
     }
 
-    // Skip anything which is not 'package.json'
-    if (!zipEntry.name.endsWith(PACKAGE_JSON)) continue;
-
-    // Skip if 'package.json' is not a file
+    // Skip if it is not a file
     if (!zipEntry.isFile) continue;
 
-    try {
-      const packageJsonContent = await zip.entryData(zipEntry.name);
-      packageJsonFiles.push({
-        path: zipEntry.name,
-        content: packageJsonContent.toString(),
-      });
-    } catch {
-      // Continue without adding package.json file, if entry data can't be read.
-      // ToDo: add warning when logging is supported in future.
+    // Populate 'package.json' files.
+    if (zipEntry.name.endsWith(PACKAGE_JSON)) {
+      try {
+        const packageJsonContent = await zip.entryData(zipEntry.name);
+        packageJsonFiles.push({
+          path: zipEntry.name,
+          content: packageJsonContent.toString(),
+        });
+      } catch {
+        // Continue without adding package.json file, if entry data can't be read.
+        // ToDo: add warning when logging is supported in future.
+      }
+      continue;
     }
-  }
 
-  if (packageJsonFiles.length !== 0) {
-    await zip.close();
-    return {
-      packageJsonFiles,
-      ...(Object.keys(awsSdkPackageJsonMap).length > 0 && { awsSdkPackageJsonMap }),
-    };
-  }
+    // Populate JavaScript files.
+    if (zipEntry.name.match(/\.(js|mjs|cjs)$/)) {
+      try {
+        const javascriptContent = await zip.entryData(zipEntry.name);
+        javascriptFiles.push({
+          path: zipEntry.name,
+          content: javascriptContent.toString(),
+        });
+      } catch {
+        // Continue without adding JavaScript file, if entry data can't be read.
+        // ToDo: add warning when logging is supported in future.
+      }
+      continue;
+    }
 
-  for (const path of ["index.js", "index.mjs", "index.cjs"]) {
-    if (!zipEntries[path]) continue;
-    if (!zipEntries[path].isFile) continue;
-    try {
-      const bundleContent = await zip.entryData(path);
-      await zip.close();
-      return {
-        bundleFile: {
-          path,
-          content: bundleContent.toString(),
-        },
-      };
-    } catch {
-      // Continue processing next index file, if entry data can't be read.
-      // ToDo: add warning when logging is supported in future.
+    // Populate JavaScript files.
+    if (zipEntry.name.endsWith(".ts")) {
+      try {
+        const typescriptContent = await zip.entryData(zipEntry.name);
+        typescriptFiles.push({
+          path: zipEntry.name,
+          content: typescriptContent.toString(),
+        });
+      } catch {
+        // Continue without adding TypeScript file, if entry data can't be read.
+        // ToDo: add warning when logging is supported in future.
+      }
+      continue;
     }
   }
 
   await zip.close();
-  return {};
+  return {
+    ...(packageJsonFiles.length > 0 && { packageJsonFiles }),
+    ...(Object.keys(awsSdkPackageJsonMap).length > 0 && { awsSdkPackageJsonMap }),
+    ...(javascriptFiles.length > 0 && { javascriptFiles }),
+    ...(typescriptFiles.length > 0 && { typescriptFiles }),
+  };
 };
