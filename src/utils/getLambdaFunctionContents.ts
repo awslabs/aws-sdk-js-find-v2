@@ -12,6 +12,11 @@ export interface FileInfo {
 
 export interface LambdaFunctionContents {
   /**
+   * String contents of the JS/TS files.
+   */
+  codeFiles: FileInfo[];
+
+  /**
    * String contents of all package.json files from Lambda Function.
    */
   packageJsonFiles?: FileInfo[];
@@ -20,16 +25,6 @@ export interface LambdaFunctionContents {
    * Map with aws-sdk package.json filepath as key and contents as value.
    */
   awsSdkPackageJsonMap?: Record<string, string>;
-
-  /**
-   * String contents of the JavaScript files.
-   */
-  javascriptFiles?: FileInfo[];
-
-  /**
-   * String contents of the TypeScript files.
-   */
-  typescriptFiles?: FileInfo[];
 }
 
 /**
@@ -46,8 +41,7 @@ export const getLambdaFunctionContents = async (
   const zip = new StreamZip.async({ file: zipPath });
 
   const packageJsonFiles = [];
-  const javascriptFiles = [];
-  const typescriptFiles = [];
+  const codeFiles = [];
   const awsSdkPackageJsonMap: Record<string, string> = {};
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
@@ -87,10 +81,10 @@ export const getLambdaFunctionContents = async (
     }
 
     // Populate JavaScript files.
-    if (zipEntry.name.match(/\.(js|mjs|cjs)$/)) {
+    if (zipEntry.name.match(/\.(js|ts|mjs|cjs)$/)) {
       try {
         const javascriptContent = await zip.entryData(zipEntry.name);
-        javascriptFiles.push({
+        codeFiles.push({
           path: zipEntry.name,
           content: javascriptContent.toString(),
         });
@@ -100,28 +94,12 @@ export const getLambdaFunctionContents = async (
       }
       continue;
     }
-
-    // Populate JavaScript files.
-    if (zipEntry.name.endsWith(".ts")) {
-      try {
-        const typescriptContent = await zip.entryData(zipEntry.name);
-        typescriptFiles.push({
-          path: zipEntry.name,
-          content: typescriptContent.toString(),
-        });
-      } catch {
-        // Continue without adding TypeScript file, if entry data can't be read.
-        // ToDo: add warning when logging is supported in future.
-      }
-      continue;
-    }
   }
 
   await zip.close();
   return {
+    codeFiles,
     ...(packageJsonFiles.length > 0 && { packageJsonFiles }),
     ...(Object.keys(awsSdkPackageJsonMap).length > 0 && { awsSdkPackageJsonMap }),
-    ...(javascriptFiles.length > 0 && { javascriptFiles }),
-    ...(typescriptFiles.length > 0 && { typescriptFiles }),
   };
 };
