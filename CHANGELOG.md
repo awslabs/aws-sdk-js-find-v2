@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.6.1
+
+### Patch Changes
+
+- Read exact version of aws-sdk dependency from node_modules folder ([1f50f5776ba6459f9ccc18f1f99d2b292bf4f144](https://github.com/awslabs/aws-sdk-js-find-v2/commit/1f50f5776ba6459f9ccc18f1f99d2b292bf4f144))
+
 ## 0.6.0
 
 ### Minor Changes
