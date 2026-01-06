@@ -4,10 +4,12 @@ const isAwsSdkV2 = (path: string) => path === "aws-sdk" || path.startsWith("aws-
 
 type AstNode = Record<string, unknown>;
 
-const hasAwsSdkV2InRequire = (node: unknown): boolean => {
+const hasAwsSdkV2InRequireOrImportEquals = (node: unknown): boolean => {
   if (!node || typeof node !== "object") return false;
 
   const n = node as AstNode;
+
+  // Search for aws-sdk in require
   if (
     n.type === "CallExpression" &&
     (n.callee as AstNode)?.name === "require" &&
@@ -16,8 +18,19 @@ const hasAwsSdkV2InRequire = (node: unknown): boolean => {
     return true;
   }
 
+  // Search for aws-sdk in import equals
+  if (
+    n.type === "TSImportEqualsDeclaration" &&
+    (n.moduleReference as AstNode)?.type === "TSExternalModuleReference" &&
+    isAwsSdkV2(((n.moduleReference as AstNode)?.expression as AstNode)?.value as string)
+  ) {
+    return true;
+  }
+
   return Object.values(n).some((child) =>
-    Array.isArray(child) ? child.some(hasAwsSdkV2InRequire) : hasAwsSdkV2InRequire(child),
+    Array.isArray(child)
+      ? child.some(hasAwsSdkV2InRequireOrImportEquals)
+      : hasAwsSdkV2InRequireOrImportEquals(child),
   );
 };
 
@@ -33,7 +46,7 @@ export const hasSdkV2InFile = async (filePath: string, fileContent: string) => {
     if (isAwsSdkV2(importPath)) return true;
   }
 
-  if (hasAwsSdkV2InRequire(program)) return true;
+  if (hasAwsSdkV2InRequireOrImportEquals(program)) return true;
 
   return false;
 };
