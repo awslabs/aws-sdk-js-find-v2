@@ -4,6 +4,11 @@ const isAwsSdkV2 = (path: string) => path === "aws-sdk" || path.startsWith("aws-
 
 type AstNode = Record<string, unknown>;
 
+/**
+ * Recursively searches AST for JS SDK v2 require/import patterns.
+ * @param node - AST node to search.
+ * @returns true if JS SDK v2 require/import pattern is found.
+ */
 const hasAwsSdkV2InAst = (node: unknown): boolean => {
   if (!node || typeof node !== "object") return false;
 
