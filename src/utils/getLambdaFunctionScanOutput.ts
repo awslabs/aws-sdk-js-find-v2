@@ -1,19 +1,19 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
 import { satisfies, validate } from "compare-versions";
 
+import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
 import { downloadFile } from "./downloadFile.ts";
 import {
   getLambdaFunctionContents,
   type LambdaFunctionContents,
 } from "./getLambdaFunctionContents.ts";
+import { getPossibleHandlerFiles } from "./getPossibleHandlerFiles.ts";
+import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
+import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
 
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { dirname, join } from "node:path";
-import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
-import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
-import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
-import { getPossibleHandlerFiles } from "./getPossibleHandlerFiles.ts";
 
 export interface LambdaFunctionScanOptions {
   // The name of the Lambda function
