@@ -39,8 +39,8 @@ export const printLambdaCommandOutput = (
       notes += ` ${scanOutput.AwsSdkJsV2Error}`;
     }
 
-    if (scanOutput.AwsSdkJsV2Location !== undefined) {
-      notes += ` ${scanOutput.AwsSdkJsV2Location}`;
+    if (scanOutput.AwsSdkJsV2Locations !== undefined) {
+      notes += ` Found in:\n${scanOutput.AwsSdkJsV2Locations.map((location) => `- ${location}`).join("\n")}`;
     }
 
     table.push([
