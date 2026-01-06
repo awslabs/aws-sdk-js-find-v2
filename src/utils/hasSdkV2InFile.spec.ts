@@ -18,7 +18,7 @@ describe("hasSdkV2InFile", () => {
     files.forEach((file) => {
       it(`in '${file}'`, () => {
         const content = readFileSync(join(bundlesDir, file), "utf-8");
-        return expect(hasSdkV2InFile(file, content)).resolves.toBe(output);
+        expect(hasSdkV2InFile(file, content)).toBe(output);
       });
     });
   });

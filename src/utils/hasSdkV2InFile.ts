@@ -1,4 +1,4 @@
-import { parse } from "oxc-parser";
+import { parseSync } from "oxc-parser";
 
 const isAwsSdkV2 = (path: string) => path === "aws-sdk" || path.startsWith("aws-sdk/");
 
@@ -34,8 +34,8 @@ const hasAwsSdkV2InRequireOrImportEquals = (node: unknown): boolean => {
   );
 };
 
-export const hasSdkV2InFile = async (filePath: string, fileContent: string) => {
-  const { module, program } = await parse(filePath, fileContent);
+export const hasSdkV2InFile = (filePath: string, fileContent: string) => {
+  const { module, program } = parseSync(filePath, fileContent);
 
   for (const { moduleRequest } of module.staticImports) {
     if (isAwsSdkV2(moduleRequest.value)) return true;

@@ -115,7 +115,7 @@ export const getLambdaFunctionScanOutput = async (
 
   // Search for JS SDK v2 occurrence in source code
   for (const [filePath, fileContent] of Object.entries(codeMap)) {
-    if (await hasSdkV2InFile(filePath, fileContent)) {
+    if (hasSdkV2InFile(filePath, fileContent)) {
       filesWithJsSdkV2.push(filePath);
     }
   }

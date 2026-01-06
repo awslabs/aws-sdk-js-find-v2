@@ -88,7 +88,7 @@ describe("getLambdaFunctionScanOutput", () => {
       codeMap: { "index.mjs": 'import AWS from "aws-sdk";' },
       packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -120,7 +120,7 @@ describe("getLambdaFunctionScanOutput", () => {
       codeMap: { "index.js": "no sdk here" },
       packageJsonMap: { "package.json": '{"dependencies":{}}' },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(false);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(false);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -170,7 +170,7 @@ describe("getLambdaFunctionScanOutput", () => {
       codeMap: { "index.js": 'require("aws-sdk")' },
       packageJsonMap: { "package.json": "invalid json" },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -242,7 +242,7 @@ describe("getLambdaFunctionScanOutput", () => {
       codeMap: { "index.js": 'require("aws-sdk")' },
       packageJsonMap: { "package.json": `{"dependencies":{"aws-sdk":"${sdkVersion}"}}` },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -266,7 +266,7 @@ describe("getLambdaFunctionScanOutput", () => {
       codeMap: { "index.js": 'require("aws-sdk")' },
       packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"invalid"}}' },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -288,7 +288,7 @@ describe("getLambdaFunctionScanOutput", () => {
       packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
       awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": '{"version":"2.1692.0"}' },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -309,7 +309,7 @@ describe("getLambdaFunctionScanOutput", () => {
         "subdir/node_modules/aws-sdk/package.json": '{"version":"2.1000.0"}',
       },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -328,7 +328,7 @@ describe("getLambdaFunctionScanOutput", () => {
       packageJsonMap: { "subdir/package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
       awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": '{"version":"2.500.0"}' },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -347,7 +347,7 @@ describe("getLambdaFunctionScanOutput", () => {
       packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
       awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": "invalid json" },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -365,7 +365,7 @@ describe("getLambdaFunctionScanOutput", () => {
       codeMap: { "index.js": 'require("aws-sdk")' },
       packageJsonMap: { "package.json": '{"dependencies":{}}' },
     });
-    vi.mocked(hasSdkV2InFile).mockResolvedValue(true);
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
