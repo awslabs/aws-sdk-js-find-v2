@@ -94,14 +94,14 @@ export const getLambdaFunctionScanOutput = async (
     await rm(zipPath, { force: true });
   }
 
-  const { packageJsonFiles, awsSdkPackageJsonMap, codeFiles } = lambdaFunctionContents;
+  const { packageJsonMap, awsSdkPackageJsonMap, codeMap } = lambdaFunctionContents;
 
-  const filesWithSdkV2 = [];
+  const filesWithSdkV2: string[] = [];
 
   // Search for JS SDK v2 occurrence in source code
-  for (const fileInfo of codeFiles) {
-    if (await hasSdkV2InFile(fileInfo)) {
-      filesWithSdkV2.push(fileInfo);
+  for (const [filePath, fileContent] of Object.entries(codeMap)) {
+    if (await hasSdkV2InFile(filePath, fileContent)) {
+      filesWithSdkV2.push(filePath);
     }
   }
 
@@ -112,8 +112,8 @@ export const getLambdaFunctionScanOutput = async (
   }
 
   // Search for JS SDK v2 version from package.json
-  if (packageJsonFiles && packageJsonFiles.length > 0) {
-    for (const { path: packageJsonPath, content: packageJsonContent } of packageJsonFiles) {
+  if (packageJsonMap && Object.keys(packageJsonMap).length > 0) {
+    for (const [packageJsonPath, packageJsonContent] of Object.entries(packageJsonMap)) {
       try {
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
@@ -158,7 +158,7 @@ export const getLambdaFunctionScanOutput = async (
             return output;
           }
           output.ContainsAwsSdkJsV2 = true;
-          output.AwsSdkJsV2Locations = filesWithSdkV2.map((fileInfo) => fileInfo.path);
+          output.AwsSdkJsV2Locations = filesWithSdkV2;
           return output;
         }
       } catch (error) {
@@ -172,17 +172,15 @@ export const getLambdaFunctionScanOutput = async (
 
   // Treat detected files as bundle files and check for version range
   else {
-    for (const fileInfo of filesWithSdkV2) {
+    for (const filePath of filesWithSdkV2) {
       try {
-        if (hasSdkV2InBundle(fileInfo.content, sdkVersionRange)) {
+        if (hasSdkV2InBundle(codeMap[filePath], sdkVersionRange)) {
           output.ContainsAwsSdkJsV2 = true;
-          output.AwsSdkJsV2Locations = filesWithSdkV2.map((fileInfo) => fileInfo.path);
+          output.AwsSdkJsV2Locations = filesWithSdkV2;
           return output;
         }
       } catch (error) {
-        const errorPrefix = `Error reading bundle '${fileInfo.path}' for aws-sdk@${
-          sdkVersionRange
-        }`;
+        const errorPrefix = `Error reading bundle '${filePath}' for aws-sdk@${sdkVersionRange}`;
         output.AwsSdkJsV2Error =
           error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
         return output;
