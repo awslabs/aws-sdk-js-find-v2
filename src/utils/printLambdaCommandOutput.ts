@@ -40,8 +40,7 @@ export const printLambdaCommandOutput = (
     }
 
     if (scanOutput.AwsSdkJsV2Locations !== undefined) {
-      const numberOfFiles = scanOutput.AwsSdkJsV2Locations.length;
-      notes += ` In ${numberOfFiles} file${numberOfFiles > 1 ? "s" : ""}. Check 'json' output for details.`;
+      notes += ` Found in:\n${scanOutput.AwsSdkJsV2Locations.map((location) => `- ${location}`).join("\n")}`;
     }
 
     table.push([
