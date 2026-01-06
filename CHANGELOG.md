@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.7.0
+
+### Minor Changes
+
+- Process handler source code using oxc-parser to check for JS SDK v2 imports ([3fee8314d789a2c04299db7be50e931e27ed9f8d](https://github.com/awslabs/aws-sdk-js-find-v2/commit/3fee8314d789a2c04299db7be50e931e27ed9f8d))
+
 ## 0.6.1
 
 ### Patch Changes
