@@ -58,6 +58,14 @@ describe("getCodePathToSdkVersionMap", () => {
     expect(result.get("index.js")).toBeUndefined();
   });
 
+  it("caches directory lookups for multiple files in the same directory", () => {
+    const packageJsonMap = new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]);
+    const result = getCodePathToSdkVersionMap(["src/a.js", "src/b.js", "src/c.js"], packageJsonMap);
+    expect(result.get("src/a.js")).toBe("^2.0.0");
+    expect(result.get("src/b.js")).toBe("^2.0.0");
+    expect(result.get("src/c.js")).toBe("^2.0.0");
+  });
+
   it("handles invalid aws-sdk package.json gracefully", () => {
     const packageJsonMap = new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]);
     const awsSdkPackageJsonMap = new Map([["node_modules/aws-sdk/package.json", "invalid json"]]);
