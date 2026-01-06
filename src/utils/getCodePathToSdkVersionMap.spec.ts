@@ -57,4 +57,11 @@ describe("getCodePathToSdkVersionMap", () => {
     const result = getCodePathToSdkVersionMap(["index.js"], packageJsonMap);
     expect(result.get("index.js")).toBeUndefined();
   });
+
+  it("handles invalid aws-sdk package.json gracefully", () => {
+    const packageJsonMap = new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]);
+    const awsSdkPackageJsonMap = new Map([["node_modules/aws-sdk/package.json", "invalid json"]]);
+    const result = getCodePathToSdkVersionMap(["index.js"], packageJsonMap, awsSdkPackageJsonMap);
+    expect(result.get("index.js")).toBe("^2.0.0");
+  });
 });
