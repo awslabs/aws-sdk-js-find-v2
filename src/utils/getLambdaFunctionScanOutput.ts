@@ -120,7 +120,7 @@ export const getLambdaFunctionScanOutput = async (
     }
   }
 
-  // JS SDK v2 not found in souce code.
+  // JS SDK v2 not found in source code.
   if (filesWithJsSdkV2.length === 0) {
     output.ContainsAwsSdkJsV2 = false;
     return output;
