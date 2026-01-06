@@ -115,8 +115,12 @@ export const getLambdaFunctionScanOutput = async (
 
   // Search for JS SDK v2 occurrence in source code
   for (const [filePath, fileContent] of Object.entries(codeMap)) {
-    if (hasSdkV2InFile(filePath, fileContent)) {
-      filesWithJsSdkV2.push(filePath);
+    try {
+      if (hasSdkV2InFile(filePath, fileContent)) {
+        filesWithJsSdkV2.push(filePath);
+      }
+    } catch {
+      // Skip files that fail to parse
     }
   }
 
