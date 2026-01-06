@@ -21,11 +21,14 @@ export interface LambdaFunctionContents {
 
 /**
  * Extracts the contents of a Lambda Function zip file.
- * Returns string contents of package.json files, if available.
- * Otherwise, returns the contents of bundle file.
+ *
+ * Parses the zip and returns:
+ * - JS/TS source files (excluding node_modules)
+ * - package.json files (excluding node_modules)
+ * - aws-sdk package.json from node_modules (for version detection)
  *
  * @param zipPath - The path to the zip file of Lambda Function.
- * @returns Promise<LambdaFunctionContents> - Resolves to an object containing the extracted contents.
+ * @returns Extracted contents categorized by file type.
  */
 export const getLambdaFunctionContents = async (
   zipPath: string,

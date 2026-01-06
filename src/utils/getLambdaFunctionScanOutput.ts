@@ -55,13 +55,17 @@ export interface LambdaFunctionScanOutput {
 /**
  * Scans a Lambda function to detect AWS SDK for JavaScript v2 usage.
  *
- * Downloads the function code, extracts it, and checks for v2 SDK in:
- * 1. package.json dependencies
- * 2. Bundled index file
+ * Downloads the function code, extracts it, and checks for JS SDK v2 signature in handled file if it's a bundle.
+ * If not found, it checks for source code files has require/imports JS SDK v2. It also checks dependencies in
+ * package.json for version validation.
  *
  * @param client - AWS Lambda client instance
  * @param options - Scan configuration options
- * @returns Scan results including SDK v2 detection status and location
+ * @param options.functionName - The name of the Lambda function
+ * @param options.region - AWS region the Lambda function is deployed to
+ * @param options.runtime - Lambda Function's Node.js runtime
+ * @param options.sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
+ * @returns Scan results including SDK v2 detection status and locations
  */
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
