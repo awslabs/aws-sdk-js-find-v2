@@ -37,6 +37,12 @@ const hasAwsSdkV2InAst = (node: unknown): boolean => {
   );
 };
 
+/**
+ * Checks if a file contains AWS SDK for JavaScript v2 imports or requires.
+ * @param filePath - Path to the file (used for parser configuration).
+ * @param fileContent - Content of the file to analyze.
+ * @returns true if the file contains AWS SDK v2 usage.
+ */
 export const hasSdkV2InFile = (filePath: string, fileContent: string) => {
   const { module, program } = parseSync(filePath, fileContent);
 
