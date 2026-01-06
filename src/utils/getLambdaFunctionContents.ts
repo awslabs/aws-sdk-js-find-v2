@@ -69,13 +69,13 @@ export const getLambdaFunctionContents = async (
       continue;
     }
 
-    // Populate JavaScript files.
+    // Populate JavaScript/TypeScript files.
     if (zipEntry.name.match(/\.(js|ts|mjs|cjs)$/)) {
       try {
-        const javascriptContent = await zip.entryData(zipEntry.name);
-        codeMap[zipEntry.name] = javascriptContent.toString();
+        const codeContent = await zip.entryData(zipEntry.name);
+        codeMap[zipEntry.name] = codeContent.toString();
       } catch {
-        // Continue without adding JavaScript file, if entry data can't be read.
+        // Continue without adding code, if entry data can't be read.
         // ToDo: add warning when logging is supported in future.
       }
       continue;
