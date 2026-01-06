@@ -4,7 +4,7 @@ const isAwsSdkV2 = (path: string) => path === "aws-sdk" || path.startsWith("aws-
 
 type AstNode = Record<string, unknown>;
 
-const hasAwsSdkV2InRequireOrImportEquals = (node: unknown): boolean => {
+const hasAwsSdkV2InAst = (node: unknown): boolean => {
   if (!node || typeof node !== "object") return false;
 
   const n = node as AstNode;
@@ -27,10 +27,13 @@ const hasAwsSdkV2InRequireOrImportEquals = (node: unknown): boolean => {
     return true;
   }
 
+  // Search for aws-sdk in dynamic import
+  if (n.type === "ImportExpression" && isAwsSdkV2(((n.source as AstNode)?.value as string) ?? "")) {
+    return true;
+  }
+
   return Object.values(n).some((child) =>
-    Array.isArray(child)
-      ? child.some(hasAwsSdkV2InRequireOrImportEquals)
-      : hasAwsSdkV2InRequireOrImportEquals(child),
+    Array.isArray(child) ? child.some(hasAwsSdkV2InAst) : hasAwsSdkV2InAst(child),
   );
 };
 
@@ -41,12 +44,7 @@ export const hasSdkV2InFile = (filePath: string, fileContent: string) => {
     if (isAwsSdkV2(moduleRequest.value)) return true;
   }
 
-  for (const { moduleRequest } of module.dynamicImports) {
-    const importPath = fileContent.slice(moduleRequest.start + 1, moduleRequest.end - 1);
-    if (isAwsSdkV2(importPath)) return true;
-  }
-
-  if (hasAwsSdkV2InRequireOrImportEquals(program)) return true;
+  if (hasAwsSdkV2InAst(program)) return true;
 
   return false;
 };
