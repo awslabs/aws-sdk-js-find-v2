@@ -33,7 +33,7 @@ describe("printLambdaCommandOutput", () => {
       Runtime: "nodejs18.x",
       SdkVersion: "^2.0.0",
       ContainsAwsSdkJsV2: true,
-      AwsSdkJsV2Location: "Bundled in 'index.js'",
+      AwsSdkJsV2Locations: ["index.js"],
     },
     {
       FunctionName: "fn3",
@@ -58,7 +58,7 @@ describe("printLambdaCommandOutput", () => {
       "us-west-2",
       "nodejs18.x",
       "^2.0.0",
-      "Yes. Bundled in 'index.js'",
+      "Yes. Found in:\n- index.js",
     ]);
     expect(mockPush).toHaveBeenCalledWith([
       "fn3",
