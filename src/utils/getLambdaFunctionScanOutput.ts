@@ -106,8 +106,9 @@ export const getLambdaFunctionScanOutput = async (
     response.Configuration?.Handler ?? "index.handler",
   );
   for (const handlerFile of possibleHandlerFiles) {
-    if (handlerFile in codeMap) {
-      if (hasSdkV2InBundle(codeMap[handlerFile], sdkVersionRange)) {
+    const handlerContent = codeMap.get(handlerFile);
+    if (handlerContent !== undefined) {
+      if (hasSdkV2InBundle(handlerContent, sdkVersionRange)) {
         output.ContainsAwsSdkJsV2 = true;
         output.AwsSdkJsV2Locations = [handlerFile];
         return output;
@@ -118,7 +119,7 @@ export const getLambdaFunctionScanOutput = async (
   const filesWithJsSdkV2: string[] = [];
 
   // Search for JS SDK v2 occurrence in source code
-  for (const [filePath, fileContent] of Object.entries(codeMap)) {
+  for (const [filePath, fileContent] of codeMap) {
     try {
       if (hasSdkV2InFile(filePath, fileContent)) {
         filesWithJsSdkV2.push(filePath);
@@ -135,8 +136,8 @@ export const getLambdaFunctionScanOutput = async (
   }
 
   // Search for JS SDK v2 version from package.json
-  if (packageJsonMap && Object.keys(packageJsonMap).length > 0) {
-    for (const [packageJsonPath, packageJsonContent] of Object.entries(packageJsonMap)) {
+  if (packageJsonMap && packageJsonMap.size > 0) {
+    for (const [packageJsonPath, packageJsonContent] of packageJsonMap) {
       try {
         const packageJson = JSON.parse(packageJsonContent);
         const dependencies = packageJson.dependencies || {};
@@ -146,9 +147,9 @@ export const getLambdaFunctionScanOutput = async (
           const awsSdkPackageJsonPathInNodeModules = join(NODE_MODULES, AWS_SDK, PACKAGE_JSON);
           // Get aws-sdk package.json from nested node_modules or root node_modules.
           const awsSdkPackageJson = awsSdkPackageJsonMap
-            ? (awsSdkPackageJsonMap[
-                join(dirname(packageJsonPath), awsSdkPackageJsonPathInNodeModules)
-              ] ?? awsSdkPackageJsonMap[awsSdkPackageJsonPathInNodeModules])
+            ? (awsSdkPackageJsonMap.get(
+                join(dirname(packageJsonPath), awsSdkPackageJsonPathInNodeModules),
+              ) ?? awsSdkPackageJsonMap.get(awsSdkPackageJsonPathInNodeModules))
             : undefined;
 
           let awsSdkVersionInNodeModules: string | undefined;

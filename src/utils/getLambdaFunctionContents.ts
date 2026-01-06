@@ -6,17 +6,17 @@ export interface LambdaFunctionContents {
   /**
    * Map with JS/TS filepath as key and contents as value.
    */
-  codeMap: Record<string, string>;
+  codeMap: Map<string, string>;
 
   /**
    * Map with package.json filepath as key and contents as value.
    */
-  packageJsonMap?: Record<string, string>;
+  packageJsonMap?: Map<string, string>;
 
   /**
    * Map with aws-sdk package.json filepath as key and contents as value.
    */
-  awsSdkPackageJsonMap?: Record<string, string>;
+  awsSdkPackageJsonMap?: Map<string, string>;
 }
 
 /**
@@ -35,9 +35,9 @@ export const getLambdaFunctionContents = async (
 ): Promise<LambdaFunctionContents> => {
   const zip = new StreamZip.async({ file: zipPath });
 
-  const codeMap: Record<string, string> = {};
-  const packageJsonMap: Record<string, string> = {};
-  const awsSdkPackageJsonMap: Record<string, string> = {};
+  const codeMap = new Map<string, string>();
+  const packageJsonMap = new Map<string, string>();
+  const awsSdkPackageJsonMap = new Map<string, string>();
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
   try {
@@ -52,7 +52,7 @@ export const getLambdaFunctionContents = async (
     if (zipEntry.name.includes(`${NODE_MODULES}/`)) {
       if (zipEntry.name.endsWith(join(NODE_MODULES, AWS_SDK, PACKAGE_JSON)) && zipEntry.isFile) {
         const packageJsonContent = await zip.entryData(zipEntry.name);
-        awsSdkPackageJsonMap[zipEntry.name] = packageJsonContent.toString();
+        awsSdkPackageJsonMap.set(zipEntry.name, packageJsonContent.toString());
       }
       continue;
     }
@@ -64,7 +64,7 @@ export const getLambdaFunctionContents = async (
     if (zipEntry.name.endsWith(PACKAGE_JSON)) {
       try {
         const packageJsonContent = await zip.entryData(zipEntry.name);
-        packageJsonMap[zipEntry.name] = packageJsonContent.toString();
+        packageJsonMap.set(zipEntry.name, packageJsonContent.toString());
       } catch {
         // Continue without adding package.json file, if entry data can't be read.
         // ToDo: add warning when logging is supported in future.
@@ -76,7 +76,7 @@ export const getLambdaFunctionContents = async (
     if (zipEntry.name.match(/\.(js|ts|mjs|cjs)$/)) {
       try {
         const codeContent = await zip.entryData(zipEntry.name);
-        codeMap[zipEntry.name] = codeContent.toString();
+        codeMap.set(zipEntry.name, codeContent.toString());
       } catch {
         // Continue without adding code, if entry data can't be read.
         // ToDo: add warning when logging is supported in future.
@@ -88,7 +88,7 @@ export const getLambdaFunctionContents = async (
   await zip.close();
   return {
     codeMap,
-    ...(Object.keys(packageJsonMap).length > 0 && { packageJsonMap }),
-    ...(Object.keys(awsSdkPackageJsonMap).length > 0 && { awsSdkPackageJsonMap }),
+    ...(packageJsonMap.size > 0 && { packageJsonMap }),
+    ...(awsSdkPackageJsonMap.size > 0 && { awsSdkPackageJsonMap }),
   };
 };
