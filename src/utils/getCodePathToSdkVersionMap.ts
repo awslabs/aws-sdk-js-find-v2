@@ -47,7 +47,8 @@ export const getCodePathToSdkVersionMap = (
         parsed.dependencies?.[AWS_SDK];
     }
 
-    version ??= dir !== "." ? getSdkVersion(dirname(dir)) : undefined;
+    const parentDir = dirname(dir);
+    version ??= parentDir !== dir ? getSdkVersion(parentDir) : undefined;
     dirToSdkVersionMap.set(dir, version);
     return version;
   };
