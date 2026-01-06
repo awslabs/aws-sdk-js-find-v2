@@ -56,7 +56,7 @@ describe("getLambdaFunctionScanOutput", () => {
       Configuration: { Handler: "index.handler" },
     });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": "bundle content" },
+      codeMap: new Map([["index.js", "bundle content"]]),
     });
     vi.mocked(hasSdkV2InBundle).mockReturnValue(true);
 
@@ -85,8 +85,8 @@ describe("getLambdaFunctionScanOutput", () => {
       Configuration: { Handler: "index.handler" },
     });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.mjs": 'import AWS from "aws-sdk";' },
-      packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
+      codeMap: new Map([["index.mjs", 'import AWS from "aws-sdk";']]),
+      packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -117,8 +117,8 @@ describe("getLambdaFunctionScanOutput", () => {
       Configuration: { Handler: "index.handler" },
     });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": "no sdk here" },
-      packageJsonMap: { "package.json": '{"dependencies":{}}' },
+      codeMap: new Map([["index.js", "no sdk here"]]),
+      packageJsonMap: new Map([["package.json", '{"dependencies":{}}']]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(false);
 
@@ -142,7 +142,7 @@ describe("getLambdaFunctionScanOutput", () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({
       Code: { Location: codeLocation },
     });
-    vi.mocked(getLambdaFunctionContents).mockResolvedValue({ codeMap: {} });
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({ codeMap: new Map() });
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -167,8 +167,8 @@ describe("getLambdaFunctionScanOutput", () => {
       Code: { Location: codeLocation },
     });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "package.json": "invalid json" },
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["package.json", "invalid json"]]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -239,8 +239,8 @@ describe("getLambdaFunctionScanOutput", () => {
     const sdkVersion = "2.1693.0";
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "package.json": `{"dependencies":{"aws-sdk":"${sdkVersion}"}}` },
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["package.json", `{"dependencies":{"aws-sdk":"${sdkVersion}"}}`]]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -263,8 +263,8 @@ describe("getLambdaFunctionScanOutput", () => {
   it("returns error when version satisfies check throws", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"invalid"}}' },
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"invalid"}}']]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -284,9 +284,11 @@ describe("getLambdaFunctionScanOutput", () => {
   it("uses version from node_modules/aws-sdk/package.json when dependency is a range", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
-      awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": '{"version":"2.1692.0"}' },
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
+      awsSdkPackageJsonMap: new Map([
+        ["node_modules/aws-sdk/package.json", '{"version":"2.1692.0"}'],
+      ]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -303,11 +305,11 @@ describe("getLambdaFunctionScanOutput", () => {
   it("uses version from nested node_modules/aws-sdk/package.json", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "subdir/index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "subdir/package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
-      awsSdkPackageJsonMap: {
-        "subdir/node_modules/aws-sdk/package.json": '{"version":"2.1000.0"}',
-      },
+      codeMap: new Map([["subdir/index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["subdir/package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
+      awsSdkPackageJsonMap: new Map([
+        ["subdir/node_modules/aws-sdk/package.json", '{"version":"2.1000.0"}'],
+      ]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -324,9 +326,11 @@ describe("getLambdaFunctionScanOutput", () => {
   it("falls back to root node_modules when nested not found", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "subdir/index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "subdir/package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
-      awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": '{"version":"2.500.0"}' },
+      codeMap: new Map([["subdir/index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["subdir/package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
+      awsSdkPackageJsonMap: new Map([
+        ["node_modules/aws-sdk/package.json", '{"version":"2.500.0"}'],
+      ]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -343,9 +347,9 @@ describe("getLambdaFunctionScanOutput", () => {
   it("ignores invalid aws-sdk package.json in node_modules", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "package.json": '{"dependencies":{"aws-sdk":"^2.0.0"}}' },
-      awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": "invalid json" },
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
+      awsSdkPackageJsonMap: new Map([["node_modules/aws-sdk/package.json", "invalid json"]]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -362,8 +366,8 @@ describe("getLambdaFunctionScanOutput", () => {
   it("returns false when sdk found in code but not in package.json dependencies", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "index.js": 'require("aws-sdk")' },
-      packageJsonMap: { "package.json": '{"dependencies":{}}' },
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      packageJsonMap: new Map([["package.json", '{"dependencies":{}}']]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
 
@@ -383,7 +387,7 @@ describe("getLambdaFunctionScanOutput", () => {
       Configuration: { Handler: "handler.main" },
     });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
-      codeMap: { "handler.mjs": "bundle content" },
+      codeMap: new Map([["handler.mjs", "bundle content"]]),
     });
     vi.mocked(hasSdkV2InBundle).mockReturnValue(true);
 

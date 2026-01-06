@@ -30,7 +30,7 @@ describe("getLambdaFunctionContents", () => {
     mockZip.entries.mockRejectedValue(new Error("zip entries error"));
     const result = await getLambdaFunctionContents(mockZipPath);
 
-    expect(result).toEqual({ codeMap: {} });
+    expect(result).toEqual({ codeMap: new Map() });
     expect(mockZip.entryData).not.toHaveBeenCalled();
     expect(mockZip.close).toHaveBeenCalled();
   });
@@ -44,7 +44,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: {} });
+      expect(result).toEqual({ codeMap: new Map() });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
       expect(mockZip.close).toHaveBeenCalled();
@@ -58,7 +58,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: {} });
+      expect(result).toEqual({ codeMap: new Map() });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.js");
       expect(mockZip.close).toHaveBeenCalled();
@@ -73,7 +73,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: {} });
+      expect(result).toEqual({ codeMap: new Map() });
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
       expect(mockZip.entryData).toHaveBeenNthCalledWith(2, "index.js");
@@ -93,8 +93,8 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockZipPath);
 
       expect(result).toEqual({
-        codeMap: { "index.js": mockCode },
-        packageJsonMap: { "package.json": mockPackageJson },
+        codeMap: new Map([["index.js", mockCode]]),
+        packageJsonMap: new Map([["package.json", mockPackageJson]]),
       });
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
@@ -112,8 +112,8 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockZipPath);
 
       expect(result).toEqual({
-        codeMap: {},
-        packageJsonMap: { "package.json": mockPackageJson },
+        codeMap: new Map(),
+        packageJsonMap: new Map([["package.json", mockPackageJson]]),
       });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("package.json");
@@ -127,7 +127,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: {} });
+      expect(result).toEqual({ codeMap: new Map() });
       expect(mockZip.entryData).not.toHaveBeenCalled();
       expect(mockZip.close).toHaveBeenCalled();
     });
@@ -147,11 +147,11 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockZipPath);
 
       expect(result).toEqual({
-        codeMap: {},
-        packageJsonMap: {
-          "package.json": mockPackageJsons.root,
-          "packages/app/package.json": mockPackageJsons.app,
-        },
+        codeMap: new Map(),
+        packageJsonMap: new Map([
+          ["package.json", mockPackageJsons.root],
+          ["packages/app/package.json", mockPackageJsons.app],
+        ]),
       });
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "package.json");
@@ -174,9 +174,9 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockZipPath);
 
       expect(result).toEqual({
-        codeMap: {},
-        packageJsonMap: { "package.json": mockPackageJson },
-        awsSdkPackageJsonMap: { "node_modules/aws-sdk/package.json": awsSdkPackageJson },
+        codeMap: new Map(),
+        packageJsonMap: new Map([["package.json", mockPackageJson]]),
+        awsSdkPackageJsonMap: new Map([["node_modules/aws-sdk/package.json", awsSdkPackageJson]]),
       });
     });
 
@@ -195,11 +195,11 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockZipPath);
 
       expect(result).toEqual({
-        codeMap: {},
-        packageJsonMap: { "package.json": mockPackageJson },
-        awsSdkPackageJsonMap: {
-          "packages/app/node_modules/aws-sdk/package.json": awsSdkPackageJson,
-        },
+        codeMap: new Map(),
+        packageJsonMap: new Map([["package.json", mockPackageJson]]),
+        awsSdkPackageJsonMap: new Map([
+          ["packages/app/node_modules/aws-sdk/package.json", awsSdkPackageJson],
+        ]),
       });
     });
   });
@@ -213,7 +213,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: { "index.js": mockCode } });
+      expect(result).toEqual({ codeMap: new Map([["index.js", mockCode]]) });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.js");
       expect(mockZip.close).toHaveBeenCalled();
@@ -227,7 +227,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: { "index.mjs": mockCode } });
+      expect(result).toEqual({ codeMap: new Map([["index.mjs", mockCode]]) });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.mjs");
       expect(mockZip.close).toHaveBeenCalled();
@@ -241,7 +241,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: { "index.cjs": mockCode } });
+      expect(result).toEqual({ codeMap: new Map([["index.cjs", mockCode]]) });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.cjs");
       expect(mockZip.close).toHaveBeenCalled();
@@ -255,7 +255,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: { "index.ts": mockCode } });
+      expect(result).toEqual({ codeMap: new Map([["index.ts", mockCode]]) });
       expect(mockZip.entryData).toHaveBeenCalledOnce();
       expect(mockZip.entryData).toHaveBeenCalledWith("index.ts");
       expect(mockZip.close).toHaveBeenCalled();
@@ -271,7 +271,10 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockZipPath);
 
       expect(result).toEqual({
-        codeMap: { "index.js": mockCode, "utils.js": mockCode },
+        codeMap: new Map([
+          ["index.js", mockCode],
+          ["utils.js", mockCode],
+        ]),
       });
       expect(mockZip.entryData).toHaveBeenCalledTimes(2);
       expect(mockZip.entryData).toHaveBeenNthCalledWith(1, "index.js");
@@ -286,7 +289,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: {} });
+      expect(result).toEqual({ codeMap: new Map() });
       expect(mockZip.entryData).not.toHaveBeenCalled();
       expect(mockZip.close).toHaveBeenCalled();
     });
@@ -298,7 +301,7 @@ describe("getLambdaFunctionContents", () => {
 
       const result = await getLambdaFunctionContents(mockZipPath);
 
-      expect(result).toEqual({ codeMap: {} });
+      expect(result).toEqual({ codeMap: new Map() });
       expect(mockZip.entryData).not.toHaveBeenCalled();
       expect(mockZip.close).toHaveBeenCalled();
     });
