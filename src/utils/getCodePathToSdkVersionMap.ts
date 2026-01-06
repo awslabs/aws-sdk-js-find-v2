@@ -8,6 +8,7 @@ const safeParse = (json: string) => {
   try {
     return JSON.parse(json);
   } catch {
+    // ToDo: add warning when logging is supported in future.
     return {};
   }
 };

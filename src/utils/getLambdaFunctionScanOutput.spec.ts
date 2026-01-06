@@ -162,7 +162,7 @@ describe("getLambdaFunctionScanOutput", () => {
     expect(hasSdkV2InFile).not.toHaveBeenCalled();
   });
 
-  it("returns error for invalid package.json", async () => {
+  it("returns false for invalid package.json", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({
       Code: { Location: codeLocation },
     });
@@ -184,9 +184,7 @@ describe("getLambdaFunctionScanOutput", () => {
       Region: region,
       Runtime: runtime,
       SdkVersion: sdkVersionRange,
-      ContainsAwsSdkJsV2: null,
-      AwsSdkJsV2Error:
-        "Error parsing 'package.json': Unexpected token 'i', \"invalid json\" is not valid JSON",
+      ContainsAwsSdkJsV2: false,
     });
   });
 
@@ -260,7 +258,7 @@ describe("getLambdaFunctionScanOutput", () => {
     });
   });
 
-  it("returns error when version satisfies check throws", async () => {
+  it("returns false when version satisfies check throws", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
@@ -275,10 +273,7 @@ describe("getLambdaFunctionScanOutput", () => {
       sdkVersionRange,
     });
 
-    expect(result.ContainsAwsSdkJsV2).toBeNull();
-    expect(result.AwsSdkJsV2Error).toContain(
-      "Error checking version range '2.x' for aws-sdk@invalid in 'package.json'",
-    );
+    expect(result.ContainsAwsSdkJsV2).toBe(false);
   });
 
   it("uses version from node_modules/aws-sdk/package.json when dependency is a range", async () => {
@@ -344,7 +339,7 @@ describe("getLambdaFunctionScanOutput", () => {
     expect(result.ContainsAwsSdkJsV2).toBe(false);
   });
 
-  it("ignores invalid aws-sdk package.json in node_modules", async () => {
+  it("returns false for invalid aws-sdk package.json in node_modules", async () => {
     vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
@@ -360,7 +355,7 @@ describe("getLambdaFunctionScanOutput", () => {
       sdkVersionRange,
     });
 
-    expect(result.ContainsAwsSdkJsV2).toBe(true);
+    expect(result.ContainsAwsSdkJsV2).toBe(false);
   });
 
   it("returns false when sdk found in code but not in package.json dependencies", async () => {

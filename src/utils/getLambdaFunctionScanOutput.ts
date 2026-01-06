@@ -1,7 +1,6 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
 import { satisfies, validate } from "compare-versions";
 
-import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
 import { downloadFile } from "./downloadFile.ts";
 import {
   getLambdaFunctionContents,
@@ -13,7 +12,8 @@ import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
 
 import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { join } from "node:path";
+import { getCodePathToSdkVersionMap } from "./getCodePathToSdkVersionMap.ts";
 
 export interface LambdaFunctionScanOptions {
   // The name of the Lambda function
@@ -126,6 +126,7 @@ export const getLambdaFunctionScanOutput = async (
       }
     } catch {
       // Skip files that fail to parse
+      // ToDo: add warning when logging is supported in future.
     }
   }
 
@@ -135,66 +136,32 @@ export const getLambdaFunctionScanOutput = async (
     return output;
   }
 
-  // Search for JS SDK v2 version from package.json
-  if (packageJsonMap && packageJsonMap.size > 0) {
-    for (const [packageJsonPath, packageJsonContent] of packageJsonMap) {
+  const codePathToSdkVersionMap = getCodePathToSdkVersionMap(
+    filesWithJsSdkV2,
+    packageJsonMap,
+    awsSdkPackageJsonMap,
+  );
+
+  const jsSdkV2FilesInSdkVersionRange = [];
+  for (const [codePath, version] of codePathToSdkVersionMap) {
+    if (version && validate(version)) {
       try {
-        const packageJson = JSON.parse(packageJsonContent);
-        const dependencies = packageJson.dependencies || {};
-        if (AWS_SDK in dependencies) {
-          const awsSdkVersionInPackageJson: string = dependencies[AWS_SDK];
-
-          const awsSdkPackageJsonPathInNodeModules = join(NODE_MODULES, AWS_SDK, PACKAGE_JSON);
-          // Get aws-sdk package.json from nested node_modules or root node_modules.
-          const awsSdkPackageJson = awsSdkPackageJsonMap
-            ? (awsSdkPackageJsonMap.get(
-                join(dirname(packageJsonPath), awsSdkPackageJsonPathInNodeModules),
-              ) ?? awsSdkPackageJsonMap.get(awsSdkPackageJsonPathInNodeModules))
-            : undefined;
-
-          let awsSdkVersionInNodeModules: string | undefined;
-          try {
-            if (awsSdkPackageJson) {
-              awsSdkVersionInNodeModules = JSON.parse(awsSdkPackageJson).version;
-            }
-          } catch {
-            // Skip if JSON can't be parsed.
-            // ToDo: add warning when logging is supported in future.
-          }
-
-          const sdkVersionToCheck =
-            validate(awsSdkVersionInPackageJson) || awsSdkPackageJson === undefined
-              ? // Use version in package.json dependencies, if fixed version is defined or aws-sdk package.json is not available.
-                awsSdkVersionInPackageJson
-              : // Use version from aws-sdk package.json, if defined
-                (awsSdkVersionInNodeModules ?? awsSdkVersionInPackageJson);
-
-          try {
-            if (!satisfies(sdkVersionToCheck, sdkVersionRange)) {
-              continue;
-            }
-          } catch (error) {
-            const errorPrefix = `Error checking version range '${sdkVersionRange}' for aws-sdk@${
-              dependencies["aws-sdk"]
-            } in '${packageJsonPath}'`;
-            output.AwsSdkJsV2Error =
-              error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
-            return output;
-          }
-          output.ContainsAwsSdkJsV2 = true;
-          output.AwsSdkJsV2Locations = filesWithJsSdkV2;
-          return output;
+        if (satisfies(version, sdkVersionRange)) {
+          jsSdkV2FilesInSdkVersionRange.push(codePath);
         }
-      } catch (error) {
-        const errorPrefix = `Error parsing '${packageJsonPath}'`;
-        output.AwsSdkJsV2Error =
-          error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
-        return output;
+      } catch {
+        // Ignore if satisfies throws error
+        // ToDo: add warning when logging is supported in future.
       }
     }
   }
 
-  // JS SDK v2 dependency/code not found.
+  if (jsSdkV2FilesInSdkVersionRange.length > 0) {
+    output.ContainsAwsSdkJsV2 = true;
+    output.AwsSdkJsV2Locations = jsSdkV2FilesInSdkVersionRange;
+    return output;
+  }
+
   output.ContainsAwsSdkJsV2 = false;
   return output;
 };
