@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.7.1
+
+### Patch Changes
+
+- Find SDK version by traversing up the directory tree ([f8dde276743fb1acc42018e70c76be51e7dd9daa](https://github.com/awslabs/aws-sdk-js-find-v2/commit/f8dde276743fb1acc42018e70c76be51e7dd9daa))
+
 ## 0.7.0
 
 ### Minor Changes
