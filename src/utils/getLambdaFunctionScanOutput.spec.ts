@@ -1,4 +1,4 @@
-import { Lambda } from "@aws-sdk/client-lambda";
+import type { Lambda } from "@aws-sdk/client-lambda";
 import { rm } from "node:fs/promises";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
