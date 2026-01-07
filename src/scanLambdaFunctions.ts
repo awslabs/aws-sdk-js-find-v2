@@ -80,7 +80,7 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     functions.map((fn) =>
       limit(() =>
         getLambdaFunctionScanOutput(client, {
-          functionConfiguration: fn,
+          functionName: fn.FunctionName!,
           sdkVersionRange: sdk,
         }),
       ),

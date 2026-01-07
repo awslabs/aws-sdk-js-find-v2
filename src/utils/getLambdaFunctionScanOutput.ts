@@ -16,8 +16,8 @@ import { join } from "node:path";
 import { getCodePathToSdkVersionMap } from "./getCodePathToSdkVersionMap.ts";
 
 export interface LambdaFunctionScanOptions {
-  // Lambda Function Configuration
-  functionConfiguration: FunctionConfiguration;
+  // The name of the Lambda function
+  functionName: string;
 
   // Semver range string to check for AWS SDK for JavaScript v2
   sdkVersionRange: string;
@@ -55,24 +55,24 @@ export interface LambdaFunctionScanOutput {
  *
  * @param client - AWS Lambda client instance
  * @param options - Scan configuration options
- * @param options.function - The Lambda function configuration
+ * @param options.functionName - The name of the Lambda function
  * @param options.sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
  * @returns Scan results including SDK v2 detection status and locations
  */
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
-  { functionConfiguration, sdkVersionRange }: LambdaFunctionScanOptions,
+  { functionName, sdkVersionRange }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
-  const functionName = functionConfiguration.FunctionName!;
+  const response = await client.getFunction({ FunctionName: functionName });
+
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
-    Region: functionConfiguration.FunctionArn!.split(":")[3],
-    Runtime: functionConfiguration.Runtime!,
+    Region: response.Configuration!.FunctionArn!.split(":")[3],
+    Runtime: response.Configuration!.Runtime!,
     SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,
   };
 
-  const response = await client.getFunction({ FunctionName: functionName });
   if (!response.Code?.Location) {
     output.AwsSdkJsV2Error = "Function Code location not found.";
     return output;
@@ -96,7 +96,7 @@ export const getLambdaFunctionScanOutput = async (
 
   // Process handler as bundle file first.
   const possibleHandlerFiles = getPossibleHandlerFiles(
-    functionConfiguration?.Handler ?? "index.handler",
+    response.Configuration?.Handler ?? "index.handler",
   );
   for (const handlerFile of possibleHandlerFiles) {
     const handlerContent = codeMap.get(handlerFile);
