@@ -1,4 +1,4 @@
-import type { FunctionConfiguration, Lambda } from "@aws-sdk/client-lambda";
+import type { Lambda } from "@aws-sdk/client-lambda";
 import { satisfies, validate } from "compare-versions";
 
 import { downloadFile } from "./downloadFile.ts";
