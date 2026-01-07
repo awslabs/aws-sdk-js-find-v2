@@ -19,6 +19,9 @@ export interface LambdaFunctionScanOptions {
   // The name of the Lambda function
   functionName: string;
 
+  // AWS region the Lambda function is deployed to
+  region: string;
+
   // Semver range string to check for AWS SDK for JavaScript v2
   sdkVersionRange: string;
 }
@@ -56,18 +59,19 @@ export interface LambdaFunctionScanOutput {
  * @param client - AWS Lambda client instance
  * @param options - Scan configuration options
  * @param options.functionName - The name of the Lambda function
+ * @param options.region - AWS region the Lambda function is deployed to
  * @param options.sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
  * @returns Scan results including SDK v2 detection status and locations
  */
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
-  { functionName, sdkVersionRange }: LambdaFunctionScanOptions,
+  { functionName, region, sdkVersionRange }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
   const response = await client.getFunction({ FunctionName: functionName });
 
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
-    Region: response.Configuration!.FunctionArn!.split(":")[3],
+    Region: region,
     Runtime: response.Configuration!.Runtime!,
     SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,

@@ -75,12 +75,15 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
     }
   }
 
+  const clientRegion = await client.config.region();
+
   const limit = pLimit(concurrency);
   const scanOutput = await Promise.all(
     functions.map((fn) =>
       limit(() =>
         getLambdaFunctionScanOutput(client, {
           functionName: fn.FunctionName!,
+          region: clientRegion,
           sdkVersionRange: sdk,
         }),
       ),
