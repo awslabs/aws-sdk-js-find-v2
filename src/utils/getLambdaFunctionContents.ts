@@ -1,6 +1,5 @@
 import StreamZip from "node-stream-zip";
-import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
-import { join } from "node:path";
+import { AWS_SDK_PACKAGE_JSON, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
 
 export interface LambdaFunctionContents {
   /**
@@ -50,7 +49,7 @@ export const getLambdaFunctionContents = async (
   for (const zipEntry of Object.values(zipEntries)) {
     // Skip 'node_modules' directory, except for aws-sdk package.json file.
     if (zipEntry.name.includes(`${NODE_MODULES}/`)) {
-      if (zipEntry.name.endsWith(join(NODE_MODULES, AWS_SDK, PACKAGE_JSON)) && zipEntry.isFile) {
+      if (zipEntry.name.endsWith(AWS_SDK_PACKAGE_JSON) && zipEntry.isFile) {
         const packageJsonContent = await zip.entryData(zipEntry.name);
         awsSdkPackageJsonMap.set(zipEntry.name, packageJsonContent.toString());
       }
