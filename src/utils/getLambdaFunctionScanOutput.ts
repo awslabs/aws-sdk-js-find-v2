@@ -1,4 +1,4 @@
-import type { Lambda } from "@aws-sdk/client-lambda";
+import type { FunctionConfiguration, Lambda } from "@aws-sdk/client-lambda";
 import { satisfies, validate } from "compare-versions";
 
 import { downloadFile } from "./downloadFile.ts";
@@ -16,14 +16,8 @@ import { join } from "node:path";
 import { getCodePathToSdkVersionMap } from "./getCodePathToSdkVersionMap.ts";
 
 export interface LambdaFunctionScanOptions {
-  // The name of the Lambda function
-  functionName: string;
-
-  // AWS region the Lambda function is deployed to
-  region: string;
-
-  // Lambda Function's Node.js runtime
-  runtime: string;
+  // Lambda Function Configuration
+  functionConfiguration: FunctionConfiguration;
 
   // Semver range string to check for AWS SDK for JavaScript v2
   sdkVersionRange: string;
@@ -61,20 +55,19 @@ export interface LambdaFunctionScanOutput {
  *
  * @param client - AWS Lambda client instance
  * @param options - Scan configuration options
- * @param options.functionName - The name of the Lambda function
- * @param options.region - AWS region the Lambda function is deployed to
- * @param options.runtime - Lambda Function's Node.js runtime
+ * @param options.function - The Lambda function configuration
  * @param options.sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
  * @returns Scan results including SDK v2 detection status and locations
  */
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
-  { functionName, region, runtime, sdkVersionRange }: LambdaFunctionScanOptions,
+  { functionConfiguration, sdkVersionRange }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
+  const functionName = functionConfiguration.FunctionName!;
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
-    Region: region,
-    Runtime: runtime,
+    Region: functionConfiguration.FunctionArn!.split(":")[3],
+    Runtime: functionConfiguration.Runtime!,
     SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,
   };
@@ -103,7 +96,7 @@ export const getLambdaFunctionScanOutput = async (
 
   // Process handler as bundle file first.
   const possibleHandlerFiles = getPossibleHandlerFiles(
-    response.Configuration?.Handler ?? "index.handler",
+    functionConfiguration?.Handler ?? "index.handler",
   );
   for (const handlerFile of possibleHandlerFiles) {
     const handlerContent = codeMap.get(handlerFile);
