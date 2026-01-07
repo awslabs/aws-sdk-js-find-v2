@@ -84,7 +84,6 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
         getLambdaFunctionScanOutput(client, {
           functionName: fn.FunctionName!,
           region: clientRegion,
-          runtime: fn.Runtime!,
           sdkVersionRange: sdk,
         }),
       ),

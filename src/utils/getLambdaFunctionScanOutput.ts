@@ -22,9 +22,6 @@ export interface LambdaFunctionScanOptions {
   // AWS region the Lambda function is deployed to
   region: string;
 
-  // Lambda Function's Node.js runtime
-  runtime: string;
-
   // Semver range string to check for AWS SDK for JavaScript v2
   sdkVersionRange: string;
 }
@@ -63,23 +60,23 @@ export interface LambdaFunctionScanOutput {
  * @param options - Scan configuration options
  * @param options.functionName - The name of the Lambda function
  * @param options.region - AWS region the Lambda function is deployed to
- * @param options.runtime - Lambda Function's Node.js runtime
  * @param options.sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
  * @returns Scan results including SDK v2 detection status and locations
  */
 export const getLambdaFunctionScanOutput = async (
   client: Lambda,
-  { functionName, region, runtime, sdkVersionRange }: LambdaFunctionScanOptions,
+  { functionName, region, sdkVersionRange }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
+  const response = await client.getFunction({ FunctionName: functionName });
+
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
     Region: region,
-    Runtime: runtime,
+    Runtime: response.Configuration!.Runtime!,
     SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,
   };
 
-  const response = await client.getFunction({ FunctionName: functionName });
   if (!response.Code?.Location) {
     output.AwsSdkJsV2Error = "Function Code location not found.";
     return output;
