@@ -1,8 +1,6 @@
 import { dirname, join } from "node:path";
 
-import { AWS_SDK, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
-
-const AWS_SDK_PACKAGE_JSON = join(NODE_MODULES, AWS_SDK, PACKAGE_JSON);
+import { AWS_SDK, AWS_SDK_PACKAGE_JSON, PACKAGE_JSON } from "./constants.ts";
 
 const safeParse = (json: string) => {
   try {
