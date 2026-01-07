@@ -13,13 +13,21 @@ describe("getCodePathToSdkVersionMap", () => {
     expect(result.get("src/index.js")).toBeUndefined();
   });
 
-  it("returns version from node_modules aws-sdk package.json", () => {
+  it("returns version from node_modules aws-sdk package.json, when not available in package.json dependencies", () => {
     const packageJsonMap = new Map([["package.json", "{}"]]);
     const awsSdkPackageJsonMap = new Map([
       ["node_modules/aws-sdk/package.json", '{"version":"2.1.0"}'],
     ]);
     const result = getCodePathToSdkVersionMap(["index.js"], packageJsonMap, awsSdkPackageJsonMap);
     expect(result.get("index.js")).toBe("2.1.0");
+  });
+
+  it("returns version from node_modules aws-sdk package.json, when package.json is not available", () => {
+    const awsSdkPackageJsonMap = new Map([
+      ["node_modules/aws-sdk/package.json", '{"version":"2.5.0"}'],
+    ]);
+    const result = getCodePathToSdkVersionMap(["index.js"], undefined, awsSdkPackageJsonMap);
+    expect(result.get("index.js")).toBe("2.5.0");
   });
 
   it("returns version from package.json dependencies when node_modules aws-sdk package.json is not present", () => {

@@ -35,20 +35,21 @@ export const getCodePathToSdkVersionMap = (
     if (dirToSdkVersionMap.has(dir)) return dirToSdkVersionMap.get(dir);
 
     let version: string | undefined;
+
+    // Assign version from node_modules aws-sdk package.json, if available.
+    const awsSdkPackageJson =
+      awsSdkPackageJsonMap.get(join(dir, AWS_SDK_PACKAGE_JSON)) ??
+      awsSdkPackageJsonMap.get(AWS_SDK_PACKAGE_JSON);
+    version ??= awsSdkPackageJson && safeParse(awsSdkPackageJson).version;
+
+    // Assign version from package.json dependencies, if not populated yet.
     const pkgJson = packageJsonMap.get(join(dir, PACKAGE_JSON));
+    version ??= pkgJson && safeParse(pkgJson).dependencies?.[AWS_SDK];
 
-    if (pkgJson) {
-      const parsed = safeParse(pkgJson);
-      const awsSdkPackageJson =
-        awsSdkPackageJsonMap.get(join(dir, AWS_SDK_PACKAGE_JSON)) ??
-        awsSdkPackageJsonMap.get(AWS_SDK_PACKAGE_JSON);
-      version =
-        (awsSdkPackageJson && safeParse(awsSdkPackageJson).version) ??
-        parsed.dependencies?.[AWS_SDK];
-    }
-
+    // Assign undefined if it's rootDir, else call getSdkVersion on parent dir, if not populated yet.
     const parentDir = dirname(dir);
     version ??= parentDir !== dir ? getSdkVersion(parentDir) : undefined;
+
     dirToSdkVersionMap.set(dir, version);
     return version;
   };

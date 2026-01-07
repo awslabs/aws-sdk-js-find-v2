@@ -322,10 +322,30 @@ describe("getLambdaFunctionScanOutput", () => {
       functionName,
       region,
       runtime,
-      sdkVersionRange: "<2.1692.0",
+      sdkVersionRange: ">=2.1692.0",
     });
 
-    expect(result.ContainsAwsSdkJsV2).toBe(false);
+    expect(result.ContainsAwsSdkJsV2).toBe(true);
+  });
+
+  it("uses version from node_modules/aws-sdk/package.json when package.json is not defined", async () => {
+    vi.mocked(mockClient.getFunction).mockResolvedValue({ Code: { Location: codeLocation } });
+    vi.mocked(getLambdaFunctionContents).mockResolvedValue({
+      codeMap: new Map([["index.js", 'require("aws-sdk")']]),
+      awsSdkPackageJsonMap: new Map([
+        ["node_modules/aws-sdk/package.json", '{"version":"2.1692.0"}'],
+      ]),
+    });
+    vi.mocked(hasSdkV2InFile).mockReturnValue(true);
+
+    const result = await getLambdaFunctionScanOutput(mockClient, {
+      functionName,
+      region,
+      runtime,
+      sdkVersionRange,
+    });
+
+    expect(result.ContainsAwsSdkJsV2).toBe(true);
   });
 
   it("uses version from nested node_modules/aws-sdk/package.json", async () => {
