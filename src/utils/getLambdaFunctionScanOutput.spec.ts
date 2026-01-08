@@ -77,7 +77,7 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Locations: ["index.js"],
     });
-    expect(getLambdaFunctionContents).toHaveBeenCalledWith(codeLocation);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, { codeLocation, runtime });
     expect(hasSdkV2InBundle).toHaveBeenCalledWith("bundle content", sdkVersionRange);
     expect(hasSdkV2InFile).not.toHaveBeenCalled();
   });
@@ -102,7 +102,7 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Locations: ["index.mjs"],
     });
-    expect(getLambdaFunctionContents).toHaveBeenCalledWith(codeLocation);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, { codeLocation, runtime });
   });
 
   it("ignores aws-sdk in source code if exact version of SDK version can't be found", async () => {
@@ -124,7 +124,7 @@ describe("getLambdaFunctionScanOutput", () => {
       SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: false,
     });
-    expect(getLambdaFunctionContents).toHaveBeenCalledWith(codeLocation);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, { codeLocation, runtime });
   });
 
   it("returns false when aws-sdk not found in code", async () => {
