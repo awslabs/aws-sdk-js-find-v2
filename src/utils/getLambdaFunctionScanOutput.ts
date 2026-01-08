@@ -63,23 +63,29 @@ export const getLambdaFunctionScanOutput = async (
   { functionName, region, sdkVersionRange }: LambdaFunctionScanOptions,
 ): Promise<LambdaFunctionScanOutput> => {
   const response = await client.getFunction({ FunctionName: functionName });
+  const runtime = response.Configuration?.Runtime!;
 
   const output: LambdaFunctionScanOutput = {
     FunctionName: functionName,
     Region: region,
-    Runtime: response.Configuration!.Runtime!,
+    Runtime: runtime,
     SdkVersion: sdkVersionRange,
     ContainsAwsSdkJsV2: null,
   };
 
-  if (!response.Code?.Location) {
+  const codeLocation = response.Code?.Location;
+  if (!codeLocation) {
     output.AwsSdkJsV2Error = "Function Code location not found.";
     return output;
   }
 
   let lambdaFunctionContents: LambdaFunctionContents;
   try {
-    lambdaFunctionContents = await getLambdaFunctionContents(response.Code.Location);
+    lambdaFunctionContents = await getLambdaFunctionContents(client, {
+      codeLocation,
+      runtime,
+      layers: response.Configuration?.Layers,
+    });
   } catch (error) {
     const errorPrefix = "Error downloading or reading Lambda function code";
     output.AwsSdkJsV2Error =

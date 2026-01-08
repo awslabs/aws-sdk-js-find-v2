@@ -13,4 +13,19 @@ describe("getCodeSizeToDownload", () => {
   it("handles functions without CodeSize", () => {
     expect(getCodeSizeToDownload([{ FunctionName: "fn1" }, { CodeSize: 100 }])).toBe(100);
   });
+
+  it("includes layer code sizes", () => {
+    expect(
+      getCodeSizeToDownload([{ CodeSize: 100, Layers: [{ Arn: "arn:layer1", CodeSize: 50 }] }]),
+    ).toBe(150);
+  });
+
+  it("doesn't count same layer twice", () => {
+    expect(
+      getCodeSizeToDownload([
+        { CodeSize: 100, Layers: [{ Arn: "arn:layer1", CodeSize: 50 }] },
+        { CodeSize: 200, Layers: [{ Arn: "arn:layer1", CodeSize: 50 }] },
+      ]),
+    ).toBe(350);
+  });
 });
