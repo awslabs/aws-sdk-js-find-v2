@@ -8,7 +8,11 @@ describe("getCodeSizeToSaveOnDisk", () => {
   });
 
   it("returns code size for largest functions", () => {
-    const functions: FunctionConfiguration[] = [{ CodeSize: 10 }, { CodeSize: 200 }, { CodeSize: 100 }];
+    const functions: FunctionConfiguration[] = [
+      { CodeSize: 10 },
+      { CodeSize: 200 },
+      { CodeSize: 100 },
+    ];
     expect(getCodeSizeToSaveOnDisk(functions, 2)).toBe(300);
   });
 
