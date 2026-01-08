@@ -1,5 +1,36 @@
+import type { Lambda, Layer, Runtime } from "@aws-sdk/client-lambda";
 import StreamZip from "node-stream-zip";
+
+import { rm } from "node:fs/promises";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+
 import { AWS_SDK_PACKAGE_JSON, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
+import { downloadFile } from "./downloadFile.ts";
+import { getLambdaLayerContents, type LambdaLayerContents } from "./getLambdaLayerContents.ts";
+import { getSdkVersionFromLambdaLayerContents } from "./getSdkVersionFromLambdaLayerContents.ts";
+
+export interface LambdaFunctionContentsOptions {
+  /**
+   * The name of the Lambda function
+   */
+  functionName: string;
+
+  /**
+   * The presigned URL to download the Lambda Function code.
+   */
+  codeLocation: string;
+
+  /**
+   * The runtime of the Lambda function (e.g., nodejs20.x)
+   */
+  runtime: Runtime;
+
+  /**
+   * The function's layers
+   */
+  layers?: Layer[];
+}
 
 export interface LambdaFunctionContents {
   /**
@@ -18,25 +49,50 @@ export interface LambdaFunctionContents {
   awsSdkPackageJsonMap?: Map<string, string>;
 }
 
+const lambdaLayerCache = new Map<string, LambdaLayerContents>();
+
 /**
- * Extracts the contents of a Lambda Function zip file.
+ * Downloads and extracts the contents of a Lambda Function from its code location.
  *
- * Parses the zip and returns:
+ * Downloads the zip, parses it, and returns:
  * - JS/TS source files (excluding node_modules)
  * - package.json files (excluding node_modules)
  * - aws-sdk package.json from node_modules (for version detection)
  *
- * @param zipPath - The path to the zip file of Lambda Function.
  * @returns Extracted contents categorized by file type.
  */
 export const getLambdaFunctionContents = async (
-  zipPath: string,
+  client: Lambda,
+  { functionName, codeLocation, runtime, layers = [] }: LambdaFunctionContentsOptions,
 ): Promise<LambdaFunctionContents> => {
-  const zip = new StreamZip.async({ file: zipPath });
-
   const codeMap = new Map<string, string>();
   const packageJsonMap = new Map<string, string>();
   const awsSdkPackageJsonMap = new Map<string, string>();
+
+  // Populate awsSdkPackageJsonMap with layers first.
+  for (const layer of layers) {
+    if (!layer.Arn) continue;
+
+    if (!lambdaLayerCache.has(layer.Arn)) {
+      lambdaLayerCache.set(layer.Arn, new Map());
+      const response = await client.getLayerVersionByArn({ Arn: layer.Arn });
+      if (response.Content?.Location) {
+        const layerZipPath = join(tmpdir(), `layer-${layer.Arn}.zip`);
+        await downloadFile(response.Content.Location, layerZipPath);
+        const layerContents = await getLambdaLayerContents(layerZipPath);
+        lambdaLayerCache.set(layer.Arn, layerContents);
+        await rm(layerZipPath, { force: true });
+      }
+    }
+
+    const layerContents = lambdaLayerCache.get(layer.Arn) || new Map();
+    const version = getSdkVersionFromLambdaLayerContents(layerContents, runtime);
+    if (version) awsSdkPackageJsonMap.set(AWS_SDK_PACKAGE_JSON, JSON.stringify({ version }));
+  }
+
+  const zipPath = join(tmpdir(), `function-${functionName}.zip`);
+  await downloadFile(codeLocation, zipPath);
+  const zip = new StreamZip.async({ file: zipPath });
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
   try {
@@ -85,6 +141,7 @@ export const getLambdaFunctionContents = async (
   }
 
   await zip.close();
+  await rm(zipPath, { force: true });
   return {
     codeMap,
     ...(packageJsonMap.size > 0 && { packageJsonMap }),

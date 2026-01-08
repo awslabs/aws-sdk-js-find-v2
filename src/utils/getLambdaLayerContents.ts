@@ -4,7 +4,7 @@ import { AWS_SDK_PACKAGE_JSON } from "./constants.ts";
 /**
  * Map with aws-sdk package.json filepath as key and contents as value.
  */
-export type LambdaLayerContents = Map<string, string>;
+export type LambdaLayerContents = Map<string, { version: string }>;
 
 /**
  * Extracts the contents of a Lambda layer zip file.
@@ -15,7 +15,7 @@ export type LambdaLayerContents = Map<string, string>;
  */
 export const getLambdaLayerContents = async (zipPath: string): Promise<LambdaLayerContents> => {
   const zip = new StreamZip.async({ file: zipPath });
-  const lambdaLayerContents = new Map<string, string>();
+  const lambdaLayerContents = new Map<string, { version: string }>();
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
   try {
@@ -34,9 +34,10 @@ export const getLambdaLayerContents = async (zipPath: string): Promise<LambdaLay
 
     try {
       const packageJsonContent = await zip.entryData(zipEntry.name);
-      lambdaLayerContents.set(zipEntry.name, packageJsonContent.toString());
+      const { version } = JSON.parse(packageJsonContent.toString());
+      lambdaLayerContents.set(zipEntry.name, { version });
     } catch {
-      // Continue without adding package.json file, if entry data can't be read.
+      // Continue without adding package.json file, if entry data can't be read or there's parse error.
       // ToDo: add warning when logging is supported in future.
     }
   }
