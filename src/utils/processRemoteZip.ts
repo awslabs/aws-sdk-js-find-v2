@@ -1,7 +1,10 @@
 import { randomUUID } from "node:crypto";
-import { rm, writeFile } from "node:fs/promises";
+import { createWriteStream } from "node:fs";
+import { rm } from "node:fs/promises";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
+import { pipeline } from "node:stream/promises";
+import { Readable } from "node:stream";
 
 /**
  * Downloads a zip file, runs a processor, then cleans up.
@@ -26,7 +29,9 @@ export const processRemoteZip = async (
     throw new Error(`Response body is null for '${url}'`);
   }
 
-  await writeFile(zipPath, response.body);
+  // Stream the response to disk instead of loading into memory
+  const writeStream = createWriteStream(zipPath);
+  await pipeline(Readable.fromWeb(response.body as ReadableStream), writeStream);
 
   try {
     await processor(zipPath);

@@ -47,6 +47,12 @@ export interface LambdaFunctionContents {
 const lambdaLayerCache = new Map<string, LambdaLayerContents>();
 
 /**
+ * Cache for Lambda function contents to avoid redundant downloads.
+ * Maps code location URL to extracted function contents.
+ */
+const functionCodeCache = new Map<string, LambdaFunctionContents>();
+
+/**
  * Extracts and categorizes contents from a Lambda Function deployment package.
  *
  * Downloads and processes the Lambda function's zip file to extract:
@@ -65,45 +71,51 @@ export const getLambdaFunctionContents = async (
   client: Lambda,
   { codeLocation, runtime, layers = [] }: LambdaFunctionContentsOptions,
 ): Promise<LambdaFunctionContents> => {
+  // Check cache first
+  const cacheKey = `${codeLocation}:${runtime}:${layers.map(l => l.Arn).join(',')}`;
+  if (functionCodeCache.has(cacheKey)) {
+    return functionCodeCache.get(cacheKey)!;
+  }
+
   const codeMap = new Map<string, string>();
   const packageJsonMap = new Map<string, string>();
   const awsSdkPackageJsonMap = new Map<string, string>();
 
-  // Populate awsSdkPackageJsonMap with layers first.
-  for (const layer of layers) {
-    if (!layer.Arn) continue;
+  // Populate awsSdkPackageJsonMap with layers in parallel.
+  await Promise.all(
+    layers.map(async (layer) => {
+      if (!layer.Arn) return;
 
-    if (!lambdaLayerCache.has(layer.Arn)) {
-      const response = await client.getLayerVersionByArn({ Arn: layer.Arn });
-      const layerContents = response.Content?.Location
-        ? await getLambdaLayerContents(response.Content.Location)
-        : new Map();
-      lambdaLayerCache.set(layer.Arn, layerContents);
-    }
+      if (!lambdaLayerCache.has(layer.Arn)) {
+        const response = await client.getLayerVersionByArn({ Arn: layer.Arn });
+        const layerContents = response.Content?.Location
+          ? await getLambdaLayerContents(response.Content.Location)
+          : new Map();
+        lambdaLayerCache.set(layer.Arn, layerContents);
+      }
 
-    const layerContents = lambdaLayerCache.get(layer.Arn) || new Map();
-    const version = getSdkVersionFromLambdaLayerContents(layerContents, runtime);
-    if (version) awsSdkPackageJsonMap.set(AWS_SDK_PACKAGE_JSON, JSON.stringify({ version }));
-  }
+      const layerContents = lambdaLayerCache.get(layer.Arn) || new Map();
+      const version = getSdkVersionFromLambdaLayerContents(layerContents, runtime);
+      if (version) awsSdkPackageJsonMap.set(AWS_SDK_PACKAGE_JSON, JSON.stringify({ version }));
+    })
+  );
 
   await processRemoteZip(codeLocation, async (zipPath) => {
+    const relevantExtensions = /\.(js|ts|mjs|cjs|json)$/;
+    
     await processZipEntries(zipPath, async (entry, getData) => {
-      if (!entry.isFile) return;
+      if (!entry.isFile || !relevantExtensions.test(entry.name)) return;
 
       try {
         // Handle aws-sdk package.json in node_modules
         if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) {
           awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
         }
-
         // Handle files outside of node_modules
         else if (!entry.name.includes(`${NODE_MODULES}/`)) {
-          // Handle package.json
           if (entry.name.endsWith(PACKAGE_JSON)) {
             packageJsonMap.set(entry.name, (await getData()).toString());
-          }
-          // Handle JS/TS files
-          else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
+          } else {
             codeMap.set(entry.name, (await getData()).toString());
           }
         }
@@ -113,9 +125,13 @@ export const getLambdaFunctionContents = async (
     });
   });
 
-  return {
+  const result = {
     codeMap,
     ...(packageJsonMap.size > 0 && { packageJsonMap }),
     ...(awsSdkPackageJsonMap.size > 0 && { awsSdkPackageJsonMap }),
   };
+
+  // Cache the result
+  functionCodeCache.set(cacheKey, result);
+  return result;
 };
