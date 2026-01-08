@@ -1,6 +1,5 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
 import { processRemoteZip } from "./processRemoteZip.ts";
 import { processZipEntries } from "./processZipEntries.ts";
 import { getLambdaLayerContents } from "./getLambdaLayerContents.ts";
@@ -229,6 +228,7 @@ describe("getLambdaFunctionContents", () => {
 
   describe("code files", () => {
     it("returns codeMap for .js files", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "index.js", isFile: true } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -243,6 +243,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("returns codeMap for .mjs files", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "index.mjs", isFile: true } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -257,6 +258,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("returns codeMap for .cjs files", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "index.cjs", isFile: true } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -271,6 +273,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("returns codeMap for .ts files", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "index.ts", isFile: true } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -285,6 +288,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("returns codeMap with multiple code files", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "index.js", isFile: true } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -307,6 +311,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("skips non-file entries", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "index.js", isFile: false } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -321,6 +326,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("skips non-code files", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
         await processor({ name: "readme.md", isFile: true } as never, () =>
           Promise.resolve(Buffer.from(mockCode)),
@@ -337,6 +343,7 @@ describe("getLambdaFunctionContents", () => {
 
   describe("layer processing", () => {
     it("processes layers and adds AWS SDK version to awsSdkPackageJsonMap", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       const mockLayerArn = "arn:aws:lambda:us-east-1:123456789012:layer:test-layer:1";
       const mockLayerContents = new Map([
         ["nodejs/node_modules/aws-sdk/package.json", '{"version":"2.1692.0"}'],
@@ -367,6 +374,7 @@ describe("getLambdaFunctionContents", () => {
     });
 
     it("skips layers without ARN", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
       vi.mocked(processZipEntries).mockResolvedValue();
 
       const result = await getLambdaFunctionContents(mockClient, {
