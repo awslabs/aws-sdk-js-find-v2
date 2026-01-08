@@ -16,7 +16,7 @@ export const processZipEntries = async (
   const zipEntries = await zip.entries().catch(() => ({}));
 
   for (const entry of Object.values(zipEntries)) {
-    // Processor errors should be caught by the callee.
+    // Processor callback is provided by callee, and it should handle errors.
     await processor(entry, () => zip.entryData(entry.name)).catch(() => {});
   }
 
