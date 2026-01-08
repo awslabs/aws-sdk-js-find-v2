@@ -26,7 +26,7 @@ describe("getLambdaFunctionContents", () => {
       await processor("/tmp/test.zip");
     });
     vi.mocked(getLambdaLayerContents).mockResolvedValue(new Map());
-    vi.mocked(getSdkVersionFromLambdaLayerContents).mockReturnValue(null);
+    vi.mocked(getSdkVersionFromLambdaLayerContents).mockReturnValue(undefined);
   });
 
   it("returns empty codeMap when zip has no entries", async () => {
