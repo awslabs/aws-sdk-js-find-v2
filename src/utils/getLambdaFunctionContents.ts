@@ -1,5 +1,5 @@
-import StreamZip from "node-stream-zip";
 import { AWS_SDK_PACKAGE_JSON, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
+import { processZipEntries } from "./processZipEntries.ts";
 
 export interface LambdaFunctionContents {
   /**
@@ -32,59 +32,35 @@ export interface LambdaFunctionContents {
 export const getLambdaFunctionContents = async (
   zipPath: string,
 ): Promise<LambdaFunctionContents> => {
-  const zip = new StreamZip.async({ file: zipPath });
-
   const codeMap = new Map<string, string>();
   const packageJsonMap = new Map<string, string>();
   const awsSdkPackageJsonMap = new Map<string, string>();
 
-  let zipEntries: Record<string, StreamZip.ZipEntry> = {};
-  try {
-    zipEntries = await zip.entries();
-  } catch {
-    // Continue with empty object, if zip entries can't be read.
-    // ToDo: add warning when logging is supported in future.
-  }
+  await processZipEntries(zipPath, async (entry, getData) => {
+    if (!entry.isFile) return;
 
-  for (const zipEntry of Object.values(zipEntries)) {
-    // Skip 'node_modules' directory, except for aws-sdk package.json file.
-    if (zipEntry.name.includes(`${NODE_MODULES}/`)) {
-      if (zipEntry.name.endsWith(AWS_SDK_PACKAGE_JSON) && zipEntry.isFile) {
-        const packageJsonContent = await zip.entryData(zipEntry.name);
-        awsSdkPackageJsonMap.set(zipEntry.name, packageJsonContent.toString());
+    try {
+      // Handle aws-sdk package.json in node_modules
+      if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) {
+        awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
       }
-      continue;
-    }
 
-    // Skip if it is not a file
-    if (!zipEntry.isFile) continue;
-
-    // Populate 'package.json' files.
-    if (zipEntry.name.endsWith(PACKAGE_JSON)) {
-      try {
-        const packageJsonContent = await zip.entryData(zipEntry.name);
-        packageJsonMap.set(zipEntry.name, packageJsonContent.toString());
-      } catch {
-        // Continue without adding package.json file, if entry data can't be read.
-        // ToDo: add warning when logging is supported in future.
+      // Handle files outside of node_modules
+      else if (!entry.name.includes(`${NODE_MODULES}/`)) {
+        // Handle package.json
+        if (entry.name.endsWith(PACKAGE_JSON)) {
+          packageJsonMap.set(entry.name, (await getData()).toString());
+        }
+        // Handle JS/TS files
+        else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
+          codeMap.set(entry.name, (await getData()).toString());
+        }
       }
-      continue;
+    } catch {
+      // Continue if entry data can't be read.
     }
+  });
 
-    // Populate JavaScript/TypeScript files.
-    if (zipEntry.name.match(/\.(js|ts|mjs|cjs)$/)) {
-      try {
-        const codeContent = await zip.entryData(zipEntry.name);
-        codeMap.set(zipEntry.name, codeContent.toString());
-      } catch {
-        // Continue without adding code, if entry data can't be read.
-        // ToDo: add warning when logging is supported in future.
-      }
-      continue;
-    }
-  }
-
-  await zip.close();
   return {
     codeMap,
     ...(packageJsonMap.size > 0 && { packageJsonMap }),
