@@ -79,7 +79,7 @@ export const getLambdaFunctionScanOutput = async (
 
   let lambdaFunctionContents: LambdaFunctionContents;
   try {
-    lambdaFunctionContents = await getLambdaFunctionContents(functionName, response.Code.Location);
+    lambdaFunctionContents = await getLambdaFunctionContents(response.Code.Location);
   } catch (error) {
     const errorPrefix = "Error downloading or reading Lambda function code";
     output.AwsSdkJsV2Error =

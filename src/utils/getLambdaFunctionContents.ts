@@ -27,19 +27,17 @@ export interface LambdaFunctionContents {
  * - package.json files (excluding node_modules)
  * - aws-sdk package.json from node_modules (for version detection)
  *
- * @param functionName - The name of the Lambda function.
  * @param codeLocation - The presigned URL to download the Lambda Function code.
  * @returns Extracted contents categorized by file type.
  */
 export const getLambdaFunctionContents = async (
-  functionName: string,
   codeLocation: string,
 ): Promise<LambdaFunctionContents> => {
   const codeMap = new Map<string, string>();
   const packageJsonMap = new Map<string, string>();
   const awsSdkPackageJsonMap = new Map<string, string>();
 
-  await processRemoteZip(codeLocation, `function-${functionName}`, async (zipPath) => {
+  await processRemoteZip(codeLocation, async (zipPath) => {
     await processZipEntries(zipPath, async (entry, getData) => {
       if (!entry.isFile) return;
 
