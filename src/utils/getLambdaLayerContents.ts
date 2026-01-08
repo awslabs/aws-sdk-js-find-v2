@@ -17,14 +17,15 @@ export type LambdaLayerContents = Map<string, { version: string }>;
  */
 export const getLambdaLayerContents = (layerArn: string, codeLocation: string) =>
   processRemoteZip(codeLocation, `layer-${layerArn}`, async (zipPath) => {
-    const results = await processZipEntries(zipPath, async (entry, getData) => {
+    const results: LambdaLayerContents = new Map();
+    await processZipEntries(zipPath, async (entry, getData) => {
       if (!entry.isFile || !entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) return;
       try {
         const { version } = JSON.parse((await getData()).toString());
-        return [entry.name, { version }] as const;
+        results.set(entry.name, { version });
       } catch {
         // Continue without adding package.json file, if entry data can't be read or there's parse error.
       }
     });
-    return new Map(results) as LambdaLayerContents;
+    return results;
   });

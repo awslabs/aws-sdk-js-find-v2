@@ -4,15 +4,13 @@ import StreamZip from "node-stream-zip";
  * Processes entries in a zip file using a callback function.
  *
  * @param zipPath - Path to the zip file.
- * @param processor - Callback to process each entry. Return undefined to skip.
- * @returns Array of non-undefined results from the processor.
+ * @param processor - Callback to process each entry.
  */
-export const processZipEntries = async <T>(
+export const processZipEntries = async (
   zipPath: string,
-  processor: (entry: StreamZip.ZipEntry, getData: () => Promise<Buffer>) => Promise<T | undefined>,
-): Promise<T[]> => {
+  processor: (entry: StreamZip.ZipEntry, getData: () => Promise<Buffer>) => Promise<void>,
+) => {
   const zip = new StreamZip.async({ file: zipPath });
-  const results: T[] = [];
 
   let zipEntries: Record<string, StreamZip.ZipEntry> = {};
   try {
@@ -22,10 +20,8 @@ export const processZipEntries = async <T>(
   }
 
   for (const entry of Object.values(zipEntries)) {
-    const result = await processor(entry, () => zip.entryData(entry.name));
-    if (result !== undefined) results.push(result);
+    await processor(entry, () => zip.entryData(entry.name));
   }
 
   await zip.close();
-  return results;
 };
