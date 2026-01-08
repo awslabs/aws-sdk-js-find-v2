@@ -25,5 +25,5 @@ jobs:
         with:
           languages: ${{ matrix.language }}
           config: |
-            paths-ignore: [ "src/utils/__fixtures__/{v2,v3}/build/*.{cjs,mjs}" ]
+            paths-ignore: [ 'src/utils/__fixtures__/{v2,v3}/build/*.{cjs,mjs}' ]
       - uses: github/codeql-action/analyze@v4
