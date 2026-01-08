@@ -2,4 +2,5 @@ name: "CodeQL config"
 
 paths-ignore:
   - 'src/utils/__fixtures__/files/**'
-  - 'src/utils/__fixtures__/{v2,v3}/build/**'
+  - 'src/utils/__fixtures__/v2/build/**'
+  - 'src/utils/__fixtures__/v3/build/**'
