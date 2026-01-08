@@ -1,4 +1,5 @@
 import { AWS_SDK_PACKAGE_JSON, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
+import { processRemoteZip } from "./processRemoteZip.ts";
 import { processZipEntries } from "./processZipEntries.ts";
 
 export interface LambdaFunctionContents {
@@ -26,39 +27,43 @@ export interface LambdaFunctionContents {
  * - package.json files (excluding node_modules)
  * - aws-sdk package.json from node_modules (for version detection)
  *
- * @param zipPath - The path to the zip file of Lambda Function.
+ * @param functionName - The name of the Lambda function.
+ * @param codeLocation - The presigned URL to download the Lambda Function code.
  * @returns Extracted contents categorized by file type.
  */
 export const getLambdaFunctionContents = async (
-  zipPath: string,
+  functionName: string,
+  codeLocation: string,
 ): Promise<LambdaFunctionContents> => {
   const codeMap = new Map<string, string>();
   const packageJsonMap = new Map<string, string>();
   const awsSdkPackageJsonMap = new Map<string, string>();
 
-  await processZipEntries(zipPath, async (entry, getData) => {
-    if (!entry.isFile) return;
+  await processRemoteZip(codeLocation, `function-${functionName}`, async (zipPath) => {
+    await processZipEntries(zipPath, async (entry, getData) => {
+      if (!entry.isFile) return;
 
-    try {
-      // Handle aws-sdk package.json in node_modules
-      if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) {
-        awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
-      }
+      try {
+        // Handle aws-sdk package.json in node_modules
+        if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) {
+          awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
+        }
 
-      // Handle files outside of node_modules
-      else if (!entry.name.includes(`${NODE_MODULES}/`)) {
-        // Handle package.json
-        if (entry.name.endsWith(PACKAGE_JSON)) {
-          packageJsonMap.set(entry.name, (await getData()).toString());
+        // Handle files outside of node_modules
+        else if (!entry.name.includes(`${NODE_MODULES}/`)) {
+          // Handle package.json
+          if (entry.name.endsWith(PACKAGE_JSON)) {
+            packageJsonMap.set(entry.name, (await getData()).toString());
+          }
+          // Handle JS/TS files
+          else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
+            codeMap.set(entry.name, (await getData()).toString());
+          }
         }
-        // Handle JS/TS files
-        else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
-          codeMap.set(entry.name, (await getData()).toString());
-        }
+      } catch {
+        // Continue if entry data can't be read.
       }
-    } catch {
-      // Continue if entry data can't be read.
-    }
+    });
   });
 
   return {
