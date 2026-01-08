@@ -17,13 +17,15 @@ jobs:
 
     strategy:
       matrix:
-        language: [ 'actions', 'javascript-typescript' ]
+        include:
+          - language: actions
+          - language: javascript-typescript
+            config: |
+              paths-ignore: [ "src/utils/__fixtures__/{v2,v3}/build/*.{cjs,mjs}" ]
 
     steps:
       - uses: actions/checkout@v6
       - uses: github/codeql-action/init@v4
         with:
           languages: ${{ matrix.language }}
-          config: |
-            paths-ignore: [ "src/utils/__fixtures__/{v2,v3}/build/*.{cjs,mjs}" ]
       - uses: github/codeql-action/analyze@v4
