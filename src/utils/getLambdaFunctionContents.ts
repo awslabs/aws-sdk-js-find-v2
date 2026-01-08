@@ -74,15 +74,11 @@ export const getLambdaFunctionContents = async (
     if (!layer.Arn) continue;
 
     if (!lambdaLayerCache.has(layer.Arn)) {
-      lambdaLayerCache.set(layer.Arn, new Map());
       const response = await client.getLayerVersionByArn({ Arn: layer.Arn });
-      if (response.Content?.Location) {
-        const layerZipPath = join(tmpdir(), `layer-${layer.Arn}.zip`);
-        await downloadFile(response.Content.Location, layerZipPath);
-        const layerContents = await getLambdaLayerContents(layerZipPath);
-        lambdaLayerCache.set(layer.Arn, layerContents);
-        await rm(layerZipPath, { force: true });
-      }
+      const layerContents = response.Content?.Location
+        ? await getLambdaLayerContents(layer.Arn, response.Content.Location)
+        : new Map();
+      lambdaLayerCache.set(layer.Arn, layerContents);
     }
 
     const layerContents = lambdaLayerCache.get(layer.Arn) || new Map();
