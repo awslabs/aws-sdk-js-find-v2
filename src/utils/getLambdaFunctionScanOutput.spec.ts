@@ -1,15 +1,11 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { rm } from "node:fs/promises";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
 import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
-import { downloadFile } from "./downloadFile.ts";
 import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
 import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
 import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 
-vi.mock("node:fs/promises");
-vi.mock("./downloadFile.ts");
 vi.mock("./getLambdaFunctionContents.ts");
 vi.mock("./hasSdkV2InFile.ts");
 vi.mock("./hasSdkV2InBundle.ts");
@@ -33,7 +29,6 @@ describe("getLambdaFunctionScanOutput", () => {
       Code: { Location: codeLocation },
       Configuration: functionConfiguration,
     });
-    vi.mocked(downloadFile).mockResolvedValue(undefined);
     vi.mocked(hasSdkV2InFile).mockReturnValue(true);
     vi.mocked(hasSdkV2InBundle).mockReturnValue(false);
   });
@@ -58,7 +53,7 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Function Code location not found.",
     });
-    expect(downloadFile).not.toHaveBeenCalled();
+    expect(getLambdaFunctionContents).not.toHaveBeenCalled();
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
   });
 
@@ -82,6 +77,7 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Locations: ["index.js"],
     });
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(functionName, codeLocation);
     expect(hasSdkV2InBundle).toHaveBeenCalledWith("bundle content", sdkVersionRange);
     expect(hasSdkV2InFile).not.toHaveBeenCalled();
   });
@@ -106,10 +102,7 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Locations: ["index.mjs"],
     });
-    expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
-      force: true,
-    });
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(functionName, codeLocation);
   });
 
   it("ignores aws-sdk in source code if exact version of SDK version can't be found", async () => {
@@ -131,10 +124,7 @@ describe("getLambdaFunctionScanOutput", () => {
       SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: false,
     });
-    expect(downloadFile).toHaveBeenCalledWith(codeLocation, expect.stringContaining(functionName));
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
-      force: true,
-    });
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(functionName, codeLocation);
   });
 
   it("returns false when aws-sdk not found in code", async () => {
@@ -200,8 +190,8 @@ describe("getLambdaFunctionScanOutput", () => {
     });
   });
 
-  it("returns error when download fails", async () => {
-    vi.mocked(downloadFile).mockRejectedValue(new Error("Download failed"));
+  it("returns error when getLambdaFunctionContents fails", async () => {
+    vi.mocked(getLambdaFunctionContents).mockRejectedValue(new Error("Download failed"));
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
@@ -217,13 +207,10 @@ describe("getLambdaFunctionScanOutput", () => {
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error downloading or reading Lambda function code: Download failed",
     });
-    expect(rm).toHaveBeenCalledWith(expect.stringContaining(`${functionName}.zip`), {
-      force: true,
-    });
   });
 
-  it("returns error when download fails with non-Error", async () => {
-    vi.mocked(downloadFile).mockRejectedValue("string error");
+  it("returns error when getLambdaFunctionContents fails with non-Error", async () => {
+    vi.mocked(getLambdaFunctionContents).mockRejectedValue("string error");
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
