@@ -78,4 +78,13 @@ describe("processZipEntries", () => {
     expect(processor).not.toHaveBeenCalled();
     expect(mockZip.close).toHaveBeenCalled();
   });
+
+  it("closes zip file when processor throws", async () => {
+    mockZip.entries.mockResolvedValue({ "test.js": { name: "test.js" } });
+
+    const processor = vi.fn().mockRejectedValue(new Error("Processor error"));
+
+    await expect(processZipEntries(mockZipPath, processor)).rejects.toThrow("Processor error");
+    expect(mockZip.close).toHaveBeenCalled();
+  });
 });
