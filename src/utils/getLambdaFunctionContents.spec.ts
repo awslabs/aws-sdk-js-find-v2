@@ -1,23 +1,29 @@
 import { beforeEach, describe, it, expect, vi } from "vitest";
 import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
+import { processRemoteZip } from "./processRemoteZip.ts";
 import { processZipEntries } from "./processZipEntries.ts";
 
+vi.mock("./processRemoteZip.ts");
 vi.mock("./processZipEntries.ts");
 
 describe("getLambdaFunctionContents", () => {
-  const mockZipPath = "/path/to/file.zip";
+  const mockCodeLocation = "https://example.com/code.zip";
   const mockPackageJson = '{"name":"test"}';
   const mockCode = "code content";
 
   beforeEach(() => {
     vi.clearAllMocks();
+    vi.mocked(processRemoteZip).mockImplementation(async (_url, processor) => {
+      await processor("/tmp/test.zip");
+    });
   });
 
   it("returns empty codeMap when zip has no entries", async () => {
     vi.mocked(processZipEntries).mockResolvedValue();
 
-    const result = await getLambdaFunctionContents(mockZipPath);
+    const result = await getLambdaFunctionContents(mockCodeLocation);
     expect(result).toEqual({ codeMap: new Map() });
+    expect(processRemoteZip).toHaveBeenCalledWith(mockCodeLocation, expect.any(Function));
   });
 
   describe("returns empty codeMap when entry data can't be read", () => {
@@ -28,7 +34,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map() });
     });
 
@@ -39,7 +45,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map() });
     });
 
@@ -53,7 +59,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map() });
     });
   });
@@ -69,7 +75,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({
         codeMap: new Map([["index.js", mockCode]]),
         packageJsonMap: new Map([["package.json", mockPackageJson]]),
@@ -86,7 +92,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({
         codeMap: new Map(),
         packageJsonMap: new Map([["package.json", mockPackageJson]]),
@@ -100,7 +106,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map() });
     });
 
@@ -118,7 +124,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({
         codeMap: new Map(),
         packageJsonMap: new Map([
@@ -139,7 +145,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({
         codeMap: new Map(),
         packageJsonMap: new Map([["package.json", mockPackageJson]]),
@@ -159,7 +165,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({
         codeMap: new Map(),
         packageJsonMap: new Map([["package.json", mockPackageJson]]),
@@ -178,7 +184,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map([["index.js", mockCode]]) });
     });
 
@@ -189,7 +195,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map([["index.mjs", mockCode]]) });
     });
 
@@ -200,7 +206,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map([["index.cjs", mockCode]]) });
     });
 
@@ -211,7 +217,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map([["index.ts", mockCode]]) });
     });
 
@@ -225,7 +231,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({
         codeMap: new Map([
           ["index.js", mockCode],
@@ -241,7 +247,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map() });
     });
 
@@ -252,7 +258,7 @@ describe("getLambdaFunctionContents", () => {
         );
       });
 
-      const result = await getLambdaFunctionContents(mockZipPath);
+      const result = await getLambdaFunctionContents(mockCodeLocation);
       expect(result).toEqual({ codeMap: new Map() });
     });
   });

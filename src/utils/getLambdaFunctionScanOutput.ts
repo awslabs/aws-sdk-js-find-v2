@@ -1,7 +1,7 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
 import { satisfies, validate } from "compare-versions";
 
-import { downloadFile } from "./downloadFile.ts";
+import { getCodePathToSdkVersionMap } from "./getCodePathToSdkVersionMap.ts";
 import {
   getLambdaFunctionContents,
   type LambdaFunctionContents,
@@ -9,11 +9,6 @@ import {
 import { getPossibleHandlerFiles } from "./getPossibleHandlerFiles.ts";
 import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
 import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
-
-import { rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-import { getCodePathToSdkVersionMap } from "./getCodePathToSdkVersionMap.ts";
 
 export interface LambdaFunctionScanOptions {
   // The name of the Lambda function
@@ -81,19 +76,15 @@ export const getLambdaFunctionScanOutput = async (
     output.AwsSdkJsV2Error = "Function Code location not found.";
     return output;
   }
-  const zipPath = join(tmpdir(), `${functionName}.zip`);
 
   let lambdaFunctionContents: LambdaFunctionContents;
   try {
-    await downloadFile(response.Code.Location, zipPath);
-    lambdaFunctionContents = await getLambdaFunctionContents(zipPath);
+    lambdaFunctionContents = await getLambdaFunctionContents(response.Code.Location);
   } catch (error) {
     const errorPrefix = "Error downloading or reading Lambda function code";
     output.AwsSdkJsV2Error =
       error instanceof Error ? `${errorPrefix}: ${error.message}` : errorPrefix;
     return output;
-  } finally {
-    await rm(zipPath, { force: true });
   }
 
   const { packageJsonMap, awsSdkPackageJsonMap, codeMap } = lambdaFunctionContents;
