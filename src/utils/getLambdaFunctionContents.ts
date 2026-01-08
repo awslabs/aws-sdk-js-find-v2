@@ -87,7 +87,11 @@ export const getLambdaFunctionContents = async (
       // Handle aws-sdk package.json in node_modules
       if (entry.name.includes(`${NODE_MODULES}/`)) {
         if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON) && entry.isFile) {
-          awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
+          try {
+            awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
+          } catch {
+            // Continue if entry data can't be read.
+          }
         }
         return;
       }
