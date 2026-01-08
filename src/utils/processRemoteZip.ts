@@ -7,7 +7,7 @@ import { join } from "node:path";
  *
  * @param url - The URL to download the zip from.
  * @param name - Name for the temp file (sanitized automatically).
- * @param processor - Function that receives the zip path and returns a result.
+ * @param processor - Function that processes the zip file at the given path.
  */
 export const processRemoteZip = async (
   url: string,
