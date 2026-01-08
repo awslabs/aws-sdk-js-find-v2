@@ -29,10 +29,6 @@ jobs:
         run: sh scripts/generateBundles.sh --skip-build
       - name: check for changes
         run: |
-          # Stop checking for Rolldown CJS artifact since they're non-deterministic
-          # TODO: remove after it's fixed in https://github.com/rolldown/rolldown/issues/7646
-          git checkout -- src/utils/__fixtures__/v3/build/rolldown.cjs
-          git checkout -- src/utils/__fixtures__/v3/build/rolldown.min.cjs
           if [ -n "$(git status --porcelain)" ]; then
             echo "Error: Files were modified or added"
             git status
