@@ -2,6 +2,8 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type FunctionConfiguration, Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
+import { getCodeSizeToDownload } from "./utils/getCodeSizeToDownload.ts";
+import { getCodeSizeToSaveOnDisk } from "./utils/getCodeSizeToSaveOnDisk.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
@@ -13,6 +15,8 @@ import {
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
 vi.mock("@aws-sdk/client-lambda");
+vi.mock("./utils/getCodeSizeToDownload.ts");
+vi.mock("./utils/getCodeSizeToSaveOnDisk.ts");
 vi.mock("./utils/getDownloadConfirmation.ts");
 vi.mock("./utils/getLambdaFunctions.ts");
 vi.mock("./utils/getLambdaFunctionScanOutput.ts");
@@ -35,6 +39,8 @@ describe("scanLambdaFunctions", () => {
     console.log = vi.fn();
 
     vi.mocked(pLimit).mockImplementation(() => (fn: () => Promise<void>) => fn());
+    vi.mocked(getCodeSizeToDownload).mockReturnValue(1000);
+    vi.mocked(getCodeSizeToSaveOnDisk).mockReturnValue(1000);
     vi.mocked(getDownloadConfirmation).mockResolvedValue(true);
     vi.mocked(getLambdaNodeJsMatchingVersions).mockReturnValue(["18", "20", "22"]);
     vi.mocked(Lambda).mockImplementation(function () {
@@ -126,7 +132,9 @@ describe("scanLambdaFunctions", () => {
 
       await scanLambdaFunctions({ ...mockOptions, jobs: 4 });
 
-      expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 3000, 3000);
+      expect(getCodeSizeToDownload).toHaveBeenCalledWith(functions);
+      expect(getCodeSizeToSaveOnDisk).toHaveBeenCalledWith(functions, 2);
+      expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 1000, 1000);
     });
 
     it("skips confirmation when yes is true", async () => {
@@ -150,11 +158,11 @@ describe("scanLambdaFunctions", () => {
 
       await scanLambdaFunctions({ ...mockOptions, jobs: 4 });
 
-      expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 9000, 9000);
+      expect(getDownloadConfirmation).toHaveBeenCalledWith(2, 1000, 1000);
       expect(console.log).toHaveBeenCalledWith("Exiting.");
     });
 
-    it("calculates codeSizeToSaveOnDisk as sum of top N largest functions", async () => {
+    it("passes concurrency to getCodeSizeToSaveOnDisk", async () => {
       const functions = [
         { FunctionName: "fn-1", Runtime: "nodejs18.x", CodeSize: 1000 },
         { FunctionName: "fn-2", Runtime: "nodejs18.x", CodeSize: 3000 },
@@ -165,8 +173,7 @@ describe("scanLambdaFunctions", () => {
 
       await scanLambdaFunctions({ ...mockOptions, jobs: 2 });
 
-      // Total download: 6500, disk: top 2 (3000 + 2000) = 5000
-      expect(getDownloadConfirmation).toHaveBeenCalledWith(4, 6500, 5000);
+      expect(getCodeSizeToSaveOnDisk).toHaveBeenCalledWith(functions, 2);
     });
   });
 

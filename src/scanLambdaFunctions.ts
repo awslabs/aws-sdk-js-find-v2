@@ -1,6 +1,8 @@
 import { Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
 
+import { getCodeSizeToDownload } from "./utils/getCodeSizeToDownload.ts";
+import { getCodeSizeToSaveOnDisk } from "./utils/getCodeSizeToSaveOnDisk.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
 import { getLambdaFunctions } from "./utils/getLambdaFunctions.ts";
 import { getLambdaFunctionScanOutput } from "./utils/getLambdaFunctionScanOutput.ts";
@@ -49,24 +51,18 @@ export const scanLambdaFunctions = async (options: ScanLambdaFunctionsOptions) =
   const functions = await getLambdaFunctions(client, lambdaNodeJsMajorVersions);
   const functionCount = functions.length;
 
-  const concurrency = Math.min(functionCount, jobs || 1);
-  const codeSizeToDownload = functions.reduce((acc, fn) => acc + (fn.CodeSize || 0), 0);
-  const codeSizeToSaveOnDisk = functions
-    .map((fn) => fn.CodeSize || 0)
-    .sort((a, b) => b - a)
-    .slice(0, concurrency)
-    .reduce((acc, size) => acc + size, 0);
-
   if (functionCount === 0) {
     printLambdaCommandOutput([], output);
     return;
   }
 
+  const concurrency = Math.min(functionCount, jobs || 1);
+
   if (!yes) {
     const confirmation = await getDownloadConfirmation(
       functionCount,
-      codeSizeToDownload,
-      codeSizeToSaveOnDisk,
+      getCodeSizeToDownload(functions),
+      getCodeSizeToSaveOnDisk(functions, concurrency),
     );
     console.log();
     if (!confirmation) {
