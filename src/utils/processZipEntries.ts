@@ -15,11 +15,10 @@ export const processZipEntries = async (
   // Continue with empty object, if zip entries can't be read.
   const zipEntries = await zip.entries().catch(() => ({}));
 
-  try {
-    for (const entry of Object.values(zipEntries)) {
-      await processor(entry, () => zip.entryData(entry.name));
-    }
-  } finally {
-    await zip.close();
+  for (const entry of Object.values(zipEntries)) {
+    // Processor errors should be caught by the callee.
+    await processor(entry, () => zip.entryData(entry.name)).catch(() => {});
   }
+
+  await zip.close();
 };

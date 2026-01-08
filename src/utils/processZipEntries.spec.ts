@@ -30,7 +30,7 @@ describe("processZipEntries", () => {
     mockZip.entries.mockResolvedValue({ "file1.js": entry1, "file2.js": entry2 });
     mockZip.entryData.mockResolvedValue(Buffer.from("content"));
 
-    const processor = vi.fn();
+    const processor = vi.fn().mockResolvedValue(undefined);
     await processZipEntries(mockZipPath, processor);
 
     expect(processor).toHaveBeenCalledTimes(2);
@@ -79,12 +79,18 @@ describe("processZipEntries", () => {
     expect(mockZip.close).toHaveBeenCalled();
   });
 
-  it("closes zip file when processor throws", async () => {
-    mockZip.entries.mockResolvedValue({ "test.js": { name: "test.js" } });
+  it("ignores errors when processor throws", async () => {
+    const entry1 = { name: "file1.js" };
+    const entry2 = { name: "file2.js" };
+    mockZip.entries.mockResolvedValue({ "file1.js": entry1, "file2.js": entry2 });
 
-    const processor = vi.fn().mockRejectedValue(new Error("Processor error"));
+    const processor = vi
+      .fn()
+      .mockRejectedValueOnce(new Error("Processor error"))
+      .mockResolvedValueOnce(undefined);
+    await processZipEntries(mockZipPath, processor);
 
-    await expect(processZipEntries(mockZipPath, processor)).rejects.toThrow("Processor error");
+    expect(processor).toHaveBeenCalledTimes(2);
     expect(mockZip.close).toHaveBeenCalled();
   });
 });
