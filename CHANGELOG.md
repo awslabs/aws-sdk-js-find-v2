@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.7.2
+
+### Patch Changes
+
+- Process aws-sdk package.json from Lambda layers ([68bfc7ba86e563120d8b7296e14b44aa7cedcc6b](https://github.com/awslabs/aws-sdk-js-find-v2/commit/68bfc7ba86e563120d8b7296e14b44aa7cedcc6b))
+
 ## 0.7.1
 
 ### Patch Changes
