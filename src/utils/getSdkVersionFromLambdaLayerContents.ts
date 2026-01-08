@@ -4,9 +4,9 @@ import type { LambdaLayerContents } from "./getLambdaLayerContents.ts";
 
 /**
  * Returns version from aws-sdk package.json value based on specificity
- * - nodejs/node{major-version}/node_modules
- * - nodejs/node_modules
- * - node_modules
+ * - nodejs/node{major-version}/node_modules/aws-sdk/package.json
+ * - nodejs/node_modules/aws-sdk/package.json
+ * - node_modules/aws-sdk/package.json
  *
  * @param lambdaLayerContents - Map with aws-sdk package.json filepath as key and contents as value.
  * @param runtime - Lambda runtime (e.g., nodejs20.x)
