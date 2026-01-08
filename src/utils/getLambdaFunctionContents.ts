@@ -1,14 +1,10 @@
 import type { Lambda, Layer, Runtime } from "@aws-sdk/client-lambda";
 
-import { rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { AWS_SDK_PACKAGE_JSON, NODE_MODULES, PACKAGE_JSON } from "./constants.ts";
-import { downloadFile } from "./downloadFile.ts";
 import { getLambdaLayerContents, type LambdaLayerContents } from "./getLambdaLayerContents.ts";
 import { getSdkVersionFromLambdaLayerContents } from "./getSdkVersionFromLambdaLayerContents.ts";
 import { processZipEntries } from "./processZipEntries.ts";
+import { processRemoteZip } from "./processRemoteZip.ts";
 
 export interface LambdaFunctionContentsOptions {
   /**
@@ -86,34 +82,33 @@ export const getLambdaFunctionContents = async (
     if (version) awsSdkPackageJsonMap.set(AWS_SDK_PACKAGE_JSON, JSON.stringify({ version }));
   }
 
-  const zipPath = join(tmpdir(), `function-${functionName}.zip`);
-  await downloadFile(codeLocation, zipPath);
-
-  await processZipEntries(zipPath, async (entry, getData) => {
-    // Handle aws-sdk package.json in node_modules
-    if (entry.name.includes(`${NODE_MODULES}/`)) {
-      if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON) && entry.isFile) {
-        awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
+  return processRemoteZip(codeLocation, `function-${functionName}`, async (zipPath) => {
+    await processZipEntries(zipPath, async (entry, getData) => {
+      // Handle aws-sdk package.json in node_modules
+      if (entry.name.includes(`${NODE_MODULES}/`)) {
+        if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON) && entry.isFile) {
+          awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
+        }
+        return;
       }
-      return;
-    }
 
-    if (!entry.isFile) return;
+      if (!entry.isFile) return;
 
-    try {
-      if (entry.name.endsWith(PACKAGE_JSON)) {
-        packageJsonMap.set(entry.name, (await getData()).toString());
-      } else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
-        codeMap.set(entry.name, (await getData()).toString());
+      try {
+        if (entry.name.endsWith(PACKAGE_JSON)) {
+          packageJsonMap.set(entry.name, (await getData()).toString());
+        } else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
+          codeMap.set(entry.name, (await getData()).toString());
+        }
+      } catch {
+        // Continue if entry data can't be read.
       }
-    } catch {
-      // Continue if entry data can't be read.
-    }
+    });
+
+    return {
+      codeMap,
+      ...(packageJsonMap.size > 0 && { packageJsonMap }),
+      ...(awsSdkPackageJsonMap.size > 0 && { awsSdkPackageJsonMap }),
+    };
   });
-  await rm(zipPath, { force: true });
-  return {
-    codeMap,
-    ...(packageJsonMap.size > 0 && { packageJsonMap }),
-    ...(awsSdkPackageJsonMap.size > 0 && { awsSdkPackageJsonMap }),
-  };
 };

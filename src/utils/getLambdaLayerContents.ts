@@ -1,10 +1,6 @@
-import { rm } from "node:fs/promises";
-import { tmpdir } from "node:os";
-import { join } from "node:path";
-
 import { AWS_SDK_PACKAGE_JSON } from "./constants.ts";
-import { downloadFile } from "./downloadFile.ts";
 import { processZipEntries } from "./processZipEntries.ts";
+import { processRemoteZip } from "./processRemoteZip.ts";
 
 /**
  * Map with aws-sdk package.json filepath as key and contents as value.
@@ -19,23 +15,16 @@ export type LambdaLayerContents = Map<string, { version: string }>;
  * @param codeLocation - The presigned URL to download the Lambda layer.
  * @returns Extracted contents categorized by file type.
  */
-export const getLambdaLayerContents = async (
-  layerArn: string,
-  codeLocation: string,
-): Promise<LambdaLayerContents> => {
-  const zipPath = join(tmpdir(), `layer-${layerArn.replace(/[/:]/g, "-")}.zip`);
-  await downloadFile(codeLocation, zipPath);
-
-  const results = await processZipEntries(zipPath, async (entry, getData) => {
-    if (!entry.isFile || !entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) return;
-    try {
-      const { version } = JSON.parse((await getData()).toString());
-      return [entry.name, { version }] as const;
-    } catch {
-      // Continue without adding package.json file, if entry data can't be read or there's parse error.
-    }
+export const getLambdaLayerContents = (layerArn: string, codeLocation: string) =>
+  processRemoteZip(codeLocation, `layer-${layerArn}`, async (zipPath) => {
+    const results = await processZipEntries(zipPath, async (entry, getData) => {
+      if (!entry.isFile || !entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) return;
+      try {
+        const { version } = JSON.parse((await getData()).toString());
+        return [entry.name, { version }] as const;
+      } catch {
+        // Continue without adding package.json file, if entry data can't be read or there's parse error.
+      }
+    });
+    return new Map(results) as LambdaLayerContents;
   });
-
-  await rm(zipPath, { force: true });
-  return new Map(results);
-};
