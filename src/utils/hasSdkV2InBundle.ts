@@ -23,7 +23,7 @@ const AWS_SDK_ENV_VARS = [
   "AWS_REGION",
   "AWS_ROLE_ARN",
   "AWS_ROLE_SESSION_NAME",
-  "AWS_SDK_LOAD_CONFIG", // The v3 loads config by default. Specific to v2.
+  "AWS_SDK_LOAD_CONFIG", // v3 loads config by default.
   "AWS_SHARED_CREDENTIALS_FILE",
   "AWS_STS_REGIONAL_ENDPOINTS",
   // "AWS_USE_DUALSTACK_ENDPOINT", // Added in Nov'21 https://github.com/aws/aws-sdk-js/pull/3957
