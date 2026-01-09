@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.7.3
+
+### Patch Changes
+
+- Enable search for env vars which were tree-shaken in browser bundles ([189822c3d24ea011a907eb8fa71c2a775a65d02c](https://github.com/awslabs/aws-sdk-js-find-v2/commit/189822c3d24ea011a907eb8fa71c2a775a65d02c))
+
 ## 0.7.2
 
 ### Patch Changes
