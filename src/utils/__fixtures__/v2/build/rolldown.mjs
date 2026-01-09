@@ -1,3 +1,5 @@
+import { createRequire } from "node:module";
+
 //#region rolldown:runtime
 var __create = Object.create;
 var __defProp = Object.defineProperty;
@@ -24,10 +26,11 @@ var __toESM = (mod, isNodeMode, target) => (target = mod != null ? __create(__ge
 	value: mod,
 	enumerable: true
 }) : target, mod));
+var __require = /* @__PURE__ */ createRequire(import.meta.url);
 
 //#endregion
 //#region node_modules/aws-sdk/lib/json/builder.js
-var require_builder$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+var require_builder$2 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var util = require_util();
 	function JsonBuilder() {}
 	JsonBuilder.prototype.build = function(value, shape) {
@@ -83,7 +86,7 @@ var require_builder$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 
 //#endregion
 //#region node_modules/aws-sdk/lib/json/parser.js
-var require_parser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+var require_parser$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var util = require_util();
 	function JsonParser() {}
 	JsonParser.prototype.parse = function(value, shape) {
@@ -224,8 +227,8 @@ var require_helpers = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 //#region node_modules/aws-sdk/lib/protocol/json.js
 var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var util = require_util();
-	var JsonBuilder = require_builder$1();
-	var JsonParser = require_parser();
+	var JsonBuilder = require_builder$2();
+	var JsonParser = require_parser$1();
 	var populateHostPrefix = require_helpers().populateHostPrefix;
 	function buildRequest(req) {
 		var httpRequest = req.httpRequest;
@@ -887,8 +890,8 @@ var require_rest_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var util = require_util();
 	var Rest = require_rest();
 	var Json = require_json();
-	var JsonBuilder = require_builder$1();
-	var JsonParser = require_parser();
+	var JsonBuilder = require_builder$2();
+	var JsonParser = require_parser$1();
 	var METHODS_WITHOUT_BODY = [
 		"GET",
 		"HEAD",
@@ -1069,10 +1072,10 @@ var require_xml_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Represents an XML node.
 	* @api private
 	*/
-	function XmlNode(name, children) {
-		if (children === void 0) children = [];
+	function XmlNode(name, children$1) {
+		if (children$1 === void 0) children$1 = [];
 		this.name = name;
-		this.children = children;
+		this.children = children$1;
 		this.attributes = {};
 	}
 	XmlNode.prototype.addAttribute = function(name, value) {
@@ -1143,7 +1146,7 @@ var require_xml_text = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 
 //#endregion
 //#region node_modules/aws-sdk/lib/xml/builder.js
-var require_builder = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+var require_builder$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var util = require_util();
 	var XmlNode = require_xml_node().XmlNode;
 	var XmlText = require_xml_text().XmlText;
@@ -4101,10 +4104,10 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 				if (allowUnknownKeys || Object.prototype.hasOwnProperty.call(this.keys, key) || AWS.Service.hasService(key)) this.set(key, value);
 			});
 		},
-		loadFromPath: function loadFromPath(path) {
+		loadFromPath: function loadFromPath(path$3) {
 			this.clear();
-			var options = JSON.parse(AWS.util.readFileSync(path));
-			var fileSystemCreds = new AWS.FileSystemCredentials(path);
+			var options = JSON.parse(AWS.util.readFileSync(path$3));
+			var fileSystemCreds = new AWS.FileSystemCredentials(path$3);
 			var chain = new AWS.CredentialProviderChain();
 			chain.providers.unshift(fileSystemCreds);
 			chain.resolve(function(err, creds) {
@@ -4656,1870 +4659,6 @@ var require_discover_endpoint = /* @__PURE__ */ __commonJSMin(((exports, module)
 }));
 
 //#endregion
-//#region node_modules/has-symbols/shams.js
-var require_shams$1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./shams')} */
-	module.exports = function hasSymbols() {
-		if (typeof Symbol !== "function" || typeof Object.getOwnPropertySymbols !== "function") return false;
-		if (typeof Symbol.iterator === "symbol") return true;
-		/** @type {{ [k in symbol]?: unknown }} */
-		var obj = {};
-		var sym = Symbol("test");
-		var symObj = Object(sym);
-		if (typeof sym === "string") return false;
-		if (Object.prototype.toString.call(sym) !== "[object Symbol]") return false;
-		if (Object.prototype.toString.call(symObj) !== "[object Symbol]") return false;
-		var symVal = 42;
-		obj[sym] = symVal;
-		for (var _ in obj) return false;
-		if (typeof Object.keys === "function" && Object.keys(obj).length !== 0) return false;
-		if (typeof Object.getOwnPropertyNames === "function" && Object.getOwnPropertyNames(obj).length !== 0) return false;
-		var syms = Object.getOwnPropertySymbols(obj);
-		if (syms.length !== 1 || syms[0] !== sym) return false;
-		if (!Object.prototype.propertyIsEnumerable.call(obj, sym)) return false;
-		if (typeof Object.getOwnPropertyDescriptor === "function") {
-			var descriptor = Object.getOwnPropertyDescriptor(obj, sym);
-			if (descriptor.value !== symVal || descriptor.enumerable !== true) return false;
-		}
-		return true;
-	};
-}));
-
-//#endregion
-//#region node_modules/has-tostringtag/shams.js
-var require_shams = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var hasSymbols = require_shams$1();
-	/** @type {import('.')} */
-	module.exports = function hasToStringTagShams() {
-		return hasSymbols() && !!Symbol.toStringTag;
-	};
-}));
-
-//#endregion
-//#region node_modules/es-object-atoms/index.js
-var require_es_object_atoms = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('.')} */
-	module.exports = Object;
-}));
-
-//#endregion
-//#region node_modules/es-errors/index.js
-var require_es_errors = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('.')} */
-	module.exports = Error;
-}));
-
-//#endregion
-//#region node_modules/es-errors/eval.js
-var require_eval = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./eval')} */
-	module.exports = EvalError;
-}));
-
-//#endregion
-//#region node_modules/es-errors/range.js
-var require_range = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./range')} */
-	module.exports = RangeError;
-}));
-
-//#endregion
-//#region node_modules/es-errors/ref.js
-var require_ref = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./ref')} */
-	module.exports = ReferenceError;
-}));
-
-//#endregion
-//#region node_modules/es-errors/syntax.js
-var require_syntax = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./syntax')} */
-	module.exports = SyntaxError;
-}));
-
-//#endregion
-//#region node_modules/es-errors/type.js
-var require_type = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./type')} */
-	module.exports = TypeError;
-}));
-
-//#endregion
-//#region node_modules/es-errors/uri.js
-var require_uri = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./uri')} */
-	module.exports = URIError;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/abs.js
-var require_abs = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./abs')} */
-	module.exports = Math.abs;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/floor.js
-var require_floor = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./floor')} */
-	module.exports = Math.floor;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/max.js
-var require_max = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./max')} */
-	module.exports = Math.max;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/min.js
-var require_min = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./min')} */
-	module.exports = Math.min;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/pow.js
-var require_pow = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./pow')} */
-	module.exports = Math.pow;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/round.js
-var require_round = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./round')} */
-	module.exports = Math.round;
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/isNaN.js
-var require_isNaN = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./isNaN')} */
-	module.exports = Number.isNaN || function isNaN$1(a) {
-		return a !== a;
-	};
-}));
-
-//#endregion
-//#region node_modules/math-intrinsics/sign.js
-var require_sign = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var $isNaN = require_isNaN();
-	/** @type {import('./sign')} */
-	module.exports = function sign(number) {
-		if ($isNaN(number) || number === 0) return number;
-		return number < 0 ? -1 : 1;
-	};
-}));
-
-//#endregion
-//#region node_modules/gopd/gOPD.js
-var require_gOPD = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./gOPD')} */
-	module.exports = Object.getOwnPropertyDescriptor;
-}));
-
-//#endregion
-//#region node_modules/gopd/index.js
-var require_gopd = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('.')} */
-	var $gOPD = require_gOPD();
-	if ($gOPD) try {
-		$gOPD([], "length");
-	} catch (e) {
-		$gOPD = null;
-	}
-	module.exports = $gOPD;
-}));
-
-//#endregion
-//#region node_modules/es-define-property/index.js
-var require_es_define_property = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('.')} */
-	var $defineProperty = Object.defineProperty || false;
-	if ($defineProperty) try {
-		$defineProperty({}, "a", { value: 1 });
-	} catch (e) {
-		$defineProperty = false;
-	}
-	module.exports = $defineProperty;
-}));
-
-//#endregion
-//#region node_modules/has-symbols/index.js
-var require_has_symbols = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var origSymbol = typeof Symbol !== "undefined" && Symbol;
-	var hasSymbolSham = require_shams$1();
-	/** @type {import('.')} */
-	module.exports = function hasNativeSymbols() {
-		if (typeof origSymbol !== "function") return false;
-		if (typeof Symbol !== "function") return false;
-		if (typeof origSymbol("foo") !== "symbol") return false;
-		if (typeof Symbol("bar") !== "symbol") return false;
-		return hasSymbolSham();
-	};
-}));
-
-//#endregion
-//#region node_modules/get-proto/Reflect.getPrototypeOf.js
-var require_Reflect_getPrototypeOf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./Reflect.getPrototypeOf')} */
-	module.exports = typeof Reflect !== "undefined" && Reflect.getPrototypeOf || null;
-}));
-
-//#endregion
-//#region node_modules/get-proto/Object.getPrototypeOf.js
-var require_Object_getPrototypeOf = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var $Object = require_es_object_atoms();
-	/** @type {import('./Object.getPrototypeOf')} */
-	module.exports = $Object.getPrototypeOf || null;
-}));
-
-//#endregion
-//#region node_modules/function-bind/implementation.js
-var require_implementation = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var ERROR_MESSAGE = "Function.prototype.bind called on incompatible ";
-	var toStr = Object.prototype.toString;
-	var max = Math.max;
-	var funcType = "[object Function]";
-	var concatty = function concatty(a, b) {
-		var arr = [];
-		for (var i = 0; i < a.length; i += 1) arr[i] = a[i];
-		for (var j = 0; j < b.length; j += 1) arr[j + a.length] = b[j];
-		return arr;
-	};
-	var slicy = function slicy(arrLike, offset) {
-		var arr = [];
-		for (var i = offset || 0, j = 0; i < arrLike.length; i += 1, j += 1) arr[j] = arrLike[i];
-		return arr;
-	};
-	var joiny = function(arr, joiner) {
-		var str = "";
-		for (var i = 0; i < arr.length; i += 1) {
-			str += arr[i];
-			if (i + 1 < arr.length) str += joiner;
-		}
-		return str;
-	};
-	module.exports = function bind(that) {
-		var target = this;
-		if (typeof target !== "function" || toStr.apply(target) !== funcType) throw new TypeError(ERROR_MESSAGE + target);
-		var args = slicy(arguments, 1);
-		var bound;
-		var binder = function() {
-			if (this instanceof bound) {
-				var result = target.apply(this, concatty(args, arguments));
-				if (Object(result) === result) return result;
-				return this;
-			}
-			return target.apply(that, concatty(args, arguments));
-		};
-		var boundLength = max(0, target.length - args.length);
-		var boundArgs = [];
-		for (var i = 0; i < boundLength; i++) boundArgs[i] = "$" + i;
-		bound = Function("binder", "return function (" + joiny(boundArgs, ",") + "){ return binder.apply(this,arguments); }")(binder);
-		if (target.prototype) {
-			var Empty = function Empty$1() {};
-			Empty.prototype = target.prototype;
-			bound.prototype = new Empty();
-			Empty.prototype = null;
-		}
-		return bound;
-	};
-}));
-
-//#endregion
-//#region node_modules/function-bind/index.js
-var require_function_bind = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var implementation = require_implementation();
-	module.exports = Function.prototype.bind || implementation;
-}));
-
-//#endregion
-//#region node_modules/call-bind-apply-helpers/functionCall.js
-var require_functionCall = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./functionCall')} */
-	module.exports = Function.prototype.call;
-}));
-
-//#endregion
-//#region node_modules/call-bind-apply-helpers/functionApply.js
-var require_functionApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./functionApply')} */
-	module.exports = Function.prototype.apply;
-}));
-
-//#endregion
-//#region node_modules/call-bind-apply-helpers/reflectApply.js
-var require_reflectApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('./reflectApply')} */
-	module.exports = typeof Reflect !== "undefined" && Reflect && Reflect.apply;
-}));
-
-//#endregion
-//#region node_modules/call-bind-apply-helpers/actualApply.js
-var require_actualApply = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var bind = require_function_bind();
-	var $apply = require_functionApply();
-	var $call = require_functionCall();
-	var $reflectApply = require_reflectApply();
-	/** @type {import('./actualApply')} */
-	module.exports = $reflectApply || bind.call($call, $apply);
-}));
-
-//#endregion
-//#region node_modules/call-bind-apply-helpers/index.js
-var require_call_bind_apply_helpers = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var bind = require_function_bind();
-	var $TypeError = require_type();
-	var $call = require_functionCall();
-	var $actualApply = require_actualApply();
-	/** @type {(args: [Function, thisArg?: unknown, ...args: unknown[]]) => Function} TODO FIXME, find a way to use import('.') */
-	module.exports = function callBindBasic(args) {
-		if (args.length < 1 || typeof args[0] !== "function") throw new $TypeError("a function is required");
-		return $actualApply(bind, $call, args);
-	};
-}));
-
-//#endregion
-//#region node_modules/dunder-proto/get.js
-var require_get = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var callBind = require_call_bind_apply_helpers();
-	var gOPD = require_gopd();
-	var hasProtoAccessor;
-	try {
-		hasProtoAccessor = [].__proto__ === Array.prototype;
-	} catch (e) {
-		if (!e || typeof e !== "object" || !("code" in e) || e.code !== "ERR_PROTO_ACCESS") throw e;
-	}
-	var desc = !!hasProtoAccessor && gOPD && gOPD(Object.prototype, "__proto__");
-	var $Object = Object;
-	var $getPrototypeOf = $Object.getPrototypeOf;
-	/** @type {import('./get')} */
-	module.exports = desc && typeof desc.get === "function" ? callBind([desc.get]) : typeof $getPrototypeOf === "function" ? function getDunder(value) {
-		return $getPrototypeOf(value == null ? value : $Object(value));
-	} : false;
-}));
-
-//#endregion
-//#region node_modules/get-proto/index.js
-var require_get_proto = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var reflectGetProto = require_Reflect_getPrototypeOf();
-	var originalGetProto = require_Object_getPrototypeOf();
-	var getDunderProto = require_get();
-	/** @type {import('.')} */
-	module.exports = reflectGetProto ? function getProto(O) {
-		return reflectGetProto(O);
-	} : originalGetProto ? function getProto(O) {
-		if (!O || typeof O !== "object" && typeof O !== "function") throw new TypeError("getProto: not an object");
-		return originalGetProto(O);
-	} : getDunderProto ? function getProto(O) {
-		return getDunderProto(O);
-	} : null;
-}));
-
-//#endregion
-//#region node_modules/async-function/index.js
-var require_async_function = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const cached = async function() {}.constructor;
-	/** @type {import('.')} */
-	module.exports = () => cached;
-}));
-
-//#endregion
-//#region node_modules/generator-function/index.js
-var require_generator_function = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const cached = function* () {}.constructor;
-	/** @type {import('.')} */
-	module.exports = () => cached;
-}));
-
-//#endregion
-//#region node_modules/async-generator-function/index.js
-var require_async_generator_function = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	const cached = async function* () {}.constructor;
-	/** @type {import('.')} */
-	module.exports = () => cached;
-}));
-
-//#endregion
-//#region node_modules/hasown/index.js
-var require_hasown = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var call = Function.prototype.call;
-	var $hasOwn = Object.prototype.hasOwnProperty;
-	var bind = require_function_bind();
-	/** @type {import('.')} */
-	module.exports = bind.call(call, $hasOwn);
-}));
-
-//#endregion
-//#region node_modules/get-intrinsic/index.js
-var require_get_intrinsic = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var undefined;
-	var $Object = require_es_object_atoms();
-	var $Error = require_es_errors();
-	var $EvalError = require_eval();
-	var $RangeError = require_range();
-	var $ReferenceError = require_ref();
-	var $SyntaxError = require_syntax();
-	var $TypeError = require_type();
-	var $URIError = require_uri();
-	var abs = require_abs();
-	var floor = require_floor();
-	var max = require_max();
-	var min = require_min();
-	var pow = require_pow();
-	var round = require_round();
-	var sign = require_sign();
-	var $gOPD = require_gopd();
-	var $defineProperty = require_es_define_property();
-	var throwTypeError = function() {
-		throw new $TypeError();
-	};
-	var ThrowTypeError = $gOPD ? function() {
-		try {
-			arguments.callee;
-			return throwTypeError;
-		} catch (calleeThrows) {
-			try {
-				return $gOPD(arguments, "callee").get;
-			} catch (gOPDthrows) {
-				return throwTypeError;
-			}
-		}
-	}() : throwTypeError;
-	var hasSymbols = require_has_symbols()();
-	var getProto = require_get_proto();
-	var $ObjectGPO = require_Object_getPrototypeOf();
-	var $ReflectGPO = require_Reflect_getPrototypeOf();
-	var $apply = require_functionApply();
-	var $call = require_functionCall();
-	var needsEval = {};
-	var TypedArray = typeof Uint8Array === "undefined" || !getProto ? undefined : getProto(Uint8Array);
-	var INTRINSICS = {
-		__proto__: null,
-		"%AggregateError%": typeof AggregateError === "undefined" ? undefined : AggregateError,
-		"%Array%": Array,
-		"%ArrayBuffer%": typeof ArrayBuffer === "undefined" ? undefined : ArrayBuffer,
-		"%ArrayIteratorPrototype%": hasSymbols && getProto ? getProto([][Symbol.iterator]()) : undefined,
-		"%AsyncFromSyncIteratorPrototype%": undefined,
-		"%AsyncFunction%": needsEval,
-		"%AsyncGenerator%": needsEval,
-		"%AsyncGeneratorFunction%": needsEval,
-		"%AsyncIteratorPrototype%": needsEval,
-		"%Atomics%": typeof Atomics === "undefined" ? undefined : Atomics,
-		"%BigInt%": typeof BigInt === "undefined" ? undefined : BigInt,
-		"%BigInt64Array%": typeof BigInt64Array === "undefined" ? undefined : BigInt64Array,
-		"%BigUint64Array%": typeof BigUint64Array === "undefined" ? undefined : BigUint64Array,
-		"%Boolean%": Boolean,
-		"%DataView%": typeof DataView === "undefined" ? undefined : DataView,
-		"%Date%": Date,
-		"%decodeURI%": decodeURI,
-		"%decodeURIComponent%": decodeURIComponent,
-		"%encodeURI%": encodeURI,
-		"%encodeURIComponent%": encodeURIComponent,
-		"%Error%": $Error,
-		"%eval%": eval,
-		"%EvalError%": $EvalError,
-		"%Float16Array%": typeof Float16Array === "undefined" ? undefined : Float16Array,
-		"%Float32Array%": typeof Float32Array === "undefined" ? undefined : Float32Array,
-		"%Float64Array%": typeof Float64Array === "undefined" ? undefined : Float64Array,
-		"%FinalizationRegistry%": typeof FinalizationRegistry === "undefined" ? undefined : FinalizationRegistry,
-		"%Function%": Function,
-		"%GeneratorFunction%": needsEval,
-		"%Int8Array%": typeof Int8Array === "undefined" ? undefined : Int8Array,
-		"%Int16Array%": typeof Int16Array === "undefined" ? undefined : Int16Array,
-		"%Int32Array%": typeof Int32Array === "undefined" ? undefined : Int32Array,
-		"%isFinite%": isFinite,
-		"%isNaN%": isNaN,
-		"%IteratorPrototype%": hasSymbols && getProto ? getProto(getProto([][Symbol.iterator]())) : undefined,
-		"%JSON%": typeof JSON === "object" ? JSON : undefined,
-		"%Map%": typeof Map === "undefined" ? undefined : Map,
-		"%MapIteratorPrototype%": typeof Map === "undefined" || !hasSymbols || !getProto ? undefined : getProto((/* @__PURE__ */ new Map())[Symbol.iterator]()),
-		"%Math%": Math,
-		"%Number%": Number,
-		"%Object%": $Object,
-		"%Object.getOwnPropertyDescriptor%": $gOPD,
-		"%parseFloat%": parseFloat,
-		"%parseInt%": parseInt,
-		"%Promise%": typeof Promise === "undefined" ? undefined : Promise,
-		"%Proxy%": typeof Proxy === "undefined" ? undefined : Proxy,
-		"%RangeError%": $RangeError,
-		"%ReferenceError%": $ReferenceError,
-		"%Reflect%": typeof Reflect === "undefined" ? undefined : Reflect,
-		"%RegExp%": RegExp,
-		"%Set%": typeof Set === "undefined" ? undefined : Set,
-		"%SetIteratorPrototype%": typeof Set === "undefined" || !hasSymbols || !getProto ? undefined : getProto((/* @__PURE__ */ new Set())[Symbol.iterator]()),
-		"%SharedArrayBuffer%": typeof SharedArrayBuffer === "undefined" ? undefined : SharedArrayBuffer,
-		"%String%": String,
-		"%StringIteratorPrototype%": hasSymbols && getProto ? getProto(""[Symbol.iterator]()) : undefined,
-		"%Symbol%": hasSymbols ? Symbol : undefined,
-		"%SyntaxError%": $SyntaxError,
-		"%ThrowTypeError%": ThrowTypeError,
-		"%TypedArray%": TypedArray,
-		"%TypeError%": $TypeError,
-		"%Uint8Array%": typeof Uint8Array === "undefined" ? undefined : Uint8Array,
-		"%Uint8ClampedArray%": typeof Uint8ClampedArray === "undefined" ? undefined : Uint8ClampedArray,
-		"%Uint16Array%": typeof Uint16Array === "undefined" ? undefined : Uint16Array,
-		"%Uint32Array%": typeof Uint32Array === "undefined" ? undefined : Uint32Array,
-		"%URIError%": $URIError,
-		"%WeakMap%": typeof WeakMap === "undefined" ? undefined : WeakMap,
-		"%WeakRef%": typeof WeakRef === "undefined" ? undefined : WeakRef,
-		"%WeakSet%": typeof WeakSet === "undefined" ? undefined : WeakSet,
-		"%Function.prototype.call%": $call,
-		"%Function.prototype.apply%": $apply,
-		"%Object.defineProperty%": $defineProperty,
-		"%Object.getPrototypeOf%": $ObjectGPO,
-		"%Math.abs%": abs,
-		"%Math.floor%": floor,
-		"%Math.max%": max,
-		"%Math.min%": min,
-		"%Math.pow%": pow,
-		"%Math.round%": round,
-		"%Math.sign%": sign,
-		"%Reflect.getPrototypeOf%": $ReflectGPO
-	};
-	if (getProto) try {
-		null.error;
-	} catch (e) {
-		INTRINSICS["%Error.prototype%"] = getProto(getProto(e));
-	}
-	var getAsyncFunction = require_async_function();
-	var getGeneratorFunction = require_generator_function();
-	var getAsyncGeneratorFunction = require_async_generator_function();
-	var doEval = function doEval(name) {
-		var value;
-		if (name === "%AsyncFunction%") value = getAsyncFunction() || void 0;
-		else if (name === "%GeneratorFunction%") value = getGeneratorFunction() || void 0;
-		else if (name === "%AsyncGeneratorFunction%") value = getAsyncGeneratorFunction() || void 0;
-		else if (name === "%AsyncGenerator%") {
-			var fn = doEval("%AsyncGeneratorFunction%");
-			if (fn) value = fn.prototype;
-		} else if (name === "%AsyncIteratorPrototype%") {
-			var gen = doEval("%AsyncGenerator%");
-			if (gen && getProto) value = getProto(gen.prototype);
-		}
-		INTRINSICS[name] = value;
-		return value;
-	};
-	var LEGACY_ALIASES = {
-		__proto__: null,
-		"%ArrayBufferPrototype%": ["ArrayBuffer", "prototype"],
-		"%ArrayPrototype%": ["Array", "prototype"],
-		"%ArrayProto_entries%": [
-			"Array",
-			"prototype",
-			"entries"
-		],
-		"%ArrayProto_forEach%": [
-			"Array",
-			"prototype",
-			"forEach"
-		],
-		"%ArrayProto_keys%": [
-			"Array",
-			"prototype",
-			"keys"
-		],
-		"%ArrayProto_values%": [
-			"Array",
-			"prototype",
-			"values"
-		],
-		"%AsyncFunctionPrototype%": ["AsyncFunction", "prototype"],
-		"%AsyncGenerator%": ["AsyncGeneratorFunction", "prototype"],
-		"%AsyncGeneratorPrototype%": [
-			"AsyncGeneratorFunction",
-			"prototype",
-			"prototype"
-		],
-		"%BooleanPrototype%": ["Boolean", "prototype"],
-		"%DataViewPrototype%": ["DataView", "prototype"],
-		"%DatePrototype%": ["Date", "prototype"],
-		"%ErrorPrototype%": ["Error", "prototype"],
-		"%EvalErrorPrototype%": ["EvalError", "prototype"],
-		"%Float32ArrayPrototype%": ["Float32Array", "prototype"],
-		"%Float64ArrayPrototype%": ["Float64Array", "prototype"],
-		"%FunctionPrototype%": ["Function", "prototype"],
-		"%Generator%": ["GeneratorFunction", "prototype"],
-		"%GeneratorPrototype%": [
-			"GeneratorFunction",
-			"prototype",
-			"prototype"
-		],
-		"%Int8ArrayPrototype%": ["Int8Array", "prototype"],
-		"%Int16ArrayPrototype%": ["Int16Array", "prototype"],
-		"%Int32ArrayPrototype%": ["Int32Array", "prototype"],
-		"%JSONParse%": ["JSON", "parse"],
-		"%JSONStringify%": ["JSON", "stringify"],
-		"%MapPrototype%": ["Map", "prototype"],
-		"%NumberPrototype%": ["Number", "prototype"],
-		"%ObjectPrototype%": ["Object", "prototype"],
-		"%ObjProto_toString%": [
-			"Object",
-			"prototype",
-			"toString"
-		],
-		"%ObjProto_valueOf%": [
-			"Object",
-			"prototype",
-			"valueOf"
-		],
-		"%PromisePrototype%": ["Promise", "prototype"],
-		"%PromiseProto_then%": [
-			"Promise",
-			"prototype",
-			"then"
-		],
-		"%Promise_all%": ["Promise", "all"],
-		"%Promise_reject%": ["Promise", "reject"],
-		"%Promise_resolve%": ["Promise", "resolve"],
-		"%RangeErrorPrototype%": ["RangeError", "prototype"],
-		"%ReferenceErrorPrototype%": ["ReferenceError", "prototype"],
-		"%RegExpPrototype%": ["RegExp", "prototype"],
-		"%SetPrototype%": ["Set", "prototype"],
-		"%SharedArrayBufferPrototype%": ["SharedArrayBuffer", "prototype"],
-		"%StringPrototype%": ["String", "prototype"],
-		"%SymbolPrototype%": ["Symbol", "prototype"],
-		"%SyntaxErrorPrototype%": ["SyntaxError", "prototype"],
-		"%TypedArrayPrototype%": ["TypedArray", "prototype"],
-		"%TypeErrorPrototype%": ["TypeError", "prototype"],
-		"%Uint8ArrayPrototype%": ["Uint8Array", "prototype"],
-		"%Uint8ClampedArrayPrototype%": ["Uint8ClampedArray", "prototype"],
-		"%Uint16ArrayPrototype%": ["Uint16Array", "prototype"],
-		"%Uint32ArrayPrototype%": ["Uint32Array", "prototype"],
-		"%URIErrorPrototype%": ["URIError", "prototype"],
-		"%WeakMapPrototype%": ["WeakMap", "prototype"],
-		"%WeakSetPrototype%": ["WeakSet", "prototype"]
-	};
-	var bind = require_function_bind();
-	var hasOwn = require_hasown();
-	var $concat = bind.call($call, Array.prototype.concat);
-	var $spliceApply = bind.call($apply, Array.prototype.splice);
-	var $replace = bind.call($call, String.prototype.replace);
-	var $strSlice = bind.call($call, String.prototype.slice);
-	var $exec = bind.call($call, RegExp.prototype.exec);
-	var rePropName = /[^%.[\]]+|\[(?:(-?\d+(?:\.\d+)?)|(["'])((?:(?!\2)[^\\]|\\.)*?)\2)\]|(?=(?:\.|\[\])(?:\.|\[\]|%$))/g;
-	var reEscapeChar = /\\(\\)?/g;
-	var stringToPath = function stringToPath(string) {
-		var first = $strSlice(string, 0, 1);
-		var last = $strSlice(string, -1);
-		if (first === "%" && last !== "%") throw new $SyntaxError("invalid intrinsic syntax, expected closing `%`");
-		else if (last === "%" && first !== "%") throw new $SyntaxError("invalid intrinsic syntax, expected opening `%`");
-		var result = [];
-		$replace(string, rePropName, function(match, number, quote, subString) {
-			result[result.length] = quote ? $replace(subString, reEscapeChar, "$1") : number || match;
-		});
-		return result;
-	};
-	var getBaseIntrinsic = function getBaseIntrinsic(name, allowMissing) {
-		var intrinsicName = name;
-		var alias;
-		if (hasOwn(LEGACY_ALIASES, intrinsicName)) {
-			alias = LEGACY_ALIASES[intrinsicName];
-			intrinsicName = "%" + alias[0] + "%";
-		}
-		if (hasOwn(INTRINSICS, intrinsicName)) {
-			var value = INTRINSICS[intrinsicName];
-			if (value === needsEval) value = doEval(intrinsicName);
-			if (typeof value === "undefined" && !allowMissing) throw new $TypeError("intrinsic " + name + " exists, but is not available. Please file an issue!");
-			return {
-				alias,
-				name: intrinsicName,
-				value
-			};
-		}
-		throw new $SyntaxError("intrinsic " + name + " does not exist!");
-	};
-	module.exports = function GetIntrinsic(name, allowMissing) {
-		if (typeof name !== "string" || name.length === 0) throw new $TypeError("intrinsic name must be a non-empty string");
-		if (arguments.length > 1 && typeof allowMissing !== "boolean") throw new $TypeError("\"allowMissing\" argument must be a boolean");
-		if ($exec(/^%?[^%]*%?$/, name) === null) throw new $SyntaxError("`%` may not be present anywhere but at the beginning and end of the intrinsic name");
-		var parts = stringToPath(name);
-		var intrinsicBaseName = parts.length > 0 ? parts[0] : "";
-		var intrinsic = getBaseIntrinsic("%" + intrinsicBaseName + "%", allowMissing);
-		var intrinsicRealName = intrinsic.name;
-		var value = intrinsic.value;
-		var skipFurtherCaching = false;
-		var alias = intrinsic.alias;
-		if (alias) {
-			intrinsicBaseName = alias[0];
-			$spliceApply(parts, $concat([0, 1], alias));
-		}
-		for (var i = 1, isOwn = true; i < parts.length; i += 1) {
-			var part = parts[i];
-			var first = $strSlice(part, 0, 1);
-			var last = $strSlice(part, -1);
-			if ((first === "\"" || first === "'" || first === "`" || last === "\"" || last === "'" || last === "`") && first !== last) throw new $SyntaxError("property names with quotes must have matching quotes");
-			if (part === "constructor" || !isOwn) skipFurtherCaching = true;
-			intrinsicBaseName += "." + part;
-			intrinsicRealName = "%" + intrinsicBaseName + "%";
-			if (hasOwn(INTRINSICS, intrinsicRealName)) value = INTRINSICS[intrinsicRealName];
-			else if (value != null) {
-				if (!(part in value)) {
-					if (!allowMissing) throw new $TypeError("base intrinsic for " + name + " exists, but the property is not available.");
-					return;
-				}
-				if ($gOPD && i + 1 >= parts.length) {
-					var desc = $gOPD(value, part);
-					isOwn = !!desc;
-					if (isOwn && "get" in desc && !("originalValue" in desc.get)) value = desc.get;
-					else value = value[part];
-				} else {
-					isOwn = hasOwn(value, part);
-					value = value[part];
-				}
-				if (isOwn && !skipFurtherCaching) INTRINSICS[intrinsicRealName] = value;
-			}
-		}
-		return value;
-	};
-}));
-
-//#endregion
-//#region node_modules/call-bound/index.js
-var require_call_bound = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var GetIntrinsic = require_get_intrinsic();
-	var callBindBasic = require_call_bind_apply_helpers();
-	/** @type {(thisArg: string, searchString: string, position?: number) => number} */
-	var $indexOf = callBindBasic([GetIntrinsic("%String.prototype.indexOf%")]);
-	/** @type {import('.')} */
-	module.exports = function callBoundIntrinsic(name, allowMissing) {
-		var intrinsic = GetIntrinsic(name, !!allowMissing);
-		if (typeof intrinsic === "function" && $indexOf(name, ".prototype.") > -1) return callBindBasic([intrinsic]);
-		return intrinsic;
-	};
-}));
-
-//#endregion
-//#region node_modules/is-arguments/index.js
-var require_is_arguments = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var hasToStringTag = require_shams()();
-	var $toString = require_call_bound()("Object.prototype.toString");
-	/** @type {import('.')} */
-	var isStandardArguments = function isArguments(value) {
-		if (hasToStringTag && value && typeof value === "object" && Symbol.toStringTag in value) return false;
-		return $toString(value) === "[object Arguments]";
-	};
-	/** @type {import('.')} */
-	var isLegacyArguments = function isArguments(value) {
-		if (isStandardArguments(value)) return true;
-		return value !== null && typeof value === "object" && "length" in value && typeof value.length === "number" && value.length >= 0 && $toString(value) !== "[object Array]" && "callee" in value && $toString(value.callee) === "[object Function]";
-	};
-	var supportsStandardArguments = function() {
-		return isStandardArguments(arguments);
-	}();
-	isStandardArguments.isLegacyArguments = isLegacyArguments;
-	/** @type {import('.')} */
-	module.exports = supportsStandardArguments ? isStandardArguments : isLegacyArguments;
-}));
-
-//#endregion
-//#region node_modules/is-regex/index.js
-var require_is_regex = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var callBound = require_call_bound();
-	var hasToStringTag = require_shams()();
-	var hasOwn = require_hasown();
-	var gOPD = require_gopd();
-	/** @type {import('.')} */
-	var fn;
-	if (hasToStringTag) {
-		/** @type {(receiver: ThisParameterType<typeof RegExp.prototype.exec>, ...args: Parameters<typeof RegExp.prototype.exec>) => ReturnType<typeof RegExp.prototype.exec>} */
-		var $exec = callBound("RegExp.prototype.exec");
-		/** @type {object} */
-		var isRegexMarker = {};
-		var throwRegexMarker = function() {
-			throw isRegexMarker;
-		};
-		/** @type {{ toString(): never, valueOf(): never, [Symbol.toPrimitive]?(): never }} */
-		var badStringifier = {
-			toString: throwRegexMarker,
-			valueOf: throwRegexMarker
-		};
-		if (typeof Symbol.toPrimitive === "symbol") badStringifier[Symbol.toPrimitive] = throwRegexMarker;
-		/** @type {import('.')} */
-		fn = function isRegex(value) {
-			if (!value || typeof value !== "object") return false;
-			var descriptor = gOPD(value, "lastIndex");
-			if (!(descriptor && hasOwn(descriptor, "value"))) return false;
-			try {
-				$exec(value, badStringifier);
-			} catch (e) {
-				return e === isRegexMarker;
-			}
-		};
-	} else {
-		/** @type {(receiver: ThisParameterType<typeof Object.prototype.toString>, ...args: Parameters<typeof Object.prototype.toString>) => ReturnType<typeof Object.prototype.toString>} */
-		var $toString = callBound("Object.prototype.toString");
-		/** @const @type {'[object RegExp]'} */
-		var regexClass = "[object RegExp]";
-		/** @type {import('.')} */
-		fn = function isRegex(value) {
-			if (!value || typeof value !== "object" && typeof value !== "function") return false;
-			return $toString(value) === regexClass;
-		};
-	}
-	module.exports = fn;
-}));
-
-//#endregion
-//#region node_modules/safe-regex-test/index.js
-var require_safe_regex_test = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var callBound = require_call_bound();
-	var isRegex = require_is_regex();
-	var $exec = callBound("RegExp.prototype.exec");
-	var $TypeError = require_type();
-	/** @type {import('.')} */
-	module.exports = function regexTester(regex) {
-		if (!isRegex(regex)) throw new $TypeError("`regex` must be a RegExp");
-		return function test(s) {
-			return $exec(regex, s) !== null;
-		};
-	};
-}));
-
-//#endregion
-//#region node_modules/is-generator-function/index.js
-var require_is_generator_function = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var callBound = require_call_bound();
-	var isFnRegex = require_safe_regex_test()(/^\s*(?:function)?\*/);
-	var hasToStringTag = require_shams()();
-	var getProto = require_get_proto();
-	var toStr = callBound("Object.prototype.toString");
-	var fnToStr = callBound("Function.prototype.toString");
-	var getGeneratorFunction = require_generator_function();
-	/** @type {import('.')} */
-	module.exports = function isGeneratorFunction(fn) {
-		if (typeof fn !== "function") return false;
-		if (isFnRegex(fnToStr(fn))) return true;
-		if (!hasToStringTag) return toStr(fn) === "[object GeneratorFunction]";
-		if (!getProto) return false;
-		var GeneratorFunction = getGeneratorFunction();
-		return GeneratorFunction && getProto(fn) === GeneratorFunction.prototype;
-	};
-}));
-
-//#endregion
-//#region node_modules/is-callable/index.js
-var require_is_callable = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var fnToStr = Function.prototype.toString;
-	var reflectApply = typeof Reflect === "object" && Reflect !== null && Reflect.apply;
-	var badArrayLike;
-	var isCallableMarker;
-	if (typeof reflectApply === "function" && typeof Object.defineProperty === "function") try {
-		badArrayLike = Object.defineProperty({}, "length", { get: function() {
-			throw isCallableMarker;
-		} });
-		isCallableMarker = {};
-		reflectApply(function() {
-			throw 42;
-		}, null, badArrayLike);
-	} catch (_) {
-		if (_ !== isCallableMarker) reflectApply = null;
-	}
-	else reflectApply = null;
-	var constructorRegex = /^\s*class\b/;
-	var isES6ClassFn = function isES6ClassFunction(value) {
-		try {
-			var fnStr = fnToStr.call(value);
-			return constructorRegex.test(fnStr);
-		} catch (e) {
-			return false;
-		}
-	};
-	var tryFunctionObject = function tryFunctionToStr(value) {
-		try {
-			if (isES6ClassFn(value)) return false;
-			fnToStr.call(value);
-			return true;
-		} catch (e) {
-			return false;
-		}
-	};
-	var toStr = Object.prototype.toString;
-	var objectClass = "[object Object]";
-	var fnClass = "[object Function]";
-	var genClass = "[object GeneratorFunction]";
-	var ddaClass = "[object HTMLAllCollection]";
-	var ddaClass2 = "[object HTML document.all class]";
-	var ddaClass3 = "[object HTMLCollection]";
-	var hasToStringTag = typeof Symbol === "function" && !!Symbol.toStringTag;
-	var isIE68 = !(0 in [,]);
-	var isDDA = function isDocumentDotAll() {
-		return false;
-	};
-	if (typeof document === "object") {
-		var all = document.all;
-		if (toStr.call(all) === toStr.call(document.all)) isDDA = function isDocumentDotAll(value) {
-			if ((isIE68 || !value) && (typeof value === "undefined" || typeof value === "object")) try {
-				var str = toStr.call(value);
-				return (str === ddaClass || str === ddaClass2 || str === ddaClass3 || str === objectClass) && value("") == null;
-			} catch (e) {}
-			return false;
-		};
-	}
-	module.exports = reflectApply ? function isCallable(value) {
-		if (isDDA(value)) return true;
-		if (!value) return false;
-		if (typeof value !== "function" && typeof value !== "object") return false;
-		try {
-			reflectApply(value, null, badArrayLike);
-		} catch (e) {
-			if (e !== isCallableMarker) return false;
-		}
-		return !isES6ClassFn(value) && tryFunctionObject(value);
-	} : function isCallable(value) {
-		if (isDDA(value)) return true;
-		if (!value) return false;
-		if (typeof value !== "function" && typeof value !== "object") return false;
-		if (hasToStringTag) return tryFunctionObject(value);
-		if (isES6ClassFn(value)) return false;
-		var strClass = toStr.call(value);
-		if (strClass !== fnClass && strClass !== genClass && !/^\[object HTML/.test(strClass)) return false;
-		return tryFunctionObject(value);
-	};
-}));
-
-//#endregion
-//#region node_modules/for-each/index.js
-var require_for_each = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var isCallable = require_is_callable();
-	var toStr = Object.prototype.toString;
-	var hasOwnProperty = Object.prototype.hasOwnProperty;
-	/** @type {<This, A extends readonly unknown[]>(arr: A, iterator: (this: This | void, value: A[number], index: number, arr: A) => void, receiver: This | undefined) => void} */
-	var forEachArray = function forEachArray(array, iterator, receiver) {
-		for (var i = 0, len = array.length; i < len; i++) if (hasOwnProperty.call(array, i)) if (receiver == null) iterator(array[i], i, array);
-		else iterator.call(receiver, array[i], i, array);
-	};
-	/** @type {<This, S extends string>(string: S, iterator: (this: This | void, value: S[number], index: number, string: S) => void, receiver: This | undefined) => void} */
-	var forEachString = function forEachString(string, iterator, receiver) {
-		for (var i = 0, len = string.length; i < len; i++) if (receiver == null) iterator(string.charAt(i), i, string);
-		else iterator.call(receiver, string.charAt(i), i, string);
-	};
-	/** @type {<This, O>(obj: O, iterator: (this: This | void, value: O[keyof O], index: keyof O, obj: O) => void, receiver: This | undefined) => void} */
-	var forEachObject = function forEachObject(object, iterator, receiver) {
-		for (var k in object) if (hasOwnProperty.call(object, k)) if (receiver == null) iterator(object[k], k, object);
-		else iterator.call(receiver, object[k], k, object);
-	};
-	/** @type {(x: unknown) => x is readonly unknown[]} */
-	function isArray(x) {
-		return toStr.call(x) === "[object Array]";
-	}
-	/** @type {import('.')._internal} */
-	module.exports = function forEach(list, iterator, thisArg) {
-		if (!isCallable(iterator)) throw new TypeError("iterator must be a function");
-		var receiver;
-		if (arguments.length >= 3) receiver = thisArg;
-		if (isArray(list)) forEachArray(list, iterator, receiver);
-		else if (typeof list === "string") forEachString(list, iterator, receiver);
-		else forEachObject(list, iterator, receiver);
-	};
-}));
-
-//#endregion
-//#region node_modules/possible-typed-array-names/index.js
-var require_possible_typed_array_names = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/** @type {import('.')} */
-	module.exports = [
-		"Float16Array",
-		"Float32Array",
-		"Float64Array",
-		"Int8Array",
-		"Int16Array",
-		"Int32Array",
-		"Uint8Array",
-		"Uint8ClampedArray",
-		"Uint16Array",
-		"Uint32Array",
-		"BigInt64Array",
-		"BigUint64Array"
-	];
-}));
-
-//#endregion
-//#region node_modules/available-typed-arrays/index.js
-var require_available_typed_arrays = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var possibleNames = require_possible_typed_array_names();
-	var g = typeof globalThis === "undefined" ? global : globalThis;
-	/** @type {import('.')} */
-	module.exports = function availableTypedArrays() {
-		var out = [];
-		for (var i = 0; i < possibleNames.length; i++) if (typeof g[possibleNames[i]] === "function") out[out.length] = possibleNames[i];
-		return out;
-	};
-}));
-
-//#endregion
-//#region node_modules/define-data-property/index.js
-var require_define_data_property = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var $defineProperty = require_es_define_property();
-	var $SyntaxError = require_syntax();
-	var $TypeError = require_type();
-	var gopd = require_gopd();
-	/** @type {import('.')} */
-	module.exports = function defineDataProperty(obj, property, value) {
-		if (!obj || typeof obj !== "object" && typeof obj !== "function") throw new $TypeError("`obj` must be an object or a function`");
-		if (typeof property !== "string" && typeof property !== "symbol") throw new $TypeError("`property` must be a string or a symbol`");
-		if (arguments.length > 3 && typeof arguments[3] !== "boolean" && arguments[3] !== null) throw new $TypeError("`nonEnumerable`, if provided, must be a boolean or null");
-		if (arguments.length > 4 && typeof arguments[4] !== "boolean" && arguments[4] !== null) throw new $TypeError("`nonWritable`, if provided, must be a boolean or null");
-		if (arguments.length > 5 && typeof arguments[5] !== "boolean" && arguments[5] !== null) throw new $TypeError("`nonConfigurable`, if provided, must be a boolean or null");
-		if (arguments.length > 6 && typeof arguments[6] !== "boolean") throw new $TypeError("`loose`, if provided, must be a boolean");
-		var nonEnumerable = arguments.length > 3 ? arguments[3] : null;
-		var nonWritable = arguments.length > 4 ? arguments[4] : null;
-		var nonConfigurable = arguments.length > 5 ? arguments[5] : null;
-		var loose = arguments.length > 6 ? arguments[6] : false;
-		var desc = !!gopd && gopd(obj, property);
-		if ($defineProperty) $defineProperty(obj, property, {
-			configurable: nonConfigurable === null && desc ? desc.configurable : !nonConfigurable,
-			enumerable: nonEnumerable === null && desc ? desc.enumerable : !nonEnumerable,
-			value,
-			writable: nonWritable === null && desc ? desc.writable : !nonWritable
-		});
-		else if (loose || !nonEnumerable && !nonWritable && !nonConfigurable) obj[property] = value;
-		else throw new $SyntaxError("This environment does not support defining a property as non-configurable, non-writable, or non-enumerable.");
-	};
-}));
-
-//#endregion
-//#region node_modules/has-property-descriptors/index.js
-var require_has_property_descriptors = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var $defineProperty = require_es_define_property();
-	var hasPropertyDescriptors = function hasPropertyDescriptors() {
-		return !!$defineProperty;
-	};
-	hasPropertyDescriptors.hasArrayLengthDefineBug = function hasArrayLengthDefineBug() {
-		if (!$defineProperty) return null;
-		try {
-			return $defineProperty([], "length", { value: 1 }).length !== 1;
-		} catch (e) {
-			return true;
-		}
-	};
-	module.exports = hasPropertyDescriptors;
-}));
-
-//#endregion
-//#region node_modules/set-function-length/index.js
-var require_set_function_length = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var GetIntrinsic = require_get_intrinsic();
-	var define = require_define_data_property();
-	var hasDescriptors = require_has_property_descriptors()();
-	var gOPD = require_gopd();
-	var $TypeError = require_type();
-	var $floor = GetIntrinsic("%Math.floor%");
-	/** @type {import('.')} */
-	module.exports = function setFunctionLength(fn, length) {
-		if (typeof fn !== "function") throw new $TypeError("`fn` is not a function");
-		if (typeof length !== "number" || length < 0 || length > 4294967295 || $floor(length) !== length) throw new $TypeError("`length` must be a positive 32-bit integer");
-		var loose = arguments.length > 2 && !!arguments[2];
-		var functionLengthIsConfigurable = true;
-		var functionLengthIsWritable = true;
-		if ("length" in fn && gOPD) {
-			var desc = gOPD(fn, "length");
-			if (desc && !desc.configurable) functionLengthIsConfigurable = false;
-			if (desc && !desc.writable) functionLengthIsWritable = false;
-		}
-		if (functionLengthIsConfigurable || functionLengthIsWritable || !loose) if (hasDescriptors) define(fn, "length", length, true, true);
-		else define(fn, "length", length);
-		return fn;
-	};
-}));
-
-//#endregion
-//#region node_modules/call-bind-apply-helpers/applyBind.js
-var require_applyBind = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var bind = require_function_bind();
-	var $apply = require_functionApply();
-	var actualApply = require_actualApply();
-	/** @type {import('./applyBind')} */
-	module.exports = function applyBind() {
-		return actualApply(bind, $apply, arguments);
-	};
-}));
-
-//#endregion
-//#region node_modules/call-bind/index.js
-var require_call_bind = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var setFunctionLength = require_set_function_length();
-	var $defineProperty = require_es_define_property();
-	var callBindBasic = require_call_bind_apply_helpers();
-	var applyBind = require_applyBind();
-	module.exports = function callBind(originalFunction) {
-		var func = callBindBasic(arguments);
-		var adjustedLength = originalFunction.length - (arguments.length - 1);
-		return setFunctionLength(func, 1 + (adjustedLength > 0 ? adjustedLength : 0), true);
-	};
-	if ($defineProperty) $defineProperty(module.exports, "apply", { value: applyBind });
-	else module.exports.apply = applyBind;
-}));
-
-//#endregion
-//#region node_modules/which-typed-array/index.js
-var require_which_typed_array = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var forEach = require_for_each();
-	var availableTypedArrays = require_available_typed_arrays();
-	var callBind = require_call_bind();
-	var callBound = require_call_bound();
-	var gOPD = require_gopd();
-	var getProto = require_get_proto();
-	var $toString = callBound("Object.prototype.toString");
-	var hasToStringTag = require_shams()();
-	var g = typeof globalThis === "undefined" ? global : globalThis;
-	var typedArrays = availableTypedArrays();
-	var $slice = callBound("String.prototype.slice");
-	/** @type {<T = unknown>(array: readonly T[], value: unknown) => number} */
-	var $indexOf = callBound("Array.prototype.indexOf", true) || function indexOf(array, value) {
-		for (var i = 0; i < array.length; i += 1) if (array[i] === value) return i;
-		return -1;
-	};
-	/** @typedef {import('./types').Getter} Getter */
-	/** @type {import('./types').Cache} */
-	var cache = { __proto__: null };
-	if (hasToStringTag && gOPD && getProto) forEach(typedArrays, function(typedArray) {
-		var arr = new g[typedArray]();
-		if (Symbol.toStringTag in arr && getProto) {
-			var proto = getProto(arr);
-			var descriptor = gOPD(proto, Symbol.toStringTag);
-			if (!descriptor && proto) descriptor = gOPD(getProto(proto), Symbol.toStringTag);
-			cache["$" + typedArray] = callBind(descriptor.get);
-		}
-	});
-	else forEach(typedArrays, function(typedArray) {
-		var arr = new g[typedArray]();
-		var fn = arr.slice || arr.set;
-		if (fn) cache["$" + typedArray] = callBind(fn);
-	});
-	/** @type {(value: object) => false | import('.').TypedArrayName} */
-	var tryTypedArrays = function tryAllTypedArrays(value) {
-		/** @type {ReturnType<typeof tryAllTypedArrays>} */ var found = false;
-		forEach(
-			cache,
-			/** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */
-			function(getter, typedArray) {
-				if (!found) try {
-					if ("$" + getter(value) === typedArray) found = $slice(typedArray, 1);
-				} catch (e) {}
-			}
-		);
-		return found;
-	};
-	/** @type {(value: object) => false | import('.').TypedArrayName} */
-	var trySlices = function tryAllSlices(value) {
-		/** @type {ReturnType<typeof tryAllSlices>} */ var found = false;
-		forEach(
-			cache,
-			/** @type {(getter: Getter, name: `\$${import('.').TypedArrayName}`) => void} */
-			function(getter, name) {
-				if (!found) try {
-					getter(value);
-					found = $slice(name, 1);
-				} catch (e) {}
-			}
-		);
-		return found;
-	};
-	/** @type {import('.')} */
-	module.exports = function whichTypedArray(value) {
-		if (!value || typeof value !== "object") return false;
-		if (!hasToStringTag) {
-			/** @type {string} */
-			var tag = $slice($toString(value), 8, -1);
-			if ($indexOf(typedArrays, tag) > -1) return tag;
-			if (tag !== "Object") return false;
-			return trySlices(value);
-		}
-		if (!gOPD) return null;
-		return tryTypedArrays(value);
-	};
-}));
-
-//#endregion
-//#region node_modules/is-typed-array/index.js
-var require_is_typed_array = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var whichTypedArray = require_which_typed_array();
-	/** @type {import('.')} */
-	module.exports = function isTypedArray(value) {
-		return !!whichTypedArray(value);
-	};
-}));
-
-//#endregion
-//#region node_modules/util/support/types.js
-var require_types = /* @__PURE__ */ __commonJSMin(((exports) => {
-	var isArgumentsObject = require_is_arguments();
-	var isGeneratorFunction = require_is_generator_function();
-	var whichTypedArray = require_which_typed_array();
-	var isTypedArray = require_is_typed_array();
-	function uncurryThis(f) {
-		return f.call.bind(f);
-	}
-	var BigIntSupported = typeof BigInt !== "undefined";
-	var SymbolSupported = typeof Symbol !== "undefined";
-	var ObjectToString = uncurryThis(Object.prototype.toString);
-	var numberValue = uncurryThis(Number.prototype.valueOf);
-	var stringValue = uncurryThis(String.prototype.valueOf);
-	var booleanValue = uncurryThis(Boolean.prototype.valueOf);
-	if (BigIntSupported) var bigIntValue = uncurryThis(BigInt.prototype.valueOf);
-	if (SymbolSupported) var symbolValue = uncurryThis(Symbol.prototype.valueOf);
-	function checkBoxedPrimitive(value, prototypeValueOf) {
-		if (typeof value !== "object") return false;
-		try {
-			prototypeValueOf(value);
-			return true;
-		} catch (e) {
-			return false;
-		}
-	}
-	exports.isArgumentsObject = isArgumentsObject;
-	exports.isGeneratorFunction = isGeneratorFunction;
-	exports.isTypedArray = isTypedArray;
-	function isPromise(input) {
-		return typeof Promise !== "undefined" && input instanceof Promise || input !== null && typeof input === "object" && typeof input.then === "function" && typeof input.catch === "function";
-	}
-	exports.isPromise = isPromise;
-	function isArrayBufferView(value) {
-		if (typeof ArrayBuffer !== "undefined" && ArrayBuffer.isView) return ArrayBuffer.isView(value);
-		return isTypedArray(value) || isDataView(value);
-	}
-	exports.isArrayBufferView = isArrayBufferView;
-	function isUint8Array(value) {
-		return whichTypedArray(value) === "Uint8Array";
-	}
-	exports.isUint8Array = isUint8Array;
-	function isUint8ClampedArray(value) {
-		return whichTypedArray(value) === "Uint8ClampedArray";
-	}
-	exports.isUint8ClampedArray = isUint8ClampedArray;
-	function isUint16Array(value) {
-		return whichTypedArray(value) === "Uint16Array";
-	}
-	exports.isUint16Array = isUint16Array;
-	function isUint32Array(value) {
-		return whichTypedArray(value) === "Uint32Array";
-	}
-	exports.isUint32Array = isUint32Array;
-	function isInt8Array(value) {
-		return whichTypedArray(value) === "Int8Array";
-	}
-	exports.isInt8Array = isInt8Array;
-	function isInt16Array(value) {
-		return whichTypedArray(value) === "Int16Array";
-	}
-	exports.isInt16Array = isInt16Array;
-	function isInt32Array(value) {
-		return whichTypedArray(value) === "Int32Array";
-	}
-	exports.isInt32Array = isInt32Array;
-	function isFloat32Array(value) {
-		return whichTypedArray(value) === "Float32Array";
-	}
-	exports.isFloat32Array = isFloat32Array;
-	function isFloat64Array(value) {
-		return whichTypedArray(value) === "Float64Array";
-	}
-	exports.isFloat64Array = isFloat64Array;
-	function isBigInt64Array(value) {
-		return whichTypedArray(value) === "BigInt64Array";
-	}
-	exports.isBigInt64Array = isBigInt64Array;
-	function isBigUint64Array(value) {
-		return whichTypedArray(value) === "BigUint64Array";
-	}
-	exports.isBigUint64Array = isBigUint64Array;
-	function isMapToString(value) {
-		return ObjectToString(value) === "[object Map]";
-	}
-	isMapToString.working = typeof Map !== "undefined" && isMapToString(/* @__PURE__ */ new Map());
-	function isMap(value) {
-		if (typeof Map === "undefined") return false;
-		return isMapToString.working ? isMapToString(value) : value instanceof Map;
-	}
-	exports.isMap = isMap;
-	function isSetToString(value) {
-		return ObjectToString(value) === "[object Set]";
-	}
-	isSetToString.working = typeof Set !== "undefined" && isSetToString(/* @__PURE__ */ new Set());
-	function isSet(value) {
-		if (typeof Set === "undefined") return false;
-		return isSetToString.working ? isSetToString(value) : value instanceof Set;
-	}
-	exports.isSet = isSet;
-	function isWeakMapToString(value) {
-		return ObjectToString(value) === "[object WeakMap]";
-	}
-	isWeakMapToString.working = typeof WeakMap !== "undefined" && isWeakMapToString(/* @__PURE__ */ new WeakMap());
-	function isWeakMap(value) {
-		if (typeof WeakMap === "undefined") return false;
-		return isWeakMapToString.working ? isWeakMapToString(value) : value instanceof WeakMap;
-	}
-	exports.isWeakMap = isWeakMap;
-	function isWeakSetToString(value) {
-		return ObjectToString(value) === "[object WeakSet]";
-	}
-	isWeakSetToString.working = typeof WeakSet !== "undefined" && isWeakSetToString(/* @__PURE__ */ new WeakSet());
-	function isWeakSet(value) {
-		return isWeakSetToString(value);
-	}
-	exports.isWeakSet = isWeakSet;
-	function isArrayBufferToString(value) {
-		return ObjectToString(value) === "[object ArrayBuffer]";
-	}
-	isArrayBufferToString.working = typeof ArrayBuffer !== "undefined" && isArrayBufferToString(/* @__PURE__ */ new ArrayBuffer());
-	function isArrayBuffer(value) {
-		if (typeof ArrayBuffer === "undefined") return false;
-		return isArrayBufferToString.working ? isArrayBufferToString(value) : value instanceof ArrayBuffer;
-	}
-	exports.isArrayBuffer = isArrayBuffer;
-	function isDataViewToString(value) {
-		return ObjectToString(value) === "[object DataView]";
-	}
-	isDataViewToString.working = typeof ArrayBuffer !== "undefined" && typeof DataView !== "undefined" && isDataViewToString(new DataView(/* @__PURE__ */ new ArrayBuffer(1), 0, 1));
-	function isDataView(value) {
-		if (typeof DataView === "undefined") return false;
-		return isDataViewToString.working ? isDataViewToString(value) : value instanceof DataView;
-	}
-	exports.isDataView = isDataView;
-	var SharedArrayBufferCopy = typeof SharedArrayBuffer !== "undefined" ? SharedArrayBuffer : void 0;
-	function isSharedArrayBufferToString(value) {
-		return ObjectToString(value) === "[object SharedArrayBuffer]";
-	}
-	function isSharedArrayBuffer(value) {
-		if (typeof SharedArrayBufferCopy === "undefined") return false;
-		if (typeof isSharedArrayBufferToString.working === "undefined") isSharedArrayBufferToString.working = isSharedArrayBufferToString(new SharedArrayBufferCopy());
-		return isSharedArrayBufferToString.working ? isSharedArrayBufferToString(value) : value instanceof SharedArrayBufferCopy;
-	}
-	exports.isSharedArrayBuffer = isSharedArrayBuffer;
-	function isAsyncFunction(value) {
-		return ObjectToString(value) === "[object AsyncFunction]";
-	}
-	exports.isAsyncFunction = isAsyncFunction;
-	function isMapIterator(value) {
-		return ObjectToString(value) === "[object Map Iterator]";
-	}
-	exports.isMapIterator = isMapIterator;
-	function isSetIterator(value) {
-		return ObjectToString(value) === "[object Set Iterator]";
-	}
-	exports.isSetIterator = isSetIterator;
-	function isGeneratorObject(value) {
-		return ObjectToString(value) === "[object Generator]";
-	}
-	exports.isGeneratorObject = isGeneratorObject;
-	function isWebAssemblyCompiledModule(value) {
-		return ObjectToString(value) === "[object WebAssembly.Module]";
-	}
-	exports.isWebAssemblyCompiledModule = isWebAssemblyCompiledModule;
-	function isNumberObject(value) {
-		return checkBoxedPrimitive(value, numberValue);
-	}
-	exports.isNumberObject = isNumberObject;
-	function isStringObject(value) {
-		return checkBoxedPrimitive(value, stringValue);
-	}
-	exports.isStringObject = isStringObject;
-	function isBooleanObject(value) {
-		return checkBoxedPrimitive(value, booleanValue);
-	}
-	exports.isBooleanObject = isBooleanObject;
-	function isBigIntObject(value) {
-		return BigIntSupported && checkBoxedPrimitive(value, bigIntValue);
-	}
-	exports.isBigIntObject = isBigIntObject;
-	function isSymbolObject(value) {
-		return SymbolSupported && checkBoxedPrimitive(value, symbolValue);
-	}
-	exports.isSymbolObject = isSymbolObject;
-	function isBoxedPrimitive(value) {
-		return isNumberObject(value) || isStringObject(value) || isBooleanObject(value) || isBigIntObject(value) || isSymbolObject(value);
-	}
-	exports.isBoxedPrimitive = isBoxedPrimitive;
-	function isAnyArrayBuffer(value) {
-		return typeof Uint8Array !== "undefined" && (isArrayBuffer(value) || isSharedArrayBuffer(value));
-	}
-	exports.isAnyArrayBuffer = isAnyArrayBuffer;
-	[
-		"isProxy",
-		"isExternal",
-		"isModuleNamespaceObject"
-	].forEach(function(method) {
-		Object.defineProperty(exports, method, {
-			enumerable: false,
-			value: function() {
-				throw new Error(method + " is not supported in userland");
-			}
-		});
-	});
-}));
-
-//#endregion
-//#region node_modules/util/support/isBufferBrowser.js
-var require_isBufferBrowser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	module.exports = function isBuffer(arg) {
-		return arg && typeof arg === "object" && typeof arg.copy === "function" && typeof arg.fill === "function" && typeof arg.readUInt8 === "function";
-	};
-}));
-
-//#endregion
-//#region node_modules/inherits/inherits_browser.js
-var require_inherits_browser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	if (typeof Object.create === "function") module.exports = function inherits(ctor, superCtor) {
-		if (superCtor) {
-			ctor.super_ = superCtor;
-			ctor.prototype = Object.create(superCtor.prototype, { constructor: {
-				value: ctor,
-				enumerable: false,
-				writable: true,
-				configurable: true
-			} });
-		}
-	};
-	else module.exports = function inherits(ctor, superCtor) {
-		if (superCtor) {
-			ctor.super_ = superCtor;
-			var TempCtor = function() {};
-			TempCtor.prototype = superCtor.prototype;
-			ctor.prototype = new TempCtor();
-			ctor.prototype.constructor = ctor;
-		}
-	};
-}));
-
-//#endregion
-//#region node_modules/util/util.js
-var require_util$1 = /* @__PURE__ */ __commonJSMin(((exports) => {
-	var getOwnPropertyDescriptors = Object.getOwnPropertyDescriptors || function getOwnPropertyDescriptors(obj) {
-		var keys = Object.keys(obj);
-		var descriptors = {};
-		for (var i = 0; i < keys.length; i++) descriptors[keys[i]] = Object.getOwnPropertyDescriptor(obj, keys[i]);
-		return descriptors;
-	};
-	var formatRegExp = /%[sdj%]/g;
-	exports.format = function(f) {
-		if (!isString(f)) {
-			var objects = [];
-			for (var i = 0; i < arguments.length; i++) objects.push(inspect(arguments[i]));
-			return objects.join(" ");
-		}
-		var i = 1;
-		var args = arguments;
-		var len = args.length;
-		var str = String(f).replace(formatRegExp, function(x$1) {
-			if (x$1 === "%%") return "%";
-			if (i >= len) return x$1;
-			switch (x$1) {
-				case "%s": return String(args[i++]);
-				case "%d": return Number(args[i++]);
-				case "%j": try {
-					return JSON.stringify(args[i++]);
-				} catch (_) {
-					return "[Circular]";
-				}
-				default: return x$1;
-			}
-		});
-		for (var x = args[i]; i < len; x = args[++i]) if (isNull(x) || !isObject(x)) str += " " + x;
-		else str += " " + inspect(x);
-		return str;
-	};
-	exports.deprecate = function(fn, msg) {
-		if (typeof process !== "undefined" && process.noDeprecation === true) return fn;
-		if (typeof process === "undefined") return function() {
-			return exports.deprecate(fn, msg).apply(this, arguments);
-		};
-		var warned = false;
-		function deprecated() {
-			if (!warned) {
-				if (process.throwDeprecation) throw new Error(msg);
-				else if (process.traceDeprecation) console.trace(msg);
-				else console.error(msg);
-				warned = true;
-			}
-			return fn.apply(this, arguments);
-		}
-		return deprecated;
-	};
-	var debugs = {};
-	var debugEnvRegex = /^$/;
-	if (process.env.NODE_DEBUG) {
-		var debugEnv = process.env.NODE_DEBUG;
-		debugEnv = debugEnv.replace(/[|\\{}()[\]^$+?.]/g, "\\$&").replace(/\*/g, ".*").replace(/,/g, "$|^").toUpperCase();
-		debugEnvRegex = new RegExp("^" + debugEnv + "$", "i");
-	}
-	exports.debuglog = function(set) {
-		set = set.toUpperCase();
-		if (!debugs[set]) if (debugEnvRegex.test(set)) {
-			var pid = process.pid;
-			debugs[set] = function() {
-				var msg = exports.format.apply(exports, arguments);
-				console.error("%s %d: %s", set, pid, msg);
-			};
-		} else debugs[set] = function() {};
-		return debugs[set];
-	};
-	/**
-	* Echos the value of a value. Trys to print the value out
-	* in the best way possible given the different types.
-	*
-	* @param {Object} obj The object to print out.
-	* @param {Object} opts Optional options object that alters the output.
-	*/
-	function inspect(obj, opts) {
-		var ctx = {
-			seen: [],
-			stylize: stylizeNoColor
-		};
-		if (arguments.length >= 3) ctx.depth = arguments[2];
-		if (arguments.length >= 4) ctx.colors = arguments[3];
-		if (isBoolean(opts)) ctx.showHidden = opts;
-		else if (opts) exports._extend(ctx, opts);
-		if (isUndefined(ctx.showHidden)) ctx.showHidden = false;
-		if (isUndefined(ctx.depth)) ctx.depth = 2;
-		if (isUndefined(ctx.colors)) ctx.colors = false;
-		if (isUndefined(ctx.customInspect)) ctx.customInspect = true;
-		if (ctx.colors) ctx.stylize = stylizeWithColor;
-		return formatValue(ctx, obj, ctx.depth);
-	}
-	exports.inspect = inspect;
-	inspect.colors = {
-		"bold": [1, 22],
-		"italic": [3, 23],
-		"underline": [4, 24],
-		"inverse": [7, 27],
-		"white": [37, 39],
-		"grey": [90, 39],
-		"black": [30, 39],
-		"blue": [34, 39],
-		"cyan": [36, 39],
-		"green": [32, 39],
-		"magenta": [35, 39],
-		"red": [31, 39],
-		"yellow": [33, 39]
-	};
-	inspect.styles = {
-		"special": "cyan",
-		"number": "yellow",
-		"boolean": "yellow",
-		"undefined": "grey",
-		"null": "bold",
-		"string": "green",
-		"date": "magenta",
-		"regexp": "red"
-	};
-	function stylizeWithColor(str, styleType) {
-		var style = inspect.styles[styleType];
-		if (style) return "\x1B[" + inspect.colors[style][0] + "m" + str + "\x1B[" + inspect.colors[style][1] + "m";
-		else return str;
-	}
-	function stylizeNoColor(str, styleType) {
-		return str;
-	}
-	function arrayToHash(array) {
-		var hash = {};
-		array.forEach(function(val, idx) {
-			hash[val] = true;
-		});
-		return hash;
-	}
-	function formatValue(ctx, value, recurseTimes) {
-		if (ctx.customInspect && value && isFunction(value.inspect) && value.inspect !== exports.inspect && !(value.constructor && value.constructor.prototype === value)) {
-			var ret = value.inspect(recurseTimes, ctx);
-			if (!isString(ret)) ret = formatValue(ctx, ret, recurseTimes);
-			return ret;
-		}
-		var primitive = formatPrimitive(ctx, value);
-		if (primitive) return primitive;
-		var keys = Object.keys(value);
-		var visibleKeys = arrayToHash(keys);
-		if (ctx.showHidden) keys = Object.getOwnPropertyNames(value);
-		if (isError(value) && (keys.indexOf("message") >= 0 || keys.indexOf("description") >= 0)) return formatError(value);
-		if (keys.length === 0) {
-			if (isFunction(value)) {
-				var name = value.name ? ": " + value.name : "";
-				return ctx.stylize("[Function" + name + "]", "special");
-			}
-			if (isRegExp(value)) return ctx.stylize(RegExp.prototype.toString.call(value), "regexp");
-			if (isDate(value)) return ctx.stylize(Date.prototype.toString.call(value), "date");
-			if (isError(value)) return formatError(value);
-		}
-		var base = "", array = false, braces = ["{", "}"];
-		if (isArray(value)) {
-			array = true;
-			braces = ["[", "]"];
-		}
-		if (isFunction(value)) base = " [Function" + (value.name ? ": " + value.name : "") + "]";
-		if (isRegExp(value)) base = " " + RegExp.prototype.toString.call(value);
-		if (isDate(value)) base = " " + Date.prototype.toUTCString.call(value);
-		if (isError(value)) base = " " + formatError(value);
-		if (keys.length === 0 && (!array || value.length == 0)) return braces[0] + base + braces[1];
-		if (recurseTimes < 0) if (isRegExp(value)) return ctx.stylize(RegExp.prototype.toString.call(value), "regexp");
-		else return ctx.stylize("[Object]", "special");
-		ctx.seen.push(value);
-		var output;
-		if (array) output = formatArray(ctx, value, recurseTimes, visibleKeys, keys);
-		else output = keys.map(function(key) {
-			return formatProperty(ctx, value, recurseTimes, visibleKeys, key, array);
-		});
-		ctx.seen.pop();
-		return reduceToSingleString(output, base, braces);
-	}
-	function formatPrimitive(ctx, value) {
-		if (isUndefined(value)) return ctx.stylize("undefined", "undefined");
-		if (isString(value)) {
-			var simple = "'" + JSON.stringify(value).replace(/^"|"$/g, "").replace(/'/g, "\\'").replace(/\\"/g, "\"") + "'";
-			return ctx.stylize(simple, "string");
-		}
-		if (isNumber(value)) return ctx.stylize("" + value, "number");
-		if (isBoolean(value)) return ctx.stylize("" + value, "boolean");
-		if (isNull(value)) return ctx.stylize("null", "null");
-	}
-	function formatError(value) {
-		return "[" + Error.prototype.toString.call(value) + "]";
-	}
-	function formatArray(ctx, value, recurseTimes, visibleKeys, keys) {
-		var output = [];
-		for (var i = 0, l = value.length; i < l; ++i) if (hasOwnProperty(value, String(i))) output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, String(i), true));
-		else output.push("");
-		keys.forEach(function(key) {
-			if (!key.match(/^\d+$/)) output.push(formatProperty(ctx, value, recurseTimes, visibleKeys, key, true));
-		});
-		return output;
-	}
-	function formatProperty(ctx, value, recurseTimes, visibleKeys, key, array) {
-		var name, str, desc = Object.getOwnPropertyDescriptor(value, key) || { value: value[key] };
-		if (desc.get) if (desc.set) str = ctx.stylize("[Getter/Setter]", "special");
-		else str = ctx.stylize("[Getter]", "special");
-		else if (desc.set) str = ctx.stylize("[Setter]", "special");
-		if (!hasOwnProperty(visibleKeys, key)) name = "[" + key + "]";
-		if (!str) if (ctx.seen.indexOf(desc.value) < 0) {
-			if (isNull(recurseTimes)) str = formatValue(ctx, desc.value, null);
-			else str = formatValue(ctx, desc.value, recurseTimes - 1);
-			if (str.indexOf("\n") > -1) if (array) str = str.split("\n").map(function(line) {
-				return "  " + line;
-			}).join("\n").slice(2);
-			else str = "\n" + str.split("\n").map(function(line) {
-				return "   " + line;
-			}).join("\n");
-		} else str = ctx.stylize("[Circular]", "special");
-		if (isUndefined(name)) {
-			if (array && key.match(/^\d+$/)) return str;
-			name = JSON.stringify("" + key);
-			if (name.match(/^"([a-zA-Z_][a-zA-Z_0-9]*)"$/)) {
-				name = name.slice(1, -1);
-				name = ctx.stylize(name, "name");
-			} else {
-				name = name.replace(/'/g, "\\'").replace(/\\"/g, "\"").replace(/(^"|"$)/g, "'");
-				name = ctx.stylize(name, "string");
-			}
-		}
-		return name + ": " + str;
-	}
-	function reduceToSingleString(output, base, braces) {
-		var numLinesEst = 0;
-		if (output.reduce(function(prev, cur) {
-			numLinesEst++;
-			if (cur.indexOf("\n") >= 0) numLinesEst++;
-			return prev + cur.replace(/\u001b\[\d\d?m/g, "").length + 1;
-		}, 0) > 60) return braces[0] + (base === "" ? "" : base + "\n ") + " " + output.join(",\n  ") + " " + braces[1];
-		return braces[0] + base + " " + output.join(", ") + " " + braces[1];
-	}
-	exports.types = require_types();
-	function isArray(ar) {
-		return Array.isArray(ar);
-	}
-	exports.isArray = isArray;
-	function isBoolean(arg) {
-		return typeof arg === "boolean";
-	}
-	exports.isBoolean = isBoolean;
-	function isNull(arg) {
-		return arg === null;
-	}
-	exports.isNull = isNull;
-	function isNullOrUndefined(arg) {
-		return arg == null;
-	}
-	exports.isNullOrUndefined = isNullOrUndefined;
-	function isNumber(arg) {
-		return typeof arg === "number";
-	}
-	exports.isNumber = isNumber;
-	function isString(arg) {
-		return typeof arg === "string";
-	}
-	exports.isString = isString;
-	function isSymbol(arg) {
-		return typeof arg === "symbol";
-	}
-	exports.isSymbol = isSymbol;
-	function isUndefined(arg) {
-		return arg === void 0;
-	}
-	exports.isUndefined = isUndefined;
-	function isRegExp(re) {
-		return isObject(re) && objectToString(re) === "[object RegExp]";
-	}
-	exports.isRegExp = isRegExp;
-	exports.types.isRegExp = isRegExp;
-	function isObject(arg) {
-		return typeof arg === "object" && arg !== null;
-	}
-	exports.isObject = isObject;
-	function isDate(d) {
-		return isObject(d) && objectToString(d) === "[object Date]";
-	}
-	exports.isDate = isDate;
-	exports.types.isDate = isDate;
-	function isError(e) {
-		return isObject(e) && (objectToString(e) === "[object Error]" || e instanceof Error);
-	}
-	exports.isError = isError;
-	exports.types.isNativeError = isError;
-	function isFunction(arg) {
-		return typeof arg === "function";
-	}
-	exports.isFunction = isFunction;
-	function isPrimitive(arg) {
-		return arg === null || typeof arg === "boolean" || typeof arg === "number" || typeof arg === "string" || typeof arg === "symbol" || typeof arg === "undefined";
-	}
-	exports.isPrimitive = isPrimitive;
-	exports.isBuffer = require_isBufferBrowser();
-	function objectToString(o) {
-		return Object.prototype.toString.call(o);
-	}
-	function pad(n) {
-		return n < 10 ? "0" + n.toString(10) : n.toString(10);
-	}
-	var months = [
-		"Jan",
-		"Feb",
-		"Mar",
-		"Apr",
-		"May",
-		"Jun",
-		"Jul",
-		"Aug",
-		"Sep",
-		"Oct",
-		"Nov",
-		"Dec"
-	];
-	function timestamp() {
-		var d = /* @__PURE__ */ new Date();
-		var time = [
-			pad(d.getHours()),
-			pad(d.getMinutes()),
-			pad(d.getSeconds())
-		].join(":");
-		return [
-			d.getDate(),
-			months[d.getMonth()],
-			time
-		].join(" ");
-	}
-	exports.log = function() {
-		console.log("%s - %s", timestamp(), exports.format.apply(exports, arguments));
-	};
-	/**
-	* Inherit the prototype methods from one constructor into another.
-	*
-	* The Function.prototype.inherits from lang.js rewritten as a standalone
-	* function (not on Function.prototype). NOTE: If this file is to be loaded
-	* during bootstrapping this function needs to be rewritten using some native
-	* functions as prototype setup using normal JavaScript does not work as
-	* expected during bootstrapping (see mirror.js in r114903).
-	*
-	* @param {function} ctor Constructor function which needs to inherit the
-	*     prototype.
-	* @param {function} superCtor Constructor function to inherit prototype from.
-	*/
-	exports.inherits = require_inherits_browser();
-	exports._extend = function(origin, add) {
-		if (!add || !isObject(add)) return origin;
-		var keys = Object.keys(add);
-		var i = keys.length;
-		while (i--) origin[keys[i]] = add[keys[i]];
-		return origin;
-	};
-	function hasOwnProperty(obj, prop) {
-		return Object.prototype.hasOwnProperty.call(obj, prop);
-	}
-	var kCustomPromisifiedSymbol = typeof Symbol !== "undefined" ? Symbol("util.promisify.custom") : void 0;
-	exports.promisify = function promisify(original) {
-		if (typeof original !== "function") throw new TypeError("The \"original\" argument must be of type Function");
-		if (kCustomPromisifiedSymbol && original[kCustomPromisifiedSymbol]) {
-			var fn = original[kCustomPromisifiedSymbol];
-			if (typeof fn !== "function") throw new TypeError("The \"util.promisify.custom\" argument must be of type Function");
-			Object.defineProperty(fn, kCustomPromisifiedSymbol, {
-				value: fn,
-				enumerable: false,
-				writable: false,
-				configurable: true
-			});
-			return fn;
-		}
-		function fn() {
-			var promiseResolve, promiseReject;
-			var promise = new Promise(function(resolve, reject) {
-				promiseResolve = resolve;
-				promiseReject = reject;
-			});
-			var args = [];
-			for (var i = 0; i < arguments.length; i++) args.push(arguments[i]);
-			args.push(function(err, value) {
-				if (err) promiseReject(err);
-				else promiseResolve(value);
-			});
-			try {
-				original.apply(this, args);
-			} catch (err) {
-				promiseReject(err);
-			}
-			return promise;
-		}
-		Object.setPrototypeOf(fn, Object.getPrototypeOf(original));
-		if (kCustomPromisifiedSymbol) Object.defineProperty(fn, kCustomPromisifiedSymbol, {
-			value: fn,
-			enumerable: false,
-			writable: false,
-			configurable: true
-		});
-		return Object.defineProperties(fn, getOwnPropertyDescriptors(original));
-	};
-	exports.promisify.custom = kCustomPromisifiedSymbol;
-	function callbackifyOnRejected(reason, cb) {
-		if (!reason) {
-			var newReason = /* @__PURE__ */ new Error("Promise was rejected with a falsy value");
-			newReason.reason = reason;
-			reason = newReason;
-		}
-		return cb(reason);
-	}
-	function callbackify(original) {
-		if (typeof original !== "function") throw new TypeError("The \"original\" argument must be of type Function");
-		function callbackified() {
-			var args = [];
-			for (var i = 0; i < arguments.length; i++) args.push(arguments[i]);
-			var maybeCb = args.pop();
-			if (typeof maybeCb !== "function") throw new TypeError("The last argument must be of type Function");
-			var self = this;
-			var cb = function() {
-				return maybeCb.apply(self, arguments);
-			};
-			original.apply(this, args).then(function(ret) {
-				process.nextTick(cb.bind(null, null, ret));
-			}, function(rej) {
-				process.nextTick(callbackifyOnRejected.bind(null, rej, cb));
-			});
-		}
-		Object.setPrototypeOf(callbackified, Object.getPrototypeOf(original));
-		Object.defineProperties(callbackified, getOwnPropertyDescriptors(original));
-		return callbackified;
-	}
-	exports.callbackify = callbackify;
-}));
-
-//#endregion
 //#region node_modules/aws-sdk/lib/event_listeners.js
 var require_event_listeners = /* @__PURE__ */ __commonJSMin((() => {
 	var AWS = require_core();
@@ -6955,7 +5094,7 @@ var require_event_listeners = /* @__PURE__ */ __commonJSMin((() => {
 						var inputShape = req.service.api.operations[req.operation].input;
 						censoredParams = filterSensitiveLog(inputShape, req.params);
 					}
-					var params = require_util$1().inspect(censoredParams, true, null);
+					var params = __require("util").inspect(censoredParams, true, null);
 					var message = "";
 					if (ansi) message += "\x1B[33m";
 					message += "[AWS " + req.service.serviceIdentifier + " " + status;
@@ -9691,11 +7830,11 @@ var require_s3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		canonicalizedResource: function canonicalizedResource() {
 			var r = this.request;
 			var parts = r.path.split("?");
-			var path = parts[0];
+			var path$3 = parts[0];
 			var querystring = parts[1];
 			var resource = "";
 			if (r.virtualHostedBucket) resource += "/" + r.virtualHostedBucket;
-			resource += path;
+			resource += path$3;
 			if (querystring) {
 				var resources = [];
 				AWS.util.arrayEach.call(this, querystring.split("&"), function(param) {
@@ -10113,12 +8252,12 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			RestXml: require_rest_xml()
 		},
 		XML: {
-			Builder: require_builder(),
+			Builder: require_builder$1(),
 			Parser: null
 		},
 		JSON: {
-			Builder: require_builder$1(),
-			Parser: require_parser()
+			Builder: require_builder$2(),
+			Parser: require_parser$1()
 		},
 		Model: {
 			Api: require_api(),
@@ -10163,19 +8302,16 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region (ignored) node_modules/aws-sdk/lib
-var require_lib = /* @__PURE__ */ __commonJSMin((() => {}));
-
-//#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/rng-browser.js
-var require_rng_browser = /* @__PURE__ */ __commonJSMin(((exports) => {
+//#region node_modules/aws-sdk/node_modules/uuid/dist/rng.js
+var require_rng = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = rng;
-	var getRandomValues = typeof crypto != "undefined" && crypto.getRandomValues && crypto.getRandomValues.bind(crypto) || typeof msCrypto != "undefined" && typeof msCrypto.getRandomValues == "function" && msCrypto.getRandomValues.bind(msCrypto);
-	var rnds8 = new Uint8Array(16);
+	var _crypto$2 = _interopRequireDefault(__require("crypto"));
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : { default: obj };
+	}
 	function rng() {
-		if (!getRandomValues) throw new Error("crypto.getRandomValues() not supported. See https://github.com/uuidjs/uuid#getrandomvalues-not-supported");
-		return getRandomValues(rnds8);
+		return _crypto$2.default.randomBytes(16);
 	}
 }));
 
@@ -10225,7 +8361,7 @@ var require_bytesToUuid = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_v1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
-	var _rng = _interopRequireDefault(require_rng_browser());
+	var _rng = _interopRequireDefault(require_rng());
 	var _bytesToUuid = _interopRequireDefault(require_bytesToUuid());
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -10331,155 +8467,18 @@ var require_v35 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/md5-browser.js
-var require_md5_browser = /* @__PURE__ */ __commonJSMin(((exports) => {
+//#region node_modules/aws-sdk/node_modules/uuid/dist/md5.js
+var require_md5 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
+	var _crypto$1 = _interopRequireDefault(__require("crypto"));
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : { default: obj };
+	}
 	function md5(bytes) {
-		if (typeof bytes == "string") {
-			var msg = unescape(encodeURIComponent(bytes));
-			bytes = new Array(msg.length);
-			for (var i = 0; i < msg.length; i++) bytes[i] = msg.charCodeAt(i);
-		}
-		return md5ToHexEncodedArray(wordsToMd5(bytesToWords(bytes), bytes.length * 8));
-	}
-	function md5ToHexEncodedArray(input) {
-		var i;
-		var x;
-		var output = [];
-		var length32 = input.length * 32;
-		var hexTab = "0123456789abcdef";
-		var hex;
-		for (i = 0; i < length32; i += 8) {
-			x = input[i >> 5] >>> i % 32 & 255;
-			hex = parseInt(hexTab.charAt(x >>> 4 & 15) + hexTab.charAt(x & 15), 16);
-			output.push(hex);
-		}
-		return output;
-	}
-	function wordsToMd5(x, len) {
-		x[len >> 5] |= 128 << len % 32;
-		x[(len + 64 >>> 9 << 4) + 14] = len;
-		var i;
-		var olda;
-		var oldb;
-		var oldc;
-		var oldd;
-		var a = 1732584193;
-		var b = -271733879;
-		var c = -1732584194;
-		var d = 271733878;
-		for (i = 0; i < x.length; i += 16) {
-			olda = a;
-			oldb = b;
-			oldc = c;
-			oldd = d;
-			a = md5ff(a, b, c, d, x[i], 7, -680876936);
-			d = md5ff(d, a, b, c, x[i + 1], 12, -389564586);
-			c = md5ff(c, d, a, b, x[i + 2], 17, 606105819);
-			b = md5ff(b, c, d, a, x[i + 3], 22, -1044525330);
-			a = md5ff(a, b, c, d, x[i + 4], 7, -176418897);
-			d = md5ff(d, a, b, c, x[i + 5], 12, 1200080426);
-			c = md5ff(c, d, a, b, x[i + 6], 17, -1473231341);
-			b = md5ff(b, c, d, a, x[i + 7], 22, -45705983);
-			a = md5ff(a, b, c, d, x[i + 8], 7, 1770035416);
-			d = md5ff(d, a, b, c, x[i + 9], 12, -1958414417);
-			c = md5ff(c, d, a, b, x[i + 10], 17, -42063);
-			b = md5ff(b, c, d, a, x[i + 11], 22, -1990404162);
-			a = md5ff(a, b, c, d, x[i + 12], 7, 1804603682);
-			d = md5ff(d, a, b, c, x[i + 13], 12, -40341101);
-			c = md5ff(c, d, a, b, x[i + 14], 17, -1502002290);
-			b = md5ff(b, c, d, a, x[i + 15], 22, 1236535329);
-			a = md5gg(a, b, c, d, x[i + 1], 5, -165796510);
-			d = md5gg(d, a, b, c, x[i + 6], 9, -1069501632);
-			c = md5gg(c, d, a, b, x[i + 11], 14, 643717713);
-			b = md5gg(b, c, d, a, x[i], 20, -373897302);
-			a = md5gg(a, b, c, d, x[i + 5], 5, -701558691);
-			d = md5gg(d, a, b, c, x[i + 10], 9, 38016083);
-			c = md5gg(c, d, a, b, x[i + 15], 14, -660478335);
-			b = md5gg(b, c, d, a, x[i + 4], 20, -405537848);
-			a = md5gg(a, b, c, d, x[i + 9], 5, 568446438);
-			d = md5gg(d, a, b, c, x[i + 14], 9, -1019803690);
-			c = md5gg(c, d, a, b, x[i + 3], 14, -187363961);
-			b = md5gg(b, c, d, a, x[i + 8], 20, 1163531501);
-			a = md5gg(a, b, c, d, x[i + 13], 5, -1444681467);
-			d = md5gg(d, a, b, c, x[i + 2], 9, -51403784);
-			c = md5gg(c, d, a, b, x[i + 7], 14, 1735328473);
-			b = md5gg(b, c, d, a, x[i + 12], 20, -1926607734);
-			a = md5hh(a, b, c, d, x[i + 5], 4, -378558);
-			d = md5hh(d, a, b, c, x[i + 8], 11, -2022574463);
-			c = md5hh(c, d, a, b, x[i + 11], 16, 1839030562);
-			b = md5hh(b, c, d, a, x[i + 14], 23, -35309556);
-			a = md5hh(a, b, c, d, x[i + 1], 4, -1530992060);
-			d = md5hh(d, a, b, c, x[i + 4], 11, 1272893353);
-			c = md5hh(c, d, a, b, x[i + 7], 16, -155497632);
-			b = md5hh(b, c, d, a, x[i + 10], 23, -1094730640);
-			a = md5hh(a, b, c, d, x[i + 13], 4, 681279174);
-			d = md5hh(d, a, b, c, x[i], 11, -358537222);
-			c = md5hh(c, d, a, b, x[i + 3], 16, -722521979);
-			b = md5hh(b, c, d, a, x[i + 6], 23, 76029189);
-			a = md5hh(a, b, c, d, x[i + 9], 4, -640364487);
-			d = md5hh(d, a, b, c, x[i + 12], 11, -421815835);
-			c = md5hh(c, d, a, b, x[i + 15], 16, 530742520);
-			b = md5hh(b, c, d, a, x[i + 2], 23, -995338651);
-			a = md5ii(a, b, c, d, x[i], 6, -198630844);
-			d = md5ii(d, a, b, c, x[i + 7], 10, 1126891415);
-			c = md5ii(c, d, a, b, x[i + 14], 15, -1416354905);
-			b = md5ii(b, c, d, a, x[i + 5], 21, -57434055);
-			a = md5ii(a, b, c, d, x[i + 12], 6, 1700485571);
-			d = md5ii(d, a, b, c, x[i + 3], 10, -1894986606);
-			c = md5ii(c, d, a, b, x[i + 10], 15, -1051523);
-			b = md5ii(b, c, d, a, x[i + 1], 21, -2054922799);
-			a = md5ii(a, b, c, d, x[i + 8], 6, 1873313359);
-			d = md5ii(d, a, b, c, x[i + 15], 10, -30611744);
-			c = md5ii(c, d, a, b, x[i + 6], 15, -1560198380);
-			b = md5ii(b, c, d, a, x[i + 13], 21, 1309151649);
-			a = md5ii(a, b, c, d, x[i + 4], 6, -145523070);
-			d = md5ii(d, a, b, c, x[i + 11], 10, -1120210379);
-			c = md5ii(c, d, a, b, x[i + 2], 15, 718787259);
-			b = md5ii(b, c, d, a, x[i + 9], 21, -343485551);
-			a = safeAdd(a, olda);
-			b = safeAdd(b, oldb);
-			c = safeAdd(c, oldc);
-			d = safeAdd(d, oldd);
-		}
-		return [
-			a,
-			b,
-			c,
-			d
-		];
-	}
-	function bytesToWords(input) {
-		var i;
-		var output = [];
-		output[(input.length >> 2) - 1] = void 0;
-		for (i = 0; i < output.length; i += 1) output[i] = 0;
-		var length8 = input.length * 8;
-		for (i = 0; i < length8; i += 8) output[i >> 5] |= (input[i / 8] & 255) << i % 32;
-		return output;
-	}
-	function safeAdd(x, y) {
-		var lsw = (x & 65535) + (y & 65535);
-		return (x >> 16) + (y >> 16) + (lsw >> 16) << 16 | lsw & 65535;
-	}
-	function bitRotateLeft(num, cnt) {
-		return num << cnt | num >>> 32 - cnt;
-	}
-	function md5cmn(q, a, b, x, s, t) {
-		return safeAdd(bitRotateLeft(safeAdd(safeAdd(a, q), safeAdd(x, t)), s), b);
-	}
-	function md5ff(a, b, c, d, x, s, t) {
-		return md5cmn(b & c | ~b & d, a, b, x, s, t);
-	}
-	function md5gg(a, b, c, d, x, s, t) {
-		return md5cmn(b & d | c & ~d, a, b, x, s, t);
-	}
-	function md5hh(a, b, c, d, x, s, t) {
-		return md5cmn(b ^ c ^ d, a, b, x, s, t);
-	}
-	function md5ii(a, b, c, d, x, s, t) {
-		return md5cmn(c ^ (b | ~d), a, b, x, s, t);
+		if (Array.isArray(bytes)) bytes = Buffer.from(bytes);
+		else if (typeof bytes === "string") bytes = Buffer.from(bytes, "utf8");
+		return _crypto$1.default.createHash("md5").update(bytes).digest();
 	}
 	var _default = md5;
 	exports.default = _default;
@@ -10491,7 +8490,7 @@ var require_v3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
 	var _v = _interopRequireDefault(require_v35());
-	var _md = _interopRequireDefault(require_md5_browser());
+	var _md = _interopRequireDefault(require_md5());
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
 	}
@@ -10504,7 +8503,7 @@ var require_v3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_v4 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
-	var _rng = _interopRequireDefault(require_rng_browser());
+	var _rng = _interopRequireDefault(require_rng());
 	var _bytesToUuid = _interopRequireDefault(require_bytesToUuid());
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
@@ -10527,97 +8526,18 @@ var require_v4 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/sha1-browser.js
-var require_sha1_browser = /* @__PURE__ */ __commonJSMin(((exports) => {
+//#region node_modules/aws-sdk/node_modules/uuid/dist/sha1.js
+var require_sha1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
-	function f(s, x, y, z) {
-		switch (s) {
-			case 0: return x & y ^ ~x & z;
-			case 1: return x ^ y ^ z;
-			case 2: return x & y ^ x & z ^ y & z;
-			case 3: return x ^ y ^ z;
-		}
-	}
-	function ROTL(x, n) {
-		return x << n | x >>> 32 - n;
+	var _crypto = _interopRequireDefault(__require("crypto"));
+	function _interopRequireDefault(obj) {
+		return obj && obj.__esModule ? obj : { default: obj };
 	}
 	function sha1(bytes) {
-		var K = [
-			1518500249,
-			1859775393,
-			2400959708,
-			3395469782
-		];
-		var H = [
-			1732584193,
-			4023233417,
-			2562383102,
-			271733878,
-			3285377520
-		];
-		if (typeof bytes == "string") {
-			var msg = unescape(encodeURIComponent(bytes));
-			bytes = new Array(msg.length);
-			for (var i = 0; i < msg.length; i++) bytes[i] = msg.charCodeAt(i);
-		}
-		bytes.push(128);
-		var l = bytes.length / 4 + 2;
-		var N = Math.ceil(l / 16);
-		var M = new Array(N);
-		for (var i = 0; i < N; i++) {
-			M[i] = new Array(16);
-			for (var j = 0; j < 16; j++) M[i][j] = bytes[i * 64 + j * 4] << 24 | bytes[i * 64 + j * 4 + 1] << 16 | bytes[i * 64 + j * 4 + 2] << 8 | bytes[i * 64 + j * 4 + 3];
-		}
-		M[N - 1][14] = (bytes.length - 1) * 8 / Math.pow(2, 32);
-		M[N - 1][14] = Math.floor(M[N - 1][14]);
-		M[N - 1][15] = (bytes.length - 1) * 8 & 4294967295;
-		for (var i = 0; i < N; i++) {
-			var W = new Array(80);
-			for (var t = 0; t < 16; t++) W[t] = M[i][t];
-			for (var t = 16; t < 80; t++) W[t] = ROTL(W[t - 3] ^ W[t - 8] ^ W[t - 14] ^ W[t - 16], 1);
-			var a = H[0];
-			var b = H[1];
-			var c = H[2];
-			var d = H[3];
-			var e = H[4];
-			for (var t = 0; t < 80; t++) {
-				var s = Math.floor(t / 20);
-				var T = ROTL(a, 5) + f(s, b, c, d) + e + K[s] + W[t] >>> 0;
-				e = d;
-				d = c;
-				c = ROTL(b, 30) >>> 0;
-				b = a;
-				a = T;
-			}
-			H[0] = H[0] + a >>> 0;
-			H[1] = H[1] + b >>> 0;
-			H[2] = H[2] + c >>> 0;
-			H[3] = H[3] + d >>> 0;
-			H[4] = H[4] + e >>> 0;
-		}
-		return [
-			H[0] >> 24 & 255,
-			H[0] >> 16 & 255,
-			H[0] >> 8 & 255,
-			H[0] & 255,
-			H[1] >> 24 & 255,
-			H[1] >> 16 & 255,
-			H[1] >> 8 & 255,
-			H[1] & 255,
-			H[2] >> 24 & 255,
-			H[2] >> 16 & 255,
-			H[2] >> 8 & 255,
-			H[2] & 255,
-			H[3] >> 24 & 255,
-			H[3] >> 16 & 255,
-			H[3] >> 8 & 255,
-			H[3] & 255,
-			H[4] >> 24 & 255,
-			H[4] >> 16 & 255,
-			H[4] >> 8 & 255,
-			H[4] & 255
-		];
+		if (Array.isArray(bytes)) bytes = Buffer.from(bytes);
+		else if (typeof bytes === "string") bytes = Buffer.from(bytes, "utf8");
+		return _crypto.default.createHash("sha1").update(bytes).digest();
 	}
 	var _default = sha1;
 	exports.default = _default;
@@ -10629,7 +8549,7 @@ var require_v5 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
 	var _v = _interopRequireDefault(require_v35());
-	var _sha = _interopRequireDefault(require_sha1_browser());
+	var _sha = _interopRequireDefault(require_sha1());
 	function _interopRequireDefault(obj) {
 		return obj && obj.__esModule ? obj : { default: obj };
 	}
@@ -10751,9 +8671,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			});
 			return items.join("&");
 		},
-		readFileSync: function readFileSync(path) {
+		readFileSync: function readFileSync(path$3) {
 			if (util.isBrowser()) return null;
-			return require_lib().readFileSync(path, "utf-8");
+			return __require("fs").readFileSync(path$3, "utf-8");
 		},
 		base64: {
 			encode: function encode64(string) {
@@ -10811,7 +8731,7 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				if (typeof string.byteLength === "number") return string.byteLength;
 				else if (typeof string.length === "number") return string.length;
 				else if (typeof string.size === "number") return string.size;
-				else if (typeof string.path === "string") return require_lib().lstatSync(string.path).size;
+				else if (typeof string.path === "string") return __require("fs").lstatSync(string.path).size;
 				else throw util.error(/* @__PURE__ */ new Error("Cannot determine length of " + string), { object: string });
 			},
 			upperFirst: function upperFirst(string) {
@@ -11381,12 +9301,12 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		computeSha256: function computeSha256(body, done) {
 			if (util.isNode()) {
 				var Stream = util.stream.Stream;
-				var fs = require_lib();
+				var fs$3 = __require("fs");
 				if (typeof Stream === "function" && body instanceof Stream) if (typeof body.path === "string") {
 					var settings = {};
 					if (typeof body.start === "number") settings.start = body.start;
 					if (typeof body.end === "number") settings.end = body.end;
-					body = fs.createReadStream(body.path, settings);
+					body = fs$3.createReadStream(body.path, settings);
 				} else return done(/* @__PURE__ */ new Error("Non-file stream objects are not supported with SigV4"));
 			}
 			util.crypto.sha256(body, "hex", function(err, sha) {
@@ -11567,2672 +9487,76 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region node_modules/base64-js/index.js
-var require_base64_js = /* @__PURE__ */ __commonJSMin(((exports) => {
-	exports.byteLength = byteLength;
-	exports.toByteArray = toByteArray;
-	exports.fromByteArray = fromByteArray;
-	var lookup = [];
-	var revLookup = [];
-	var Arr = typeof Uint8Array !== "undefined" ? Uint8Array : Array;
-	var code = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/";
-	for (var i = 0, len = code.length; i < len; ++i) {
-		lookup[i] = code[i];
-		revLookup[code.charCodeAt(i)] = i;
+//#region node_modules/aws-sdk/lib/event-stream/event-message-chunker-stream.js
+var require_event_message_chunker_stream = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var util = require_core().util;
+	var Transform$1 = __require("stream").Transform;
+	var allocBuffer = util.buffer.alloc;
+	/** @type {Transform} */
+	function EventMessageChunkerStream(options) {
+		Transform$1.call(this, options);
+		this.currentMessageTotalLength = 0;
+		this.currentMessagePendingLength = 0;
+		/** @type {Buffer} */
+		this.currentMessage = null;
+		/** @type {Buffer} */
+		this.messageLengthBuffer = null;
 	}
-	revLookup["-".charCodeAt(0)] = 62;
-	revLookup["_".charCodeAt(0)] = 63;
-	function getLens(b64) {
-		var len = b64.length;
-		if (len % 4 > 0) throw new Error("Invalid string. Length must be a multiple of 4");
-		var validLen = b64.indexOf("=");
-		if (validLen === -1) validLen = len;
-		var placeHoldersLen = validLen === len ? 0 : 4 - validLen % 4;
-		return [validLen, placeHoldersLen];
-	}
-	function byteLength(b64) {
-		var lens = getLens(b64);
-		var validLen = lens[0];
-		var placeHoldersLen = lens[1];
-		return (validLen + placeHoldersLen) * 3 / 4 - placeHoldersLen;
-	}
-	function _byteLength(b64, validLen, placeHoldersLen) {
-		return (validLen + placeHoldersLen) * 3 / 4 - placeHoldersLen;
-	}
-	function toByteArray(b64) {
-		var tmp;
-		var lens = getLens(b64);
-		var validLen = lens[0];
-		var placeHoldersLen = lens[1];
-		var arr = new Arr(_byteLength(b64, validLen, placeHoldersLen));
-		var curByte = 0;
-		var len = placeHoldersLen > 0 ? validLen - 4 : validLen;
-		var i;
-		for (i = 0; i < len; i += 4) {
-			tmp = revLookup[b64.charCodeAt(i)] << 18 | revLookup[b64.charCodeAt(i + 1)] << 12 | revLookup[b64.charCodeAt(i + 2)] << 6 | revLookup[b64.charCodeAt(i + 3)];
-			arr[curByte++] = tmp >> 16 & 255;
-			arr[curByte++] = tmp >> 8 & 255;
-			arr[curByte++] = tmp & 255;
-		}
-		if (placeHoldersLen === 2) {
-			tmp = revLookup[b64.charCodeAt(i)] << 2 | revLookup[b64.charCodeAt(i + 1)] >> 4;
-			arr[curByte++] = tmp & 255;
-		}
-		if (placeHoldersLen === 1) {
-			tmp = revLookup[b64.charCodeAt(i)] << 10 | revLookup[b64.charCodeAt(i + 1)] << 4 | revLookup[b64.charCodeAt(i + 2)] >> 2;
-			arr[curByte++] = tmp >> 8 & 255;
-			arr[curByte++] = tmp & 255;
-		}
-		return arr;
-	}
-	function tripletToBase64(num) {
-		return lookup[num >> 18 & 63] + lookup[num >> 12 & 63] + lookup[num >> 6 & 63] + lookup[num & 63];
-	}
-	function encodeChunk(uint8, start, end) {
-		var tmp;
-		var output = [];
-		for (var i = start; i < end; i += 3) {
-			tmp = (uint8[i] << 16 & 16711680) + (uint8[i + 1] << 8 & 65280) + (uint8[i + 2] & 255);
-			output.push(tripletToBase64(tmp));
-		}
-		return output.join("");
-	}
-	function fromByteArray(uint8) {
-		var tmp;
-		var len = uint8.length;
-		var extraBytes = len % 3;
-		var parts = [];
-		var maxChunkLength = 16383;
-		for (var i = 0, len2 = len - extraBytes; i < len2; i += maxChunkLength) parts.push(encodeChunk(uint8, i, i + maxChunkLength > len2 ? len2 : i + maxChunkLength));
-		if (extraBytes === 1) {
-			tmp = uint8[len - 1];
-			parts.push(lookup[tmp >> 2] + lookup[tmp << 4 & 63] + "==");
-		} else if (extraBytes === 2) {
-			tmp = (uint8[len - 2] << 8) + uint8[len - 1];
-			parts.push(lookup[tmp >> 10] + lookup[tmp >> 4 & 63] + lookup[tmp << 2 & 63] + "=");
-		}
-		return parts.join("");
-	}
-}));
-
-//#endregion
-//#region node_modules/ieee754/index.js
-var require_ieee754 = /* @__PURE__ */ __commonJSMin(((exports) => {
-	/*! ieee754. BSD-3-Clause License. Feross Aboukhadijeh <https://feross.org/opensource> */
-	exports.read = function(buffer, offset, isLE, mLen, nBytes) {
-		var e, m;
-		var eLen = nBytes * 8 - mLen - 1;
-		var eMax = (1 << eLen) - 1;
-		var eBias = eMax >> 1;
-		var nBits = -7;
-		var i = isLE ? nBytes - 1 : 0;
-		var d = isLE ? -1 : 1;
-		var s = buffer[offset + i];
-		i += d;
-		e = s & (1 << -nBits) - 1;
-		s >>= -nBits;
-		nBits += eLen;
-		for (; nBits > 0; e = e * 256 + buffer[offset + i], i += d, nBits -= 8);
-		m = e & (1 << -nBits) - 1;
-		e >>= -nBits;
-		nBits += mLen;
-		for (; nBits > 0; m = m * 256 + buffer[offset + i], i += d, nBits -= 8);
-		if (e === 0) e = 1 - eBias;
-		else if (e === eMax) return m ? NaN : (s ? -1 : 1) * Infinity;
-		else {
-			m = m + Math.pow(2, mLen);
-			e = e - eBias;
-		}
-		return (s ? -1 : 1) * m * Math.pow(2, e - mLen);
-	};
-	exports.write = function(buffer, value, offset, isLE, mLen, nBytes) {
-		var e, m, c;
-		var eLen = nBytes * 8 - mLen - 1;
-		var eMax = (1 << eLen) - 1;
-		var eBias = eMax >> 1;
-		var rt = mLen === 23 ? Math.pow(2, -24) - Math.pow(2, -77) : 0;
-		var i = isLE ? 0 : nBytes - 1;
-		var d = isLE ? 1 : -1;
-		var s = value < 0 || value === 0 && 1 / value < 0 ? 1 : 0;
-		value = Math.abs(value);
-		if (isNaN(value) || value === Infinity) {
-			m = isNaN(value) ? 1 : 0;
-			e = eMax;
-		} else {
-			e = Math.floor(Math.log(value) / Math.LN2);
-			if (value * (c = Math.pow(2, -e)) < 1) {
-				e--;
-				c *= 2;
-			}
-			if (e + eBias >= 1) value += rt / c;
-			else value += rt * Math.pow(2, 1 - eBias);
-			if (value * c >= 2) {
-				e++;
-				c /= 2;
-			}
-			if (e + eBias >= eMax) {
-				m = 0;
-				e = eMax;
-			} else if (e + eBias >= 1) {
-				m = (value * c - 1) * Math.pow(2, mLen);
-				e = e + eBias;
-			} else {
-				m = value * Math.pow(2, eBias - 1) * Math.pow(2, mLen);
-				e = 0;
-			}
-		}
-		for (; mLen >= 8; buffer[offset + i] = m & 255, i += d, m /= 256, mLen -= 8);
-		e = e << mLen | m;
-		eLen += mLen;
-		for (; eLen > 0; buffer[offset + i] = e & 255, i += d, e /= 256, eLen -= 8);
-		buffer[offset + i - d] |= s * 128;
-	};
-}));
-
-//#endregion
-//#region node_modules/isarray/index.js
-var require_isarray = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var toString = {}.toString;
-	module.exports = Array.isArray || function(arr) {
-		return toString.call(arr) == "[object Array]";
-	};
-}));
-
-//#endregion
-//#region node_modules/buffer/index.js
-/*!
-* The buffer module from node.js, for the browser.
-*
-* @author   Feross Aboukhadijeh <http://feross.org>
-* @license  MIT
-*/
-var require_buffer = /* @__PURE__ */ __commonJSMin(((exports) => {
-	var base64 = require_base64_js();
-	var ieee754 = require_ieee754();
-	var isArray = require_isarray();
-	exports.Buffer = Buffer;
-	exports.SlowBuffer = SlowBuffer;
-	exports.INSPECT_MAX_BYTES = 50;
+	EventMessageChunkerStream.prototype = Object.create(Transform$1.prototype);
 	/**
-	* If `Buffer.TYPED_ARRAY_SUPPORT`:
-	*   === true    Use Uint8Array implementation (fastest)
-	*   === false   Use Object implementation (most compatible, even IE6)
 	*
-	* Browsers that support typed arrays are IE 10+, Firefox 4+, Chrome 7+, Safari 5.1+,
-	* Opera 11.6+, iOS 4.2+.
-	*
-	* Due to various browser bugs, sometimes the Object implementation will be used even
-	* when the browser supports typed arrays.
-	*
-	* Note:
-	*
-	*   - Firefox 4-29 lacks support for adding new properties to `Uint8Array` instances,
-	*     See: https://bugzilla.mozilla.org/show_bug.cgi?id=695438.
-	*
-	*   - Chrome 9-10 is missing the `TypedArray.prototype.subarray` function.
-	*
-	*   - IE10 has a broken `TypedArray.prototype.subarray` function which returns arrays of
-	*     incorrect length in some situations.
-	
-	* We detect these buggy browsers and set `Buffer.TYPED_ARRAY_SUPPORT` to `false` so they
-	* get the Object implementation, which is slower but behaves correctly.
+	* @param {Buffer} chunk
+	* @param {string} encoding
+	* @param {*} callback
 	*/
-	Buffer.TYPED_ARRAY_SUPPORT = global.TYPED_ARRAY_SUPPORT !== void 0 ? global.TYPED_ARRAY_SUPPORT : typedArraySupport();
-	exports.kMaxLength = kMaxLength();
-	function typedArraySupport() {
-		try {
-			var arr = new Uint8Array(1);
-			arr.__proto__ = {
-				__proto__: Uint8Array.prototype,
-				foo: function() {
-					return 42;
-				}
-			};
-			return arr.foo() === 42 && typeof arr.subarray === "function" && arr.subarray(1, 1).byteLength === 0;
-		} catch (e) {
-			return false;
+	EventMessageChunkerStream.prototype._transform = function(chunk, encoding, callback) {
+		var chunkLength = chunk.length;
+		var currentOffset = 0;
+		while (currentOffset < chunkLength) {
+			if (!this.currentMessage) {
+				var bytesRemaining = chunkLength - currentOffset;
+				if (!this.messageLengthBuffer) this.messageLengthBuffer = allocBuffer(4);
+				var numBytesForTotal = Math.min(4 - this.currentMessagePendingLength, bytesRemaining);
+				chunk.copy(this.messageLengthBuffer, this.currentMessagePendingLength, currentOffset, currentOffset + numBytesForTotal);
+				this.currentMessagePendingLength += numBytesForTotal;
+				currentOffset += numBytesForTotal;
+				if (this.currentMessagePendingLength < 4) break;
+				this.allocateMessage(this.messageLengthBuffer.readUInt32BE(0));
+				this.messageLengthBuffer = null;
+			}
+			var numBytesToWrite = Math.min(this.currentMessageTotalLength - this.currentMessagePendingLength, chunkLength - currentOffset);
+			chunk.copy(this.currentMessage, this.currentMessagePendingLength, currentOffset, currentOffset + numBytesToWrite);
+			this.currentMessagePendingLength += numBytesToWrite;
+			currentOffset += numBytesToWrite;
+			if (this.currentMessageTotalLength && this.currentMessageTotalLength === this.currentMessagePendingLength) {
+				this.push(this.currentMessage);
+				this.currentMessage = null;
+				this.currentMessageTotalLength = 0;
+				this.currentMessagePendingLength = 0;
+			}
 		}
-	}
-	function kMaxLength() {
-		return Buffer.TYPED_ARRAY_SUPPORT ? 2147483647 : 1073741823;
-	}
-	function createBuffer(that, length) {
-		if (kMaxLength() < length) throw new RangeError("Invalid typed array length");
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			that = new Uint8Array(length);
-			that.__proto__ = Buffer.prototype;
-		} else {
-			if (that === null) that = new Buffer(length);
-			that.length = length;
-		}
-		return that;
-	}
-	/**
-	* The Buffer constructor returns instances of `Uint8Array` that have their
-	* prototype changed to `Buffer.prototype`. Furthermore, `Buffer` is a subclass of
-	* `Uint8Array`, so the returned instances will have all the node `Buffer` methods
-	* and the `Uint8Array` methods. Square bracket notation works as expected -- it
-	* returns a single octet.
-	*
-	* The `Uint8Array` prototype remains unmodified.
-	*/
-	function Buffer(arg, encodingOrOffset, length) {
-		if (!Buffer.TYPED_ARRAY_SUPPORT && !(this instanceof Buffer)) return new Buffer(arg, encodingOrOffset, length);
-		if (typeof arg === "number") {
-			if (typeof encodingOrOffset === "string") throw new Error("If encoding is specified then the first argument must be a string");
-			return allocUnsafe(this, arg);
-		}
-		return from(this, arg, encodingOrOffset, length);
-	}
-	Buffer.poolSize = 8192;
-	Buffer._augment = function(arr) {
-		arr.__proto__ = Buffer.prototype;
-		return arr;
+		callback();
 	};
-	function from(that, value, encodingOrOffset, length) {
-		if (typeof value === "number") throw new TypeError("\"value\" argument must not be a number");
-		if (typeof ArrayBuffer !== "undefined" && value instanceof ArrayBuffer) return fromArrayBuffer(that, value, encodingOrOffset, length);
-		if (typeof value === "string") return fromString(that, value, encodingOrOffset);
-		return fromObject(that, value);
-	}
-	/**
-	* Functionally equivalent to Buffer(arg, encoding) but throws a TypeError
-	* if value is a number.
-	* Buffer.from(str[, encoding])
-	* Buffer.from(array)
-	* Buffer.from(buffer)
-	* Buffer.from(arrayBuffer[, byteOffset[, length]])
-	**/
-	Buffer.from = function(value, encodingOrOffset, length) {
-		return from(null, value, encodingOrOffset, length);
-	};
-	if (Buffer.TYPED_ARRAY_SUPPORT) {
-		Buffer.prototype.__proto__ = Uint8Array.prototype;
-		Buffer.__proto__ = Uint8Array;
-		if (typeof Symbol !== "undefined" && Symbol.species && Buffer[Symbol.species] === Buffer) Object.defineProperty(Buffer, Symbol.species, {
-			value: null,
-			configurable: true
-		});
-	}
-	function assertSize(size) {
-		if (typeof size !== "number") throw new TypeError("\"size\" argument must be a number");
-		else if (size < 0) throw new RangeError("\"size\" argument must not be negative");
-	}
-	function alloc(that, size, fill, encoding) {
-		assertSize(size);
-		if (size <= 0) return createBuffer(that, size);
-		if (fill !== void 0) return typeof encoding === "string" ? createBuffer(that, size).fill(fill, encoding) : createBuffer(that, size).fill(fill);
-		return createBuffer(that, size);
-	}
-	/**
-	* Creates a new filled Buffer instance.
-	* alloc(size[, fill[, encoding]])
-	**/
-	Buffer.alloc = function(size, fill, encoding) {
-		return alloc(null, size, fill, encoding);
-	};
-	function allocUnsafe(that, size) {
-		assertSize(size);
-		that = createBuffer(that, size < 0 ? 0 : checked(size) | 0);
-		if (!Buffer.TYPED_ARRAY_SUPPORT) for (var i = 0; i < size; ++i) that[i] = 0;
-		return that;
-	}
-	/**
-	* Equivalent to Buffer(num), by default creates a non-zero-filled Buffer instance.
-	* */
-	Buffer.allocUnsafe = function(size) {
-		return allocUnsafe(null, size);
+	EventMessageChunkerStream.prototype._flush = function(callback) {
+		if (this.currentMessageTotalLength) if (this.currentMessageTotalLength === this.currentMessagePendingLength) callback(null, this.currentMessage);
+		else callback(/* @__PURE__ */ new Error("Truncated event message received."));
+		else callback();
 	};
 	/**
-	* Equivalent to SlowBuffer(num), by default creates a non-zero-filled Buffer instance.
-	*/
-	Buffer.allocUnsafeSlow = function(size) {
-		return allocUnsafe(null, size);
-	};
-	function fromString(that, string, encoding) {
-		if (typeof encoding !== "string" || encoding === "") encoding = "utf8";
-		if (!Buffer.isEncoding(encoding)) throw new TypeError("\"encoding\" must be a valid string encoding");
-		var length = byteLength(string, encoding) | 0;
-		that = createBuffer(that, length);
-		var actual = that.write(string, encoding);
-		if (actual !== length) that = that.slice(0, actual);
-		return that;
-	}
-	function fromArrayLike(that, array) {
-		var length = array.length < 0 ? 0 : checked(array.length) | 0;
-		that = createBuffer(that, length);
-		for (var i = 0; i < length; i += 1) that[i] = array[i] & 255;
-		return that;
-	}
-	function fromArrayBuffer(that, array, byteOffset, length) {
-		array.byteLength;
-		if (byteOffset < 0 || array.byteLength < byteOffset) throw new RangeError("'offset' is out of bounds");
-		if (array.byteLength < byteOffset + (length || 0)) throw new RangeError("'length' is out of bounds");
-		if (byteOffset === void 0 && length === void 0) array = new Uint8Array(array);
-		else if (length === void 0) array = new Uint8Array(array, byteOffset);
-		else array = new Uint8Array(array, byteOffset, length);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			that = array;
-			that.__proto__ = Buffer.prototype;
-		} else that = fromArrayLike(that, array);
-		return that;
-	}
-	function fromObject(that, obj) {
-		if (Buffer.isBuffer(obj)) {
-			var len = checked(obj.length) | 0;
-			that = createBuffer(that, len);
-			if (that.length === 0) return that;
-			obj.copy(that, 0, 0, len);
-			return that;
-		}
-		if (obj) {
-			if (typeof ArrayBuffer !== "undefined" && obj.buffer instanceof ArrayBuffer || "length" in obj) {
-				if (typeof obj.length !== "number" || isnan(obj.length)) return createBuffer(that, 0);
-				return fromArrayLike(that, obj);
-			}
-			if (obj.type === "Buffer" && isArray(obj.data)) return fromArrayLike(that, obj.data);
-		}
-		throw new TypeError("First argument must be a string, Buffer, ArrayBuffer, Array, or array-like object.");
-	}
-	function checked(length) {
-		if (length >= kMaxLength()) throw new RangeError("Attempt to allocate Buffer larger than maximum size: 0x" + kMaxLength().toString(16) + " bytes");
-		return length | 0;
-	}
-	function SlowBuffer(length) {
-		if (+length != length) length = 0;
-		return Buffer.alloc(+length);
-	}
-	Buffer.isBuffer = function isBuffer(b) {
-		return !!(b != null && b._isBuffer);
-	};
-	Buffer.compare = function compare(a, b) {
-		if (!Buffer.isBuffer(a) || !Buffer.isBuffer(b)) throw new TypeError("Arguments must be Buffers");
-		if (a === b) return 0;
-		var x = a.length;
-		var y = b.length;
-		for (var i = 0, len = Math.min(x, y); i < len; ++i) if (a[i] !== b[i]) {
-			x = a[i];
-			y = b[i];
-			break;
-		}
-		if (x < y) return -1;
-		if (y < x) return 1;
-		return 0;
-	};
-	Buffer.isEncoding = function isEncoding(encoding) {
-		switch (String(encoding).toLowerCase()) {
-			case "hex":
-			case "utf8":
-			case "utf-8":
-			case "ascii":
-			case "latin1":
-			case "binary":
-			case "base64":
-			case "ucs2":
-			case "ucs-2":
-			case "utf16le":
-			case "utf-16le": return true;
-			default: return false;
-		}
-	};
-	Buffer.concat = function concat(list, length) {
-		if (!isArray(list)) throw new TypeError("\"list\" argument must be an Array of Buffers");
-		if (list.length === 0) return Buffer.alloc(0);
-		var i;
-		if (length === void 0) {
-			length = 0;
-			for (i = 0; i < list.length; ++i) length += list[i].length;
-		}
-		var buffer = Buffer.allocUnsafe(length);
-		var pos = 0;
-		for (i = 0; i < list.length; ++i) {
-			var buf = list[i];
-			if (!Buffer.isBuffer(buf)) throw new TypeError("\"list\" argument must be an Array of Buffers");
-			buf.copy(buffer, pos);
-			pos += buf.length;
-		}
-		return buffer;
-	};
-	function byteLength(string, encoding) {
-		if (Buffer.isBuffer(string)) return string.length;
-		if (typeof ArrayBuffer !== "undefined" && typeof ArrayBuffer.isView === "function" && (ArrayBuffer.isView(string) || string instanceof ArrayBuffer)) return string.byteLength;
-		if (typeof string !== "string") string = "" + string;
-		var len = string.length;
-		if (len === 0) return 0;
-		var loweredCase = false;
-		for (;;) switch (encoding) {
-			case "ascii":
-			case "latin1":
-			case "binary": return len;
-			case "utf8":
-			case "utf-8":
-			case void 0: return utf8ToBytes(string).length;
-			case "ucs2":
-			case "ucs-2":
-			case "utf16le":
-			case "utf-16le": return len * 2;
-			case "hex": return len >>> 1;
-			case "base64": return base64ToBytes(string).length;
-			default:
-				if (loweredCase) return utf8ToBytes(string).length;
-				encoding = ("" + encoding).toLowerCase();
-				loweredCase = true;
-		}
-	}
-	Buffer.byteLength = byteLength;
-	function slowToString(encoding, start, end) {
-		var loweredCase = false;
-		if (start === void 0 || start < 0) start = 0;
-		if (start > this.length) return "";
-		if (end === void 0 || end > this.length) end = this.length;
-		if (end <= 0) return "";
-		end >>>= 0;
-		start >>>= 0;
-		if (end <= start) return "";
-		if (!encoding) encoding = "utf8";
-		while (true) switch (encoding) {
-			case "hex": return hexSlice(this, start, end);
-			case "utf8":
-			case "utf-8": return utf8Slice(this, start, end);
-			case "ascii": return asciiSlice(this, start, end);
-			case "latin1":
-			case "binary": return latin1Slice(this, start, end);
-			case "base64": return base64Slice(this, start, end);
-			case "ucs2":
-			case "ucs-2":
-			case "utf16le":
-			case "utf-16le": return utf16leSlice(this, start, end);
-			default:
-				if (loweredCase) throw new TypeError("Unknown encoding: " + encoding);
-				encoding = (encoding + "").toLowerCase();
-				loweredCase = true;
-		}
-	}
-	Buffer.prototype._isBuffer = true;
-	function swap(b, n, m) {
-		var i = b[n];
-		b[n] = b[m];
-		b[m] = i;
-	}
-	Buffer.prototype.swap16 = function swap16() {
-		var len = this.length;
-		if (len % 2 !== 0) throw new RangeError("Buffer size must be a multiple of 16-bits");
-		for (var i = 0; i < len; i += 2) swap(this, i, i + 1);
-		return this;
-	};
-	Buffer.prototype.swap32 = function swap32() {
-		var len = this.length;
-		if (len % 4 !== 0) throw new RangeError("Buffer size must be a multiple of 32-bits");
-		for (var i = 0; i < len; i += 4) {
-			swap(this, i, i + 3);
-			swap(this, i + 1, i + 2);
-		}
-		return this;
-	};
-	Buffer.prototype.swap64 = function swap64() {
-		var len = this.length;
-		if (len % 8 !== 0) throw new RangeError("Buffer size must be a multiple of 64-bits");
-		for (var i = 0; i < len; i += 8) {
-			swap(this, i, i + 7);
-			swap(this, i + 1, i + 6);
-			swap(this, i + 2, i + 5);
-			swap(this, i + 3, i + 4);
-		}
-		return this;
-	};
-	Buffer.prototype.toString = function toString() {
-		var length = this.length | 0;
-		if (length === 0) return "";
-		if (arguments.length === 0) return utf8Slice(this, 0, length);
-		return slowToString.apply(this, arguments);
-	};
-	Buffer.prototype.equals = function equals(b) {
-		if (!Buffer.isBuffer(b)) throw new TypeError("Argument must be a Buffer");
-		if (this === b) return true;
-		return Buffer.compare(this, b) === 0;
-	};
-	Buffer.prototype.inspect = function inspect() {
-		var str = "";
-		var max = exports.INSPECT_MAX_BYTES;
-		if (this.length > 0) {
-			str = this.toString("hex", 0, max).match(/.{2}/g).join(" ");
-			if (this.length > max) str += " ... ";
-		}
-		return "<Buffer " + str + ">";
-	};
-	Buffer.prototype.compare = function compare(target, start, end, thisStart, thisEnd) {
-		if (!Buffer.isBuffer(target)) throw new TypeError("Argument must be a Buffer");
-		if (start === void 0) start = 0;
-		if (end === void 0) end = target ? target.length : 0;
-		if (thisStart === void 0) thisStart = 0;
-		if (thisEnd === void 0) thisEnd = this.length;
-		if (start < 0 || end > target.length || thisStart < 0 || thisEnd > this.length) throw new RangeError("out of range index");
-		if (thisStart >= thisEnd && start >= end) return 0;
-		if (thisStart >= thisEnd) return -1;
-		if (start >= end) return 1;
-		start >>>= 0;
-		end >>>= 0;
-		thisStart >>>= 0;
-		thisEnd >>>= 0;
-		if (this === target) return 0;
-		var x = thisEnd - thisStart;
-		var y = end - start;
-		var len = Math.min(x, y);
-		var thisCopy = this.slice(thisStart, thisEnd);
-		var targetCopy = target.slice(start, end);
-		for (var i = 0; i < len; ++i) if (thisCopy[i] !== targetCopy[i]) {
-			x = thisCopy[i];
-			y = targetCopy[i];
-			break;
-		}
-		if (x < y) return -1;
-		if (y < x) return 1;
-		return 0;
-	};
-	function bidirectionalIndexOf(buffer, val, byteOffset, encoding, dir) {
-		if (buffer.length === 0) return -1;
-		if (typeof byteOffset === "string") {
-			encoding = byteOffset;
-			byteOffset = 0;
-		} else if (byteOffset > 2147483647) byteOffset = 2147483647;
-		else if (byteOffset < -2147483648) byteOffset = -2147483648;
-		byteOffset = +byteOffset;
-		if (isNaN(byteOffset)) byteOffset = dir ? 0 : buffer.length - 1;
-		if (byteOffset < 0) byteOffset = buffer.length + byteOffset;
-		if (byteOffset >= buffer.length) if (dir) return -1;
-		else byteOffset = buffer.length - 1;
-		else if (byteOffset < 0) if (dir) byteOffset = 0;
-		else return -1;
-		if (typeof val === "string") val = Buffer.from(val, encoding);
-		if (Buffer.isBuffer(val)) {
-			if (val.length === 0) return -1;
-			return arrayIndexOf(buffer, val, byteOffset, encoding, dir);
-		} else if (typeof val === "number") {
-			val = val & 255;
-			if (Buffer.TYPED_ARRAY_SUPPORT && typeof Uint8Array.prototype.indexOf === "function") if (dir) return Uint8Array.prototype.indexOf.call(buffer, val, byteOffset);
-			else return Uint8Array.prototype.lastIndexOf.call(buffer, val, byteOffset);
-			return arrayIndexOf(buffer, [val], byteOffset, encoding, dir);
-		}
-		throw new TypeError("val must be string, number or Buffer");
-	}
-	function arrayIndexOf(arr, val, byteOffset, encoding, dir) {
-		var indexSize = 1;
-		var arrLength = arr.length;
-		var valLength = val.length;
-		if (encoding !== void 0) {
-			encoding = String(encoding).toLowerCase();
-			if (encoding === "ucs2" || encoding === "ucs-2" || encoding === "utf16le" || encoding === "utf-16le") {
-				if (arr.length < 2 || val.length < 2) return -1;
-				indexSize = 2;
-				arrLength /= 2;
-				valLength /= 2;
-				byteOffset /= 2;
-			}
-		}
-		function read(buf, i$1) {
-			if (indexSize === 1) return buf[i$1];
-			else return buf.readUInt16BE(i$1 * indexSize);
-		}
-		var i;
-		if (dir) {
-			var foundIndex = -1;
-			for (i = byteOffset; i < arrLength; i++) if (read(arr, i) === read(val, foundIndex === -1 ? 0 : i - foundIndex)) {
-				if (foundIndex === -1) foundIndex = i;
-				if (i - foundIndex + 1 === valLength) return foundIndex * indexSize;
-			} else {
-				if (foundIndex !== -1) i -= i - foundIndex;
-				foundIndex = -1;
-			}
-		} else {
-			if (byteOffset + valLength > arrLength) byteOffset = arrLength - valLength;
-			for (i = byteOffset; i >= 0; i--) {
-				var found = true;
-				for (var j = 0; j < valLength; j++) if (read(arr, i + j) !== read(val, j)) {
-					found = false;
-					break;
-				}
-				if (found) return i;
-			}
-		}
-		return -1;
-	}
-	Buffer.prototype.includes = function includes(val, byteOffset, encoding) {
-		return this.indexOf(val, byteOffset, encoding) !== -1;
-	};
-	Buffer.prototype.indexOf = function indexOf(val, byteOffset, encoding) {
-		return bidirectionalIndexOf(this, val, byteOffset, encoding, true);
-	};
-	Buffer.prototype.lastIndexOf = function lastIndexOf(val, byteOffset, encoding) {
-		return bidirectionalIndexOf(this, val, byteOffset, encoding, false);
-	};
-	function hexWrite(buf, string, offset, length) {
-		offset = Number(offset) || 0;
-		var remaining = buf.length - offset;
-		if (!length) length = remaining;
-		else {
-			length = Number(length);
-			if (length > remaining) length = remaining;
-		}
-		var strLen = string.length;
-		if (strLen % 2 !== 0) throw new TypeError("Invalid hex string");
-		if (length > strLen / 2) length = strLen / 2;
-		for (var i = 0; i < length; ++i) {
-			var parsed = parseInt(string.substr(i * 2, 2), 16);
-			if (isNaN(parsed)) return i;
-			buf[offset + i] = parsed;
-		}
-		return i;
-	}
-	function utf8Write(buf, string, offset, length) {
-		return blitBuffer(utf8ToBytes(string, buf.length - offset), buf, offset, length);
-	}
-	function asciiWrite(buf, string, offset, length) {
-		return blitBuffer(asciiToBytes(string), buf, offset, length);
-	}
-	function latin1Write(buf, string, offset, length) {
-		return asciiWrite(buf, string, offset, length);
-	}
-	function base64Write(buf, string, offset, length) {
-		return blitBuffer(base64ToBytes(string), buf, offset, length);
-	}
-	function ucs2Write(buf, string, offset, length) {
-		return blitBuffer(utf16leToBytes(string, buf.length - offset), buf, offset, length);
-	}
-	Buffer.prototype.write = function write(string, offset, length, encoding) {
-		if (offset === void 0) {
-			encoding = "utf8";
-			length = this.length;
-			offset = 0;
-		} else if (length === void 0 && typeof offset === "string") {
-			encoding = offset;
-			length = this.length;
-			offset = 0;
-		} else if (isFinite(offset)) {
-			offset = offset | 0;
-			if (isFinite(length)) {
-				length = length | 0;
-				if (encoding === void 0) encoding = "utf8";
-			} else {
-				encoding = length;
-				length = void 0;
-			}
-		} else throw new Error("Buffer.write(string, encoding, offset[, length]) is no longer supported");
-		var remaining = this.length - offset;
-		if (length === void 0 || length > remaining) length = remaining;
-		if (string.length > 0 && (length < 0 || offset < 0) || offset > this.length) throw new RangeError("Attempt to write outside buffer bounds");
-		if (!encoding) encoding = "utf8";
-		var loweredCase = false;
-		for (;;) switch (encoding) {
-			case "hex": return hexWrite(this, string, offset, length);
-			case "utf8":
-			case "utf-8": return utf8Write(this, string, offset, length);
-			case "ascii": return asciiWrite(this, string, offset, length);
-			case "latin1":
-			case "binary": return latin1Write(this, string, offset, length);
-			case "base64": return base64Write(this, string, offset, length);
-			case "ucs2":
-			case "ucs-2":
-			case "utf16le":
-			case "utf-16le": return ucs2Write(this, string, offset, length);
-			default:
-				if (loweredCase) throw new TypeError("Unknown encoding: " + encoding);
-				encoding = ("" + encoding).toLowerCase();
-				loweredCase = true;
-		}
-	};
-	Buffer.prototype.toJSON = function toJSON() {
-		return {
-			type: "Buffer",
-			data: Array.prototype.slice.call(this._arr || this, 0)
-		};
-	};
-	function base64Slice(buf, start, end) {
-		if (start === 0 && end === buf.length) return base64.fromByteArray(buf);
-		else return base64.fromByteArray(buf.slice(start, end));
-	}
-	function utf8Slice(buf, start, end) {
-		end = Math.min(buf.length, end);
-		var res = [];
-		var i = start;
-		while (i < end) {
-			var firstByte = buf[i];
-			var codePoint = null;
-			var bytesPerSequence = firstByte > 239 ? 4 : firstByte > 223 ? 3 : firstByte > 191 ? 2 : 1;
-			if (i + bytesPerSequence <= end) {
-				var secondByte, thirdByte, fourthByte, tempCodePoint;
-				switch (bytesPerSequence) {
-					case 1:
-						if (firstByte < 128) codePoint = firstByte;
-						break;
-					case 2:
-						secondByte = buf[i + 1];
-						if ((secondByte & 192) === 128) {
-							tempCodePoint = (firstByte & 31) << 6 | secondByte & 63;
-							if (tempCodePoint > 127) codePoint = tempCodePoint;
-						}
-						break;
-					case 3:
-						secondByte = buf[i + 1];
-						thirdByte = buf[i + 2];
-						if ((secondByte & 192) === 128 && (thirdByte & 192) === 128) {
-							tempCodePoint = (firstByte & 15) << 12 | (secondByte & 63) << 6 | thirdByte & 63;
-							if (tempCodePoint > 2047 && (tempCodePoint < 55296 || tempCodePoint > 57343)) codePoint = tempCodePoint;
-						}
-						break;
-					case 4:
-						secondByte = buf[i + 1];
-						thirdByte = buf[i + 2];
-						fourthByte = buf[i + 3];
-						if ((secondByte & 192) === 128 && (thirdByte & 192) === 128 && (fourthByte & 192) === 128) {
-							tempCodePoint = (firstByte & 15) << 18 | (secondByte & 63) << 12 | (thirdByte & 63) << 6 | fourthByte & 63;
-							if (tempCodePoint > 65535 && tempCodePoint < 1114112) codePoint = tempCodePoint;
-						}
-				}
-			}
-			if (codePoint === null) {
-				codePoint = 65533;
-				bytesPerSequence = 1;
-			} else if (codePoint > 65535) {
-				codePoint -= 65536;
-				res.push(codePoint >>> 10 & 1023 | 55296);
-				codePoint = 56320 | codePoint & 1023;
-			}
-			res.push(codePoint);
-			i += bytesPerSequence;
-		}
-		return decodeCodePointsArray(res);
-	}
-	var MAX_ARGUMENTS_LENGTH = 4096;
-	function decodeCodePointsArray(codePoints) {
-		var len = codePoints.length;
-		if (len <= MAX_ARGUMENTS_LENGTH) return String.fromCharCode.apply(String, codePoints);
-		var res = "";
-		var i = 0;
-		while (i < len) res += String.fromCharCode.apply(String, codePoints.slice(i, i += MAX_ARGUMENTS_LENGTH));
-		return res;
-	}
-	function asciiSlice(buf, start, end) {
-		var ret = "";
-		end = Math.min(buf.length, end);
-		for (var i = start; i < end; ++i) ret += String.fromCharCode(buf[i] & 127);
-		return ret;
-	}
-	function latin1Slice(buf, start, end) {
-		var ret = "";
-		end = Math.min(buf.length, end);
-		for (var i = start; i < end; ++i) ret += String.fromCharCode(buf[i]);
-		return ret;
-	}
-	function hexSlice(buf, start, end) {
-		var len = buf.length;
-		if (!start || start < 0) start = 0;
-		if (!end || end < 0 || end > len) end = len;
-		var out = "";
-		for (var i = start; i < end; ++i) out += toHex(buf[i]);
-		return out;
-	}
-	function utf16leSlice(buf, start, end) {
-		var bytes = buf.slice(start, end);
-		var res = "";
-		for (var i = 0; i < bytes.length; i += 2) res += String.fromCharCode(bytes[i] + bytes[i + 1] * 256);
-		return res;
-	}
-	Buffer.prototype.slice = function slice(start, end) {
-		var len = this.length;
-		start = ~~start;
-		end = end === void 0 ? len : ~~end;
-		if (start < 0) {
-			start += len;
-			if (start < 0) start = 0;
-		} else if (start > len) start = len;
-		if (end < 0) {
-			end += len;
-			if (end < 0) end = 0;
-		} else if (end > len) end = len;
-		if (end < start) end = start;
-		var newBuf;
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			newBuf = this.subarray(start, end);
-			newBuf.__proto__ = Buffer.prototype;
-		} else {
-			var sliceLen = end - start;
-			newBuf = new Buffer(sliceLen, void 0);
-			for (var i = 0; i < sliceLen; ++i) newBuf[i] = this[i + start];
-		}
-		return newBuf;
-	};
-	function checkOffset(offset, ext, length) {
-		if (offset % 1 !== 0 || offset < 0) throw new RangeError("offset is not uint");
-		if (offset + ext > length) throw new RangeError("Trying to access beyond buffer length");
-	}
-	Buffer.prototype.readUIntLE = function readUIntLE(offset, byteLength, noAssert) {
-		offset = offset | 0;
-		byteLength = byteLength | 0;
-		if (!noAssert) checkOffset(offset, byteLength, this.length);
-		var val = this[offset];
-		var mul = 1;
-		var i = 0;
-		while (++i < byteLength && (mul *= 256)) val += this[offset + i] * mul;
-		return val;
-	};
-	Buffer.prototype.readUIntBE = function readUIntBE(offset, byteLength, noAssert) {
-		offset = offset | 0;
-		byteLength = byteLength | 0;
-		if (!noAssert) checkOffset(offset, byteLength, this.length);
-		var val = this[offset + --byteLength];
-		var mul = 1;
-		while (byteLength > 0 && (mul *= 256)) val += this[offset + --byteLength] * mul;
-		return val;
-	};
-	Buffer.prototype.readUInt8 = function readUInt8(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 1, this.length);
-		return this[offset];
-	};
-	Buffer.prototype.readUInt16LE = function readUInt16LE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 2, this.length);
-		return this[offset] | this[offset + 1] << 8;
-	};
-	Buffer.prototype.readUInt16BE = function readUInt16BE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 2, this.length);
-		return this[offset] << 8 | this[offset + 1];
-	};
-	Buffer.prototype.readUInt32LE = function readUInt32LE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 4, this.length);
-		return (this[offset] | this[offset + 1] << 8 | this[offset + 2] << 16) + this[offset + 3] * 16777216;
-	};
-	Buffer.prototype.readUInt32BE = function readUInt32BE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 4, this.length);
-		return this[offset] * 16777216 + (this[offset + 1] << 16 | this[offset + 2] << 8 | this[offset + 3]);
-	};
-	Buffer.prototype.readIntLE = function readIntLE(offset, byteLength, noAssert) {
-		offset = offset | 0;
-		byteLength = byteLength | 0;
-		if (!noAssert) checkOffset(offset, byteLength, this.length);
-		var val = this[offset];
-		var mul = 1;
-		var i = 0;
-		while (++i < byteLength && (mul *= 256)) val += this[offset + i] * mul;
-		mul *= 128;
-		if (val >= mul) val -= Math.pow(2, 8 * byteLength);
-		return val;
-	};
-	Buffer.prototype.readIntBE = function readIntBE(offset, byteLength, noAssert) {
-		offset = offset | 0;
-		byteLength = byteLength | 0;
-		if (!noAssert) checkOffset(offset, byteLength, this.length);
-		var i = byteLength;
-		var mul = 1;
-		var val = this[offset + --i];
-		while (i > 0 && (mul *= 256)) val += this[offset + --i] * mul;
-		mul *= 128;
-		if (val >= mul) val -= Math.pow(2, 8 * byteLength);
-		return val;
-	};
-	Buffer.prototype.readInt8 = function readInt8(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 1, this.length);
-		if (!(this[offset] & 128)) return this[offset];
-		return (255 - this[offset] + 1) * -1;
-	};
-	Buffer.prototype.readInt16LE = function readInt16LE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 2, this.length);
-		var val = this[offset] | this[offset + 1] << 8;
-		return val & 32768 ? val | 4294901760 : val;
-	};
-	Buffer.prototype.readInt16BE = function readInt16BE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 2, this.length);
-		var val = this[offset + 1] | this[offset] << 8;
-		return val & 32768 ? val | 4294901760 : val;
-	};
-	Buffer.prototype.readInt32LE = function readInt32LE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 4, this.length);
-		return this[offset] | this[offset + 1] << 8 | this[offset + 2] << 16 | this[offset + 3] << 24;
-	};
-	Buffer.prototype.readInt32BE = function readInt32BE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 4, this.length);
-		return this[offset] << 24 | this[offset + 1] << 16 | this[offset + 2] << 8 | this[offset + 3];
-	};
-	Buffer.prototype.readFloatLE = function readFloatLE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 4, this.length);
-		return ieee754.read(this, offset, true, 23, 4);
-	};
-	Buffer.prototype.readFloatBE = function readFloatBE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 4, this.length);
-		return ieee754.read(this, offset, false, 23, 4);
-	};
-	Buffer.prototype.readDoubleLE = function readDoubleLE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 8, this.length);
-		return ieee754.read(this, offset, true, 52, 8);
-	};
-	Buffer.prototype.readDoubleBE = function readDoubleBE(offset, noAssert) {
-		if (!noAssert) checkOffset(offset, 8, this.length);
-		return ieee754.read(this, offset, false, 52, 8);
-	};
-	function checkInt(buf, value, offset, ext, max, min) {
-		if (!Buffer.isBuffer(buf)) throw new TypeError("\"buffer\" argument must be a Buffer instance");
-		if (value > max || value < min) throw new RangeError("\"value\" argument is out of bounds");
-		if (offset + ext > buf.length) throw new RangeError("Index out of range");
-	}
-	Buffer.prototype.writeUIntLE = function writeUIntLE(value, offset, byteLength, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		byteLength = byteLength | 0;
-		if (!noAssert) {
-			var maxBytes = Math.pow(2, 8 * byteLength) - 1;
-			checkInt(this, value, offset, byteLength, maxBytes, 0);
-		}
-		var mul = 1;
-		var i = 0;
-		this[offset] = value & 255;
-		while (++i < byteLength && (mul *= 256)) this[offset + i] = value / mul & 255;
-		return offset + byteLength;
-	};
-	Buffer.prototype.writeUIntBE = function writeUIntBE(value, offset, byteLength, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		byteLength = byteLength | 0;
-		if (!noAssert) {
-			var maxBytes = Math.pow(2, 8 * byteLength) - 1;
-			checkInt(this, value, offset, byteLength, maxBytes, 0);
-		}
-		var i = byteLength - 1;
-		var mul = 1;
-		this[offset + i] = value & 255;
-		while (--i >= 0 && (mul *= 256)) this[offset + i] = value / mul & 255;
-		return offset + byteLength;
-	};
-	Buffer.prototype.writeUInt8 = function writeUInt8(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 1, 255, 0);
-		if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value);
-		this[offset] = value & 255;
-		return offset + 1;
-	};
-	function objectWriteUInt16(buf, value, offset, littleEndian) {
-		if (value < 0) value = 65535 + value + 1;
-		for (var i = 0, j = Math.min(buf.length - offset, 2); i < j; ++i) buf[offset + i] = (value & 255 << 8 * (littleEndian ? i : 1 - i)) >>> (littleEndian ? i : 1 - i) * 8;
-	}
-	Buffer.prototype.writeUInt16LE = function writeUInt16LE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 2, 65535, 0);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value & 255;
-			this[offset + 1] = value >>> 8;
-		} else objectWriteUInt16(this, value, offset, true);
-		return offset + 2;
-	};
-	Buffer.prototype.writeUInt16BE = function writeUInt16BE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 2, 65535, 0);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value >>> 8;
-			this[offset + 1] = value & 255;
-		} else objectWriteUInt16(this, value, offset, false);
-		return offset + 2;
-	};
-	function objectWriteUInt32(buf, value, offset, littleEndian) {
-		if (value < 0) value = 4294967295 + value + 1;
-		for (var i = 0, j = Math.min(buf.length - offset, 4); i < j; ++i) buf[offset + i] = value >>> (littleEndian ? i : 3 - i) * 8 & 255;
-	}
-	Buffer.prototype.writeUInt32LE = function writeUInt32LE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 4, 4294967295, 0);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset + 3] = value >>> 24;
-			this[offset + 2] = value >>> 16;
-			this[offset + 1] = value >>> 8;
-			this[offset] = value & 255;
-		} else objectWriteUInt32(this, value, offset, true);
-		return offset + 4;
-	};
-	Buffer.prototype.writeUInt32BE = function writeUInt32BE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 4, 4294967295, 0);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value >>> 24;
-			this[offset + 1] = value >>> 16;
-			this[offset + 2] = value >>> 8;
-			this[offset + 3] = value & 255;
-		} else objectWriteUInt32(this, value, offset, false);
-		return offset + 4;
-	};
-	Buffer.prototype.writeIntLE = function writeIntLE(value, offset, byteLength, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) {
-			var limit = Math.pow(2, 8 * byteLength - 1);
-			checkInt(this, value, offset, byteLength, limit - 1, -limit);
-		}
-		var i = 0;
-		var mul = 1;
-		var sub = 0;
-		this[offset] = value & 255;
-		while (++i < byteLength && (mul *= 256)) {
-			if (value < 0 && sub === 0 && this[offset + i - 1] !== 0) sub = 1;
-			this[offset + i] = (value / mul >> 0) - sub & 255;
-		}
-		return offset + byteLength;
-	};
-	Buffer.prototype.writeIntBE = function writeIntBE(value, offset, byteLength, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) {
-			var limit = Math.pow(2, 8 * byteLength - 1);
-			checkInt(this, value, offset, byteLength, limit - 1, -limit);
-		}
-		var i = byteLength - 1;
-		var mul = 1;
-		var sub = 0;
-		this[offset + i] = value & 255;
-		while (--i >= 0 && (mul *= 256)) {
-			if (value < 0 && sub === 0 && this[offset + i + 1] !== 0) sub = 1;
-			this[offset + i] = (value / mul >> 0) - sub & 255;
-		}
-		return offset + byteLength;
-	};
-	Buffer.prototype.writeInt8 = function writeInt8(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 1, 127, -128);
-		if (!Buffer.TYPED_ARRAY_SUPPORT) value = Math.floor(value);
-		if (value < 0) value = 255 + value + 1;
-		this[offset] = value & 255;
-		return offset + 1;
-	};
-	Buffer.prototype.writeInt16LE = function writeInt16LE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 2, 32767, -32768);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value & 255;
-			this[offset + 1] = value >>> 8;
-		} else objectWriteUInt16(this, value, offset, true);
-		return offset + 2;
-	};
-	Buffer.prototype.writeInt16BE = function writeInt16BE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 2, 32767, -32768);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value >>> 8;
-			this[offset + 1] = value & 255;
-		} else objectWriteUInt16(this, value, offset, false);
-		return offset + 2;
-	};
-	Buffer.prototype.writeInt32LE = function writeInt32LE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 4, 2147483647, -2147483648);
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value & 255;
-			this[offset + 1] = value >>> 8;
-			this[offset + 2] = value >>> 16;
-			this[offset + 3] = value >>> 24;
-		} else objectWriteUInt32(this, value, offset, true);
-		return offset + 4;
-	};
-	Buffer.prototype.writeInt32BE = function writeInt32BE(value, offset, noAssert) {
-		value = +value;
-		offset = offset | 0;
-		if (!noAssert) checkInt(this, value, offset, 4, 2147483647, -2147483648);
-		if (value < 0) value = 4294967295 + value + 1;
-		if (Buffer.TYPED_ARRAY_SUPPORT) {
-			this[offset] = value >>> 24;
-			this[offset + 1] = value >>> 16;
-			this[offset + 2] = value >>> 8;
-			this[offset + 3] = value & 255;
-		} else objectWriteUInt32(this, value, offset, false);
-		return offset + 4;
-	};
-	function checkIEEE754(buf, value, offset, ext, max, min) {
-		if (offset + ext > buf.length) throw new RangeError("Index out of range");
-		if (offset < 0) throw new RangeError("Index out of range");
-	}
-	function writeFloat(buf, value, offset, littleEndian, noAssert) {
-		if (!noAssert) checkIEEE754(buf, value, offset, 4, 34028234663852886e22, -34028234663852886e22);
-		ieee754.write(buf, value, offset, littleEndian, 23, 4);
-		return offset + 4;
-	}
-	Buffer.prototype.writeFloatLE = function writeFloatLE(value, offset, noAssert) {
-		return writeFloat(this, value, offset, true, noAssert);
-	};
-	Buffer.prototype.writeFloatBE = function writeFloatBE(value, offset, noAssert) {
-		return writeFloat(this, value, offset, false, noAssert);
-	};
-	function writeDouble(buf, value, offset, littleEndian, noAssert) {
-		if (!noAssert) checkIEEE754(buf, value, offset, 8, 17976931348623157e292, -17976931348623157e292);
-		ieee754.write(buf, value, offset, littleEndian, 52, 8);
-		return offset + 8;
-	}
-	Buffer.prototype.writeDoubleLE = function writeDoubleLE(value, offset, noAssert) {
-		return writeDouble(this, value, offset, true, noAssert);
-	};
-	Buffer.prototype.writeDoubleBE = function writeDoubleBE(value, offset, noAssert) {
-		return writeDouble(this, value, offset, false, noAssert);
-	};
-	Buffer.prototype.copy = function copy(target, targetStart, start, end) {
-		if (!start) start = 0;
-		if (!end && end !== 0) end = this.length;
-		if (targetStart >= target.length) targetStart = target.length;
-		if (!targetStart) targetStart = 0;
-		if (end > 0 && end < start) end = start;
-		if (end === start) return 0;
-		if (target.length === 0 || this.length === 0) return 0;
-		if (targetStart < 0) throw new RangeError("targetStart out of bounds");
-		if (start < 0 || start >= this.length) throw new RangeError("sourceStart out of bounds");
-		if (end < 0) throw new RangeError("sourceEnd out of bounds");
-		if (end > this.length) end = this.length;
-		if (target.length - targetStart < end - start) end = target.length - targetStart + start;
-		var len = end - start;
-		var i;
-		if (this === target && start < targetStart && targetStart < end) for (i = len - 1; i >= 0; --i) target[i + targetStart] = this[i + start];
-		else if (len < 1e3 || !Buffer.TYPED_ARRAY_SUPPORT) for (i = 0; i < len; ++i) target[i + targetStart] = this[i + start];
-		else Uint8Array.prototype.set.call(target, this.subarray(start, start + len), targetStart);
-		return len;
-	};
-	Buffer.prototype.fill = function fill(val, start, end, encoding) {
-		if (typeof val === "string") {
-			if (typeof start === "string") {
-				encoding = start;
-				start = 0;
-				end = this.length;
-			} else if (typeof end === "string") {
-				encoding = end;
-				end = this.length;
-			}
-			if (val.length === 1) {
-				var code = val.charCodeAt(0);
-				if (code < 256) val = code;
-			}
-			if (encoding !== void 0 && typeof encoding !== "string") throw new TypeError("encoding must be a string");
-			if (typeof encoding === "string" && !Buffer.isEncoding(encoding)) throw new TypeError("Unknown encoding: " + encoding);
-		} else if (typeof val === "number") val = val & 255;
-		if (start < 0 || this.length < start || this.length < end) throw new RangeError("Out of range index");
-		if (end <= start) return this;
-		start = start >>> 0;
-		end = end === void 0 ? this.length : end >>> 0;
-		if (!val) val = 0;
-		var i;
-		if (typeof val === "number") for (i = start; i < end; ++i) this[i] = val;
-		else {
-			var bytes = Buffer.isBuffer(val) ? val : utf8ToBytes(new Buffer(val, encoding).toString());
-			var len = bytes.length;
-			for (i = 0; i < end - start; ++i) this[i + start] = bytes[i % len];
-		}
-		return this;
-	};
-	var INVALID_BASE64_RE = /[^+\/0-9A-Za-z-_]/g;
-	function base64clean(str) {
-		str = stringtrim(str).replace(INVALID_BASE64_RE, "");
-		if (str.length < 2) return "";
-		while (str.length % 4 !== 0) str = str + "=";
-		return str;
-	}
-	function stringtrim(str) {
-		if (str.trim) return str.trim();
-		return str.replace(/^\s+|\s+$/g, "");
-	}
-	function toHex(n) {
-		if (n < 16) return "0" + n.toString(16);
-		return n.toString(16);
-	}
-	function utf8ToBytes(string, units) {
-		units = units || Infinity;
-		var codePoint;
-		var length = string.length;
-		var leadSurrogate = null;
-		var bytes = [];
-		for (var i = 0; i < length; ++i) {
-			codePoint = string.charCodeAt(i);
-			if (codePoint > 55295 && codePoint < 57344) {
-				if (!leadSurrogate) {
-					if (codePoint > 56319) {
-						if ((units -= 3) > -1) bytes.push(239, 191, 189);
-						continue;
-					} else if (i + 1 === length) {
-						if ((units -= 3) > -1) bytes.push(239, 191, 189);
-						continue;
-					}
-					leadSurrogate = codePoint;
-					continue;
-				}
-				if (codePoint < 56320) {
-					if ((units -= 3) > -1) bytes.push(239, 191, 189);
-					leadSurrogate = codePoint;
-					continue;
-				}
-				codePoint = (leadSurrogate - 55296 << 10 | codePoint - 56320) + 65536;
-			} else if (leadSurrogate) {
-				if ((units -= 3) > -1) bytes.push(239, 191, 189);
-			}
-			leadSurrogate = null;
-			if (codePoint < 128) {
-				if ((units -= 1) < 0) break;
-				bytes.push(codePoint);
-			} else if (codePoint < 2048) {
-				if ((units -= 2) < 0) break;
-				bytes.push(codePoint >> 6 | 192, codePoint & 63 | 128);
-			} else if (codePoint < 65536) {
-				if ((units -= 3) < 0) break;
-				bytes.push(codePoint >> 12 | 224, codePoint >> 6 & 63 | 128, codePoint & 63 | 128);
-			} else if (codePoint < 1114112) {
-				if ((units -= 4) < 0) break;
-				bytes.push(codePoint >> 18 | 240, codePoint >> 12 & 63 | 128, codePoint >> 6 & 63 | 128, codePoint & 63 | 128);
-			} else throw new Error("Invalid code point");
-		}
-		return bytes;
-	}
-	function asciiToBytes(str) {
-		var byteArray = [];
-		for (var i = 0; i < str.length; ++i) byteArray.push(str.charCodeAt(i) & 255);
-		return byteArray;
-	}
-	function utf16leToBytes(str, units) {
-		var c, hi, lo;
-		var byteArray = [];
-		for (var i = 0; i < str.length; ++i) {
-			if ((units -= 2) < 0) break;
-			c = str.charCodeAt(i);
-			hi = c >> 8;
-			lo = c % 256;
-			byteArray.push(lo);
-			byteArray.push(hi);
-		}
-		return byteArray;
-	}
-	function base64ToBytes(str) {
-		return base64.toByteArray(base64clean(str));
-	}
-	function blitBuffer(src, dst, offset, length) {
-		for (var i = 0; i < length; ++i) {
-			if (i + offset >= dst.length || i >= src.length) break;
-			dst[i + offset] = src[i];
-		}
-		return i;
-	}
-	function isnan(val) {
-		return val !== val;
-	}
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/browserHashUtils.js
-var require_browserHashUtils = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var Buffer = require_buffer().Buffer;
-	/**
-	* This is a polyfill for the static method `isView` of `ArrayBuffer`, which is
-	* e.g. missing in IE 10.
-	*
+	* @param {number} size Size of the message to be allocated.
 	* @api private
 	*/
-	if (typeof ArrayBuffer !== "undefined" && typeof ArrayBuffer.isView === "undefined") ArrayBuffer.isView = function(arg) {
-		return viewStrings.indexOf(Object.prototype.toString.call(arg)) > -1;
+	EventMessageChunkerStream.prototype.allocateMessage = function(size) {
+		if (typeof size !== "number") throw new Error("Attempted to allocate an event message where size was not a number: " + size);
+		this.currentMessageTotalLength = size;
+		this.currentMessagePendingLength = 4;
+		this.currentMessage = allocBuffer(size);
+		this.currentMessage.writeUInt32BE(size, 0);
 	};
 	/**
 	* @api private
 	*/
-	var viewStrings = [
-		"[object Int8Array]",
-		"[object Uint8Array]",
-		"[object Uint8ClampedArray]",
-		"[object Int16Array]",
-		"[object Uint16Array]",
-		"[object Int32Array]",
-		"[object Uint32Array]",
-		"[object Float32Array]",
-		"[object Float64Array]",
-		"[object DataView]"
-	];
-	/**
-	* @api private
-	*/
-	function isEmptyData(data) {
-		if (typeof data === "string") return data.length === 0;
-		return data.byteLength === 0;
-	}
-	/**
-	* @api private
-	*/
-	function convertToBuffer(data) {
-		if (typeof data === "string") data = new Buffer(data, "utf8");
-		if (ArrayBuffer.isView(data)) return new Uint8Array(data.buffer, data.byteOffset, data.byteLength / Uint8Array.BYTES_PER_ELEMENT);
-		return new Uint8Array(data);
-	}
-	/**
-	* @api private
-	*/
-	module.exports = exports = {
-		isEmptyData,
-		convertToBuffer
-	};
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/browserHmac.js
-var require_browserHmac = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var hashUtils = require_browserHashUtils();
-	/**
-	* @api private
-	*/
-	function Hmac(hashCtor, secret) {
-		this.hash = new hashCtor();
-		this.outer = new hashCtor();
-		var inner = bufferFromSecret(hashCtor, secret);
-		var outer = new Uint8Array(hashCtor.BLOCK_SIZE);
-		outer.set(inner);
-		for (var i = 0; i < hashCtor.BLOCK_SIZE; i++) {
-			inner[i] ^= 54;
-			outer[i] ^= 92;
-		}
-		this.hash.update(inner);
-		this.outer.update(outer);
-		for (var i = 0; i < inner.byteLength; i++) inner[i] = 0;
-	}
-	/**
-	* @api private
-	*/
-	module.exports = exports = Hmac;
-	Hmac.prototype.update = function(toHash) {
-		if (hashUtils.isEmptyData(toHash) || this.error) return this;
-		try {
-			this.hash.update(hashUtils.convertToBuffer(toHash));
-		} catch (e) {
-			this.error = e;
-		}
-		return this;
-	};
-	Hmac.prototype.digest = function(encoding) {
-		if (!this.outer.finished) this.outer.update(this.hash.digest());
-		return this.outer.digest(encoding);
-	};
-	function bufferFromSecret(hashCtor, secret) {
-		var input = hashUtils.convertToBuffer(secret);
-		if (input.byteLength > hashCtor.BLOCK_SIZE) {
-			var bufferHash = new hashCtor();
-			bufferHash.update(input);
-			input = bufferHash.digest();
-		}
-		var buffer = new Uint8Array(hashCtor.BLOCK_SIZE);
-		buffer.set(input);
-		return buffer;
-	}
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/browserMd5.js
-var require_browserMd5 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var hashUtils = require_browserHashUtils();
-	var Buffer = require_buffer().Buffer;
-	var BLOCK_SIZE = 64;
-	var DIGEST_LENGTH = 16;
-	/**
-	* @api private
-	*/
-	function Md5() {
-		this.state = [
-			1732584193,
-			4023233417,
-			2562383102,
-			271733878
-		];
-		this.buffer = new DataView(new ArrayBuffer(BLOCK_SIZE));
-		this.bufferLength = 0;
-		this.bytesHashed = 0;
-		this.finished = false;
-	}
-	/**
-	* @api private
-	*/
-	module.exports = exports = Md5;
-	Md5.BLOCK_SIZE = BLOCK_SIZE;
-	Md5.prototype.update = function(sourceData) {
-		if (hashUtils.isEmptyData(sourceData)) return this;
-		else if (this.finished) throw new Error("Attempted to update an already finished hash.");
-		var data = hashUtils.convertToBuffer(sourceData);
-		var position = 0;
-		var byteLength = data.byteLength;
-		this.bytesHashed += byteLength;
-		while (byteLength > 0) {
-			this.buffer.setUint8(this.bufferLength++, data[position++]);
-			byteLength--;
-			if (this.bufferLength === BLOCK_SIZE) {
-				this.hashBuffer();
-				this.bufferLength = 0;
-			}
-		}
-		return this;
-	};
-	Md5.prototype.digest = function(encoding) {
-		if (!this.finished) {
-			var _a = this, buffer = _a.buffer, undecoratedLength = _a.bufferLength;
-			var bitsHashed = _a.bytesHashed * 8;
-			buffer.setUint8(this.bufferLength++, 128);
-			if (undecoratedLength % BLOCK_SIZE >= BLOCK_SIZE - 8) {
-				for (var i = this.bufferLength; i < BLOCK_SIZE; i++) buffer.setUint8(i, 0);
-				this.hashBuffer();
-				this.bufferLength = 0;
-			}
-			for (var i = this.bufferLength; i < BLOCK_SIZE - 8; i++) buffer.setUint8(i, 0);
-			buffer.setUint32(BLOCK_SIZE - 8, bitsHashed >>> 0, true);
-			buffer.setUint32(BLOCK_SIZE - 4, Math.floor(bitsHashed / 4294967296), true);
-			this.hashBuffer();
-			this.finished = true;
-		}
-		var out = new DataView(new ArrayBuffer(DIGEST_LENGTH));
-		for (var i = 0; i < 4; i++) out.setUint32(i * 4, this.state[i], true);
-		var buff = new Buffer(out.buffer, out.byteOffset, out.byteLength);
-		return encoding ? buff.toString(encoding) : buff;
-	};
-	Md5.prototype.hashBuffer = function() {
-		var _a = this, buffer = _a.buffer, state = _a.state;
-		var a = state[0], b = state[1], c = state[2], d = state[3];
-		a = ff(a, b, c, d, buffer.getUint32(0, true), 7, 3614090360);
-		d = ff(d, a, b, c, buffer.getUint32(4, true), 12, 3905402710);
-		c = ff(c, d, a, b, buffer.getUint32(8, true), 17, 606105819);
-		b = ff(b, c, d, a, buffer.getUint32(12, true), 22, 3250441966);
-		a = ff(a, b, c, d, buffer.getUint32(16, true), 7, 4118548399);
-		d = ff(d, a, b, c, buffer.getUint32(20, true), 12, 1200080426);
-		c = ff(c, d, a, b, buffer.getUint32(24, true), 17, 2821735955);
-		b = ff(b, c, d, a, buffer.getUint32(28, true), 22, 4249261313);
-		a = ff(a, b, c, d, buffer.getUint32(32, true), 7, 1770035416);
-		d = ff(d, a, b, c, buffer.getUint32(36, true), 12, 2336552879);
-		c = ff(c, d, a, b, buffer.getUint32(40, true), 17, 4294925233);
-		b = ff(b, c, d, a, buffer.getUint32(44, true), 22, 2304563134);
-		a = ff(a, b, c, d, buffer.getUint32(48, true), 7, 1804603682);
-		d = ff(d, a, b, c, buffer.getUint32(52, true), 12, 4254626195);
-		c = ff(c, d, a, b, buffer.getUint32(56, true), 17, 2792965006);
-		b = ff(b, c, d, a, buffer.getUint32(60, true), 22, 1236535329);
-		a = gg(a, b, c, d, buffer.getUint32(4, true), 5, 4129170786);
-		d = gg(d, a, b, c, buffer.getUint32(24, true), 9, 3225465664);
-		c = gg(c, d, a, b, buffer.getUint32(44, true), 14, 643717713);
-		b = gg(b, c, d, a, buffer.getUint32(0, true), 20, 3921069994);
-		a = gg(a, b, c, d, buffer.getUint32(20, true), 5, 3593408605);
-		d = gg(d, a, b, c, buffer.getUint32(40, true), 9, 38016083);
-		c = gg(c, d, a, b, buffer.getUint32(60, true), 14, 3634488961);
-		b = gg(b, c, d, a, buffer.getUint32(16, true), 20, 3889429448);
-		a = gg(a, b, c, d, buffer.getUint32(36, true), 5, 568446438);
-		d = gg(d, a, b, c, buffer.getUint32(56, true), 9, 3275163606);
-		c = gg(c, d, a, b, buffer.getUint32(12, true), 14, 4107603335);
-		b = gg(b, c, d, a, buffer.getUint32(32, true), 20, 1163531501);
-		a = gg(a, b, c, d, buffer.getUint32(52, true), 5, 2850285829);
-		d = gg(d, a, b, c, buffer.getUint32(8, true), 9, 4243563512);
-		c = gg(c, d, a, b, buffer.getUint32(28, true), 14, 1735328473);
-		b = gg(b, c, d, a, buffer.getUint32(48, true), 20, 2368359562);
-		a = hh(a, b, c, d, buffer.getUint32(20, true), 4, 4294588738);
-		d = hh(d, a, b, c, buffer.getUint32(32, true), 11, 2272392833);
-		c = hh(c, d, a, b, buffer.getUint32(44, true), 16, 1839030562);
-		b = hh(b, c, d, a, buffer.getUint32(56, true), 23, 4259657740);
-		a = hh(a, b, c, d, buffer.getUint32(4, true), 4, 2763975236);
-		d = hh(d, a, b, c, buffer.getUint32(16, true), 11, 1272893353);
-		c = hh(c, d, a, b, buffer.getUint32(28, true), 16, 4139469664);
-		b = hh(b, c, d, a, buffer.getUint32(40, true), 23, 3200236656);
-		a = hh(a, b, c, d, buffer.getUint32(52, true), 4, 681279174);
-		d = hh(d, a, b, c, buffer.getUint32(0, true), 11, 3936430074);
-		c = hh(c, d, a, b, buffer.getUint32(12, true), 16, 3572445317);
-		b = hh(b, c, d, a, buffer.getUint32(24, true), 23, 76029189);
-		a = hh(a, b, c, d, buffer.getUint32(36, true), 4, 3654602809);
-		d = hh(d, a, b, c, buffer.getUint32(48, true), 11, 3873151461);
-		c = hh(c, d, a, b, buffer.getUint32(60, true), 16, 530742520);
-		b = hh(b, c, d, a, buffer.getUint32(8, true), 23, 3299628645);
-		a = ii(a, b, c, d, buffer.getUint32(0, true), 6, 4096336452);
-		d = ii(d, a, b, c, buffer.getUint32(28, true), 10, 1126891415);
-		c = ii(c, d, a, b, buffer.getUint32(56, true), 15, 2878612391);
-		b = ii(b, c, d, a, buffer.getUint32(20, true), 21, 4237533241);
-		a = ii(a, b, c, d, buffer.getUint32(48, true), 6, 1700485571);
-		d = ii(d, a, b, c, buffer.getUint32(12, true), 10, 2399980690);
-		c = ii(c, d, a, b, buffer.getUint32(40, true), 15, 4293915773);
-		b = ii(b, c, d, a, buffer.getUint32(4, true), 21, 2240044497);
-		a = ii(a, b, c, d, buffer.getUint32(32, true), 6, 1873313359);
-		d = ii(d, a, b, c, buffer.getUint32(60, true), 10, 4264355552);
-		c = ii(c, d, a, b, buffer.getUint32(24, true), 15, 2734768916);
-		b = ii(b, c, d, a, buffer.getUint32(52, true), 21, 1309151649);
-		a = ii(a, b, c, d, buffer.getUint32(16, true), 6, 4149444226);
-		d = ii(d, a, b, c, buffer.getUint32(44, true), 10, 3174756917);
-		c = ii(c, d, a, b, buffer.getUint32(8, true), 15, 718787259);
-		b = ii(b, c, d, a, buffer.getUint32(36, true), 21, 3951481745);
-		state[0] = a + state[0] & 4294967295;
-		state[1] = b + state[1] & 4294967295;
-		state[2] = c + state[2] & 4294967295;
-		state[3] = d + state[3] & 4294967295;
-	};
-	function cmn(q, a, b, x, s, t) {
-		a = (a + q & 4294967295) + (x + t & 4294967295) & 4294967295;
-		return (a << s | a >>> 32 - s) + b & 4294967295;
-	}
-	function ff(a, b, c, d, x, s, t) {
-		return cmn(b & c | ~b & d, a, b, x, s, t);
-	}
-	function gg(a, b, c, d, x, s, t) {
-		return cmn(b & d | c & ~d, a, b, x, s, t);
-	}
-	function hh(a, b, c, d, x, s, t) {
-		return cmn(b ^ c ^ d, a, b, x, s, t);
-	}
-	function ii(a, b, c, d, x, s, t) {
-		return cmn(c ^ (b | ~d), a, b, x, s, t);
-	}
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/browserSha1.js
-var require_browserSha1 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var Buffer = require_buffer().Buffer;
-	var hashUtils = require_browserHashUtils();
-	var BLOCK_SIZE = 64;
-	var DIGEST_LENGTH = 20;
-	new Uint32Array([
-		1518500249,
-		1859775393,
-		-1894007588,
-		-899497514
-	]);
-	Math.pow(2, 53) - 1;
-	/**
-	* @api private
-	*/
-	function Sha1() {
-		this.h0 = 1732584193;
-		this.h1 = 4023233417;
-		this.h2 = 2562383102;
-		this.h3 = 271733878;
-		this.h4 = 3285377520;
-		this.block = new Uint32Array(80);
-		this.offset = 0;
-		this.shift = 24;
-		this.totalLength = 0;
-	}
-	/**
-	* @api private
-	*/
-	module.exports = exports = Sha1;
-	Sha1.BLOCK_SIZE = BLOCK_SIZE;
-	Sha1.prototype.update = function(data) {
-		if (this.finished) throw new Error("Attempted to update an already finished hash.");
-		if (hashUtils.isEmptyData(data)) return this;
-		data = hashUtils.convertToBuffer(data);
-		var length = data.length;
-		this.totalLength += length * 8;
-		for (var i = 0; i < length; i++) this.write(data[i]);
-		return this;
-	};
-	Sha1.prototype.write = function write(byte) {
-		this.block[this.offset] |= (byte & 255) << this.shift;
-		if (this.shift) this.shift -= 8;
-		else {
-			this.offset++;
-			this.shift = 24;
-		}
-		if (this.offset === 16) this.processBlock();
-	};
-	Sha1.prototype.digest = function(encoding) {
-		this.write(128);
-		if (this.offset > 14 || this.offset === 14 && this.shift < 24) this.processBlock();
-		this.offset = 14;
-		this.shift = 24;
-		this.write(0);
-		this.write(0);
-		this.write(this.totalLength > 0xffffffffff ? this.totalLength / 1099511627776 : 0);
-		this.write(this.totalLength > 4294967295 ? this.totalLength / 4294967296 : 0);
-		for (var s = 24; s >= 0; s -= 8) this.write(this.totalLength >> s);
-		var out = new Buffer(DIGEST_LENGTH);
-		var outView = new DataView(out.buffer);
-		outView.setUint32(0, this.h0, false);
-		outView.setUint32(4, this.h1, false);
-		outView.setUint32(8, this.h2, false);
-		outView.setUint32(12, this.h3, false);
-		outView.setUint32(16, this.h4, false);
-		return encoding ? out.toString(encoding) : out;
-	};
-	Sha1.prototype.processBlock = function processBlock() {
-		for (var i = 16; i < 80; i++) {
-			var w = this.block[i - 3] ^ this.block[i - 8] ^ this.block[i - 14] ^ this.block[i - 16];
-			this.block[i] = w << 1 | w >>> 31;
-		}
-		var a = this.h0;
-		var b = this.h1;
-		var c = this.h2;
-		var d = this.h3;
-		var e = this.h4;
-		var f, k;
-		for (i = 0; i < 80; i++) {
-			if (i < 20) {
-				f = d ^ b & (c ^ d);
-				k = 1518500249;
-			} else if (i < 40) {
-				f = b ^ c ^ d;
-				k = 1859775393;
-			} else if (i < 60) {
-				f = b & c | d & (b | c);
-				k = 2400959708;
-			} else {
-				f = b ^ c ^ d;
-				k = 3395469782;
-			}
-			var temp = (a << 5 | a >>> 27) + f + e + k + (this.block[i] | 0);
-			e = d;
-			d = c;
-			c = b << 30 | b >>> 2;
-			b = a;
-			a = temp;
-		}
-		this.h0 = this.h0 + a | 0;
-		this.h1 = this.h1 + b | 0;
-		this.h2 = this.h2 + c | 0;
-		this.h3 = this.h3 + d | 0;
-		this.h4 = this.h4 + e | 0;
-		this.offset = 0;
-		for (i = 0; i < 16; i++) this.block[i] = 0;
-	};
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/browserSha256.js
-var require_browserSha256 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var Buffer = require_buffer().Buffer;
-	var hashUtils = require_browserHashUtils();
-	var BLOCK_SIZE = 64;
-	var DIGEST_LENGTH = 32;
-	var KEY = new Uint32Array([
-		1116352408,
-		1899447441,
-		3049323471,
-		3921009573,
-		961987163,
-		1508970993,
-		2453635748,
-		2870763221,
-		3624381080,
-		310598401,
-		607225278,
-		1426881987,
-		1925078388,
-		2162078206,
-		2614888103,
-		3248222580,
-		3835390401,
-		4022224774,
-		264347078,
-		604807628,
-		770255983,
-		1249150122,
-		1555081692,
-		1996064986,
-		2554220882,
-		2821834349,
-		2952996808,
-		3210313671,
-		3336571891,
-		3584528711,
-		113926993,
-		338241895,
-		666307205,
-		773529912,
-		1294757372,
-		1396182291,
-		1695183700,
-		1986661051,
-		2177026350,
-		2456956037,
-		2730485921,
-		2820302411,
-		3259730800,
-		3345764771,
-		3516065817,
-		3600352804,
-		4094571909,
-		275423344,
-		430227734,
-		506948616,
-		659060556,
-		883997877,
-		958139571,
-		1322822218,
-		1537002063,
-		1747873779,
-		1955562222,
-		2024104815,
-		2227730452,
-		2361852424,
-		2428436474,
-		2756734187,
-		3204031479,
-		3329325298
-	]);
-	var MAX_HASHABLE_LENGTH = Math.pow(2, 53) - 1;
-	/**
-	* @private
-	*/
-	function Sha256() {
-		this.state = [
-			1779033703,
-			3144134277,
-			1013904242,
-			2773480762,
-			1359893119,
-			2600822924,
-			528734635,
-			1541459225
-		];
-		this.temp = new Int32Array(64);
-		this.buffer = new Uint8Array(64);
-		this.bufferLength = 0;
-		this.bytesHashed = 0;
-		/**
-		* @private
-		*/
-		this.finished = false;
-	}
-	/**
-	* @api private
-	*/
-	module.exports = exports = Sha256;
-	Sha256.BLOCK_SIZE = BLOCK_SIZE;
-	Sha256.prototype.update = function(data) {
-		if (this.finished) throw new Error("Attempted to update an already finished hash.");
-		if (hashUtils.isEmptyData(data)) return this;
-		data = hashUtils.convertToBuffer(data);
-		var position = 0;
-		var byteLength = data.byteLength;
-		this.bytesHashed += byteLength;
-		if (this.bytesHashed * 8 > MAX_HASHABLE_LENGTH) throw new Error("Cannot hash more than 2^53 - 1 bits");
-		while (byteLength > 0) {
-			this.buffer[this.bufferLength++] = data[position++];
-			byteLength--;
-			if (this.bufferLength === BLOCK_SIZE) {
-				this.hashBuffer();
-				this.bufferLength = 0;
-			}
-		}
-		return this;
-	};
-	Sha256.prototype.digest = function(encoding) {
-		if (!this.finished) {
-			var bitsHashed = this.bytesHashed * 8;
-			var bufferView = new DataView(this.buffer.buffer, this.buffer.byteOffset, this.buffer.byteLength);
-			var undecoratedLength = this.bufferLength;
-			bufferView.setUint8(this.bufferLength++, 128);
-			if (undecoratedLength % BLOCK_SIZE >= BLOCK_SIZE - 8) {
-				for (var i = this.bufferLength; i < BLOCK_SIZE; i++) bufferView.setUint8(i, 0);
-				this.hashBuffer();
-				this.bufferLength = 0;
-			}
-			for (var i = this.bufferLength; i < BLOCK_SIZE - 8; i++) bufferView.setUint8(i, 0);
-			bufferView.setUint32(BLOCK_SIZE - 8, Math.floor(bitsHashed / 4294967296), true);
-			bufferView.setUint32(BLOCK_SIZE - 4, bitsHashed);
-			this.hashBuffer();
-			this.finished = true;
-		}
-		var out = new Buffer(DIGEST_LENGTH);
-		for (var i = 0; i < 8; i++) {
-			out[i * 4] = this.state[i] >>> 24 & 255;
-			out[i * 4 + 1] = this.state[i] >>> 16 & 255;
-			out[i * 4 + 2] = this.state[i] >>> 8 & 255;
-			out[i * 4 + 3] = this.state[i] >>> 0 & 255;
-		}
-		return encoding ? out.toString(encoding) : out;
-	};
-	Sha256.prototype.hashBuffer = function() {
-		var _a = this, buffer = _a.buffer, state = _a.state;
-		var state0 = state[0], state1 = state[1], state2 = state[2], state3 = state[3], state4 = state[4], state5 = state[5], state6 = state[6], state7 = state[7];
-		for (var i = 0; i < BLOCK_SIZE; i++) {
-			if (i < 16) this.temp[i] = (buffer[i * 4] & 255) << 24 | (buffer[i * 4 + 1] & 255) << 16 | (buffer[i * 4 + 2] & 255) << 8 | buffer[i * 4 + 3] & 255;
-			else {
-				var u = this.temp[i - 2];
-				var t1_1 = (u >>> 17 | u << 15) ^ (u >>> 19 | u << 13) ^ u >>> 10;
-				u = this.temp[i - 15];
-				var t2_1 = (u >>> 7 | u << 25) ^ (u >>> 18 | u << 14) ^ u >>> 3;
-				this.temp[i] = (t1_1 + this.temp[i - 7] | 0) + (t2_1 + this.temp[i - 16] | 0);
-			}
-			var t1 = (((state4 >>> 6 | state4 << 26) ^ (state4 >>> 11 | state4 << 21) ^ (state4 >>> 25 | state4 << 7)) + (state4 & state5 ^ ~state4 & state6) | 0) + (state7 + (KEY[i] + this.temp[i] | 0) | 0) | 0;
-			var t2 = ((state0 >>> 2 | state0 << 30) ^ (state0 >>> 13 | state0 << 19) ^ (state0 >>> 22 | state0 << 10)) + (state0 & state1 ^ state0 & state2 ^ state1 & state2) | 0;
-			state7 = state6;
-			state6 = state5;
-			state5 = state4;
-			state4 = state3 + t1 | 0;
-			state3 = state2;
-			state2 = state1;
-			state1 = state0;
-			state0 = t1 + t2 | 0;
-		}
-		state[0] += state0;
-		state[1] += state1;
-		state[2] += state2;
-		state[3] += state3;
-		state[4] += state4;
-		state[5] += state5;
-		state[6] += state6;
-		state[7] += state7;
-	};
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/browserCryptoLib.js
-var require_browserCryptoLib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var Hmac = require_browserHmac();
-	var Md5 = require_browserMd5();
-	var Sha1 = require_browserSha1();
-	var Sha256 = require_browserSha256();
-	/**
-	* @api private
-	*/
-	module.exports = exports = {
-		createHash: function createHash(alg) {
-			alg = alg.toLowerCase();
-			if (alg === "md5") return new Md5();
-			else if (alg === "sha256") return new Sha256();
-			else if (alg === "sha1") return new Sha1();
-			throw new Error("Hash algorithm " + alg + " is not supported in the browser SDK");
-		},
-		createHmac: function createHmac(alg, key) {
-			alg = alg.toLowerCase();
-			if (alg === "md5") return new Hmac(Md5, key);
-			else if (alg === "sha256") return new Hmac(Sha256, key);
-			else if (alg === "sha1") return new Hmac(Sha1, key);
-			throw new Error("HMAC algorithm " + alg + " is not supported in the browser SDK");
-		},
-		createSign: function() {
-			throw new Error("createSign is not implemented in the browser");
-		}
-	};
-}));
-
-//#endregion
-//#region node_modules/punycode/punycode.js
-var require_punycode = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	(function(root) {
-		/** Detect free variables */
-		var freeExports = typeof exports == "object" && exports && !exports.nodeType && exports;
-		var freeModule = typeof module == "object" && module && !module.nodeType && module;
-		var freeGlobal = typeof global == "object" && global;
-		if (freeGlobal.global === freeGlobal || freeGlobal.window === freeGlobal || freeGlobal.self === freeGlobal) root = freeGlobal;
-		/**
-		* The `punycode` object.
-		* @name punycode
-		* @type Object
-		*/
-		var punycode, maxInt = 2147483647, base = 36, tMin = 1, tMax = 26, skew = 38, damp = 700, initialBias = 72, initialN = 128, delimiter = "-", regexPunycode = /^xn--/, regexNonASCII = /[^\x20-\x7E]/, regexSeparators = /[\x2E\u3002\uFF0E\uFF61]/g, errors = {
-			"overflow": "Overflow: input needs wider integers to process",
-			"not-basic": "Illegal input >= 0x80 (not a basic code point)",
-			"invalid-input": "Invalid input"
-		}, baseMinusTMin = base - tMin, floor = Math.floor, stringFromCharCode = String.fromCharCode, key;
-		/**
-		* A generic error utility function.
-		* @private
-		* @param {String} type The error type.
-		* @returns {Error} Throws a `RangeError` with the applicable error message.
-		*/
-		function error(type) {
-			throw RangeError(errors[type]);
-		}
-		/**
-		* A generic `Array#map` utility function.
-		* @private
-		* @param {Array} array The array to iterate over.
-		* @param {Function} callback The function that gets called for every array
-		* item.
-		* @returns {Array} A new array of values returned by the callback function.
-		*/
-		function map(array, fn) {
-			var length = array.length;
-			var result = [];
-			while (length--) result[length] = fn(array[length]);
-			return result;
-		}
-		/**
-		* A simple `Array#map`-like wrapper to work with domain name strings or email
-		* addresses.
-		* @private
-		* @param {String} domain The domain name or email address.
-		* @param {Function} callback The function that gets called for every
-		* character.
-		* @returns {Array} A new string of characters returned by the callback
-		* function.
-		*/
-		function mapDomain(string, fn) {
-			var parts = string.split("@");
-			var result = "";
-			if (parts.length > 1) {
-				result = parts[0] + "@";
-				string = parts[1];
-			}
-			string = string.replace(regexSeparators, ".");
-			var encoded = map(string.split("."), fn).join(".");
-			return result + encoded;
-		}
-		/**
-		* Creates an array containing the numeric code points of each Unicode
-		* character in the string. While JavaScript uses UCS-2 internally,
-		* this function will convert a pair of surrogate halves (each of which
-		* UCS-2 exposes as separate characters) into a single code point,
-		* matching UTF-16.
-		* @see `punycode.ucs2.encode`
-		* @see <https://mathiasbynens.be/notes/javascript-encoding>
-		* @memberOf punycode.ucs2
-		* @name decode
-		* @param {String} string The Unicode input string (UCS-2).
-		* @returns {Array} The new array of code points.
-		*/
-		function ucs2decode(string) {
-			var output = [], counter = 0, length = string.length, value, extra;
-			while (counter < length) {
-				value = string.charCodeAt(counter++);
-				if (value >= 55296 && value <= 56319 && counter < length) {
-					extra = string.charCodeAt(counter++);
-					if ((extra & 64512) == 56320) output.push(((value & 1023) << 10) + (extra & 1023) + 65536);
-					else {
-						output.push(value);
-						counter--;
-					}
-				} else output.push(value);
-			}
-			return output;
-		}
-		/**
-		* Creates a string based on an array of numeric code points.
-		* @see `punycode.ucs2.decode`
-		* @memberOf punycode.ucs2
-		* @name encode
-		* @param {Array} codePoints The array of numeric code points.
-		* @returns {String} The new Unicode string (UCS-2).
-		*/
-		function ucs2encode(array) {
-			return map(array, function(value) {
-				var output = "";
-				if (value > 65535) {
-					value -= 65536;
-					output += stringFromCharCode(value >>> 10 & 1023 | 55296);
-					value = 56320 | value & 1023;
-				}
-				output += stringFromCharCode(value);
-				return output;
-			}).join("");
-		}
-		/**
-		* Converts a basic code point into a digit/integer.
-		* @see `digitToBasic()`
-		* @private
-		* @param {Number} codePoint The basic numeric code point value.
-		* @returns {Number} The numeric value of a basic code point (for use in
-		* representing integers) in the range `0` to `base - 1`, or `base` if
-		* the code point does not represent a value.
-		*/
-		function basicToDigit(codePoint) {
-			if (codePoint - 48 < 10) return codePoint - 22;
-			if (codePoint - 65 < 26) return codePoint - 65;
-			if (codePoint - 97 < 26) return codePoint - 97;
-			return base;
-		}
-		/**
-		* Converts a digit/integer into a basic code point.
-		* @see `basicToDigit()`
-		* @private
-		* @param {Number} digit The numeric value of a basic code point.
-		* @returns {Number} The basic code point whose value (when used for
-		* representing integers) is `digit`, which needs to be in the range
-		* `0` to `base - 1`. If `flag` is non-zero, the uppercase form is
-		* used; else, the lowercase form is used. The behavior is undefined
-		* if `flag` is non-zero and `digit` has no uppercase form.
-		*/
-		function digitToBasic(digit, flag) {
-			return digit + 22 + 75 * (digit < 26) - ((flag != 0) << 5);
-		}
-		/**
-		* Bias adaptation function as per section 3.4 of RFC 3492.
-		* http://tools.ietf.org/html/rfc3492#section-3.4
-		* @private
-		*/
-		function adapt(delta, numPoints, firstTime) {
-			var k = 0;
-			delta = firstTime ? floor(delta / damp) : delta >> 1;
-			delta += floor(delta / numPoints);
-			for (; delta > baseMinusTMin * tMax >> 1; k += base) delta = floor(delta / baseMinusTMin);
-			return floor(k + (baseMinusTMin + 1) * delta / (delta + skew));
-		}
-		/**
-		* Converts a Punycode string of ASCII-only symbols to a string of Unicode
-		* symbols.
-		* @memberOf punycode
-		* @param {String} input The Punycode string of ASCII-only symbols.
-		* @returns {String} The resulting string of Unicode symbols.
-		*/
-		function decode(input) {
-			var output = [], inputLength = input.length, out, i = 0, n = initialN, bias = initialBias, basic = input.lastIndexOf(delimiter), j, index, oldi, w, k, digit, t, baseMinusT;
-			if (basic < 0) basic = 0;
-			for (j = 0; j < basic; ++j) {
-				if (input.charCodeAt(j) >= 128) error("not-basic");
-				output.push(input.charCodeAt(j));
-			}
-			for (index = basic > 0 ? basic + 1 : 0; index < inputLength;) {
-				for (oldi = i, w = 1, k = base;; k += base) {
-					if (index >= inputLength) error("invalid-input");
-					digit = basicToDigit(input.charCodeAt(index++));
-					if (digit >= base || digit > floor((maxInt - i) / w)) error("overflow");
-					i += digit * w;
-					t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
-					if (digit < t) break;
-					baseMinusT = base - t;
-					if (w > floor(maxInt / baseMinusT)) error("overflow");
-					w *= baseMinusT;
-				}
-				out = output.length + 1;
-				bias = adapt(i - oldi, out, oldi == 0);
-				if (floor(i / out) > maxInt - n) error("overflow");
-				n += floor(i / out);
-				i %= out;
-				output.splice(i++, 0, n);
-			}
-			return ucs2encode(output);
-		}
-		/**
-		* Converts a string of Unicode symbols (e.g. a domain name label) to a
-		* Punycode string of ASCII-only symbols.
-		* @memberOf punycode
-		* @param {String} input The string of Unicode symbols.
-		* @returns {String} The resulting Punycode string of ASCII-only symbols.
-		*/
-		function encode(input) {
-			var n, delta, handledCPCount, basicLength, bias, j, m, q, k, t, currentValue, output = [], inputLength, handledCPCountPlusOne, baseMinusT, qMinusT;
-			input = ucs2decode(input);
-			inputLength = input.length;
-			n = initialN;
-			delta = 0;
-			bias = initialBias;
-			for (j = 0; j < inputLength; ++j) {
-				currentValue = input[j];
-				if (currentValue < 128) output.push(stringFromCharCode(currentValue));
-			}
-			handledCPCount = basicLength = output.length;
-			if (basicLength) output.push(delimiter);
-			while (handledCPCount < inputLength) {
-				for (m = maxInt, j = 0; j < inputLength; ++j) {
-					currentValue = input[j];
-					if (currentValue >= n && currentValue < m) m = currentValue;
-				}
-				handledCPCountPlusOne = handledCPCount + 1;
-				if (m - n > floor((maxInt - delta) / handledCPCountPlusOne)) error("overflow");
-				delta += (m - n) * handledCPCountPlusOne;
-				n = m;
-				for (j = 0; j < inputLength; ++j) {
-					currentValue = input[j];
-					if (currentValue < n && ++delta > maxInt) error("overflow");
-					if (currentValue == n) {
-						for (q = delta, k = base;; k += base) {
-							t = k <= bias ? tMin : k >= bias + tMax ? tMax : k - bias;
-							if (q < t) break;
-							qMinusT = q - t;
-							baseMinusT = base - t;
-							output.push(stringFromCharCode(digitToBasic(t + qMinusT % baseMinusT, 0)));
-							q = floor(qMinusT / baseMinusT);
-						}
-						output.push(stringFromCharCode(digitToBasic(q, 0)));
-						bias = adapt(delta, handledCPCountPlusOne, handledCPCount == basicLength);
-						delta = 0;
-						++handledCPCount;
-					}
-				}
-				++delta;
-				++n;
-			}
-			return output.join("");
-		}
-		/**
-		* Converts a Punycode string representing a domain name or an email address
-		* to Unicode. Only the Punycoded parts of the input will be converted, i.e.
-		* it doesn't matter if you call it on a string that has already been
-		* converted to Unicode.
-		* @memberOf punycode
-		* @param {String} input The Punycoded domain name or email address to
-		* convert to Unicode.
-		* @returns {String} The Unicode representation of the given Punycode
-		* string.
-		*/
-		function toUnicode(input) {
-			return mapDomain(input, function(string) {
-				return regexPunycode.test(string) ? decode(string.slice(4).toLowerCase()) : string;
-			});
-		}
-		/**
-		* Converts a Unicode string representing a domain name or an email address to
-		* Punycode. Only the non-ASCII parts of the domain name will be converted,
-		* i.e. it doesn't matter if you call it with a domain that's already in
-		* ASCII.
-		* @memberOf punycode
-		* @param {String} input The domain name or email address to convert, as a
-		* Unicode string.
-		* @returns {String} The Punycode representation of the given domain name or
-		* email address.
-		*/
-		function toASCII(input) {
-			return mapDomain(input, function(string) {
-				return regexNonASCII.test(string) ? "xn--" + encode(string) : string;
-			});
-		}
-		/** Define the public API */
-		punycode = {
-			"version": "1.3.2",
-			"ucs2": {
-				"decode": ucs2decode,
-				"encode": ucs2encode
-			},
-			"decode": decode,
-			"encode": encode,
-			"toASCII": toASCII,
-			"toUnicode": toUnicode
-		};
-		/** Expose `punycode` */
-		if (typeof define == "function" && typeof define.amd == "object" && define.amd) define("punycode", function() {
-			return punycode;
-		});
-		else if (freeExports && freeModule) if (module.exports == freeExports) freeModule.exports = punycode;
-		else for (key in punycode) punycode.hasOwnProperty(key) && (freeExports[key] = punycode[key]);
-		else root.punycode = punycode;
-	})(exports);
-}));
-
-//#endregion
-//#region node_modules/querystring/decode.js
-var require_decode = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	function hasOwnProperty(obj, prop) {
-		return Object.prototype.hasOwnProperty.call(obj, prop);
-	}
-	module.exports = function(qs, sep, eq, options) {
-		sep = sep || "&";
-		eq = eq || "=";
-		var obj = {};
-		if (typeof qs !== "string" || qs.length === 0) return obj;
-		var regexp = /\+/g;
-		qs = qs.split(sep);
-		var maxKeys = 1e3;
-		if (options && typeof options.maxKeys === "number") maxKeys = options.maxKeys;
-		var len = qs.length;
-		if (maxKeys > 0 && len > maxKeys) len = maxKeys;
-		for (var i = 0; i < len; ++i) {
-			var x = qs[i].replace(regexp, "%20"), idx = x.indexOf(eq), kstr, vstr, k, v;
-			if (idx >= 0) {
-				kstr = x.substr(0, idx);
-				vstr = x.substr(idx + 1);
-			} else {
-				kstr = x;
-				vstr = "";
-			}
-			k = decodeURIComponent(kstr);
-			v = decodeURIComponent(vstr);
-			if (!hasOwnProperty(obj, k)) obj[k] = v;
-			else if (Array.isArray(obj[k])) obj[k].push(v);
-			else obj[k] = [obj[k], v];
-		}
-		return obj;
-	};
-}));
-
-//#endregion
-//#region node_modules/querystring/encode.js
-var require_encode = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var stringifyPrimitive = function(v) {
-		switch (typeof v) {
-			case "string": return v;
-			case "boolean": return v ? "true" : "false";
-			case "number": return isFinite(v) ? v : "";
-			default: return "";
-		}
-	};
-	module.exports = function(obj, sep, eq, name) {
-		sep = sep || "&";
-		eq = eq || "=";
-		if (obj === null) obj = void 0;
-		if (typeof obj === "object") return Object.keys(obj).map(function(k) {
-			var ks = encodeURIComponent(stringifyPrimitive(k)) + eq;
-			if (Array.isArray(obj[k])) return obj[k].map(function(v) {
-				return ks + encodeURIComponent(stringifyPrimitive(v));
-			}).join(sep);
-			else return ks + encodeURIComponent(stringifyPrimitive(obj[k]));
-		}).join(sep);
-		if (!name) return "";
-		return encodeURIComponent(stringifyPrimitive(name)) + eq + encodeURIComponent(stringifyPrimitive(obj));
-	};
-}));
-
-//#endregion
-//#region node_modules/querystring/index.js
-var require_querystring = /* @__PURE__ */ __commonJSMin(((exports) => {
-	exports.decode = exports.parse = require_decode();
-	exports.encode = exports.stringify = require_encode();
-}));
-
-//#endregion
-//#region node_modules/url/url.js
-var require_url = /* @__PURE__ */ __commonJSMin(((exports) => {
-	var punycode = require_punycode();
-	exports.parse = urlParse;
-	exports.resolve = urlResolve;
-	exports.resolveObject = urlResolveObject;
-	exports.format = urlFormat;
-	exports.Url = Url;
-	function Url() {
-		this.protocol = null;
-		this.slashes = null;
-		this.auth = null;
-		this.host = null;
-		this.port = null;
-		this.hostname = null;
-		this.hash = null;
-		this.search = null;
-		this.query = null;
-		this.pathname = null;
-		this.path = null;
-		this.href = null;
-	}
-	var protocolPattern = /^([a-z0-9.+-]+:)/i, portPattern = /:[0-9]*$/, unwise = [
-		"{",
-		"}",
-		"|",
-		"\\",
-		"^",
-		"`"
-	].concat([
-		"<",
-		">",
-		"\"",
-		"`",
-		" ",
-		"\r",
-		"\n",
-		"	"
-	]), autoEscape = ["'"].concat(unwise), nonHostChars = [
-		"%",
-		"/",
-		"?",
-		";",
-		"#"
-	].concat(autoEscape), hostEndingChars = [
-		"/",
-		"?",
-		"#"
-	], hostnameMaxLen = 255, hostnamePartPattern = /^[a-z0-9A-Z_-]{0,63}$/, hostnamePartStart = /^([a-z0-9A-Z_-]{0,63})(.*)$/, unsafeProtocol = {
-		"javascript": true,
-		"javascript:": true
-	}, hostlessProtocol = {
-		"javascript": true,
-		"javascript:": true
-	}, slashedProtocol = {
-		"http": true,
-		"https": true,
-		"ftp": true,
-		"gopher": true,
-		"file": true,
-		"http:": true,
-		"https:": true,
-		"ftp:": true,
-		"gopher:": true,
-		"file:": true
-	}, querystring = require_querystring();
-	function urlParse(url, parseQueryString, slashesDenoteHost) {
-		if (url && isObject(url) && url instanceof Url) return url;
-		var u = new Url();
-		u.parse(url, parseQueryString, slashesDenoteHost);
-		return u;
-	}
-	Url.prototype.parse = function(url, parseQueryString, slashesDenoteHost) {
-		if (!isString(url)) throw new TypeError("Parameter 'url' must be a string, not " + typeof url);
-		var rest = url;
-		rest = rest.trim();
-		var proto = protocolPattern.exec(rest);
-		if (proto) {
-			proto = proto[0];
-			var lowerProto = proto.toLowerCase();
-			this.protocol = lowerProto;
-			rest = rest.substr(proto.length);
-		}
-		if (slashesDenoteHost || proto || rest.match(/^\/\/[^@\/]+@[^@\/]+/)) {
-			var slashes = rest.substr(0, 2) === "//";
-			if (slashes && !(proto && hostlessProtocol[proto])) {
-				rest = rest.substr(2);
-				this.slashes = true;
-			}
-		}
-		if (!hostlessProtocol[proto] && (slashes || proto && !slashedProtocol[proto])) {
-			var hostEnd = -1;
-			for (var i = 0; i < hostEndingChars.length; i++) {
-				var hec = rest.indexOf(hostEndingChars[i]);
-				if (hec !== -1 && (hostEnd === -1 || hec < hostEnd)) hostEnd = hec;
-			}
-			var auth, atSign;
-			if (hostEnd === -1) atSign = rest.lastIndexOf("@");
-			else atSign = rest.lastIndexOf("@", hostEnd);
-			if (atSign !== -1) {
-				auth = rest.slice(0, atSign);
-				rest = rest.slice(atSign + 1);
-				this.auth = decodeURIComponent(auth);
-			}
-			hostEnd = -1;
-			for (var i = 0; i < nonHostChars.length; i++) {
-				var hec = rest.indexOf(nonHostChars[i]);
-				if (hec !== -1 && (hostEnd === -1 || hec < hostEnd)) hostEnd = hec;
-			}
-			if (hostEnd === -1) hostEnd = rest.length;
-			this.host = rest.slice(0, hostEnd);
-			rest = rest.slice(hostEnd);
-			this.parseHost();
-			this.hostname = this.hostname || "";
-			var ipv6Hostname = this.hostname[0] === "[" && this.hostname[this.hostname.length - 1] === "]";
-			if (!ipv6Hostname) {
-				var hostparts = this.hostname.split(/\./);
-				for (var i = 0, l = hostparts.length; i < l; i++) {
-					var part = hostparts[i];
-					if (!part) continue;
-					if (!part.match(hostnamePartPattern)) {
-						var newpart = "";
-						for (var j = 0, k = part.length; j < k; j++) if (part.charCodeAt(j) > 127) newpart += "x";
-						else newpart += part[j];
-						if (!newpart.match(hostnamePartPattern)) {
-							var validParts = hostparts.slice(0, i);
-							var notHost = hostparts.slice(i + 1);
-							var bit = part.match(hostnamePartStart);
-							if (bit) {
-								validParts.push(bit[1]);
-								notHost.unshift(bit[2]);
-							}
-							if (notHost.length) rest = "/" + notHost.join(".") + rest;
-							this.hostname = validParts.join(".");
-							break;
-						}
-					}
-				}
-			}
-			if (this.hostname.length > hostnameMaxLen) this.hostname = "";
-			else this.hostname = this.hostname.toLowerCase();
-			if (!ipv6Hostname) {
-				var domainArray = this.hostname.split(".");
-				var newOut = [];
-				for (var i = 0; i < domainArray.length; ++i) {
-					var s = domainArray[i];
-					newOut.push(s.match(/[^A-Za-z0-9_-]/) ? "xn--" + punycode.encode(s) : s);
-				}
-				this.hostname = newOut.join(".");
-			}
-			var p = this.port ? ":" + this.port : "";
-			this.host = (this.hostname || "") + p;
-			this.href += this.host;
-			if (ipv6Hostname) {
-				this.hostname = this.hostname.substr(1, this.hostname.length - 2);
-				if (rest[0] !== "/") rest = "/" + rest;
-			}
-		}
-		if (!unsafeProtocol[lowerProto]) for (var i = 0, l = autoEscape.length; i < l; i++) {
-			var ae = autoEscape[i];
-			var esc = encodeURIComponent(ae);
-			if (esc === ae) esc = escape(ae);
-			rest = rest.split(ae).join(esc);
-		}
-		var hash = rest.indexOf("#");
-		if (hash !== -1) {
-			this.hash = rest.substr(hash);
-			rest = rest.slice(0, hash);
-		}
-		var qm = rest.indexOf("?");
-		if (qm !== -1) {
-			this.search = rest.substr(qm);
-			this.query = rest.substr(qm + 1);
-			if (parseQueryString) this.query = querystring.parse(this.query);
-			rest = rest.slice(0, qm);
-		} else if (parseQueryString) {
-			this.search = "";
-			this.query = {};
-		}
-		if (rest) this.pathname = rest;
-		if (slashedProtocol[lowerProto] && this.hostname && !this.pathname) this.pathname = "/";
-		if (this.pathname || this.search) {
-			var p = this.pathname || "";
-			var s = this.search || "";
-			this.path = p + s;
-		}
-		this.href = this.format();
-		return this;
-	};
-	function urlFormat(obj) {
-		if (isString(obj)) obj = urlParse(obj);
-		if (!(obj instanceof Url)) return Url.prototype.format.call(obj);
-		return obj.format();
-	}
-	Url.prototype.format = function() {
-		var auth = this.auth || "";
-		if (auth) {
-			auth = encodeURIComponent(auth);
-			auth = auth.replace(/%3A/i, ":");
-			auth += "@";
-		}
-		var protocol = this.protocol || "", pathname = this.pathname || "", hash = this.hash || "", host = false, query = "";
-		if (this.host) host = auth + this.host;
-		else if (this.hostname) {
-			host = auth + (this.hostname.indexOf(":") === -1 ? this.hostname : "[" + this.hostname + "]");
-			if (this.port) host += ":" + this.port;
-		}
-		if (this.query && isObject(this.query) && Object.keys(this.query).length) query = querystring.stringify(this.query);
-		var search = this.search || query && "?" + query || "";
-		if (protocol && protocol.substr(-1) !== ":") protocol += ":";
-		if (this.slashes || (!protocol || slashedProtocol[protocol]) && host !== false) {
-			host = "//" + (host || "");
-			if (pathname && pathname.charAt(0) !== "/") pathname = "/" + pathname;
-		} else if (!host) host = "";
-		if (hash && hash.charAt(0) !== "#") hash = "#" + hash;
-		if (search && search.charAt(0) !== "?") search = "?" + search;
-		pathname = pathname.replace(/[?#]/g, function(match) {
-			return encodeURIComponent(match);
-		});
-		search = search.replace("#", "%23");
-		return protocol + host + pathname + search + hash;
-	};
-	function urlResolve(source, relative) {
-		return urlParse(source, false, true).resolve(relative);
-	}
-	Url.prototype.resolve = function(relative) {
-		return this.resolveObject(urlParse(relative, false, true)).format();
-	};
-	function urlResolveObject(source, relative) {
-		if (!source) return relative;
-		return urlParse(source, false, true).resolveObject(relative);
-	}
-	Url.prototype.resolveObject = function(relative) {
-		if (isString(relative)) {
-			var rel = new Url();
-			rel.parse(relative, false, true);
-			relative = rel;
-		}
-		var result = new Url();
-		Object.keys(this).forEach(function(k) {
-			result[k] = this[k];
-		}, this);
-		result.hash = relative.hash;
-		if (relative.href === "") {
-			result.href = result.format();
-			return result;
-		}
-		if (relative.slashes && !relative.protocol) {
-			Object.keys(relative).forEach(function(k) {
-				if (k !== "protocol") result[k] = relative[k];
-			});
-			if (slashedProtocol[result.protocol] && result.hostname && !result.pathname) result.path = result.pathname = "/";
-			result.href = result.format();
-			return result;
-		}
-		if (relative.protocol && relative.protocol !== result.protocol) {
-			if (!slashedProtocol[relative.protocol]) {
-				Object.keys(relative).forEach(function(k) {
-					result[k] = relative[k];
-				});
-				result.href = result.format();
-				return result;
-			}
-			result.protocol = relative.protocol;
-			if (!relative.host && !hostlessProtocol[relative.protocol]) {
-				var relPath = (relative.pathname || "").split("/");
-				while (relPath.length && !(relative.host = relPath.shift()));
-				if (!relative.host) relative.host = "";
-				if (!relative.hostname) relative.hostname = "";
-				if (relPath[0] !== "") relPath.unshift("");
-				if (relPath.length < 2) relPath.unshift("");
-				result.pathname = relPath.join("/");
-			} else result.pathname = relative.pathname;
-			result.search = relative.search;
-			result.query = relative.query;
-			result.host = relative.host || "";
-			result.auth = relative.auth;
-			result.hostname = relative.hostname || relative.host;
-			result.port = relative.port;
-			if (result.pathname || result.search) result.path = (result.pathname || "") + (result.search || "");
-			result.slashes = result.slashes || relative.slashes;
-			result.href = result.format();
-			return result;
-		}
-		var isSourceAbs = result.pathname && result.pathname.charAt(0) === "/", isRelAbs = relative.host || relative.pathname && relative.pathname.charAt(0) === "/", mustEndAbs = isRelAbs || isSourceAbs || result.host && relative.pathname, removeAllDots = mustEndAbs, srcPath = result.pathname && result.pathname.split("/") || [], relPath = relative.pathname && relative.pathname.split("/") || [], psychotic = result.protocol && !slashedProtocol[result.protocol];
-		if (psychotic) {
-			result.hostname = "";
-			result.port = null;
-			if (result.host) if (srcPath[0] === "") srcPath[0] = result.host;
-			else srcPath.unshift(result.host);
-			result.host = "";
-			if (relative.protocol) {
-				relative.hostname = null;
-				relative.port = null;
-				if (relative.host) if (relPath[0] === "") relPath[0] = relative.host;
-				else relPath.unshift(relative.host);
-				relative.host = null;
-			}
-			mustEndAbs = mustEndAbs && (relPath[0] === "" || srcPath[0] === "");
-		}
-		if (isRelAbs) {
-			result.host = relative.host || relative.host === "" ? relative.host : result.host;
-			result.hostname = relative.hostname || relative.hostname === "" ? relative.hostname : result.hostname;
-			result.search = relative.search;
-			result.query = relative.query;
-			srcPath = relPath;
-		} else if (relPath.length) {
-			if (!srcPath) srcPath = [];
-			srcPath.pop();
-			srcPath = srcPath.concat(relPath);
-			result.search = relative.search;
-			result.query = relative.query;
-		} else if (!isNullOrUndefined(relative.search)) {
-			if (psychotic) {
-				result.hostname = result.host = srcPath.shift();
-				var authInHost = result.host && result.host.indexOf("@") > 0 ? result.host.split("@") : false;
-				if (authInHost) {
-					result.auth = authInHost.shift();
-					result.host = result.hostname = authInHost.shift();
-				}
-			}
-			result.search = relative.search;
-			result.query = relative.query;
-			if (!isNull(result.pathname) || !isNull(result.search)) result.path = (result.pathname ? result.pathname : "") + (result.search ? result.search : "");
-			result.href = result.format();
-			return result;
-		}
-		if (!srcPath.length) {
-			result.pathname = null;
-			if (result.search) result.path = "/" + result.search;
-			else result.path = null;
-			result.href = result.format();
-			return result;
-		}
-		var last = srcPath.slice(-1)[0];
-		var hasTrailingSlash = (result.host || relative.host) && (last === "." || last === "..") || last === "";
-		var up = 0;
-		for (var i = srcPath.length; i >= 0; i--) {
-			last = srcPath[i];
-			if (last == ".") srcPath.splice(i, 1);
-			else if (last === "..") {
-				srcPath.splice(i, 1);
-				up++;
-			} else if (up) {
-				srcPath.splice(i, 1);
-				up--;
-			}
-		}
-		if (!mustEndAbs && !removeAllDots) for (; up--;) srcPath.unshift("..");
-		if (mustEndAbs && srcPath[0] !== "" && (!srcPath[0] || srcPath[0].charAt(0) !== "/")) srcPath.unshift("");
-		if (hasTrailingSlash && srcPath.join("/").substr(-1) !== "/") srcPath.push("");
-		var isAbsolute = srcPath[0] === "" || srcPath[0] && srcPath[0].charAt(0) === "/";
-		if (psychotic) {
-			result.hostname = result.host = isAbsolute ? "" : srcPath.length ? srcPath.shift() : "";
-			var authInHost = result.host && result.host.indexOf("@") > 0 ? result.host.split("@") : false;
-			if (authInHost) {
-				result.auth = authInHost.shift();
-				result.host = result.hostname = authInHost.shift();
-			}
-		}
-		mustEndAbs = mustEndAbs || result.host && srcPath.length;
-		if (mustEndAbs && !isAbsolute) srcPath.unshift("");
-		if (!srcPath.length) {
-			result.pathname = null;
-			result.path = null;
-		} else result.pathname = srcPath.join("/");
-		if (!isNull(result.pathname) || !isNull(result.search)) result.path = (result.pathname ? result.pathname : "") + (result.search ? result.search : "");
-		result.auth = relative.auth || result.auth;
-		result.slashes = result.slashes || relative.slashes;
-		result.href = result.format();
-		return result;
-	};
-	Url.prototype.parseHost = function() {
-		var host = this.host;
-		var port = portPattern.exec(host);
-		if (port) {
-			port = port[0];
-			if (port !== ":") this.port = port.substr(1);
-			host = host.substr(0, host.length - port.length);
-		}
-		if (host) this.hostname = host;
-	};
-	function isString(arg) {
-		return typeof arg === "string";
-	}
-	function isObject(arg) {
-		return typeof arg === "object" && arg !== null;
-	}
-	function isNull(arg) {
-		return arg === null;
-	}
-	function isNullOrUndefined(arg) {
-		return arg == null;
-	}
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/realclock/browserClock.js
-var require_browserClock = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	module.exports = { now: function now() {
-		if (typeof performance !== "undefined" && typeof performance.now === "function") return performance.now();
-		return Date.now();
-	} };
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/event-stream/event-message-chunker.js
-var require_event_message_chunker = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	/**
-	* Takes in a buffer of event messages and splits them into individual messages.
-	* @param {Buffer} buffer
-	* @api private
-	*/
-	function eventMessageChunker(buffer) {
-		/** @type Buffer[] */
-		var messages = [];
-		var offset = 0;
-		while (offset < buffer.length) {
-			var totalLength = buffer.readInt32BE(offset);
-			var message = buffer.slice(offset, totalLength + offset);
-			offset += totalLength;
-			messages.push(message);
-		}
-		return messages;
-	}
-	/**
-	* @api private
-	*/
-	module.exports = { eventMessageChunker };
+	module.exports = { EventMessageChunkerStream };
 }));
 
 //#endregion
@@ -14503,6 +9827,100 @@ var require_parse_event = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
+//#region node_modules/aws-sdk/lib/event-stream/event-message-unmarshaller-stream.js
+var require_event_message_unmarshaller_stream = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var Transform = __require("stream").Transform;
+	var parseEvent = require_parse_event().parseEvent;
+	/** @type {Transform} */
+	function EventUnmarshallerStream(options) {
+		options = options || {};
+		options.readableObjectMode = true;
+		Transform.call(this, options);
+		this._readableState.objectMode = true;
+		this.parser = options.parser;
+		this.eventStreamModel = options.eventStreamModel;
+	}
+	EventUnmarshallerStream.prototype = Object.create(Transform.prototype);
+	/**
+	*
+	* @param {Buffer} chunk
+	* @param {string} encoding
+	* @param {*} callback
+	*/
+	EventUnmarshallerStream.prototype._transform = function(chunk, encoding, callback) {
+		try {
+			var event = parseEvent(this.parser, chunk, this.eventStreamModel);
+			this.push(event);
+			return callback();
+		} catch (err) {
+			callback(err);
+		}
+	};
+	/**
+	* @api private
+	*/
+	module.exports = { EventUnmarshallerStream };
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/event-stream/streaming-create-event-stream.js
+var require_streaming_create_event_stream = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	/**
+	* What is necessary to create an event stream in node?
+	*  - http response stream
+	*  - parser
+	*  - event stream model
+	*/
+	var EventMessageChunkerStream = require_event_message_chunker_stream().EventMessageChunkerStream;
+	var EventUnmarshallerStream = require_event_message_unmarshaller_stream().EventUnmarshallerStream;
+	function createEventStream(stream, parser, model) {
+		var eventStream = new EventUnmarshallerStream({
+			parser,
+			eventStreamModel: model
+		});
+		var eventMessageChunker = new EventMessageChunkerStream();
+		stream.pipe(eventMessageChunker).pipe(eventStream);
+		stream.on("error", function(err) {
+			eventMessageChunker.emit("error", err);
+		});
+		eventMessageChunker.on("error", function(err) {
+			eventStream.emit("error", err);
+		});
+		return eventStream;
+	}
+	/**
+	* @api private
+	*/
+	module.exports = { createEventStream };
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/event-stream/event-message-chunker.js
+var require_event_message_chunker = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	/**
+	* Takes in a buffer of event messages and splits them into individual messages.
+	* @param {Buffer} buffer
+	* @api private
+	*/
+	function eventMessageChunker(buffer) {
+		/** @type Buffer[] */
+		var messages = [];
+		var offset = 0;
+		while (offset < buffer.length) {
+			var totalLength = buffer.readInt32BE(offset);
+			var message = buffer.slice(offset, totalLength + offset);
+			offset += totalLength;
+			messages.push(message);
+		}
+		return messages;
+	}
+	/**
+	* @api private
+	*/
+	module.exports = { eventMessageChunker };
+}));
+
+//#endregion
 //#region node_modules/aws-sdk/lib/event-stream/buffered-create-event-stream.js
 var require_buffered_create_event_stream = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	var eventMessageChunker = require_event_message_chunker().eventMessageChunker;
@@ -14517,6 +9935,286 @@ var require_buffered_create_event_stream = /* @__PURE__ */ __commonJSMin(((expor
 	* @api private
 	*/
 	module.exports = { createEventStream };
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/realclock/nodeClock.js
+var require_nodeClock = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	module.exports = { now: function now() {
+		var second = process.hrtime();
+		return second[0] * 1e3 + second[1] / 1e6;
+	} };
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/publisher/index.js
+var require_publisher = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var util = require_core().util;
+	var dgram = __require("dgram");
+	var stringToBuffer = util.buffer.toBuffer;
+	var MAX_MESSAGE_SIZE = 1024 * 8;
+	/**
+	* Publishes metrics via udp.
+	* @param {object} options Paramters for Publisher constructor
+	* @param {number} [options.port = 31000] Port number
+	* @param {string} [options.clientId = ''] Client Identifier
+	* @param {boolean} [options.enabled = false] enable sending metrics datagram
+	* @api private
+	*/
+	function Publisher(options) {
+		options = options || {};
+		this.enabled = options.enabled || false;
+		this.port = options.port || 31e3;
+		this.clientId = options.clientId || "";
+		this.address = options.host || "127.0.0.1";
+		if (this.clientId.length > 255) this.clientId = this.clientId.substr(0, 255);
+		this.messagesInFlight = 0;
+	}
+	Publisher.prototype.fieldsToTrim = {
+		UserAgent: 256,
+		SdkException: 128,
+		SdkExceptionMessage: 512,
+		AwsException: 128,
+		AwsExceptionMessage: 512,
+		FinalSdkException: 128,
+		FinalSdkExceptionMessage: 512,
+		FinalAwsException: 128,
+		FinalAwsExceptionMessage: 512
+	};
+	/**
+	* Trims fields that have a specified max length.
+	* @param {object} event ApiCall or ApiCallAttempt event.
+	* @returns {object}
+	* @api private
+	*/
+	Publisher.prototype.trimFields = function(event) {
+		var trimmableFields = Object.keys(this.fieldsToTrim);
+		for (var i = 0, iLen = trimmableFields.length; i < iLen; i++) {
+			var field = trimmableFields[i];
+			if (event.hasOwnProperty(field)) {
+				var maxLength = this.fieldsToTrim[field];
+				var value = event[field];
+				if (value && value.length > maxLength) event[field] = value.substr(0, maxLength);
+			}
+		}
+		return event;
+	};
+	/**
+	* Handles ApiCall and ApiCallAttempt events.
+	* @param {Object} event apiCall or apiCallAttempt event.
+	* @api private
+	*/
+	Publisher.prototype.eventHandler = function(event) {
+		event.ClientId = this.clientId;
+		this.trimFields(event);
+		var message = stringToBuffer(JSON.stringify(event));
+		if (!this.enabled || message.length > MAX_MESSAGE_SIZE) return;
+		this.publishDatagram(message);
+	};
+	/**
+	* Publishes message to an agent.
+	* @param {Buffer} message JSON message to send to agent.
+	* @api private
+	*/
+	Publisher.prototype.publishDatagram = function(message) {
+		var self = this;
+		this.getClient();
+		this.messagesInFlight++;
+		this.client.send(message, 0, message.length, this.port, this.address, function(err, bytes) {
+			if (--self.messagesInFlight <= 0) self.destroyClient();
+		});
+	};
+	/**
+	* Returns an existing udp socket, or creates one if it doesn't already exist.
+	* @api private
+	*/
+	Publisher.prototype.getClient = function() {
+		if (!this.client) this.client = dgram.createSocket("udp4");
+		return this.client;
+	};
+	/**
+	* Destroys the udp socket.
+	* @api private
+	*/
+	Publisher.prototype.destroyClient = function() {
+		if (this.client) {
+			this.client.close();
+			this.client = void 0;
+		}
+	};
+	module.exports = { Publisher };
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/publisher/configuration.js
+var require_configuration = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var AWS = require_core();
+	/**
+	* Resolve client-side monitoring configuration from either environmental variables
+	* or shared config file. Configurations from environmental variables have higher priority
+	* than those from shared config file. The resolver will try to read the shared config file
+	* no matter whether the AWS_SDK_LOAD_CONFIG variable is set.
+	* @api private
+	*/
+	function resolveMonitoringConfig() {
+		var config = {
+			port: void 0,
+			clientId: void 0,
+			enabled: void 0,
+			host: void 0
+		};
+		if (fromEnvironment(config) || fromConfigFile(config)) return toJSType(config);
+		return toJSType(config);
+	}
+	/**
+	* Resolve configurations from environmental variables.
+	* @param {object} client side monitoring config object needs to be resolved
+	* @returns {boolean} whether resolving configurations is done
+	* @api private
+	*/
+	function fromEnvironment(config) {
+		config.port = config.port || process.env.AWS_CSM_PORT;
+		config.enabled = config.enabled || process.env.AWS_CSM_ENABLED;
+		config.clientId = config.clientId || process.env.AWS_CSM_CLIENT_ID;
+		config.host = config.host || process.env.AWS_CSM_HOST;
+		return config.port && config.enabled && config.clientId && config.host || ["false", "0"].indexOf(config.enabled) >= 0;
+	}
+	/**
+	* Resolve cofigurations from shared config file with specified role name
+	* @param {object} client side monitoring config object needs to be resolved
+	* @returns {boolean} whether resolving configurations is done
+	* @api private
+	*/
+	function fromConfigFile(config) {
+		var sharedFileConfig;
+		try {
+			var sharedFileConfig = AWS.util.iniLoader.loadFrom({
+				isConfig: true,
+				filename: process.env[AWS.util.sharedConfigFileEnv]
+			})[process.env.AWS_PROFILE || AWS.util.defaultProfile];
+		} catch (err) {
+			return false;
+		}
+		if (!sharedFileConfig) return config;
+		config.port = config.port || sharedFileConfig.csm_port;
+		config.enabled = config.enabled || sharedFileConfig.csm_enabled;
+		config.clientId = config.clientId || sharedFileConfig.csm_client_id;
+		config.host = config.host || sharedFileConfig.csm_host;
+		return config.port && config.enabled && config.clientId && config.host;
+	}
+	/**
+	* Transfer the resolved configuration value to proper types: port as number, enabled
+	* as boolean and clientId as string. The 'enabled' flag is valued to false when set
+	* to 'false' or '0'.
+	* @param {object} resolved client side monitoring config
+	* @api private
+	*/
+	function toJSType(config) {
+		if (!config.enabled || [
+			"false",
+			"0",
+			void 0
+		].indexOf(config.enabled.toLowerCase()) >= 0) config.enabled = false;
+		else config.enabled = true;
+		config.port = config.port ? parseInt(config.port, 10) : void 0;
+		return config;
+	}
+	module.exports = resolveMonitoringConfig;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/shared-ini/ini-loader.js
+var require_ini_loader = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var AWS = require_core();
+	var os = __require("os");
+	var path$2 = __require("path");
+	function parseFile(filename) {
+		return AWS.util.ini.parse(AWS.util.readFileSync(filename));
+	}
+	function getProfiles(fileContent) {
+		var tmpContent = {};
+		Object.keys(fileContent).forEach(function(sectionName) {
+			if (/^sso-session\s/.test(sectionName)) return;
+			Object.defineProperty(tmpContent, sectionName.replace(/^profile\s/, ""), {
+				value: fileContent[sectionName],
+				enumerable: true
+			});
+		});
+		return tmpContent;
+	}
+	function getSsoSessions(fileContent) {
+		var tmpContent = {};
+		Object.keys(fileContent).forEach(function(sectionName) {
+			if (!/^sso-session\s/.test(sectionName)) return;
+			Object.defineProperty(tmpContent, sectionName.replace(/^sso-session\s/, ""), {
+				value: fileContent[sectionName],
+				enumerable: true
+			});
+		});
+		return tmpContent;
+	}
+	/**
+	* Ini file loader class the same as that used in the SDK. It loads and
+	* parses config and credentials files in .ini format and cache the content
+	* to assure files are only read once.
+	* Note that calling operations on the instance instantiated from this class
+	* won't affect the behavior of SDK since SDK uses an internal singleton of
+	* this class.
+	* @!macro nobrowser
+	*/
+	AWS.IniLoader = AWS.util.inherit({
+		constructor: function IniLoader() {
+			this.resolvedProfiles = {};
+			this.resolvedSsoSessions = {};
+		},
+		clearCachedFiles: function clearCachedFiles() {
+			this.resolvedProfiles = {};
+			this.resolvedSsoSessions = {};
+		},
+		loadFrom: function loadFrom(options) {
+			options = options || {};
+			var isConfig = options.isConfig === true;
+			var filename = options.filename || this.getDefaultFilePath(isConfig);
+			if (!this.resolvedProfiles[filename]) {
+				var fileContent = parseFile(filename);
+				if (isConfig) Object.defineProperty(this.resolvedProfiles, filename, { value: getProfiles(fileContent) });
+				else Object.defineProperty(this.resolvedProfiles, filename, { value: fileContent });
+			}
+			return this.resolvedProfiles[filename];
+		},
+		loadSsoSessionsFrom: function loadSsoSessionsFrom(options) {
+			options = options || {};
+			var filename = options.filename || this.getDefaultFilePath(true);
+			if (!this.resolvedSsoSessions[filename]) {
+				var fileContent = parseFile(filename);
+				Object.defineProperty(this.resolvedSsoSessions, filename, { value: getSsoSessions(fileContent) });
+			}
+			return this.resolvedSsoSessions[filename];
+		},
+		getDefaultFilePath: function getDefaultFilePath(isConfig) {
+			return path$2.join(this.getHomeDir(), ".aws", isConfig ? "config" : "credentials");
+		},
+		getHomeDir: function getHomeDir() {
+			var env = process.env;
+			var home = env.HOME || env.USERPROFILE || (env.HOMEPATH ? (env.HOMEDRIVE || "C:/") + env.HOMEPATH : null);
+			if (home) return home;
+			if (typeof os.homedir === "function") return os.homedir();
+			throw AWS.util.error(/* @__PURE__ */ new Error("Cannot load credentials, HOME path not set"));
+		}
+	});
+	var IniLoader = AWS.IniLoader;
+	module.exports = { IniLoader };
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/shared-ini/index.js
+var require_shared_ini = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var IniLoader = require_ini_loader().IniLoader;
+	/**
+	* Singleton object to load specified config/credentials files.
+	* It will cache all the files ever loaded;
+	*/
+	module.exports.iniLoader = new IniLoader();
 }));
 
 //#endregion
@@ -15324,7 +11022,7 @@ var require_cognito_identity_2014_06_30_paginators = /* @__PURE__ */ __commonJSM
 //#endregion
 //#region node_modules/aws-sdk/clients/cognitoidentity.js
 var require_cognitoidentity = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	require_browser_loader();
+	require_node_loader();
 	var AWS = require_core();
 	var Service = AWS.Service;
 	var apiLoader = AWS.apiLoader;
@@ -15630,65 +11328,4949 @@ var require_saml_credentials = /* @__PURE__ */ __commonJSMin((() => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/lib/xml/browser_parser.js
-var require_browser_parser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var util = require_util();
-	var Shape = require_shape();
-	function DomXmlParser() {}
-	DomXmlParser.prototype.parse = function(xml, shape) {
-		if (xml.replace(/^\s+/, "") === "") return {};
-		var result, error;
-		try {
-			if (window.DOMParser) {
-				try {
-					result = new DOMParser().parseFromString(xml, "text/xml");
-				} catch (syntaxError) {
-					throw util.error(/* @__PURE__ */ new Error("Parse error in document"), {
-						originalError: syntaxError,
-						code: "XMLParserError",
-						retryable: true
-					});
-				}
-				if (result.documentElement === null) throw util.error(/* @__PURE__ */ new Error("Cannot parse empty document."), {
-					code: "XMLParserError",
-					retryable: true
+//#region node_modules/aws-sdk/lib/credentials/process_credentials.js
+var require_process_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	var proc = __require("child_process");
+	var iniLoader = AWS.util.iniLoader;
+	/**
+	* Represents credentials loaded from shared credentials file
+	* (defaulting to ~/.aws/credentials or defined by the
+	* `AWS_SHARED_CREDENTIALS_FILE` environment variable).
+	*
+	* ## Using process credentials
+	*
+	* The credentials file can specify a credential provider that executes
+	* a given process and attempts to read its stdout to recieve a JSON payload
+	* containing the credentials:
+	*
+	*     [default]
+	*     credential_process = /usr/bin/credential_proc
+	*
+	* Automatically handles refreshing credentials if an Expiration time is
+	* provided in the credentials payload. Credentials supplied in the same profile
+	* will take precedence over the credential_process.
+	*
+	* Sourcing credentials from an external process can potentially be dangerous,
+	* so proceed with caution. Other credential providers should be preferred if
+	* at all possible. If using this option, you should make sure that the shared
+	* credentials file is as locked down as possible using security best practices
+	* for your operating system.
+	*
+	* ## Using custom profiles
+	*
+	* The SDK supports loading credentials for separate profiles. This can be done
+	* in two ways:
+	*
+	* 1. Set the `AWS_PROFILE` environment variable in your process prior to
+	*    loading the SDK.
+	* 2. Directly load the AWS.ProcessCredentials provider:
+	*
+	* ```javascript
+	* var creds = new AWS.ProcessCredentials({profile: 'myprofile'});
+	* AWS.config.credentials = creds;
+	* ```
+	*
+	* @!macro nobrowser
+	*/
+	AWS.ProcessCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function ProcessCredentials(options) {
+			AWS.Credentials.call(this);
+			options = options || {};
+			this.filename = options.filename;
+			this.profile = options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
+			this.get(options.callback || AWS.util.fn.noop);
+		},
+		load: function load(callback) {
+			var self = this;
+			try {
+				var profile = AWS.util.getProfilesFromSharedConfig(iniLoader, this.filename)[this.profile] || {};
+				if (Object.keys(profile).length === 0) throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + this.profile + " not found"), { code: "ProcessCredentialsProviderFailure" });
+				if (profile["credential_process"]) this.loadViaCredentialProcess(profile, function(err, data) {
+					if (err) callback(err, null);
+					else {
+						self.expired = false;
+						self.accessKeyId = data.AccessKeyId;
+						self.secretAccessKey = data.SecretAccessKey;
+						self.sessionToken = data.SessionToken;
+						if (data.Expiration) self.expireTime = new Date(data.Expiration);
+						callback(null);
+					}
 				});
-				var isError = result.getElementsByTagName("parsererror")[0];
-				if (isError && (isError.parentNode === result || isError.parentNode.nodeName === "body" || isError.parentNode.parentNode === result || isError.parentNode.parentNode.nodeName === "body")) {
-					var errorElement = isError.getElementsByTagName("div")[0] || isError;
-					throw util.error(new Error(errorElement.textContent || "Parser error in document"), {
-						code: "XMLParserError",
-						retryable: true
-					});
+				else throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + this.profile + " did not include credential process"), { code: "ProcessCredentialsProviderFailure" });
+			} catch (err) {
+				callback(err);
+			}
+		},
+		loadViaCredentialProcess: function loadViaCredentialProcess(profile, callback) {
+			proc.exec(profile["credential_process"], { env: process.env }, function(err, stdOut, stdErr) {
+				if (err) callback(AWS.util.error(/* @__PURE__ */ new Error("credential_process returned error"), { code: "ProcessCredentialsProviderFailure" }), null);
+				else try {
+					var credData = JSON.parse(stdOut);
+					if (credData.Expiration) {
+						var currentTime = AWS.util.date.getDate();
+						if (new Date(credData.Expiration) < currentTime) throw Error("credential_process returned expired credentials");
+					}
+					if (credData.Version !== 1) throw Error("credential_process does not return Version == 1");
+					callback(null, credData);
+				} catch (err$1) {
+					callback(AWS.util.error(new Error(err$1.message), { code: "ProcessCredentialsProviderFailure" }), null);
 				}
-			} else if (window.ActiveXObject) {
-				result = new window.ActiveXObject("Microsoft.XMLDOM");
-				result.async = false;
-				if (!result.loadXML(xml)) throw util.error(/* @__PURE__ */ new Error("Parse error in document"), {
-					code: "XMLParserError",
-					retryable: true
-				});
-			} else throw new Error("Cannot load XML parser");
-		} catch (e) {
-			error = e;
+			});
+		},
+		refresh: function refresh(callback) {
+			iniLoader.clearCachedFiles();
+			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		}
-		if (result && result.documentElement && !error) {
-			var data = parseXml(result.documentElement, shape);
-			var metadata = getElementByTagName(result.documentElement, "ResponseMetadata");
-			if (metadata) data.ResponseMetadata = parseXml(metadata, {});
+	});
+}));
+
+//#endregion
+//#region node_modules/xml2js/lib/defaults.js
+var require_defaults = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function() {
+		exports.defaults = {
+			"0.1": {
+				explicitCharkey: false,
+				trim: true,
+				normalize: true,
+				normalizeTags: false,
+				attrkey: "@",
+				charkey: "#",
+				explicitArray: false,
+				ignoreAttrs: false,
+				mergeAttrs: false,
+				explicitRoot: false,
+				validator: null,
+				xmlns: false,
+				explicitChildren: false,
+				childkey: "@@",
+				charsAsChildren: false,
+				includeWhiteChars: false,
+				async: false,
+				strict: true,
+				attrNameProcessors: null,
+				attrValueProcessors: null,
+				tagNameProcessors: null,
+				valueProcessors: null,
+				emptyTag: ""
+			},
+			"0.2": {
+				explicitCharkey: false,
+				trim: false,
+				normalize: false,
+				normalizeTags: false,
+				attrkey: "$",
+				charkey: "_",
+				explicitArray: true,
+				ignoreAttrs: false,
+				mergeAttrs: false,
+				explicitRoot: true,
+				validator: null,
+				xmlns: false,
+				explicitChildren: false,
+				preserveChildrenOrder: false,
+				childkey: "$$",
+				charsAsChildren: false,
+				includeWhiteChars: false,
+				async: false,
+				strict: true,
+				attrNameProcessors: null,
+				attrValueProcessors: null,
+				tagNameProcessors: null,
+				valueProcessors: null,
+				rootName: "root",
+				xmldec: {
+					"version": "1.0",
+					"encoding": "UTF-8",
+					"standalone": true
+				},
+				doctype: null,
+				renderOpts: {
+					"pretty": true,
+					"indent": "  ",
+					"newline": "\n"
+				},
+				headless: false,
+				chunkSize: 1e4,
+				emptyTag: "",
+				cdata: false
+			}
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/Utility.js
+var require_Utility = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var assign, getValue, isArray, isEmpty, isFunction, isObject, isPlainObject, slice = [].slice, hasProp = {}.hasOwnProperty;
+		assign = function() {
+			var i, key, len, source, sources, target = arguments[0];
+			sources = 2 <= arguments.length ? slice.call(arguments, 1) : [];
+			if (isFunction(Object.assign)) Object.assign.apply(null, arguments);
+			else for (i = 0, len = sources.length; i < len; i++) {
+				source = sources[i];
+				if (source != null) for (key in source) {
+					if (!hasProp.call(source, key)) continue;
+					target[key] = source[key];
+				}
+			}
+			return target;
+		};
+		isFunction = function(val) {
+			return !!val && Object.prototype.toString.call(val) === "[object Function]";
+		};
+		isObject = function(val) {
+			var ref;
+			return !!val && ((ref = typeof val) === "function" || ref === "object");
+		};
+		isArray = function(val) {
+			if (isFunction(Array.isArray)) return Array.isArray(val);
+			else return Object.prototype.toString.call(val) === "[object Array]";
+		};
+		isEmpty = function(val) {
+			var key;
+			if (isArray(val)) return !val.length;
+			else {
+				for (key in val) {
+					if (!hasProp.call(val, key)) continue;
+					return false;
+				}
+				return true;
+			}
+		};
+		isPlainObject = function(val) {
+			var ctor, proto;
+			return isObject(val) && (proto = Object.getPrototypeOf(val)) && (ctor = proto.constructor) && typeof ctor === "function" && ctor instanceof ctor && Function.prototype.toString.call(ctor) === Function.prototype.toString.call(Object);
+		};
+		getValue = function(obj) {
+			if (isFunction(obj.valueOf)) return obj.valueOf();
+			else return obj;
+		};
+		module.exports.assign = assign;
+		module.exports.isFunction = isFunction;
+		module.exports.isObject = isObject;
+		module.exports.isArray = isArray;
+		module.exports.isEmpty = isEmpty;
+		module.exports.isPlainObject = isPlainObject;
+		module.exports.getValue = getValue;
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDOMImplementation.js
+var require_XMLDOMImplementation = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = (function() {
+			function XMLDOMImplementation() {}
+			XMLDOMImplementation.prototype.hasFeature = function(feature, version) {
+				return true;
+			};
+			XMLDOMImplementation.prototype.createDocumentType = function(qualifiedName, publicId, systemId) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			XMLDOMImplementation.prototype.createDocument = function(namespaceURI, qualifiedName, doctype) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			XMLDOMImplementation.prototype.createHTMLDocument = function(title) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			XMLDOMImplementation.prototype.getFeature = function(feature, version) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			return XMLDOMImplementation;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDOMErrorHandler.js
+var require_XMLDOMErrorHandler = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = (function() {
+			function XMLDOMErrorHandler() {}
+			XMLDOMErrorHandler.prototype.handleError = function(error) {
+				throw new Error(error);
+			};
+			return XMLDOMErrorHandler;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDOMStringList.js
+var require_XMLDOMStringList = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = (function() {
+			function XMLDOMStringList(arr) {
+				this.arr = arr || [];
+			}
+			Object.defineProperty(XMLDOMStringList.prototype, "length", { get: function() {
+				return this.arr.length;
+			} });
+			XMLDOMStringList.prototype.item = function(index) {
+				return this.arr[index] || null;
+			};
+			XMLDOMStringList.prototype.contains = function(str) {
+				return this.arr.indexOf(str) !== -1;
+			};
+			return XMLDOMStringList;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDOMConfiguration.js
+var require_XMLDOMConfiguration = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var XMLDOMErrorHandler = require_XMLDOMErrorHandler(), XMLDOMStringList = require_XMLDOMStringList();
+		module.exports = (function() {
+			function XMLDOMConfiguration() {
+				this.defaultParams = {
+					"canonical-form": false,
+					"cdata-sections": false,
+					"comments": false,
+					"datatype-normalization": false,
+					"element-content-whitespace": true,
+					"entities": true,
+					"error-handler": new XMLDOMErrorHandler(),
+					"infoset": true,
+					"validate-if-schema": false,
+					"namespaces": true,
+					"namespace-declarations": true,
+					"normalize-characters": false,
+					"schema-location": "",
+					"schema-type": "",
+					"split-cdata-sections": true,
+					"validate": false,
+					"well-formed": true
+				};
+				this.params = Object.create(this.defaultParams);
+			}
+			Object.defineProperty(XMLDOMConfiguration.prototype, "parameterNames", { get: function() {
+				return new XMLDOMStringList(Object.keys(this.defaultParams));
+			} });
+			XMLDOMConfiguration.prototype.getParameter = function(name) {
+				if (this.params.hasOwnProperty(name)) return this.params[name];
+				else return null;
+			};
+			XMLDOMConfiguration.prototype.canSetParameter = function(name, value) {
+				return true;
+			};
+			XMLDOMConfiguration.prototype.setParameter = function(name, value) {
+				if (value != null) return this.params[name] = value;
+				else return delete this.params[name];
+			};
+			return XMLDOMConfiguration;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/NodeType.js
+var require_NodeType = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = {
+			Element: 1,
+			Attribute: 2,
+			Text: 3,
+			CData: 4,
+			EntityReference: 5,
+			EntityDeclaration: 6,
+			ProcessingInstruction: 7,
+			Comment: 8,
+			Document: 9,
+			DocType: 10,
+			DocumentFragment: 11,
+			NotationDeclaration: 12,
+			Declaration: 201,
+			Raw: 202,
+			AttributeDeclaration: 203,
+			ElementDeclaration: 204,
+			Dummy: 205
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLAttribute.js
+var require_XMLAttribute = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType = require_NodeType();
+		require_XMLNode();
+		module.exports = (function() {
+			function XMLAttribute(parent, name, value) {
+				this.parent = parent;
+				if (this.parent) {
+					this.options = this.parent.options;
+					this.stringify = this.parent.stringify;
+				}
+				if (name == null) throw new Error("Missing attribute name. " + this.debugInfo(name));
+				this.name = this.stringify.name(name);
+				this.value = this.stringify.attValue(value);
+				this.type = NodeType.Attribute;
+				this.isId = false;
+				this.schemaTypeInfo = null;
+			}
+			Object.defineProperty(XMLAttribute.prototype, "nodeType", { get: function() {
+				return this.type;
+			} });
+			Object.defineProperty(XMLAttribute.prototype, "ownerElement", { get: function() {
+				return this.parent;
+			} });
+			Object.defineProperty(XMLAttribute.prototype, "textContent", {
+				get: function() {
+					return this.value;
+				},
+				set: function(value) {
+					return this.value = value || "";
+				}
+			});
+			Object.defineProperty(XMLAttribute.prototype, "namespaceURI", { get: function() {
+				return "";
+			} });
+			Object.defineProperty(XMLAttribute.prototype, "prefix", { get: function() {
+				return "";
+			} });
+			Object.defineProperty(XMLAttribute.prototype, "localName", { get: function() {
+				return this.name;
+			} });
+			Object.defineProperty(XMLAttribute.prototype, "specified", { get: function() {
+				return true;
+			} });
+			XMLAttribute.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLAttribute.prototype.toString = function(options) {
+				return this.options.writer.attribute(this, this.options.writer.filterOptions(options));
+			};
+			XMLAttribute.prototype.debugInfo = function(name) {
+				name = name || this.name;
+				if (name == null) return "parent: <" + this.parent.name + ">";
+				else return "attribute: {" + name + "}, parent: <" + this.parent.name + ">";
+			};
+			XMLAttribute.prototype.isEqualNode = function(node) {
+				if (node.namespaceURI !== this.namespaceURI) return false;
+				if (node.prefix !== this.prefix) return false;
+				if (node.localName !== this.localName) return false;
+				if (node.value !== this.value) return false;
+				return true;
+			};
+			return XMLAttribute;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLNamedNodeMap.js
+var require_XMLNamedNodeMap = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = (function() {
+			function XMLNamedNodeMap(nodes) {
+				this.nodes = nodes;
+			}
+			Object.defineProperty(XMLNamedNodeMap.prototype, "length", { get: function() {
+				return Object.keys(this.nodes).length || 0;
+			} });
+			XMLNamedNodeMap.prototype.clone = function() {
+				return this.nodes = null;
+			};
+			XMLNamedNodeMap.prototype.getNamedItem = function(name) {
+				return this.nodes[name];
+			};
+			XMLNamedNodeMap.prototype.setNamedItem = function(node) {
+				var oldNode = this.nodes[node.nodeName];
+				this.nodes[node.nodeName] = node;
+				return oldNode || null;
+			};
+			XMLNamedNodeMap.prototype.removeNamedItem = function(name) {
+				var oldNode = this.nodes[name];
+				delete this.nodes[name];
+				return oldNode || null;
+			};
+			XMLNamedNodeMap.prototype.item = function(index) {
+				return this.nodes[Object.keys(this.nodes)[index]] || null;
+			};
+			XMLNamedNodeMap.prototype.getNamedItemNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			XMLNamedNodeMap.prototype.setNamedItemNS = function(node) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			XMLNamedNodeMap.prototype.removeNamedItemNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented.");
+			};
+			return XMLNamedNodeMap;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLElement.js
+var require_XMLElement = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLAttribute, XMLNamedNodeMap, XMLNode, getValue, isFunction, isObject, ref, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		ref = require_Utility(), isObject = ref.isObject, isFunction = ref.isFunction, getValue = ref.getValue;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		XMLAttribute = require_XMLAttribute();
+		XMLNamedNodeMap = require_XMLNamedNodeMap();
+		module.exports = (function(superClass) {
+			extend(XMLElement, superClass);
+			function XMLElement(parent, name, attributes) {
+				var child, j, len, ref1;
+				XMLElement.__super__.constructor.call(this, parent);
+				if (name == null) throw new Error("Missing element name. " + this.debugInfo());
+				this.name = this.stringify.name(name);
+				this.type = NodeType.Element;
+				this.attribs = {};
+				this.schemaTypeInfo = null;
+				if (attributes != null) this.attribute(attributes);
+				if (parent.type === NodeType.Document) {
+					this.isRoot = true;
+					this.documentObject = parent;
+					parent.rootObject = this;
+					if (parent.children) {
+						ref1 = parent.children;
+						for (j = 0, len = ref1.length; j < len; j++) {
+							child = ref1[j];
+							if (child.type === NodeType.DocType) {
+								child.name = this.name;
+								break;
+							}
+						}
+					}
+				}
+			}
+			Object.defineProperty(XMLElement.prototype, "tagName", { get: function() {
+				return this.name;
+			} });
+			Object.defineProperty(XMLElement.prototype, "namespaceURI", { get: function() {
+				return "";
+			} });
+			Object.defineProperty(XMLElement.prototype, "prefix", { get: function() {
+				return "";
+			} });
+			Object.defineProperty(XMLElement.prototype, "localName", { get: function() {
+				return this.name;
+			} });
+			Object.defineProperty(XMLElement.prototype, "id", { get: function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			} });
+			Object.defineProperty(XMLElement.prototype, "className", { get: function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			} });
+			Object.defineProperty(XMLElement.prototype, "classList", { get: function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			} });
+			Object.defineProperty(XMLElement.prototype, "attributes", { get: function() {
+				if (!this.attributeMap || !this.attributeMap.nodes) this.attributeMap = new XMLNamedNodeMap(this.attribs);
+				return this.attributeMap;
+			} });
+			XMLElement.prototype.clone = function() {
+				var att, attName, clonedSelf = Object.create(this), ref1;
+				if (clonedSelf.isRoot) clonedSelf.documentObject = null;
+				clonedSelf.attribs = {};
+				ref1 = this.attribs;
+				for (attName in ref1) {
+					if (!hasProp.call(ref1, attName)) continue;
+					att = ref1[attName];
+					clonedSelf.attribs[attName] = att.clone();
+				}
+				clonedSelf.children = [];
+				this.children.forEach(function(child) {
+					var clonedChild = child.clone();
+					clonedChild.parent = clonedSelf;
+					return clonedSelf.children.push(clonedChild);
+				});
+				return clonedSelf;
+			};
+			XMLElement.prototype.attribute = function(name, value) {
+				var attName, attValue;
+				if (name != null) name = getValue(name);
+				if (isObject(name)) for (attName in name) {
+					if (!hasProp.call(name, attName)) continue;
+					attValue = name[attName];
+					this.attribute(attName, attValue);
+				}
+				else {
+					if (isFunction(value)) value = value.apply();
+					if (this.options.keepNullAttributes && value == null) this.attribs[name] = new XMLAttribute(this, name, "");
+					else if (value != null) this.attribs[name] = new XMLAttribute(this, name, value);
+				}
+				return this;
+			};
+			XMLElement.prototype.removeAttribute = function(name) {
+				var attName, j, len;
+				if (name == null) throw new Error("Missing attribute name. " + this.debugInfo());
+				name = getValue(name);
+				if (Array.isArray(name)) for (j = 0, len = name.length; j < len; j++) {
+					attName = name[j];
+					delete this.attribs[attName];
+				}
+				else delete this.attribs[name];
+				return this;
+			};
+			XMLElement.prototype.toString = function(options) {
+				return this.options.writer.element(this, this.options.writer.filterOptions(options));
+			};
+			XMLElement.prototype.att = function(name, value) {
+				return this.attribute(name, value);
+			};
+			XMLElement.prototype.a = function(name, value) {
+				return this.attribute(name, value);
+			};
+			XMLElement.prototype.getAttribute = function(name) {
+				if (this.attribs.hasOwnProperty(name)) return this.attribs[name].value;
+				else return null;
+			};
+			XMLElement.prototype.setAttribute = function(name, value) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getAttributeNode = function(name) {
+				if (this.attribs.hasOwnProperty(name)) return this.attribs[name];
+				else return null;
+			};
+			XMLElement.prototype.setAttributeNode = function(newAttr) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.removeAttributeNode = function(oldAttr) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getElementsByTagName = function(name) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getAttributeNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.setAttributeNS = function(namespaceURI, qualifiedName, value) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.removeAttributeNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getAttributeNodeNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.setAttributeNodeNS = function(newAttr) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getElementsByTagNameNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.hasAttribute = function(name) {
+				return this.attribs.hasOwnProperty(name);
+			};
+			XMLElement.prototype.hasAttributeNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.setIdAttribute = function(name, isId) {
+				if (this.attribs.hasOwnProperty(name)) return this.attribs[name].isId;
+				else return isId;
+			};
+			XMLElement.prototype.setIdAttributeNS = function(namespaceURI, localName, isId) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.setIdAttributeNode = function(idAttr, isId) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getElementsByTagName = function(tagname) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getElementsByTagNameNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.getElementsByClassName = function(classNames) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLElement.prototype.isEqualNode = function(node) {
+				var i, j, ref1;
+				if (!XMLElement.__super__.isEqualNode.apply(this, arguments).isEqualNode(node)) return false;
+				if (node.namespaceURI !== this.namespaceURI) return false;
+				if (node.prefix !== this.prefix) return false;
+				if (node.localName !== this.localName) return false;
+				if (node.attribs.length !== this.attribs.length) return false;
+				for (i = j = 0, ref1 = this.attribs.length - 1; 0 <= ref1 ? j <= ref1 : j >= ref1; i = 0 <= ref1 ? ++j : --j) if (!this.attribs[i].isEqualNode(node.attribs[i])) return false;
+				return true;
+			};
+			return XMLElement;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLCharacterData.js
+var require_XMLCharacterData = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var XMLNode, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		XMLNode = require_XMLNode();
+		module.exports = (function(superClass) {
+			extend(XMLCharacterData, superClass);
+			function XMLCharacterData(parent) {
+				XMLCharacterData.__super__.constructor.call(this, parent);
+				this.value = "";
+			}
+			Object.defineProperty(XMLCharacterData.prototype, "data", {
+				get: function() {
+					return this.value;
+				},
+				set: function(value) {
+					return this.value = value || "";
+				}
+			});
+			Object.defineProperty(XMLCharacterData.prototype, "length", { get: function() {
+				return this.value.length;
+			} });
+			Object.defineProperty(XMLCharacterData.prototype, "textContent", {
+				get: function() {
+					return this.value;
+				},
+				set: function(value) {
+					return this.value = value || "";
+				}
+			});
+			XMLCharacterData.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLCharacterData.prototype.substringData = function(offset, count) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLCharacterData.prototype.appendData = function(arg) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLCharacterData.prototype.insertData = function(offset, arg) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLCharacterData.prototype.deleteData = function(offset, count) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLCharacterData.prototype.replaceData = function(offset, count, arg) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLCharacterData.prototype.isEqualNode = function(node) {
+				if (!XMLCharacterData.__super__.isEqualNode.apply(this, arguments).isEqualNode(node)) return false;
+				if (node.data !== this.data) return false;
+				return true;
+			};
+			return XMLCharacterData;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLCData.js
+var require_XMLCData = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLCharacterData, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		NodeType = require_NodeType();
+		XMLCharacterData = require_XMLCharacterData();
+		module.exports = (function(superClass) {
+			extend(XMLCData, superClass);
+			function XMLCData(parent, text) {
+				XMLCData.__super__.constructor.call(this, parent);
+				if (text == null) throw new Error("Missing CDATA text. " + this.debugInfo());
+				this.name = "#cdata-section";
+				this.type = NodeType.CData;
+				this.value = this.stringify.cdata(text);
+			}
+			XMLCData.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLCData.prototype.toString = function(options) {
+				return this.options.writer.cdata(this, this.options.writer.filterOptions(options));
+			};
+			return XMLCData;
+		})(XMLCharacterData);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLComment.js
+var require_XMLComment = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLCharacterData, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		NodeType = require_NodeType();
+		XMLCharacterData = require_XMLCharacterData();
+		module.exports = (function(superClass) {
+			extend(XMLComment, superClass);
+			function XMLComment(parent, text) {
+				XMLComment.__super__.constructor.call(this, parent);
+				if (text == null) throw new Error("Missing comment text. " + this.debugInfo());
+				this.name = "#comment";
+				this.type = NodeType.Comment;
+				this.value = this.stringify.comment(text);
+			}
+			XMLComment.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLComment.prototype.toString = function(options) {
+				return this.options.writer.comment(this, this.options.writer.filterOptions(options));
+			};
+			return XMLComment;
+		})(XMLCharacterData);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDeclaration.js
+var require_XMLDeclaration = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, isObject, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		isObject = require_Utility().isObject;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		module.exports = (function(superClass) {
+			extend(XMLDeclaration, superClass);
+			function XMLDeclaration(parent, version, encoding, standalone) {
+				var ref;
+				XMLDeclaration.__super__.constructor.call(this, parent);
+				if (isObject(version)) ref = version, version = ref.version, encoding = ref.encoding, standalone = ref.standalone;
+				if (!version) version = "1.0";
+				this.type = NodeType.Declaration;
+				this.version = this.stringify.xmlVersion(version);
+				if (encoding != null) this.encoding = this.stringify.xmlEncoding(encoding);
+				if (standalone != null) this.standalone = this.stringify.xmlStandalone(standalone);
+			}
+			XMLDeclaration.prototype.toString = function(options) {
+				return this.options.writer.declaration(this, this.options.writer.filterOptions(options));
+			};
+			return XMLDeclaration;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDTDAttList.js
+var require_XMLDTDAttList = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		module.exports = (function(superClass) {
+			extend(XMLDTDAttList, superClass);
+			function XMLDTDAttList(parent, elementName, attributeName, attributeType, defaultValueType, defaultValue) {
+				XMLDTDAttList.__super__.constructor.call(this, parent);
+				if (elementName == null) throw new Error("Missing DTD element name. " + this.debugInfo());
+				if (attributeName == null) throw new Error("Missing DTD attribute name. " + this.debugInfo(elementName));
+				if (!attributeType) throw new Error("Missing DTD attribute type. " + this.debugInfo(elementName));
+				if (!defaultValueType) throw new Error("Missing DTD attribute default. " + this.debugInfo(elementName));
+				if (defaultValueType.indexOf("#") !== 0) defaultValueType = "#" + defaultValueType;
+				if (!defaultValueType.match(/^(#REQUIRED|#IMPLIED|#FIXED|#DEFAULT)$/)) throw new Error("Invalid default value type; expected: #REQUIRED, #IMPLIED, #FIXED or #DEFAULT. " + this.debugInfo(elementName));
+				if (defaultValue && !defaultValueType.match(/^(#FIXED|#DEFAULT)$/)) throw new Error("Default value only applies to #FIXED or #DEFAULT. " + this.debugInfo(elementName));
+				this.elementName = this.stringify.name(elementName);
+				this.type = NodeType.AttributeDeclaration;
+				this.attributeName = this.stringify.name(attributeName);
+				this.attributeType = this.stringify.dtdAttType(attributeType);
+				if (defaultValue) this.defaultValue = this.stringify.dtdAttDefault(defaultValue);
+				this.defaultValueType = defaultValueType;
+			}
+			XMLDTDAttList.prototype.toString = function(options) {
+				return this.options.writer.dtdAttList(this, this.options.writer.filterOptions(options));
+			};
+			return XMLDTDAttList;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDTDEntity.js
+var require_XMLDTDEntity = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, isObject, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		isObject = require_Utility().isObject;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		module.exports = (function(superClass) {
+			extend(XMLDTDEntity, superClass);
+			function XMLDTDEntity(parent, pe, name, value) {
+				XMLDTDEntity.__super__.constructor.call(this, parent);
+				if (name == null) throw new Error("Missing DTD entity name. " + this.debugInfo(name));
+				if (value == null) throw new Error("Missing DTD entity value. " + this.debugInfo(name));
+				this.pe = !!pe;
+				this.name = this.stringify.name(name);
+				this.type = NodeType.EntityDeclaration;
+				if (!isObject(value)) {
+					this.value = this.stringify.dtdEntityValue(value);
+					this.internal = true;
+				} else {
+					if (!value.pubID && !value.sysID) throw new Error("Public and/or system identifiers are required for an external entity. " + this.debugInfo(name));
+					if (value.pubID && !value.sysID) throw new Error("System identifier is required for a public external entity. " + this.debugInfo(name));
+					this.internal = false;
+					if (value.pubID != null) this.pubID = this.stringify.dtdPubID(value.pubID);
+					if (value.sysID != null) this.sysID = this.stringify.dtdSysID(value.sysID);
+					if (value.nData != null) this.nData = this.stringify.dtdNData(value.nData);
+					if (this.pe && this.nData) throw new Error("Notation declaration is not allowed in a parameter entity. " + this.debugInfo(name));
+				}
+			}
+			Object.defineProperty(XMLDTDEntity.prototype, "publicId", { get: function() {
+				return this.pubID;
+			} });
+			Object.defineProperty(XMLDTDEntity.prototype, "systemId", { get: function() {
+				return this.sysID;
+			} });
+			Object.defineProperty(XMLDTDEntity.prototype, "notationName", { get: function() {
+				return this.nData || null;
+			} });
+			Object.defineProperty(XMLDTDEntity.prototype, "inputEncoding", { get: function() {
+				return null;
+			} });
+			Object.defineProperty(XMLDTDEntity.prototype, "xmlEncoding", { get: function() {
+				return null;
+			} });
+			Object.defineProperty(XMLDTDEntity.prototype, "xmlVersion", { get: function() {
+				return null;
+			} });
+			XMLDTDEntity.prototype.toString = function(options) {
+				return this.options.writer.dtdEntity(this, this.options.writer.filterOptions(options));
+			};
+			return XMLDTDEntity;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDTDElement.js
+var require_XMLDTDElement = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		module.exports = (function(superClass) {
+			extend(XMLDTDElement, superClass);
+			function XMLDTDElement(parent, name, value) {
+				XMLDTDElement.__super__.constructor.call(this, parent);
+				if (name == null) throw new Error("Missing DTD element name. " + this.debugInfo());
+				if (!value) value = "(#PCDATA)";
+				if (Array.isArray(value)) value = "(" + value.join(",") + ")";
+				this.name = this.stringify.name(name);
+				this.type = NodeType.ElementDeclaration;
+				this.value = this.stringify.dtdElementValue(value);
+			}
+			XMLDTDElement.prototype.toString = function(options) {
+				return this.options.writer.dtdElement(this, this.options.writer.filterOptions(options));
+			};
+			return XMLDTDElement;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDTDNotation.js
+var require_XMLDTDNotation = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		module.exports = (function(superClass) {
+			extend(XMLDTDNotation, superClass);
+			function XMLDTDNotation(parent, name, value) {
+				XMLDTDNotation.__super__.constructor.call(this, parent);
+				if (name == null) throw new Error("Missing DTD notation name. " + this.debugInfo(name));
+				if (!value.pubID && !value.sysID) throw new Error("Public or system identifiers are required for an external entity. " + this.debugInfo(name));
+				this.name = this.stringify.name(name);
+				this.type = NodeType.NotationDeclaration;
+				if (value.pubID != null) this.pubID = this.stringify.dtdPubID(value.pubID);
+				if (value.sysID != null) this.sysID = this.stringify.dtdSysID(value.sysID);
+			}
+			Object.defineProperty(XMLDTDNotation.prototype, "publicId", { get: function() {
+				return this.pubID;
+			} });
+			Object.defineProperty(XMLDTDNotation.prototype, "systemId", { get: function() {
+				return this.sysID;
+			} });
+			XMLDTDNotation.prototype.toString = function(options) {
+				return this.options.writer.dtdNotation(this, this.options.writer.filterOptions(options));
+			};
+			return XMLDTDNotation;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDocType.js
+var require_XMLDocType = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLNamedNodeMap, XMLNode, isObject, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		isObject = require_Utility().isObject;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		XMLDTDAttList = require_XMLDTDAttList();
+		XMLDTDEntity = require_XMLDTDEntity();
+		XMLDTDElement = require_XMLDTDElement();
+		XMLDTDNotation = require_XMLDTDNotation();
+		XMLNamedNodeMap = require_XMLNamedNodeMap();
+		module.exports = (function(superClass) {
+			extend(XMLDocType, superClass);
+			function XMLDocType(parent, pubID, sysID) {
+				var child, i, len, ref, ref1, ref2;
+				XMLDocType.__super__.constructor.call(this, parent);
+				this.type = NodeType.DocType;
+				if (parent.children) {
+					ref = parent.children;
+					for (i = 0, len = ref.length; i < len; i++) {
+						child = ref[i];
+						if (child.type === NodeType.Element) {
+							this.name = child.name;
+							break;
+						}
+					}
+				}
+				this.documentObject = parent;
+				if (isObject(pubID)) ref1 = pubID, pubID = ref1.pubID, sysID = ref1.sysID;
+				if (sysID == null) ref2 = [pubID, sysID], sysID = ref2[0], pubID = ref2[1];
+				if (pubID != null) this.pubID = this.stringify.dtdPubID(pubID);
+				if (sysID != null) this.sysID = this.stringify.dtdSysID(sysID);
+			}
+			Object.defineProperty(XMLDocType.prototype, "entities", { get: function() {
+				var child, i, len, nodes = {}, ref = this.children;
+				for (i = 0, len = ref.length; i < len; i++) {
+					child = ref[i];
+					if (child.type === NodeType.EntityDeclaration && !child.pe) nodes[child.name] = child;
+				}
+				return new XMLNamedNodeMap(nodes);
+			} });
+			Object.defineProperty(XMLDocType.prototype, "notations", { get: function() {
+				var child, i, len, nodes = {}, ref = this.children;
+				for (i = 0, len = ref.length; i < len; i++) {
+					child = ref[i];
+					if (child.type === NodeType.NotationDeclaration) nodes[child.name] = child;
+				}
+				return new XMLNamedNodeMap(nodes);
+			} });
+			Object.defineProperty(XMLDocType.prototype, "publicId", { get: function() {
+				return this.pubID;
+			} });
+			Object.defineProperty(XMLDocType.prototype, "systemId", { get: function() {
+				return this.sysID;
+			} });
+			Object.defineProperty(XMLDocType.prototype, "internalSubset", { get: function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			} });
+			XMLDocType.prototype.element = function(name, value) {
+				var child = new XMLDTDElement(this, name, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLDocType.prototype.attList = function(elementName, attributeName, attributeType, defaultValueType, defaultValue) {
+				var child = new XMLDTDAttList(this, elementName, attributeName, attributeType, defaultValueType, defaultValue);
+				this.children.push(child);
+				return this;
+			};
+			XMLDocType.prototype.entity = function(name, value) {
+				var child = new XMLDTDEntity(this, false, name, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLDocType.prototype.pEntity = function(name, value) {
+				var child = new XMLDTDEntity(this, true, name, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLDocType.prototype.notation = function(name, value) {
+				var child = new XMLDTDNotation(this, name, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLDocType.prototype.toString = function(options) {
+				return this.options.writer.docType(this, this.options.writer.filterOptions(options));
+			};
+			XMLDocType.prototype.ele = function(name, value) {
+				return this.element(name, value);
+			};
+			XMLDocType.prototype.att = function(elementName, attributeName, attributeType, defaultValueType, defaultValue) {
+				return this.attList(elementName, attributeName, attributeType, defaultValueType, defaultValue);
+			};
+			XMLDocType.prototype.ent = function(name, value) {
+				return this.entity(name, value);
+			};
+			XMLDocType.prototype.pent = function(name, value) {
+				return this.pEntity(name, value);
+			};
+			XMLDocType.prototype.not = function(name, value) {
+				return this.notation(name, value);
+			};
+			XMLDocType.prototype.up = function() {
+				return this.root() || this.documentObject;
+			};
+			XMLDocType.prototype.isEqualNode = function(node) {
+				if (!XMLDocType.__super__.isEqualNode.apply(this, arguments).isEqualNode(node)) return false;
+				if (node.name !== this.name) return false;
+				if (node.publicId !== this.publicId) return false;
+				if (node.systemId !== this.systemId) return false;
+				return true;
+			};
+			return XMLDocType;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLRaw.js
+var require_XMLRaw = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		NodeType = require_NodeType();
+		XMLNode = require_XMLNode();
+		module.exports = (function(superClass) {
+			extend(XMLRaw, superClass);
+			function XMLRaw(parent, text) {
+				XMLRaw.__super__.constructor.call(this, parent);
+				if (text == null) throw new Error("Missing raw text. " + this.debugInfo());
+				this.type = NodeType.Raw;
+				this.value = this.stringify.raw(text);
+			}
+			XMLRaw.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLRaw.prototype.toString = function(options) {
+				return this.options.writer.raw(this, this.options.writer.filterOptions(options));
+			};
+			return XMLRaw;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLText.js
+var require_XMLText = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLCharacterData, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		NodeType = require_NodeType();
+		XMLCharacterData = require_XMLCharacterData();
+		module.exports = (function(superClass) {
+			extend(XMLText, superClass);
+			function XMLText(parent, text) {
+				XMLText.__super__.constructor.call(this, parent);
+				if (text == null) throw new Error("Missing element text. " + this.debugInfo());
+				this.name = "#text";
+				this.type = NodeType.Text;
+				this.value = this.stringify.text(text);
+			}
+			Object.defineProperty(XMLText.prototype, "isElementContentWhitespace", { get: function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			} });
+			Object.defineProperty(XMLText.prototype, "wholeText", { get: function() {
+				var next, prev, str = "";
+				prev = this.previousSibling;
+				while (prev) {
+					str = prev.data + str;
+					prev = prev.previousSibling;
+				}
+				str += this.data;
+				next = this.nextSibling;
+				while (next) {
+					str = str + next.data;
+					next = next.nextSibling;
+				}
+				return str;
+			} });
+			XMLText.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLText.prototype.toString = function(options) {
+				return this.options.writer.text(this, this.options.writer.filterOptions(options));
+			};
+			XMLText.prototype.splitText = function(offset) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLText.prototype.replaceWholeText = function(content) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			return XMLText;
+		})(XMLCharacterData);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLProcessingInstruction.js
+var require_XMLProcessingInstruction = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLCharacterData, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		NodeType = require_NodeType();
+		XMLCharacterData = require_XMLCharacterData();
+		module.exports = (function(superClass) {
+			extend(XMLProcessingInstruction, superClass);
+			function XMLProcessingInstruction(parent, target, value) {
+				XMLProcessingInstruction.__super__.constructor.call(this, parent);
+				if (target == null) throw new Error("Missing instruction target. " + this.debugInfo());
+				this.type = NodeType.ProcessingInstruction;
+				this.target = this.stringify.insTarget(target);
+				this.name = this.target;
+				if (value) this.value = this.stringify.insValue(value);
+			}
+			XMLProcessingInstruction.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLProcessingInstruction.prototype.toString = function(options) {
+				return this.options.writer.processingInstruction(this, this.options.writer.filterOptions(options));
+			};
+			XMLProcessingInstruction.prototype.isEqualNode = function(node) {
+				if (!XMLProcessingInstruction.__super__.isEqualNode.apply(this, arguments).isEqualNode(node)) return false;
+				if (node.target !== this.target) return false;
+				return true;
+			};
+			return XMLProcessingInstruction;
+		})(XMLCharacterData);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDummy.js
+var require_XMLDummy = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLNode, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		module.exports = (function(superClass) {
+			extend(XMLDummy, superClass);
+			function XMLDummy(parent) {
+				XMLDummy.__super__.constructor.call(this, parent);
+				this.type = NodeType.Dummy;
+			}
+			XMLDummy.prototype.clone = function() {
+				return Object.create(this);
+			};
+			XMLDummy.prototype.toString = function(options) {
+				return "";
+			};
+			return XMLDummy;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLNodeList.js
+var require_XMLNodeList = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = (function() {
+			function XMLNodeList(nodes) {
+				this.nodes = nodes;
+			}
+			Object.defineProperty(XMLNodeList.prototype, "length", { get: function() {
+				return this.nodes.length || 0;
+			} });
+			XMLNodeList.prototype.clone = function() {
+				return this.nodes = null;
+			};
+			XMLNodeList.prototype.item = function(index) {
+				return this.nodes[index] || null;
+			};
+			return XMLNodeList;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/DocumentPosition.js
+var require_DocumentPosition = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = {
+			Disconnected: 1,
+			Preceding: 2,
+			Following: 4,
+			Contains: 8,
+			ContainedBy: 16,
+			ImplementationSpecific: 32
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLNode.js
+var require_XMLNode = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var DocumentPosition, NodeType, XMLCData, XMLComment, XMLDeclaration, XMLDocType, XMLDummy, XMLElement, XMLNodeList, XMLProcessingInstruction, XMLRaw, XMLText, getValue, isEmpty, isFunction, isObject, ref1, hasProp = {}.hasOwnProperty;
+		ref1 = require_Utility(), isObject = ref1.isObject, isFunction = ref1.isFunction, isEmpty = ref1.isEmpty, getValue = ref1.getValue;
+		XMLElement = null;
+		XMLCData = null;
+		XMLComment = null;
+		XMLDeclaration = null;
+		XMLDocType = null;
+		XMLRaw = null;
+		XMLText = null;
+		XMLProcessingInstruction = null;
+		XMLDummy = null;
+		NodeType = null;
+		XMLNodeList = null;
+		DocumentPosition = null;
+		module.exports = (function() {
+			function XMLNode(parent1) {
+				this.parent = parent1;
+				if (this.parent) {
+					this.options = this.parent.options;
+					this.stringify = this.parent.stringify;
+				}
+				this.value = null;
+				this.children = [];
+				this.baseURI = null;
+				if (!XMLElement) {
+					XMLElement = require_XMLElement();
+					XMLCData = require_XMLCData();
+					XMLComment = require_XMLComment();
+					XMLDeclaration = require_XMLDeclaration();
+					XMLDocType = require_XMLDocType();
+					XMLRaw = require_XMLRaw();
+					XMLText = require_XMLText();
+					XMLProcessingInstruction = require_XMLProcessingInstruction();
+					XMLDummy = require_XMLDummy();
+					NodeType = require_NodeType();
+					XMLNodeList = require_XMLNodeList();
+					require_XMLNamedNodeMap();
+					DocumentPosition = require_DocumentPosition();
+				}
+			}
+			Object.defineProperty(XMLNode.prototype, "nodeName", { get: function() {
+				return this.name;
+			} });
+			Object.defineProperty(XMLNode.prototype, "nodeType", { get: function() {
+				return this.type;
+			} });
+			Object.defineProperty(XMLNode.prototype, "nodeValue", { get: function() {
+				return this.value;
+			} });
+			Object.defineProperty(XMLNode.prototype, "parentNode", { get: function() {
+				return this.parent;
+			} });
+			Object.defineProperty(XMLNode.prototype, "childNodes", { get: function() {
+				if (!this.childNodeList || !this.childNodeList.nodes) this.childNodeList = new XMLNodeList(this.children);
+				return this.childNodeList;
+			} });
+			Object.defineProperty(XMLNode.prototype, "firstChild", { get: function() {
+				return this.children[0] || null;
+			} });
+			Object.defineProperty(XMLNode.prototype, "lastChild", { get: function() {
+				return this.children[this.children.length - 1] || null;
+			} });
+			Object.defineProperty(XMLNode.prototype, "previousSibling", { get: function() {
+				var i = this.parent.children.indexOf(this);
+				return this.parent.children[i - 1] || null;
+			} });
+			Object.defineProperty(XMLNode.prototype, "nextSibling", { get: function() {
+				var i = this.parent.children.indexOf(this);
+				return this.parent.children[i + 1] || null;
+			} });
+			Object.defineProperty(XMLNode.prototype, "ownerDocument", { get: function() {
+				return this.document() || null;
+			} });
+			Object.defineProperty(XMLNode.prototype, "textContent", {
+				get: function() {
+					var child, j, len, ref2, str;
+					if (this.nodeType === NodeType.Element || this.nodeType === NodeType.DocumentFragment) {
+						str = "";
+						ref2 = this.children;
+						for (j = 0, len = ref2.length; j < len; j++) {
+							child = ref2[j];
+							if (child.textContent) str += child.textContent;
+						}
+						return str;
+					} else return null;
+				},
+				set: function(value) {
+					throw new Error("This DOM method is not implemented." + this.debugInfo());
+				}
+			});
+			XMLNode.prototype.setParent = function(parent) {
+				var child, j, len, ref2, results;
+				this.parent = parent;
+				if (parent) {
+					this.options = parent.options;
+					this.stringify = parent.stringify;
+				}
+				ref2 = this.children;
+				results = [];
+				for (j = 0, len = ref2.length; j < len; j++) {
+					child = ref2[j];
+					results.push(child.setParent(this));
+				}
+				return results;
+			};
+			XMLNode.prototype.element = function(name, attributes, text) {
+				var childNode, item, j, k, key, lastChild = null, len, len1, ref2, ref3, val;
+				if (attributes === null && text == null) ref2 = [{}, null], attributes = ref2[0], text = ref2[1];
+				if (attributes == null) attributes = {};
+				attributes = getValue(attributes);
+				if (!isObject(attributes)) ref3 = [attributes, text], text = ref3[0], attributes = ref3[1];
+				if (name != null) name = getValue(name);
+				if (Array.isArray(name)) for (j = 0, len = name.length; j < len; j++) {
+					item = name[j];
+					lastChild = this.element(item);
+				}
+				else if (isFunction(name)) lastChild = this.element(name.apply());
+				else if (isObject(name)) for (key in name) {
+					if (!hasProp.call(name, key)) continue;
+					val = name[key];
+					if (isFunction(val)) val = val.apply();
+					if (!this.options.ignoreDecorators && this.stringify.convertAttKey && key.indexOf(this.stringify.convertAttKey) === 0) lastChild = this.attribute(key.substr(this.stringify.convertAttKey.length), val);
+					else if (!this.options.separateArrayItems && Array.isArray(val) && isEmpty(val)) lastChild = this.dummy();
+					else if (isObject(val) && isEmpty(val)) lastChild = this.element(key);
+					else if (!this.options.keepNullNodes && val == null) lastChild = this.dummy();
+					else if (!this.options.separateArrayItems && Array.isArray(val)) for (k = 0, len1 = val.length; k < len1; k++) {
+						item = val[k];
+						childNode = {};
+						childNode[key] = item;
+						lastChild = this.element(childNode);
+					}
+					else if (isObject(val)) if (!this.options.ignoreDecorators && this.stringify.convertTextKey && key.indexOf(this.stringify.convertTextKey) === 0) lastChild = this.element(val);
+					else {
+						lastChild = this.element(key);
+						lastChild.element(val);
+					}
+					else lastChild = this.element(key, val);
+				}
+				else if (!this.options.keepNullNodes && text === null) lastChild = this.dummy();
+				else if (!this.options.ignoreDecorators && this.stringify.convertTextKey && name.indexOf(this.stringify.convertTextKey) === 0) lastChild = this.text(text);
+				else if (!this.options.ignoreDecorators && this.stringify.convertCDataKey && name.indexOf(this.stringify.convertCDataKey) === 0) lastChild = this.cdata(text);
+				else if (!this.options.ignoreDecorators && this.stringify.convertCommentKey && name.indexOf(this.stringify.convertCommentKey) === 0) lastChild = this.comment(text);
+				else if (!this.options.ignoreDecorators && this.stringify.convertRawKey && name.indexOf(this.stringify.convertRawKey) === 0) lastChild = this.raw(text);
+				else if (!this.options.ignoreDecorators && this.stringify.convertPIKey && name.indexOf(this.stringify.convertPIKey) === 0) lastChild = this.instruction(name.substr(this.stringify.convertPIKey.length), text);
+				else lastChild = this.node(name, attributes, text);
+				if (lastChild == null) throw new Error("Could not create any elements with: " + name + ". " + this.debugInfo());
+				return lastChild;
+			};
+			XMLNode.prototype.insertBefore = function(name, attributes, text) {
+				var child, i, newChild, refChild, removed;
+				if (name != null ? name.type : void 0) {
+					newChild = name;
+					refChild = attributes;
+					newChild.setParent(this);
+					if (refChild) {
+						i = children.indexOf(refChild);
+						removed = children.splice(i);
+						children.push(newChild);
+						Array.prototype.push.apply(children, removed);
+					} else children.push(newChild);
+					return newChild;
+				} else {
+					if (this.isRoot) throw new Error("Cannot insert elements at root level. " + this.debugInfo(name));
+					i = this.parent.children.indexOf(this);
+					removed = this.parent.children.splice(i);
+					child = this.parent.element(name, attributes, text);
+					Array.prototype.push.apply(this.parent.children, removed);
+					return child;
+				}
+			};
+			XMLNode.prototype.insertAfter = function(name, attributes, text) {
+				var child, i, removed;
+				if (this.isRoot) throw new Error("Cannot insert elements at root level. " + this.debugInfo(name));
+				i = this.parent.children.indexOf(this);
+				removed = this.parent.children.splice(i + 1);
+				child = this.parent.element(name, attributes, text);
+				Array.prototype.push.apply(this.parent.children, removed);
+				return child;
+			};
+			XMLNode.prototype.remove = function() {
+				var i;
+				if (this.isRoot) throw new Error("Cannot remove the root element. " + this.debugInfo());
+				i = this.parent.children.indexOf(this);
+				[].splice.apply(this.parent.children, [i, i - i + 1].concat([]));
+				return this.parent;
+			};
+			XMLNode.prototype.node = function(name, attributes, text) {
+				var child, ref2;
+				if (name != null) name = getValue(name);
+				attributes || (attributes = {});
+				attributes = getValue(attributes);
+				if (!isObject(attributes)) ref2 = [attributes, text], text = ref2[0], attributes = ref2[1];
+				child = new XMLElement(this, name, attributes);
+				if (text != null) child.text(text);
+				this.children.push(child);
+				return child;
+			};
+			XMLNode.prototype.text = function(value) {
+				var child;
+				if (isObject(value)) this.element(value);
+				child = new XMLText(this, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLNode.prototype.cdata = function(value) {
+				var child = new XMLCData(this, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLNode.prototype.comment = function(value) {
+				var child = new XMLComment(this, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLNode.prototype.commentBefore = function(value) {
+				var i = this.parent.children.indexOf(this), removed = this.parent.children.splice(i);
+				this.parent.comment(value);
+				Array.prototype.push.apply(this.parent.children, removed);
+				return this;
+			};
+			XMLNode.prototype.commentAfter = function(value) {
+				var i = this.parent.children.indexOf(this), removed = this.parent.children.splice(i + 1);
+				this.parent.comment(value);
+				Array.prototype.push.apply(this.parent.children, removed);
+				return this;
+			};
+			XMLNode.prototype.raw = function(value) {
+				var child = new XMLRaw(this, value);
+				this.children.push(child);
+				return this;
+			};
+			XMLNode.prototype.dummy = function() {
+				return new XMLDummy(this);
+			};
+			XMLNode.prototype.instruction = function(target, value) {
+				var insTarget, insValue, instruction, j, len;
+				if (target != null) target = getValue(target);
+				if (value != null) value = getValue(value);
+				if (Array.isArray(target)) for (j = 0, len = target.length; j < len; j++) {
+					insTarget = target[j];
+					this.instruction(insTarget);
+				}
+				else if (isObject(target)) for (insTarget in target) {
+					if (!hasProp.call(target, insTarget)) continue;
+					insValue = target[insTarget];
+					this.instruction(insTarget, insValue);
+				}
+				else {
+					if (isFunction(value)) value = value.apply();
+					instruction = new XMLProcessingInstruction(this, target, value);
+					this.children.push(instruction);
+				}
+				return this;
+			};
+			XMLNode.prototype.instructionBefore = function(target, value) {
+				var i = this.parent.children.indexOf(this), removed = this.parent.children.splice(i);
+				this.parent.instruction(target, value);
+				Array.prototype.push.apply(this.parent.children, removed);
+				return this;
+			};
+			XMLNode.prototype.instructionAfter = function(target, value) {
+				var i = this.parent.children.indexOf(this), removed = this.parent.children.splice(i + 1);
+				this.parent.instruction(target, value);
+				Array.prototype.push.apply(this.parent.children, removed);
+				return this;
+			};
+			XMLNode.prototype.declaration = function(version, encoding, standalone) {
+				var doc = this.document(), xmldec = new XMLDeclaration(doc, version, encoding, standalone);
+				if (doc.children.length === 0) doc.children.unshift(xmldec);
+				else if (doc.children[0].type === NodeType.Declaration) doc.children[0] = xmldec;
+				else doc.children.unshift(xmldec);
+				return doc.root() || doc;
+			};
+			XMLNode.prototype.dtd = function(pubID, sysID) {
+				var child, doc = this.document(), doctype = new XMLDocType(doc, pubID, sysID), i, j, k, len, len1, ref2 = doc.children, ref3;
+				for (i = j = 0, len = ref2.length; j < len; i = ++j) {
+					child = ref2[i];
+					if (child.type === NodeType.DocType) {
+						doc.children[i] = doctype;
+						return doctype;
+					}
+				}
+				ref3 = doc.children;
+				for (i = k = 0, len1 = ref3.length; k < len1; i = ++k) {
+					child = ref3[i];
+					if (child.isRoot) {
+						doc.children.splice(i, 0, doctype);
+						return doctype;
+					}
+				}
+				doc.children.push(doctype);
+				return doctype;
+			};
+			XMLNode.prototype.up = function() {
+				if (this.isRoot) throw new Error("The root node has no parent. Use doc() if you need to get the document object.");
+				return this.parent;
+			};
+			XMLNode.prototype.root = function() {
+				var node = this;
+				while (node) if (node.type === NodeType.Document) return node.rootObject;
+				else if (node.isRoot) return node;
+				else node = node.parent;
+			};
+			XMLNode.prototype.document = function() {
+				var node = this;
+				while (node) if (node.type === NodeType.Document) return node;
+				else node = node.parent;
+			};
+			XMLNode.prototype.end = function(options) {
+				return this.document().end(options);
+			};
+			XMLNode.prototype.prev = function() {
+				var i = this.parent.children.indexOf(this);
+				if (i < 1) throw new Error("Already at the first node. " + this.debugInfo());
+				return this.parent.children[i - 1];
+			};
+			XMLNode.prototype.next = function() {
+				var i = this.parent.children.indexOf(this);
+				if (i === -1 || i === this.parent.children.length - 1) throw new Error("Already at the last node. " + this.debugInfo());
+				return this.parent.children[i + 1];
+			};
+			XMLNode.prototype.importDocument = function(doc) {
+				var clonedRoot = doc.root().clone();
+				clonedRoot.parent = this;
+				clonedRoot.isRoot = false;
+				this.children.push(clonedRoot);
+				return this;
+			};
+			XMLNode.prototype.debugInfo = function(name) {
+				var ref2, ref3;
+				name = name || this.name;
+				if (name == null && !((ref2 = this.parent) != null ? ref2.name : void 0)) return "";
+				else if (name == null) return "parent: <" + this.parent.name + ">";
+				else if (!((ref3 = this.parent) != null ? ref3.name : void 0)) return "node: <" + name + ">";
+				else return "node: <" + name + ">, parent: <" + this.parent.name + ">";
+			};
+			XMLNode.prototype.ele = function(name, attributes, text) {
+				return this.element(name, attributes, text);
+			};
+			XMLNode.prototype.nod = function(name, attributes, text) {
+				return this.node(name, attributes, text);
+			};
+			XMLNode.prototype.txt = function(value) {
+				return this.text(value);
+			};
+			XMLNode.prototype.dat = function(value) {
+				return this.cdata(value);
+			};
+			XMLNode.prototype.com = function(value) {
+				return this.comment(value);
+			};
+			XMLNode.prototype.ins = function(target, value) {
+				return this.instruction(target, value);
+			};
+			XMLNode.prototype.doc = function() {
+				return this.document();
+			};
+			XMLNode.prototype.dec = function(version, encoding, standalone) {
+				return this.declaration(version, encoding, standalone);
+			};
+			XMLNode.prototype.e = function(name, attributes, text) {
+				return this.element(name, attributes, text);
+			};
+			XMLNode.prototype.n = function(name, attributes, text) {
+				return this.node(name, attributes, text);
+			};
+			XMLNode.prototype.t = function(value) {
+				return this.text(value);
+			};
+			XMLNode.prototype.d = function(value) {
+				return this.cdata(value);
+			};
+			XMLNode.prototype.c = function(value) {
+				return this.comment(value);
+			};
+			XMLNode.prototype.r = function(value) {
+				return this.raw(value);
+			};
+			XMLNode.prototype.i = function(target, value) {
+				return this.instruction(target, value);
+			};
+			XMLNode.prototype.u = function() {
+				return this.up();
+			};
+			XMLNode.prototype.importXMLBuilder = function(doc) {
+				return this.importDocument(doc);
+			};
+			XMLNode.prototype.replaceChild = function(newChild, oldChild) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.removeChild = function(oldChild) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.appendChild = function(newChild) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.hasChildNodes = function() {
+				return this.children.length !== 0;
+			};
+			XMLNode.prototype.cloneNode = function(deep) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.normalize = function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.isSupported = function(feature, version) {
+				return true;
+			};
+			XMLNode.prototype.hasAttributes = function() {
+				return this.attribs.length !== 0;
+			};
+			XMLNode.prototype.compareDocumentPosition = function(other) {
+				var ref = this, res;
+				if (ref === other) return 0;
+				else if (this.document() !== other.document()) {
+					res = DocumentPosition.Disconnected | DocumentPosition.ImplementationSpecific;
+					if (Math.random() < .5) res |= DocumentPosition.Preceding;
+					else res |= DocumentPosition.Following;
+					return res;
+				} else if (ref.isAncestor(other)) return DocumentPosition.Contains | DocumentPosition.Preceding;
+				else if (ref.isDescendant(other)) return DocumentPosition.Contains | DocumentPosition.Following;
+				else if (ref.isPreceding(other)) return DocumentPosition.Preceding;
+				else return DocumentPosition.Following;
+			};
+			XMLNode.prototype.isSameNode = function(other) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.lookupPrefix = function(namespaceURI) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.isDefaultNamespace = function(namespaceURI) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.lookupNamespaceURI = function(prefix) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.isEqualNode = function(node) {
+				var i, j, ref2;
+				if (node.nodeType !== this.nodeType) return false;
+				if (node.children.length !== this.children.length) return false;
+				for (i = j = 0, ref2 = this.children.length - 1; 0 <= ref2 ? j <= ref2 : j >= ref2; i = 0 <= ref2 ? ++j : --j) if (!this.children[i].isEqualNode(node.children[i])) return false;
+				return true;
+			};
+			XMLNode.prototype.getFeature = function(feature, version) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.setUserData = function(key, data, handler$1) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.getUserData = function(key) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLNode.prototype.contains = function(other) {
+				if (!other) return false;
+				return other === this || this.isDescendant(other);
+			};
+			XMLNode.prototype.isDescendant = function(node) {
+				var child, isDescendantChild, j, len, ref2 = this.children;
+				for (j = 0, len = ref2.length; j < len; j++) {
+					child = ref2[j];
+					if (node === child) return true;
+					isDescendantChild = child.isDescendant(node);
+					if (isDescendantChild) return true;
+				}
+				return false;
+			};
+			XMLNode.prototype.isAncestor = function(node) {
+				return node.isDescendant(this);
+			};
+			XMLNode.prototype.isPreceding = function(node) {
+				var nodePos = this.treePosition(node), thisPos = this.treePosition(this);
+				if (nodePos === -1 || thisPos === -1) return false;
+				else return nodePos < thisPos;
+			};
+			XMLNode.prototype.isFollowing = function(node) {
+				var nodePos = this.treePosition(node), thisPos = this.treePosition(this);
+				if (nodePos === -1 || thisPos === -1) return false;
+				else return nodePos > thisPos;
+			};
+			XMLNode.prototype.treePosition = function(node) {
+				var found, pos = 0;
+				found = false;
+				this.foreachTreeNode(this.document(), function(childNode) {
+					pos++;
+					if (!found && childNode === node) return found = true;
+				});
+				if (found) return pos;
+				else return -1;
+			};
+			XMLNode.prototype.foreachTreeNode = function(node, func) {
+				var child, j, len, ref2, res;
+				node || (node = this.document());
+				ref2 = node.children;
+				for (j = 0, len = ref2.length; j < len; j++) {
+					child = ref2[j];
+					if (res = func(child)) return res;
+					else {
+						res = this.foreachTreeNode(child, func);
+						if (res) return res;
+					}
+				}
+			};
+			return XMLNode;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLStringifier.js
+var require_XMLStringifier = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var bind = function(fn, me) {
+			return function() {
+				return fn.apply(me, arguments);
+			};
+		}, hasProp = {}.hasOwnProperty;
+		module.exports = (function() {
+			function XMLStringifier(options) {
+				this.assertLegalName = bind(this.assertLegalName, this);
+				this.assertLegalChar = bind(this.assertLegalChar, this);
+				var key, ref, value;
+				options || (options = {});
+				this.options = options;
+				if (!this.options.version) this.options.version = "1.0";
+				ref = options.stringify || {};
+				for (key in ref) {
+					if (!hasProp.call(ref, key)) continue;
+					value = ref[key];
+					this[key] = value;
+				}
+			}
+			XMLStringifier.prototype.name = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalName("" + val || "");
+			};
+			XMLStringifier.prototype.text = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar(this.textEscape("" + val || ""));
+			};
+			XMLStringifier.prototype.cdata = function(val) {
+				if (this.options.noValidation) return val;
+				val = "" + val || "";
+				val = val.replace("]]>", "]]]]><![CDATA[>");
+				return this.assertLegalChar(val);
+			};
+			XMLStringifier.prototype.comment = function(val) {
+				if (this.options.noValidation) return val;
+				val = "" + val || "";
+				if (val.match(/--/)) throw new Error("Comment text cannot contain double-hypen: " + val);
+				return this.assertLegalChar(val);
+			};
+			XMLStringifier.prototype.raw = function(val) {
+				if (this.options.noValidation) return val;
+				return "" + val || "";
+			};
+			XMLStringifier.prototype.attValue = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar(this.attEscape(val = "" + val || ""));
+			};
+			XMLStringifier.prototype.insTarget = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.insValue = function(val) {
+				if (this.options.noValidation) return val;
+				val = "" + val || "";
+				if (val.match(/\?>/)) throw new Error("Invalid processing instruction value: " + val);
+				return this.assertLegalChar(val);
+			};
+			XMLStringifier.prototype.xmlVersion = function(val) {
+				if (this.options.noValidation) return val;
+				val = "" + val || "";
+				if (!val.match(/1\.[0-9]+/)) throw new Error("Invalid version number: " + val);
+				return val;
+			};
+			XMLStringifier.prototype.xmlEncoding = function(val) {
+				if (this.options.noValidation) return val;
+				val = "" + val || "";
+				if (!val.match(/^[A-Za-z](?:[A-Za-z0-9._-])*$/)) throw new Error("Invalid encoding: " + val);
+				return this.assertLegalChar(val);
+			};
+			XMLStringifier.prototype.xmlStandalone = function(val) {
+				if (this.options.noValidation) return val;
+				if (val) return "yes";
+				else return "no";
+			};
+			XMLStringifier.prototype.dtdPubID = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.dtdSysID = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.dtdElementValue = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.dtdAttType = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.dtdAttDefault = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.dtdEntityValue = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.dtdNData = function(val) {
+				if (this.options.noValidation) return val;
+				return this.assertLegalChar("" + val || "");
+			};
+			XMLStringifier.prototype.convertAttKey = "@";
+			XMLStringifier.prototype.convertPIKey = "?";
+			XMLStringifier.prototype.convertTextKey = "#text";
+			XMLStringifier.prototype.convertCDataKey = "#cdata";
+			XMLStringifier.prototype.convertCommentKey = "#comment";
+			XMLStringifier.prototype.convertRawKey = "#raw";
+			XMLStringifier.prototype.assertLegalChar = function(str) {
+				var regex, res;
+				if (this.options.noValidation) return str;
+				regex = "";
+				if (this.options.version === "1.0") {
+					regex = /[\0-\x08\x0B\f\x0E-\x1F\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
+					if (res = str.match(regex)) throw new Error("Invalid character in string: " + str + " at index " + res.index);
+				} else if (this.options.version === "1.1") {
+					regex = /[\0\uFFFE\uFFFF]|[\uD800-\uDBFF](?![\uDC00-\uDFFF])|(?:[^\uD800-\uDBFF]|^)[\uDC00-\uDFFF]/;
+					if (res = str.match(regex)) throw new Error("Invalid character in string: " + str + " at index " + res.index);
+				}
+				return str;
+			};
+			XMLStringifier.prototype.assertLegalName = function(str) {
+				var regex;
+				if (this.options.noValidation) return str;
+				this.assertLegalChar(str);
+				regex = /^([:A-Z_a-z\xC0-\xD6\xD8-\xF6\xF8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]|[\uD800-\uDB7F][\uDC00-\uDFFF])([\x2D\.0-:A-Z_a-z\xB7\xC0-\xD6\xD8-\xF6\xF8-\u037D\u037F-\u1FFF\u200C\u200D\u203F\u2040\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]|[\uD800-\uDB7F][\uDC00-\uDFFF])*$/;
+				if (!str.match(regex)) throw new Error("Invalid character in name");
+				return str;
+			};
+			XMLStringifier.prototype.textEscape = function(str) {
+				var ampregex;
+				if (this.options.noValidation) return str;
+				ampregex = this.options.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g;
+				return str.replace(ampregex, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\r/g, "&#xD;");
+			};
+			XMLStringifier.prototype.attEscape = function(str) {
+				var ampregex;
+				if (this.options.noValidation) return str;
+				ampregex = this.options.noDoubleEncoding ? /(?!&\S+;)&/g : /&/g;
+				return str.replace(ampregex, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;").replace(/\t/g, "&#x9;").replace(/\n/g, "&#xA;").replace(/\r/g, "&#xD;");
+			};
+			return XMLStringifier;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/WriterState.js
+var require_WriterState = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		module.exports = {
+			None: 0,
+			OpenTag: 1,
+			InsideTag: 2,
+			CloseTag: 3
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLWriterBase.js
+var require_XMLWriterBase = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, WriterState, assign, hasProp = {}.hasOwnProperty;
+		assign = require_Utility().assign;
+		NodeType = require_NodeType();
+		require_XMLDeclaration();
+		require_XMLDocType();
+		require_XMLCData();
+		require_XMLComment();
+		require_XMLElement();
+		require_XMLRaw();
+		require_XMLText();
+		require_XMLProcessingInstruction();
+		require_XMLDummy();
+		require_XMLDTDAttList();
+		require_XMLDTDElement();
+		require_XMLDTDEntity();
+		require_XMLDTDNotation();
+		WriterState = require_WriterState();
+		module.exports = (function() {
+			function XMLWriterBase(options) {
+				var key, ref, value;
+				options || (options = {});
+				this.options = options;
+				ref = options.writer || {};
+				for (key in ref) {
+					if (!hasProp.call(ref, key)) continue;
+					value = ref[key];
+					this["_" + key] = this[key];
+					this[key] = value;
+				}
+			}
+			XMLWriterBase.prototype.filterOptions = function(options) {
+				var filteredOptions, ref, ref1, ref2, ref3, ref4, ref5, ref6;
+				options || (options = {});
+				options = assign({}, this.options, options);
+				filteredOptions = { writer: this };
+				filteredOptions.pretty = options.pretty || false;
+				filteredOptions.allowEmpty = options.allowEmpty || false;
+				filteredOptions.indent = (ref = options.indent) != null ? ref : "  ";
+				filteredOptions.newline = (ref1 = options.newline) != null ? ref1 : "\n";
+				filteredOptions.offset = (ref2 = options.offset) != null ? ref2 : 0;
+				filteredOptions.dontPrettyTextNodes = (ref3 = (ref4 = options.dontPrettyTextNodes) != null ? ref4 : options.dontprettytextnodes) != null ? ref3 : 0;
+				filteredOptions.spaceBeforeSlash = (ref5 = (ref6 = options.spaceBeforeSlash) != null ? ref6 : options.spacebeforeslash) != null ? ref5 : "";
+				if (filteredOptions.spaceBeforeSlash === true) filteredOptions.spaceBeforeSlash = " ";
+				filteredOptions.suppressPrettyCount = 0;
+				filteredOptions.user = {};
+				filteredOptions.state = WriterState.None;
+				return filteredOptions;
+			};
+			XMLWriterBase.prototype.indent = function(node, options, level) {
+				var indentLevel;
+				if (!options.pretty || options.suppressPrettyCount) return "";
+				else if (options.pretty) {
+					indentLevel = (level || 0) + options.offset + 1;
+					if (indentLevel > 0) return new Array(indentLevel).join(options.indent);
+				}
+				return "";
+			};
+			XMLWriterBase.prototype.endline = function(node, options, level) {
+				if (!options.pretty || options.suppressPrettyCount) return "";
+				else return options.newline;
+			};
+			XMLWriterBase.prototype.attribute = function(att, options, level) {
+				var r;
+				this.openAttribute(att, options, level);
+				r = " " + att.name + "=\"" + att.value + "\"";
+				this.closeAttribute(att, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.cdata = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<![CDATA[";
+				options.state = WriterState.InsideTag;
+				r += node.value;
+				options.state = WriterState.CloseTag;
+				r += "]]>" + this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.comment = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<!-- ";
+				options.state = WriterState.InsideTag;
+				r += node.value;
+				options.state = WriterState.CloseTag;
+				r += " -->" + this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.declaration = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<?xml";
+				options.state = WriterState.InsideTag;
+				r += " version=\"" + node.version + "\"";
+				if (node.encoding != null) r += " encoding=\"" + node.encoding + "\"";
+				if (node.standalone != null) r += " standalone=\"" + node.standalone + "\"";
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + "?>";
+				r += this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.docType = function(node, options, level) {
+				var child, i, len, r, ref;
+				level || (level = 0);
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level);
+				r += "<!DOCTYPE " + node.root().name;
+				if (node.pubID && node.sysID) r += " PUBLIC \"" + node.pubID + "\" \"" + node.sysID + "\"";
+				else if (node.sysID) r += " SYSTEM \"" + node.sysID + "\"";
+				if (node.children.length > 0) {
+					r += " [";
+					r += this.endline(node, options, level);
+					options.state = WriterState.InsideTag;
+					ref = node.children;
+					for (i = 0, len = ref.length; i < len; i++) {
+						child = ref[i];
+						r += this.writeChildNode(child, options, level + 1);
+					}
+					options.state = WriterState.CloseTag;
+					r += "]";
+				}
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + ">";
+				r += this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.element = function(node, options, level) {
+				var att, child, childNodeCount, firstChildNode, i, j, len, len1, name, prettySuppressed, r, ref, ref1, ref2;
+				level || (level = 0);
+				prettySuppressed = false;
+				r = "";
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r += this.indent(node, options, level) + "<" + node.name;
+				ref = node.attribs;
+				for (name in ref) {
+					if (!hasProp.call(ref, name)) continue;
+					att = ref[name];
+					r += this.attribute(att, options, level);
+				}
+				childNodeCount = node.children.length;
+				firstChildNode = childNodeCount === 0 ? null : node.children[0];
+				if (childNodeCount === 0 || node.children.every(function(e) {
+					return (e.type === NodeType.Text || e.type === NodeType.Raw) && e.value === "";
+				})) if (options.allowEmpty) {
+					r += ">";
+					options.state = WriterState.CloseTag;
+					r += "</" + node.name + ">" + this.endline(node, options, level);
+				} else {
+					options.state = WriterState.CloseTag;
+					r += options.spaceBeforeSlash + "/>" + this.endline(node, options, level);
+				}
+				else if (options.pretty && childNodeCount === 1 && (firstChildNode.type === NodeType.Text || firstChildNode.type === NodeType.Raw) && firstChildNode.value != null) {
+					r += ">";
+					options.state = WriterState.InsideTag;
+					options.suppressPrettyCount++;
+					prettySuppressed = true;
+					r += this.writeChildNode(firstChildNode, options, level + 1);
+					options.suppressPrettyCount--;
+					prettySuppressed = false;
+					options.state = WriterState.CloseTag;
+					r += "</" + node.name + ">" + this.endline(node, options, level);
+				} else {
+					if (options.dontPrettyTextNodes) {
+						ref1 = node.children;
+						for (i = 0, len = ref1.length; i < len; i++) {
+							child = ref1[i];
+							if ((child.type === NodeType.Text || child.type === NodeType.Raw) && child.value != null) {
+								options.suppressPrettyCount++;
+								prettySuppressed = true;
+								break;
+							}
+						}
+					}
+					r += ">" + this.endline(node, options, level);
+					options.state = WriterState.InsideTag;
+					ref2 = node.children;
+					for (j = 0, len1 = ref2.length; j < len1; j++) {
+						child = ref2[j];
+						r += this.writeChildNode(child, options, level + 1);
+					}
+					options.state = WriterState.CloseTag;
+					r += this.indent(node, options, level) + "</" + node.name + ">";
+					if (prettySuppressed) options.suppressPrettyCount--;
+					r += this.endline(node, options, level);
+					options.state = WriterState.None;
+				}
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.writeChildNode = function(node, options, level) {
+				switch (node.type) {
+					case NodeType.CData: return this.cdata(node, options, level);
+					case NodeType.Comment: return this.comment(node, options, level);
+					case NodeType.Element: return this.element(node, options, level);
+					case NodeType.Raw: return this.raw(node, options, level);
+					case NodeType.Text: return this.text(node, options, level);
+					case NodeType.ProcessingInstruction: return this.processingInstruction(node, options, level);
+					case NodeType.Dummy: return "";
+					case NodeType.Declaration: return this.declaration(node, options, level);
+					case NodeType.DocType: return this.docType(node, options, level);
+					case NodeType.AttributeDeclaration: return this.dtdAttList(node, options, level);
+					case NodeType.ElementDeclaration: return this.dtdElement(node, options, level);
+					case NodeType.EntityDeclaration: return this.dtdEntity(node, options, level);
+					case NodeType.NotationDeclaration: return this.dtdNotation(node, options, level);
+					default: throw new Error("Unknown XML node type: " + node.constructor.name);
+				}
+			};
+			XMLWriterBase.prototype.processingInstruction = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<?";
+				options.state = WriterState.InsideTag;
+				r += node.target;
+				if (node.value) r += " " + node.value;
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + "?>";
+				r += this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.raw = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level);
+				options.state = WriterState.InsideTag;
+				r += node.value;
+				options.state = WriterState.CloseTag;
+				r += this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.text = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level);
+				options.state = WriterState.InsideTag;
+				r += node.value;
+				options.state = WriterState.CloseTag;
+				r += this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.dtdAttList = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<!ATTLIST";
+				options.state = WriterState.InsideTag;
+				r += " " + node.elementName + " " + node.attributeName + " " + node.attributeType;
+				if (node.defaultValueType !== "#DEFAULT") r += " " + node.defaultValueType;
+				if (node.defaultValue) r += " \"" + node.defaultValue + "\"";
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + ">" + this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.dtdElement = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<!ELEMENT";
+				options.state = WriterState.InsideTag;
+				r += " " + node.name + " " + node.value;
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + ">" + this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.dtdEntity = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<!ENTITY";
+				options.state = WriterState.InsideTag;
+				if (node.pe) r += " %";
+				r += " " + node.name;
+				if (node.value) r += " \"" + node.value + "\"";
+				else {
+					if (node.pubID && node.sysID) r += " PUBLIC \"" + node.pubID + "\" \"" + node.sysID + "\"";
+					else if (node.sysID) r += " SYSTEM \"" + node.sysID + "\"";
+					if (node.nData) r += " NDATA " + node.nData;
+				}
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + ">" + this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.dtdNotation = function(node, options, level) {
+				var r;
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				r = this.indent(node, options, level) + "<!NOTATION";
+				options.state = WriterState.InsideTag;
+				r += " " + node.name;
+				if (node.pubID && node.sysID) r += " PUBLIC \"" + node.pubID + "\" \"" + node.sysID + "\"";
+				else if (node.pubID) r += " PUBLIC \"" + node.pubID + "\"";
+				else if (node.sysID) r += " SYSTEM \"" + node.sysID + "\"";
+				options.state = WriterState.CloseTag;
+				r += options.spaceBeforeSlash + ">" + this.endline(node, options, level);
+				options.state = WriterState.None;
+				this.closeNode(node, options, level);
+				return r;
+			};
+			XMLWriterBase.prototype.openNode = function(node, options, level) {};
+			XMLWriterBase.prototype.closeNode = function(node, options, level) {};
+			XMLWriterBase.prototype.openAttribute = function(att, options, level) {};
+			XMLWriterBase.prototype.closeAttribute = function(att, options, level) {};
+			return XMLWriterBase;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLStringWriter.js
+var require_XMLStringWriter = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var XMLWriterBase, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		XMLWriterBase = require_XMLWriterBase();
+		module.exports = (function(superClass) {
+			extend(XMLStringWriter, superClass);
+			function XMLStringWriter(options) {
+				XMLStringWriter.__super__.constructor.call(this, options);
+			}
+			XMLStringWriter.prototype.document = function(doc, options) {
+				var child, i, len, r, ref;
+				options = this.filterOptions(options);
+				r = "";
+				ref = doc.children;
+				for (i = 0, len = ref.length; i < len; i++) {
+					child = ref[i];
+					r += this.writeChildNode(child, options, 0);
+				}
+				if (options.pretty && r.slice(-options.newline.length) === options.newline) r = r.slice(0, -options.newline.length);
+				return r;
+			};
+			return XMLStringWriter;
+		})(XMLWriterBase);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDocument.js
+var require_XMLDocument = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, XMLDOMConfiguration, XMLDOMImplementation, XMLNode, XMLStringWriter, XMLStringifier, isPlainObject, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		isPlainObject = require_Utility().isPlainObject;
+		XMLDOMImplementation = require_XMLDOMImplementation();
+		XMLDOMConfiguration = require_XMLDOMConfiguration();
+		XMLNode = require_XMLNode();
+		NodeType = require_NodeType();
+		XMLStringifier = require_XMLStringifier();
+		XMLStringWriter = require_XMLStringWriter();
+		module.exports = (function(superClass) {
+			extend(XMLDocument, superClass);
+			function XMLDocument(options) {
+				XMLDocument.__super__.constructor.call(this, null);
+				this.name = "#document";
+				this.type = NodeType.Document;
+				this.documentURI = null;
+				this.domConfig = new XMLDOMConfiguration();
+				options || (options = {});
+				if (!options.writer) options.writer = new XMLStringWriter();
+				this.options = options;
+				this.stringify = new XMLStringifier(options);
+			}
+			Object.defineProperty(XMLDocument.prototype, "implementation", { value: new XMLDOMImplementation() });
+			Object.defineProperty(XMLDocument.prototype, "doctype", { get: function() {
+				var child, i, len, ref = this.children;
+				for (i = 0, len = ref.length; i < len; i++) {
+					child = ref[i];
+					if (child.type === NodeType.DocType) return child;
+				}
+				return null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "documentElement", { get: function() {
+				return this.rootObject || null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "inputEncoding", { get: function() {
+				return null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "strictErrorChecking", { get: function() {
+				return false;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "xmlEncoding", { get: function() {
+				if (this.children.length !== 0 && this.children[0].type === NodeType.Declaration) return this.children[0].encoding;
+				else return null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "xmlStandalone", { get: function() {
+				if (this.children.length !== 0 && this.children[0].type === NodeType.Declaration) return this.children[0].standalone === "yes";
+				else return false;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "xmlVersion", { get: function() {
+				if (this.children.length !== 0 && this.children[0].type === NodeType.Declaration) return this.children[0].version;
+				else return "1.0";
+			} });
+			Object.defineProperty(XMLDocument.prototype, "URL", { get: function() {
+				return this.documentURI;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "origin", { get: function() {
+				return null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "compatMode", { get: function() {
+				return null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "characterSet", { get: function() {
+				return null;
+			} });
+			Object.defineProperty(XMLDocument.prototype, "contentType", { get: function() {
+				return null;
+			} });
+			XMLDocument.prototype.end = function(writer) {
+				var writerOptions = {};
+				if (!writer) writer = this.options.writer;
+				else if (isPlainObject(writer)) {
+					writerOptions = writer;
+					writer = this.options.writer;
+				}
+				return writer.document(this, writer.filterOptions(writerOptions));
+			};
+			XMLDocument.prototype.toString = function(options) {
+				return this.options.writer.document(this, this.options.writer.filterOptions(options));
+			};
+			XMLDocument.prototype.createElement = function(tagName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createDocumentFragment = function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createTextNode = function(data) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createComment = function(data) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createCDATASection = function(data) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createProcessingInstruction = function(target, data) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createAttribute = function(name) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createEntityReference = function(name) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.getElementsByTagName = function(tagname) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.importNode = function(importedNode, deep) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createElementNS = function(namespaceURI, qualifiedName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createAttributeNS = function(namespaceURI, qualifiedName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.getElementsByTagNameNS = function(namespaceURI, localName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.getElementById = function(elementId) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.adoptNode = function(source) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.normalizeDocument = function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.renameNode = function(node, namespaceURI, qualifiedName) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.getElementsByClassName = function(classNames) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createEvent = function(eventInterface) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createRange = function() {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createNodeIterator = function(root, whatToShow, filter) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			XMLDocument.prototype.createTreeWalker = function(root, whatToShow, filter) {
+				throw new Error("This DOM method is not implemented." + this.debugInfo());
+			};
+			return XMLDocument;
+		})(XMLNode);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLDocumentCB.js
+var require_XMLDocumentCB = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, WriterState, XMLAttribute, XMLCData, XMLComment, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLDeclaration, XMLDocType, XMLDocument, XMLElement, XMLProcessingInstruction, XMLRaw, XMLStringWriter, XMLStringifier, XMLText, getValue, isFunction, isObject, isPlainObject, ref, hasProp = {}.hasOwnProperty;
+		ref = require_Utility(), isObject = ref.isObject, isFunction = ref.isFunction, isPlainObject = ref.isPlainObject, getValue = ref.getValue;
+		NodeType = require_NodeType();
+		XMLDocument = require_XMLDocument();
+		XMLElement = require_XMLElement();
+		XMLCData = require_XMLCData();
+		XMLComment = require_XMLComment();
+		XMLRaw = require_XMLRaw();
+		XMLText = require_XMLText();
+		XMLProcessingInstruction = require_XMLProcessingInstruction();
+		XMLDeclaration = require_XMLDeclaration();
+		XMLDocType = require_XMLDocType();
+		XMLDTDAttList = require_XMLDTDAttList();
+		XMLDTDEntity = require_XMLDTDEntity();
+		XMLDTDElement = require_XMLDTDElement();
+		XMLDTDNotation = require_XMLDTDNotation();
+		XMLAttribute = require_XMLAttribute();
+		XMLStringifier = require_XMLStringifier();
+		XMLStringWriter = require_XMLStringWriter();
+		WriterState = require_WriterState();
+		module.exports = (function() {
+			function XMLDocumentCB(options, onData, onEnd) {
+				var writerOptions;
+				this.name = "?xml";
+				this.type = NodeType.Document;
+				options || (options = {});
+				writerOptions = {};
+				if (!options.writer) options.writer = new XMLStringWriter();
+				else if (isPlainObject(options.writer)) {
+					writerOptions = options.writer;
+					options.writer = new XMLStringWriter();
+				}
+				this.options = options;
+				this.writer = options.writer;
+				this.writerOptions = this.writer.filterOptions(writerOptions);
+				this.stringify = new XMLStringifier(options);
+				this.onDataCallback = onData || function() {};
+				this.onEndCallback = onEnd || function() {};
+				this.currentNode = null;
+				this.currentLevel = -1;
+				this.openTags = {};
+				this.documentStarted = false;
+				this.documentCompleted = false;
+				this.root = null;
+			}
+			XMLDocumentCB.prototype.createChildNode = function(node) {
+				var att, attName, attributes, child, i, len, ref1, ref2;
+				switch (node.type) {
+					case NodeType.CData:
+						this.cdata(node.value);
+						break;
+					case NodeType.Comment:
+						this.comment(node.value);
+						break;
+					case NodeType.Element:
+						attributes = {};
+						ref1 = node.attribs;
+						for (attName in ref1) {
+							if (!hasProp.call(ref1, attName)) continue;
+							att = ref1[attName];
+							attributes[attName] = att.value;
+						}
+						this.node(node.name, attributes);
+						break;
+					case NodeType.Dummy:
+						this.dummy();
+						break;
+					case NodeType.Raw:
+						this.raw(node.value);
+						break;
+					case NodeType.Text:
+						this.text(node.value);
+						break;
+					case NodeType.ProcessingInstruction:
+						this.instruction(node.target, node.value);
+						break;
+					default: throw new Error("This XML node type is not supported in a JS object: " + node.constructor.name);
+				}
+				ref2 = node.children;
+				for (i = 0, len = ref2.length; i < len; i++) {
+					child = ref2[i];
+					this.createChildNode(child);
+					if (child.type === NodeType.Element) this.up();
+				}
+				return this;
+			};
+			XMLDocumentCB.prototype.dummy = function() {
+				return this;
+			};
+			XMLDocumentCB.prototype.node = function(name, attributes, text) {
+				var ref1;
+				if (name == null) throw new Error("Missing node name.");
+				if (this.root && this.currentLevel === -1) throw new Error("Document can only have one root node. " + this.debugInfo(name));
+				this.openCurrent();
+				name = getValue(name);
+				if (attributes == null) attributes = {};
+				attributes = getValue(attributes);
+				if (!isObject(attributes)) ref1 = [attributes, text], text = ref1[0], attributes = ref1[1];
+				this.currentNode = new XMLElement(this, name, attributes);
+				this.currentNode.children = false;
+				this.currentLevel++;
+				this.openTags[this.currentLevel] = this.currentNode;
+				if (text != null) this.text(text);
+				return this;
+			};
+			XMLDocumentCB.prototype.element = function(name, attributes, text) {
+				var child, i, len, oldValidationFlag, ref1, root;
+				if (this.currentNode && this.currentNode.type === NodeType.DocType) this.dtdElement.apply(this, arguments);
+				else if (Array.isArray(name) || isObject(name) || isFunction(name)) {
+					oldValidationFlag = this.options.noValidation;
+					this.options.noValidation = true;
+					root = new XMLDocument(this.options).element("TEMP_ROOT");
+					root.element(name);
+					this.options.noValidation = oldValidationFlag;
+					ref1 = root.children;
+					for (i = 0, len = ref1.length; i < len; i++) {
+						child = ref1[i];
+						this.createChildNode(child);
+						if (child.type === NodeType.Element) this.up();
+					}
+				} else this.node(name, attributes, text);
+				return this;
+			};
+			XMLDocumentCB.prototype.attribute = function(name, value) {
+				var attName, attValue;
+				if (!this.currentNode || this.currentNode.children) throw new Error("att() can only be used immediately after an ele() call in callback mode. " + this.debugInfo(name));
+				if (name != null) name = getValue(name);
+				if (isObject(name)) for (attName in name) {
+					if (!hasProp.call(name, attName)) continue;
+					attValue = name[attName];
+					this.attribute(attName, attValue);
+				}
+				else {
+					if (isFunction(value)) value = value.apply();
+					if (this.options.keepNullAttributes && value == null) this.currentNode.attribs[name] = new XMLAttribute(this, name, "");
+					else if (value != null) this.currentNode.attribs[name] = new XMLAttribute(this, name, value);
+				}
+				return this;
+			};
+			XMLDocumentCB.prototype.text = function(value) {
+				var node;
+				this.openCurrent();
+				node = new XMLText(this, value);
+				this.onData(this.writer.text(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.cdata = function(value) {
+				var node;
+				this.openCurrent();
+				node = new XMLCData(this, value);
+				this.onData(this.writer.cdata(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.comment = function(value) {
+				var node;
+				this.openCurrent();
+				node = new XMLComment(this, value);
+				this.onData(this.writer.comment(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.raw = function(value) {
+				var node;
+				this.openCurrent();
+				node = new XMLRaw(this, value);
+				this.onData(this.writer.raw(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.instruction = function(target, value) {
+				var i, insTarget, insValue, len, node;
+				this.openCurrent();
+				if (target != null) target = getValue(target);
+				if (value != null) value = getValue(value);
+				if (Array.isArray(target)) for (i = 0, len = target.length; i < len; i++) {
+					insTarget = target[i];
+					this.instruction(insTarget);
+				}
+				else if (isObject(target)) for (insTarget in target) {
+					if (!hasProp.call(target, insTarget)) continue;
+					insValue = target[insTarget];
+					this.instruction(insTarget, insValue);
+				}
+				else {
+					if (isFunction(value)) value = value.apply();
+					node = new XMLProcessingInstruction(this, target, value);
+					this.onData(this.writer.processingInstruction(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				}
+				return this;
+			};
+			XMLDocumentCB.prototype.declaration = function(version, encoding, standalone) {
+				var node;
+				this.openCurrent();
+				if (this.documentStarted) throw new Error("declaration() must be the first node.");
+				node = new XMLDeclaration(this, version, encoding, standalone);
+				this.onData(this.writer.declaration(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.doctype = function(root, pubID, sysID) {
+				this.openCurrent();
+				if (root == null) throw new Error("Missing root node name.");
+				if (this.root) throw new Error("dtd() must come before the root node.");
+				this.currentNode = new XMLDocType(this, pubID, sysID);
+				this.currentNode.rootNodeName = root;
+				this.currentNode.children = false;
+				this.currentLevel++;
+				this.openTags[this.currentLevel] = this.currentNode;
+				return this;
+			};
+			XMLDocumentCB.prototype.dtdElement = function(name, value) {
+				var node;
+				this.openCurrent();
+				node = new XMLDTDElement(this, name, value);
+				this.onData(this.writer.dtdElement(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.attList = function(elementName, attributeName, attributeType, defaultValueType, defaultValue) {
+				var node;
+				this.openCurrent();
+				node = new XMLDTDAttList(this, elementName, attributeName, attributeType, defaultValueType, defaultValue);
+				this.onData(this.writer.dtdAttList(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.entity = function(name, value) {
+				var node;
+				this.openCurrent();
+				node = new XMLDTDEntity(this, false, name, value);
+				this.onData(this.writer.dtdEntity(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.pEntity = function(name, value) {
+				var node;
+				this.openCurrent();
+				node = new XMLDTDEntity(this, true, name, value);
+				this.onData(this.writer.dtdEntity(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.notation = function(name, value) {
+				var node;
+				this.openCurrent();
+				node = new XMLDTDNotation(this, name, value);
+				this.onData(this.writer.dtdNotation(node, this.writerOptions, this.currentLevel + 1), this.currentLevel + 1);
+				return this;
+			};
+			XMLDocumentCB.prototype.up = function() {
+				if (this.currentLevel < 0) throw new Error("The document node has no parent.");
+				if (this.currentNode) {
+					if (this.currentNode.children) this.closeNode(this.currentNode);
+					else this.openNode(this.currentNode);
+					this.currentNode = null;
+				} else this.closeNode(this.openTags[this.currentLevel]);
+				delete this.openTags[this.currentLevel];
+				this.currentLevel--;
+				return this;
+			};
+			XMLDocumentCB.prototype.end = function() {
+				while (this.currentLevel >= 0) this.up();
+				return this.onEnd();
+			};
+			XMLDocumentCB.prototype.openCurrent = function() {
+				if (this.currentNode) {
+					this.currentNode.children = true;
+					return this.openNode(this.currentNode);
+				}
+			};
+			XMLDocumentCB.prototype.openNode = function(node) {
+				var att, chunk, name, ref1;
+				if (!node.isOpen) {
+					if (!this.root && this.currentLevel === 0 && node.type === NodeType.Element) this.root = node;
+					chunk = "";
+					if (node.type === NodeType.Element) {
+						this.writerOptions.state = WriterState.OpenTag;
+						chunk = this.writer.indent(node, this.writerOptions, this.currentLevel) + "<" + node.name;
+						ref1 = node.attribs;
+						for (name in ref1) {
+							if (!hasProp.call(ref1, name)) continue;
+							att = ref1[name];
+							chunk += this.writer.attribute(att, this.writerOptions, this.currentLevel);
+						}
+						chunk += (node.children ? ">" : "/>") + this.writer.endline(node, this.writerOptions, this.currentLevel);
+						this.writerOptions.state = WriterState.InsideTag;
+					} else {
+						this.writerOptions.state = WriterState.OpenTag;
+						chunk = this.writer.indent(node, this.writerOptions, this.currentLevel) + "<!DOCTYPE " + node.rootNodeName;
+						if (node.pubID && node.sysID) chunk += " PUBLIC \"" + node.pubID + "\" \"" + node.sysID + "\"";
+						else if (node.sysID) chunk += " SYSTEM \"" + node.sysID + "\"";
+						if (node.children) {
+							chunk += " [";
+							this.writerOptions.state = WriterState.InsideTag;
+						} else {
+							this.writerOptions.state = WriterState.CloseTag;
+							chunk += ">";
+						}
+						chunk += this.writer.endline(node, this.writerOptions, this.currentLevel);
+					}
+					this.onData(chunk, this.currentLevel);
+					return node.isOpen = true;
+				}
+			};
+			XMLDocumentCB.prototype.closeNode = function(node) {
+				var chunk;
+				if (!node.isClosed) {
+					chunk = "";
+					this.writerOptions.state = WriterState.CloseTag;
+					if (node.type === NodeType.Element) chunk = this.writer.indent(node, this.writerOptions, this.currentLevel) + "</" + node.name + ">" + this.writer.endline(node, this.writerOptions, this.currentLevel);
+					else chunk = this.writer.indent(node, this.writerOptions, this.currentLevel) + "]>" + this.writer.endline(node, this.writerOptions, this.currentLevel);
+					this.writerOptions.state = WriterState.None;
+					this.onData(chunk, this.currentLevel);
+					return node.isClosed = true;
+				}
+			};
+			XMLDocumentCB.prototype.onData = function(chunk, level) {
+				this.documentStarted = true;
+				return this.onDataCallback(chunk, level + 1);
+			};
+			XMLDocumentCB.prototype.onEnd = function() {
+				this.documentCompleted = true;
+				return this.onEndCallback();
+			};
+			XMLDocumentCB.prototype.debugInfo = function(name) {
+				if (name == null) return "";
+				else return "node: <" + name + ">";
+			};
+			XMLDocumentCB.prototype.ele = function() {
+				return this.element.apply(this, arguments);
+			};
+			XMLDocumentCB.prototype.nod = function(name, attributes, text) {
+				return this.node(name, attributes, text);
+			};
+			XMLDocumentCB.prototype.txt = function(value) {
+				return this.text(value);
+			};
+			XMLDocumentCB.prototype.dat = function(value) {
+				return this.cdata(value);
+			};
+			XMLDocumentCB.prototype.com = function(value) {
+				return this.comment(value);
+			};
+			XMLDocumentCB.prototype.ins = function(target, value) {
+				return this.instruction(target, value);
+			};
+			XMLDocumentCB.prototype.dec = function(version, encoding, standalone) {
+				return this.declaration(version, encoding, standalone);
+			};
+			XMLDocumentCB.prototype.dtd = function(root, pubID, sysID) {
+				return this.doctype(root, pubID, sysID);
+			};
+			XMLDocumentCB.prototype.e = function(name, attributes, text) {
+				return this.element(name, attributes, text);
+			};
+			XMLDocumentCB.prototype.n = function(name, attributes, text) {
+				return this.node(name, attributes, text);
+			};
+			XMLDocumentCB.prototype.t = function(value) {
+				return this.text(value);
+			};
+			XMLDocumentCB.prototype.d = function(value) {
+				return this.cdata(value);
+			};
+			XMLDocumentCB.prototype.c = function(value) {
+				return this.comment(value);
+			};
+			XMLDocumentCB.prototype.r = function(value) {
+				return this.raw(value);
+			};
+			XMLDocumentCB.prototype.i = function(target, value) {
+				return this.instruction(target, value);
+			};
+			XMLDocumentCB.prototype.att = function() {
+				if (this.currentNode && this.currentNode.type === NodeType.DocType) return this.attList.apply(this, arguments);
+				else return this.attribute.apply(this, arguments);
+			};
+			XMLDocumentCB.prototype.a = function() {
+				if (this.currentNode && this.currentNode.type === NodeType.DocType) return this.attList.apply(this, arguments);
+				else return this.attribute.apply(this, arguments);
+			};
+			XMLDocumentCB.prototype.ent = function(name, value) {
+				return this.entity(name, value);
+			};
+			XMLDocumentCB.prototype.pent = function(name, value) {
+				return this.pEntity(name, value);
+			};
+			XMLDocumentCB.prototype.not = function(name, value) {
+				return this.notation(name, value);
+			};
+			return XMLDocumentCB;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/XMLStreamWriter.js
+var require_XMLStreamWriter = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, WriterState, XMLWriterBase, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		NodeType = require_NodeType();
+		XMLWriterBase = require_XMLWriterBase();
+		WriterState = require_WriterState();
+		module.exports = (function(superClass) {
+			extend(XMLStreamWriter, superClass);
+			function XMLStreamWriter(stream, options) {
+				this.stream = stream;
+				XMLStreamWriter.__super__.constructor.call(this, options);
+			}
+			XMLStreamWriter.prototype.endline = function(node, options, level) {
+				if (node.isLastRootNode && options.state === WriterState.CloseTag) return "";
+				else return XMLStreamWriter.__super__.endline.call(this, node, options, level);
+			};
+			XMLStreamWriter.prototype.document = function(doc, options) {
+				var child, i, j, k, len, len1, ref = doc.children, ref1, results;
+				for (i = j = 0, len = ref.length; j < len; i = ++j) {
+					child = ref[i];
+					child.isLastRootNode = i === doc.children.length - 1;
+				}
+				options = this.filterOptions(options);
+				ref1 = doc.children;
+				results = [];
+				for (k = 0, len1 = ref1.length; k < len1; k++) {
+					child = ref1[k];
+					results.push(this.writeChildNode(child, options, 0));
+				}
+				return results;
+			};
+			XMLStreamWriter.prototype.attribute = function(att, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.attribute.call(this, att, options, level));
+			};
+			XMLStreamWriter.prototype.cdata = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.cdata.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.comment = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.comment.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.declaration = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.declaration.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.docType = function(node, options, level) {
+				var child, j, len, ref;
+				level || (level = 0);
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				this.stream.write(this.indent(node, options, level));
+				this.stream.write("<!DOCTYPE " + node.root().name);
+				if (node.pubID && node.sysID) this.stream.write(" PUBLIC \"" + node.pubID + "\" \"" + node.sysID + "\"");
+				else if (node.sysID) this.stream.write(" SYSTEM \"" + node.sysID + "\"");
+				if (node.children.length > 0) {
+					this.stream.write(" [");
+					this.stream.write(this.endline(node, options, level));
+					options.state = WriterState.InsideTag;
+					ref = node.children;
+					for (j = 0, len = ref.length; j < len; j++) {
+						child = ref[j];
+						this.writeChildNode(child, options, level + 1);
+					}
+					options.state = WriterState.CloseTag;
+					this.stream.write("]");
+				}
+				options.state = WriterState.CloseTag;
+				this.stream.write(options.spaceBeforeSlash + ">");
+				this.stream.write(this.endline(node, options, level));
+				options.state = WriterState.None;
+				return this.closeNode(node, options, level);
+			};
+			XMLStreamWriter.prototype.element = function(node, options, level) {
+				var att, child, childNodeCount, firstChildNode, j, len, name, ref, ref1;
+				level || (level = 0);
+				this.openNode(node, options, level);
+				options.state = WriterState.OpenTag;
+				this.stream.write(this.indent(node, options, level) + "<" + node.name);
+				ref = node.attribs;
+				for (name in ref) {
+					if (!hasProp.call(ref, name)) continue;
+					att = ref[name];
+					this.attribute(att, options, level);
+				}
+				childNodeCount = node.children.length;
+				firstChildNode = childNodeCount === 0 ? null : node.children[0];
+				if (childNodeCount === 0 || node.children.every(function(e) {
+					return (e.type === NodeType.Text || e.type === NodeType.Raw) && e.value === "";
+				})) if (options.allowEmpty) {
+					this.stream.write(">");
+					options.state = WriterState.CloseTag;
+					this.stream.write("</" + node.name + ">");
+				} else {
+					options.state = WriterState.CloseTag;
+					this.stream.write(options.spaceBeforeSlash + "/>");
+				}
+				else if (options.pretty && childNodeCount === 1 && (firstChildNode.type === NodeType.Text || firstChildNode.type === NodeType.Raw) && firstChildNode.value != null) {
+					this.stream.write(">");
+					options.state = WriterState.InsideTag;
+					options.suppressPrettyCount++;
+					this.writeChildNode(firstChildNode, options, level + 1);
+					options.suppressPrettyCount--;
+					options.state = WriterState.CloseTag;
+					this.stream.write("</" + node.name + ">");
+				} else {
+					this.stream.write(">" + this.endline(node, options, level));
+					options.state = WriterState.InsideTag;
+					ref1 = node.children;
+					for (j = 0, len = ref1.length; j < len; j++) {
+						child = ref1[j];
+						this.writeChildNode(child, options, level + 1);
+					}
+					options.state = WriterState.CloseTag;
+					this.stream.write(this.indent(node, options, level) + "</" + node.name + ">");
+				}
+				this.stream.write(this.endline(node, options, level));
+				options.state = WriterState.None;
+				return this.closeNode(node, options, level);
+			};
+			XMLStreamWriter.prototype.processingInstruction = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.processingInstruction.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.raw = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.raw.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.text = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.text.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.dtdAttList = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.dtdAttList.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.dtdElement = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.dtdElement.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.dtdEntity = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.dtdEntity.call(this, node, options, level));
+			};
+			XMLStreamWriter.prototype.dtdNotation = function(node, options, level) {
+				return this.stream.write(XMLStreamWriter.__super__.dtdNotation.call(this, node, options, level));
+			};
+			return XMLStreamWriter;
+		})(XMLWriterBase);
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xmlbuilder/lib/index.js
+var require_lib = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	(function() {
+		var NodeType, WriterState, XMLDOMImplementation, XMLDocument, XMLDocumentCB, XMLStreamWriter, XMLStringWriter, assign, isFunction, ref = require_Utility();
+		assign = ref.assign, isFunction = ref.isFunction;
+		XMLDOMImplementation = require_XMLDOMImplementation();
+		XMLDocument = require_XMLDocument();
+		XMLDocumentCB = require_XMLDocumentCB();
+		XMLStringWriter = require_XMLStringWriter();
+		XMLStreamWriter = require_XMLStreamWriter();
+		NodeType = require_NodeType();
+		WriterState = require_WriterState();
+		module.exports.create = function(name, xmldec, doctype, options) {
+			var doc, root;
+			if (name == null) throw new Error("Root element needs a name.");
+			options = assign({}, xmldec, doctype, options);
+			doc = new XMLDocument(options);
+			root = doc.element(name);
+			if (!options.headless) {
+				doc.declaration(options);
+				if (options.pubID != null || options.sysID != null) doc.dtd(options);
+			}
+			return root;
+		};
+		module.exports.begin = function(options, onData, onEnd) {
+			var ref1;
+			if (isFunction(options)) {
+				ref1 = [options, onData], onData = ref1[0], onEnd = ref1[1];
+				options = {};
+			}
+			if (onData) return new XMLDocumentCB(options, onData, onEnd);
+			else return new XMLDocument(options);
+		};
+		module.exports.stringWriter = function(options) {
+			return new XMLStringWriter(options);
+		};
+		module.exports.streamWriter = function(stream, options) {
+			return new XMLStreamWriter(stream, options);
+		};
+		module.exports.implementation = new XMLDOMImplementation();
+		module.exports.nodeType = NodeType;
+		module.exports.writerState = WriterState;
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xml2js/lib/builder.js
+var require_builder = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function() {
+		"use strict";
+		var builder, defaults, escapeCDATA, requiresCDATA, wrapCDATA, hasProp = {}.hasOwnProperty;
+		builder = require_lib();
+		defaults = require_defaults().defaults;
+		requiresCDATA = function(entry) {
+			return typeof entry === "string" && (entry.indexOf("&") >= 0 || entry.indexOf(">") >= 0 || entry.indexOf("<") >= 0);
+		};
+		wrapCDATA = function(entry) {
+			return "<![CDATA[" + escapeCDATA(entry) + "]]>";
+		};
+		escapeCDATA = function(entry) {
+			return entry.replace("]]>", "]]]]><![CDATA[>");
+		};
+		exports.Builder = (function() {
+			function Builder(opts) {
+				var key, ref, value;
+				this.options = {};
+				ref = defaults["0.2"];
+				for (key in ref) {
+					if (!hasProp.call(ref, key)) continue;
+					value = ref[key];
+					this.options[key] = value;
+				}
+				for (key in opts) {
+					if (!hasProp.call(opts, key)) continue;
+					value = opts[key];
+					this.options[key] = value;
+				}
+			}
+			Builder.prototype.buildObject = function(rootObj) {
+				var attrkey = this.options.attrkey, charkey = this.options.charkey, render, rootElement, rootName;
+				if (Object.keys(rootObj).length === 1 && this.options.rootName === defaults["0.2"].rootName) {
+					rootName = Object.keys(rootObj)[0];
+					rootObj = rootObj[rootName];
+				} else rootName = this.options.rootName;
+				render = (function(_this) {
+					return function(element, obj) {
+						var attr, child, entry, index, key, value;
+						if (typeof obj !== "object") if (_this.options.cdata && requiresCDATA(obj)) element.raw(wrapCDATA(obj));
+						else element.txt(obj);
+						else if (Array.isArray(obj)) for (index in obj) {
+							if (!hasProp.call(obj, index)) continue;
+							child = obj[index];
+							for (key in child) {
+								entry = child[key];
+								element = render(element.ele(key), entry).up();
+							}
+						}
+						else for (key in obj) {
+							if (!hasProp.call(obj, key)) continue;
+							child = obj[key];
+							if (key === attrkey) {
+								if (typeof child === "object") for (attr in child) {
+									value = child[attr];
+									element = element.att(attr, value);
+								}
+							} else if (key === charkey) if (_this.options.cdata && requiresCDATA(child)) element = element.raw(wrapCDATA(child));
+							else element = element.txt(child);
+							else if (Array.isArray(child)) for (index in child) {
+								if (!hasProp.call(child, index)) continue;
+								entry = child[index];
+								if (typeof entry === "string") if (_this.options.cdata && requiresCDATA(entry)) element = element.ele(key).raw(wrapCDATA(entry)).up();
+								else element = element.ele(key, entry).up();
+								else element = render(element.ele(key), entry).up();
+							}
+							else if (typeof child === "object") element = render(element.ele(key), child).up();
+							else if (typeof child === "string" && _this.options.cdata && requiresCDATA(child)) element = element.ele(key).raw(wrapCDATA(child)).up();
+							else {
+								if (child == null) child = "";
+								element = element.ele(key, child.toString()).up();
+							}
+						}
+						return element;
+					};
+				})(this);
+				rootElement = builder.create(rootName, this.options.xmldec, this.options.doctype, {
+					headless: this.options.headless,
+					allowSurrogateChars: this.options.allowSurrogateChars
+				});
+				return render(rootElement, rootObj).end(this.options.renderOpts);
+			};
+			return Builder;
+		})();
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xml2js/node_modules/sax/lib/sax.js
+var require_sax = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function(sax) {
+		sax.parser = function(strict, opt) {
+			return new SAXParser(strict, opt);
+		};
+		sax.SAXParser = SAXParser;
+		sax.SAXStream = SAXStream;
+		sax.createStream = createStream;
+		sax.MAX_BUFFER_LENGTH = 64 * 1024;
+		var buffers = [
+			"comment",
+			"sgmlDecl",
+			"textNode",
+			"tagName",
+			"doctype",
+			"procInstName",
+			"procInstBody",
+			"entity",
+			"attribName",
+			"attribValue",
+			"cdata",
+			"script"
+		];
+		sax.EVENTS = [
+			"text",
+			"processinginstruction",
+			"sgmldeclaration",
+			"doctype",
+			"comment",
+			"opentagstart",
+			"attribute",
+			"opentag",
+			"closetag",
+			"opencdata",
+			"cdata",
+			"closecdata",
+			"error",
+			"end",
+			"ready",
+			"script",
+			"opennamespace",
+			"closenamespace"
+		];
+		function SAXParser(strict, opt) {
+			if (!(this instanceof SAXParser)) return new SAXParser(strict, opt);
+			var parser = this;
+			clearBuffers(parser);
+			parser.q = parser.c = "";
+			parser.bufferCheckPosition = sax.MAX_BUFFER_LENGTH;
+			parser.opt = opt || {};
+			parser.opt.lowercase = parser.opt.lowercase || parser.opt.lowercasetags;
+			parser.looseCase = parser.opt.lowercase ? "toLowerCase" : "toUpperCase";
+			parser.tags = [];
+			parser.closed = parser.closedRoot = parser.sawRoot = false;
+			parser.tag = parser.error = null;
+			parser.strict = !!strict;
+			parser.noscript = !!(strict || parser.opt.noscript);
+			parser.state = S.BEGIN;
+			parser.strictEntities = parser.opt.strictEntities;
+			parser.ENTITIES = parser.strictEntities ? Object.create(sax.XML_ENTITIES) : Object.create(sax.ENTITIES);
+			parser.attribList = [];
+			if (parser.opt.xmlns) parser.ns = Object.create(rootNS);
+			if (parser.opt.unquotedAttributeValues === void 0) parser.opt.unquotedAttributeValues = !strict;
+			parser.trackPosition = parser.opt.position !== false;
+			if (parser.trackPosition) parser.position = parser.line = parser.column = 0;
+			emit(parser, "onready");
+		}
+		if (!Object.create) Object.create = function(o) {
+			function F() {}
+			F.prototype = o;
+			return new F();
+		};
+		if (!Object.keys) Object.keys = function(o) {
+			var a = [];
+			for (var i in o) if (o.hasOwnProperty(i)) a.push(i);
+			return a;
+		};
+		function checkBufferLength(parser) {
+			var maxAllowed = Math.max(sax.MAX_BUFFER_LENGTH, 10);
+			var maxActual = 0;
+			for (var i = 0, l = buffers.length; i < l; i++) {
+				var len = parser[buffers[i]].length;
+				if (len > maxAllowed) switch (buffers[i]) {
+					case "textNode":
+						closeText(parser);
+						break;
+					case "cdata":
+						emitNode(parser, "oncdata", parser.cdata);
+						parser.cdata = "";
+						break;
+					case "script":
+						emitNode(parser, "onscript", parser.script);
+						parser.script = "";
+						break;
+					default: error(parser, "Max buffer length exceeded: " + buffers[i]);
+				}
+				maxActual = Math.max(maxActual, len);
+			}
+			parser.bufferCheckPosition = sax.MAX_BUFFER_LENGTH - maxActual + parser.position;
+		}
+		function clearBuffers(parser) {
+			for (var i = 0, l = buffers.length; i < l; i++) parser[buffers[i]] = "";
+		}
+		function flushBuffers(parser) {
+			closeText(parser);
+			if (parser.cdata !== "") {
+				emitNode(parser, "oncdata", parser.cdata);
+				parser.cdata = "";
+			}
+			if (parser.script !== "") {
+				emitNode(parser, "onscript", parser.script);
+				parser.script = "";
+			}
+		}
+		SAXParser.prototype = {
+			end: function() {
+				end(this);
+			},
+			write,
+			resume: function() {
+				this.error = null;
+				return this;
+			},
+			close: function() {
+				return this.write(null);
+			},
+			flush: function() {
+				flushBuffers(this);
+			}
+		};
+		var Stream;
+		try {
+			Stream = __require("stream").Stream;
+		} catch (ex) {
+			Stream = function() {};
+		}
+		if (!Stream) Stream = function() {};
+		var streamWraps = sax.EVENTS.filter(function(ev) {
+			return ev !== "error" && ev !== "end";
+		});
+		function createStream(strict, opt) {
+			return new SAXStream(strict, opt);
+		}
+		function SAXStream(strict, opt) {
+			if (!(this instanceof SAXStream)) return new SAXStream(strict, opt);
+			Stream.apply(this);
+			this._parser = new SAXParser(strict, opt);
+			this.writable = true;
+			this.readable = true;
+			var me = this;
+			this._parser.onend = function() {
+				me.emit("end");
+			};
+			this._parser.onerror = function(er) {
+				me.emit("error", er);
+				me._parser.error = null;
+			};
+			this._decoder = null;
+			streamWraps.forEach(function(ev) {
+				Object.defineProperty(me, "on" + ev, {
+					get: function() {
+						return me._parser["on" + ev];
+					},
+					set: function(h) {
+						if (!h) {
+							me.removeAllListeners(ev);
+							me._parser["on" + ev] = h;
+							return h;
+						}
+						me.on(ev, h);
+					},
+					enumerable: true,
+					configurable: false
+				});
+			});
+		}
+		SAXStream.prototype = Object.create(Stream.prototype, { constructor: { value: SAXStream } });
+		SAXStream.prototype.write = function(data) {
+			if (typeof Buffer === "function" && typeof Buffer.isBuffer === "function" && Buffer.isBuffer(data)) {
+				if (!this._decoder) {
+					var SD = __require("string_decoder").StringDecoder;
+					this._decoder = new SD("utf8");
+				}
+				data = this._decoder.write(data);
+			}
+			this._parser.write(data.toString());
+			this.emit("data", data);
+			return true;
+		};
+		SAXStream.prototype.end = function(chunk) {
+			if (chunk && chunk.length) this.write(chunk);
+			this._parser.end();
+			return true;
+		};
+		SAXStream.prototype.on = function(ev, handler$1) {
+			var me = this;
+			if (!me._parser["on" + ev] && streamWraps.indexOf(ev) !== -1) me._parser["on" + ev] = function() {
+				var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
+				args.splice(0, 0, ev);
+				me.emit.apply(me, args);
+			};
+			return Stream.prototype.on.call(me, ev, handler$1);
+		};
+		var CDATA = "[CDATA[";
+		var DOCTYPE = "DOCTYPE";
+		var XML_NAMESPACE = "http://www.w3.org/XML/1998/namespace";
+		var XMLNS_NAMESPACE = "http://www.w3.org/2000/xmlns/";
+		var rootNS = {
+			xml: XML_NAMESPACE,
+			xmlns: XMLNS_NAMESPACE
+		};
+		var nameStart = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
+		var nameBody = /[:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
+		var entityStart = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD]/;
+		var entityBody = /[#:_A-Za-z\u00C0-\u00D6\u00D8-\u00F6\u00F8-\u02FF\u0370-\u037D\u037F-\u1FFF\u200C-\u200D\u2070-\u218F\u2C00-\u2FEF\u3001-\uD7FF\uF900-\uFDCF\uFDF0-\uFFFD\u00B7\u0300-\u036F\u203F-\u2040.\d-]/;
+		function isWhitespace(c) {
+			return c === " " || c === "\n" || c === "\r" || c === "	";
+		}
+		function isQuote(c) {
+			return c === "\"" || c === "'";
+		}
+		function isAttribEnd(c) {
+			return c === ">" || isWhitespace(c);
+		}
+		function isMatch(regex, c) {
+			return regex.test(c);
+		}
+		function notMatch(regex, c) {
+			return !isMatch(regex, c);
+		}
+		var S = 0;
+		sax.STATE = {
+			BEGIN: S++,
+			BEGIN_WHITESPACE: S++,
+			TEXT: S++,
+			TEXT_ENTITY: S++,
+			OPEN_WAKA: S++,
+			SGML_DECL: S++,
+			SGML_DECL_QUOTED: S++,
+			DOCTYPE: S++,
+			DOCTYPE_QUOTED: S++,
+			DOCTYPE_DTD: S++,
+			DOCTYPE_DTD_QUOTED: S++,
+			COMMENT_STARTING: S++,
+			COMMENT: S++,
+			COMMENT_ENDING: S++,
+			COMMENT_ENDED: S++,
+			CDATA: S++,
+			CDATA_ENDING: S++,
+			CDATA_ENDING_2: S++,
+			PROC_INST: S++,
+			PROC_INST_BODY: S++,
+			PROC_INST_ENDING: S++,
+			OPEN_TAG: S++,
+			OPEN_TAG_SLASH: S++,
+			ATTRIB: S++,
+			ATTRIB_NAME: S++,
+			ATTRIB_NAME_SAW_WHITE: S++,
+			ATTRIB_VALUE: S++,
+			ATTRIB_VALUE_QUOTED: S++,
+			ATTRIB_VALUE_CLOSED: S++,
+			ATTRIB_VALUE_UNQUOTED: S++,
+			ATTRIB_VALUE_ENTITY_Q: S++,
+			ATTRIB_VALUE_ENTITY_U: S++,
+			CLOSE_TAG: S++,
+			CLOSE_TAG_SAW_WHITE: S++,
+			SCRIPT: S++,
+			SCRIPT_ENDING: S++
+		};
+		sax.XML_ENTITIES = {
+			amp: "&",
+			gt: ">",
+			lt: "<",
+			quot: "\"",
+			apos: "'"
+		};
+		sax.ENTITIES = {
+			amp: "&",
+			gt: ">",
+			lt: "<",
+			quot: "\"",
+			apos: "'",
+			AElig: 198,
+			Aacute: 193,
+			Acirc: 194,
+			Agrave: 192,
+			Aring: 197,
+			Atilde: 195,
+			Auml: 196,
+			Ccedil: 199,
+			ETH: 208,
+			Eacute: 201,
+			Ecirc: 202,
+			Egrave: 200,
+			Euml: 203,
+			Iacute: 205,
+			Icirc: 206,
+			Igrave: 204,
+			Iuml: 207,
+			Ntilde: 209,
+			Oacute: 211,
+			Ocirc: 212,
+			Ograve: 210,
+			Oslash: 216,
+			Otilde: 213,
+			Ouml: 214,
+			THORN: 222,
+			Uacute: 218,
+			Ucirc: 219,
+			Ugrave: 217,
+			Uuml: 220,
+			Yacute: 221,
+			aacute: 225,
+			acirc: 226,
+			aelig: 230,
+			agrave: 224,
+			aring: 229,
+			atilde: 227,
+			auml: 228,
+			ccedil: 231,
+			eacute: 233,
+			ecirc: 234,
+			egrave: 232,
+			eth: 240,
+			euml: 235,
+			iacute: 237,
+			icirc: 238,
+			igrave: 236,
+			iuml: 239,
+			ntilde: 241,
+			oacute: 243,
+			ocirc: 244,
+			ograve: 242,
+			oslash: 248,
+			otilde: 245,
+			ouml: 246,
+			szlig: 223,
+			thorn: 254,
+			uacute: 250,
+			ucirc: 251,
+			ugrave: 249,
+			uuml: 252,
+			yacute: 253,
+			yuml: 255,
+			copy: 169,
+			reg: 174,
+			nbsp: 160,
+			iexcl: 161,
+			cent: 162,
+			pound: 163,
+			curren: 164,
+			yen: 165,
+			brvbar: 166,
+			sect: 167,
+			uml: 168,
+			ordf: 170,
+			laquo: 171,
+			not: 172,
+			shy: 173,
+			macr: 175,
+			deg: 176,
+			plusmn: 177,
+			sup1: 185,
+			sup2: 178,
+			sup3: 179,
+			acute: 180,
+			micro: 181,
+			para: 182,
+			middot: 183,
+			cedil: 184,
+			ordm: 186,
+			raquo: 187,
+			frac14: 188,
+			frac12: 189,
+			frac34: 190,
+			iquest: 191,
+			times: 215,
+			divide: 247,
+			OElig: 338,
+			oelig: 339,
+			Scaron: 352,
+			scaron: 353,
+			Yuml: 376,
+			fnof: 402,
+			circ: 710,
+			tilde: 732,
+			Alpha: 913,
+			Beta: 914,
+			Gamma: 915,
+			Delta: 916,
+			Epsilon: 917,
+			Zeta: 918,
+			Eta: 919,
+			Theta: 920,
+			Iota: 921,
+			Kappa: 922,
+			Lambda: 923,
+			Mu: 924,
+			Nu: 925,
+			Xi: 926,
+			Omicron: 927,
+			Pi: 928,
+			Rho: 929,
+			Sigma: 931,
+			Tau: 932,
+			Upsilon: 933,
+			Phi: 934,
+			Chi: 935,
+			Psi: 936,
+			Omega: 937,
+			alpha: 945,
+			beta: 946,
+			gamma: 947,
+			delta: 948,
+			epsilon: 949,
+			zeta: 950,
+			eta: 951,
+			theta: 952,
+			iota: 953,
+			kappa: 954,
+			lambda: 955,
+			mu: 956,
+			nu: 957,
+			xi: 958,
+			omicron: 959,
+			pi: 960,
+			rho: 961,
+			sigmaf: 962,
+			sigma: 963,
+			tau: 964,
+			upsilon: 965,
+			phi: 966,
+			chi: 967,
+			psi: 968,
+			omega: 969,
+			thetasym: 977,
+			upsih: 978,
+			piv: 982,
+			ensp: 8194,
+			emsp: 8195,
+			thinsp: 8201,
+			zwnj: 8204,
+			zwj: 8205,
+			lrm: 8206,
+			rlm: 8207,
+			ndash: 8211,
+			mdash: 8212,
+			lsquo: 8216,
+			rsquo: 8217,
+			sbquo: 8218,
+			ldquo: 8220,
+			rdquo: 8221,
+			bdquo: 8222,
+			dagger: 8224,
+			Dagger: 8225,
+			bull: 8226,
+			hellip: 8230,
+			permil: 8240,
+			prime: 8242,
+			Prime: 8243,
+			lsaquo: 8249,
+			rsaquo: 8250,
+			oline: 8254,
+			frasl: 8260,
+			euro: 8364,
+			image: 8465,
+			weierp: 8472,
+			real: 8476,
+			trade: 8482,
+			alefsym: 8501,
+			larr: 8592,
+			uarr: 8593,
+			rarr: 8594,
+			darr: 8595,
+			harr: 8596,
+			crarr: 8629,
+			lArr: 8656,
+			uArr: 8657,
+			rArr: 8658,
+			dArr: 8659,
+			hArr: 8660,
+			forall: 8704,
+			part: 8706,
+			exist: 8707,
+			empty: 8709,
+			nabla: 8711,
+			isin: 8712,
+			notin: 8713,
+			ni: 8715,
+			prod: 8719,
+			sum: 8721,
+			minus: 8722,
+			lowast: 8727,
+			radic: 8730,
+			prop: 8733,
+			infin: 8734,
+			ang: 8736,
+			and: 8743,
+			or: 8744,
+			cap: 8745,
+			cup: 8746,
+			int: 8747,
+			there4: 8756,
+			sim: 8764,
+			cong: 8773,
+			asymp: 8776,
+			ne: 8800,
+			equiv: 8801,
+			le: 8804,
+			ge: 8805,
+			sub: 8834,
+			sup: 8835,
+			nsub: 8836,
+			sube: 8838,
+			supe: 8839,
+			oplus: 8853,
+			otimes: 8855,
+			perp: 8869,
+			sdot: 8901,
+			lceil: 8968,
+			rceil: 8969,
+			lfloor: 8970,
+			rfloor: 8971,
+			lang: 9001,
+			rang: 9002,
+			loz: 9674,
+			spades: 9824,
+			clubs: 9827,
+			hearts: 9829,
+			diams: 9830
+		};
+		Object.keys(sax.ENTITIES).forEach(function(key) {
+			var e = sax.ENTITIES[key];
+			var s$1 = typeof e === "number" ? String.fromCharCode(e) : e;
+			sax.ENTITIES[key] = s$1;
+		});
+		for (var s in sax.STATE) sax.STATE[sax.STATE[s]] = s;
+		S = sax.STATE;
+		function emit(parser, event, data) {
+			parser[event] && parser[event](data);
+		}
+		function emitNode(parser, nodeType, data) {
+			if (parser.textNode) closeText(parser);
+			emit(parser, nodeType, data);
+		}
+		function closeText(parser) {
+			parser.textNode = textopts(parser.opt, parser.textNode);
+			if (parser.textNode) emit(parser, "ontext", parser.textNode);
+			parser.textNode = "";
+		}
+		function textopts(opt, text) {
+			if (opt.trim) text = text.trim();
+			if (opt.normalize) text = text.replace(/\s+/g, " ");
+			return text;
+		}
+		function error(parser, er) {
+			closeText(parser);
+			if (parser.trackPosition) er += "\nLine: " + parser.line + "\nColumn: " + parser.column + "\nChar: " + parser.c;
+			er = new Error(er);
+			parser.error = er;
+			emit(parser, "onerror", er);
+			return parser;
+		}
+		function end(parser) {
+			if (parser.sawRoot && !parser.closedRoot) strictFail(parser, "Unclosed root tag");
+			if (parser.state !== S.BEGIN && parser.state !== S.BEGIN_WHITESPACE && parser.state !== S.TEXT) error(parser, "Unexpected end");
+			closeText(parser);
+			parser.c = "";
+			parser.closed = true;
+			emit(parser, "onend");
+			SAXParser.call(parser, parser.strict, parser.opt);
+			return parser;
+		}
+		function strictFail(parser, message) {
+			if (typeof parser !== "object" || !(parser instanceof SAXParser)) throw new Error("bad call to strictFail");
+			if (parser.strict) error(parser, message);
+		}
+		function newTag(parser) {
+			if (!parser.strict) parser.tagName = parser.tagName[parser.looseCase]();
+			var parent = parser.tags[parser.tags.length - 1] || parser;
+			var tag = parser.tag = {
+				name: parser.tagName,
+				attributes: {}
+			};
+			if (parser.opt.xmlns) tag.ns = parent.ns;
+			parser.attribList.length = 0;
+			emitNode(parser, "onopentagstart", tag);
+		}
+		function qname(name, attribute) {
+			var qualName = name.indexOf(":") < 0 ? ["", name] : name.split(":");
+			var prefix = qualName[0];
+			var local = qualName[1];
+			if (attribute && name === "xmlns") {
+				prefix = "xmlns";
+				local = "";
+			}
+			return {
+				prefix,
+				local
+			};
+		}
+		function attrib(parser) {
+			if (!parser.strict) parser.attribName = parser.attribName[parser.looseCase]();
+			if (parser.attribList.indexOf(parser.attribName) !== -1 || parser.tag.attributes.hasOwnProperty(parser.attribName)) {
+				parser.attribName = parser.attribValue = "";
+				return;
+			}
+			if (parser.opt.xmlns) {
+				var qn = qname(parser.attribName, true);
+				var prefix = qn.prefix;
+				var local = qn.local;
+				if (prefix === "xmlns") if (local === "xml" && parser.attribValue !== XML_NAMESPACE) strictFail(parser, "xml: prefix must be bound to " + XML_NAMESPACE + "\nActual: " + parser.attribValue);
+				else if (local === "xmlns" && parser.attribValue !== XMLNS_NAMESPACE) strictFail(parser, "xmlns: prefix must be bound to " + XMLNS_NAMESPACE + "\nActual: " + parser.attribValue);
+				else {
+					var tag = parser.tag;
+					var parent = parser.tags[parser.tags.length - 1] || parser;
+					if (tag.ns === parent.ns) tag.ns = Object.create(parent.ns);
+					tag.ns[local] = parser.attribValue;
+				}
+				parser.attribList.push([parser.attribName, parser.attribValue]);
+			} else {
+				parser.tag.attributes[parser.attribName] = parser.attribValue;
+				emitNode(parser, "onattribute", {
+					name: parser.attribName,
+					value: parser.attribValue
+				});
+			}
+			parser.attribName = parser.attribValue = "";
+		}
+		function openTag(parser, selfClosing) {
+			if (parser.opt.xmlns) {
+				var tag = parser.tag;
+				var qn = qname(parser.tagName);
+				tag.prefix = qn.prefix;
+				tag.local = qn.local;
+				tag.uri = tag.ns[qn.prefix] || "";
+				if (tag.prefix && !tag.uri) {
+					strictFail(parser, "Unbound namespace prefix: " + JSON.stringify(parser.tagName));
+					tag.uri = qn.prefix;
+				}
+				var parent = parser.tags[parser.tags.length - 1] || parser;
+				if (tag.ns && parent.ns !== tag.ns) Object.keys(tag.ns).forEach(function(p) {
+					emitNode(parser, "onopennamespace", {
+						prefix: p,
+						uri: tag.ns[p]
+					});
+				});
+				for (var i = 0, l = parser.attribList.length; i < l; i++) {
+					var nv = parser.attribList[i];
+					var name = nv[0];
+					var value = nv[1];
+					var qualName = qname(name, true);
+					var prefix = qualName.prefix;
+					var local = qualName.local;
+					var uri = prefix === "" ? "" : tag.ns[prefix] || "";
+					var a = {
+						name,
+						value,
+						prefix,
+						local,
+						uri
+					};
+					if (prefix && prefix !== "xmlns" && !uri) {
+						strictFail(parser, "Unbound namespace prefix: " + JSON.stringify(prefix));
+						a.uri = prefix;
+					}
+					parser.tag.attributes[name] = a;
+					emitNode(parser, "onattribute", a);
+				}
+				parser.attribList.length = 0;
+			}
+			parser.tag.isSelfClosing = !!selfClosing;
+			parser.sawRoot = true;
+			parser.tags.push(parser.tag);
+			emitNode(parser, "onopentag", parser.tag);
+			if (!selfClosing) {
+				if (!parser.noscript && parser.tagName.toLowerCase() === "script") parser.state = S.SCRIPT;
+				else parser.state = S.TEXT;
+				parser.tag = null;
+				parser.tagName = "";
+			}
+			parser.attribName = parser.attribValue = "";
+			parser.attribList.length = 0;
+		}
+		function closeTag(parser) {
+			if (!parser.tagName) {
+				strictFail(parser, "Weird empty close tag.");
+				parser.textNode += "</>";
+				parser.state = S.TEXT;
+				return;
+			}
+			if (parser.script) {
+				if (parser.tagName !== "script") {
+					parser.script += "</" + parser.tagName + ">";
+					parser.tagName = "";
+					parser.state = S.SCRIPT;
+					return;
+				}
+				emitNode(parser, "onscript", parser.script);
+				parser.script = "";
+			}
+			var t = parser.tags.length;
+			var tagName = parser.tagName;
+			if (!parser.strict) tagName = tagName[parser.looseCase]();
+			var closeTo = tagName;
+			while (t--) if (parser.tags[t].name !== closeTo) strictFail(parser, "Unexpected close tag");
+			else break;
+			if (t < 0) {
+				strictFail(parser, "Unmatched closing tag: " + parser.tagName);
+				parser.textNode += "</" + parser.tagName + ">";
+				parser.state = S.TEXT;
+				return;
+			}
+			parser.tagName = tagName;
+			var s$1 = parser.tags.length;
+			while (s$1-- > t) {
+				var tag = parser.tag = parser.tags.pop();
+				parser.tagName = parser.tag.name;
+				emitNode(parser, "onclosetag", parser.tagName);
+				var x = {};
+				for (var i in tag.ns) x[i] = tag.ns[i];
+				var parent = parser.tags[parser.tags.length - 1] || parser;
+				if (parser.opt.xmlns && tag.ns !== parent.ns) Object.keys(tag.ns).forEach(function(p) {
+					var n = tag.ns[p];
+					emitNode(parser, "onclosenamespace", {
+						prefix: p,
+						uri: n
+					});
+				});
+			}
+			if (t === 0) parser.closedRoot = true;
+			parser.tagName = parser.attribValue = parser.attribName = "";
+			parser.attribList.length = 0;
+			parser.state = S.TEXT;
+		}
+		function parseEntity(parser) {
+			var entity = parser.entity;
+			var entityLC = entity.toLowerCase();
+			var num;
+			var numStr = "";
+			if (parser.ENTITIES[entity]) return parser.ENTITIES[entity];
+			if (parser.ENTITIES[entityLC]) return parser.ENTITIES[entityLC];
+			entity = entityLC;
+			if (entity.charAt(0) === "#") if (entity.charAt(1) === "x") {
+				entity = entity.slice(2);
+				num = parseInt(entity, 16);
+				numStr = num.toString(16);
+			} else {
+				entity = entity.slice(1);
+				num = parseInt(entity, 10);
+				numStr = num.toString(10);
+			}
+			entity = entity.replace(/^0+/, "");
+			if (isNaN(num) || numStr.toLowerCase() !== entity || num < 0 || num > 1114111) {
+				strictFail(parser, "Invalid character entity");
+				return "&" + parser.entity + ";";
+			}
+			return String.fromCodePoint(num);
+		}
+		function beginWhiteSpace(parser, c) {
+			if (c === "<") {
+				parser.state = S.OPEN_WAKA;
+				parser.startTagPosition = parser.position;
+			} else if (!isWhitespace(c)) {
+				strictFail(parser, "Non-whitespace before first tag.");
+				parser.textNode = c;
+				parser.state = S.TEXT;
+			}
+		}
+		function charAt(chunk, i) {
+			var result = "";
+			if (i < chunk.length) result = chunk.charAt(i);
+			return result;
+		}
+		function write(chunk) {
+			var parser = this;
+			if (this.error) throw this.error;
+			if (parser.closed) return error(parser, "Cannot write after close. Assign an onready handler.");
+			if (chunk === null) return end(parser);
+			if (typeof chunk === "object") chunk = chunk.toString();
+			var i = 0;
+			var c = "";
+			while (true) {
+				c = charAt(chunk, i++);
+				parser.c = c;
+				if (!c) break;
+				if (parser.trackPosition) {
+					parser.position++;
+					if (c === "\n") {
+						parser.line++;
+						parser.column = 0;
+					} else parser.column++;
+				}
+				switch (parser.state) {
+					case S.BEGIN:
+						parser.state = S.BEGIN_WHITESPACE;
+						if (c === "﻿") continue;
+						beginWhiteSpace(parser, c);
+						continue;
+					case S.BEGIN_WHITESPACE:
+						beginWhiteSpace(parser, c);
+						continue;
+					case S.TEXT:
+						if (parser.sawRoot && !parser.closedRoot) {
+							var starti = i - 1;
+							while (c && c !== "<" && c !== "&") {
+								c = charAt(chunk, i++);
+								if (c && parser.trackPosition) {
+									parser.position++;
+									if (c === "\n") {
+										parser.line++;
+										parser.column = 0;
+									} else parser.column++;
+								}
+							}
+							parser.textNode += chunk.substring(starti, i - 1);
+						}
+						if (c === "<" && !(parser.sawRoot && parser.closedRoot && !parser.strict)) {
+							parser.state = S.OPEN_WAKA;
+							parser.startTagPosition = parser.position;
+						} else {
+							if (!isWhitespace(c) && (!parser.sawRoot || parser.closedRoot)) strictFail(parser, "Text data outside of root node.");
+							if (c === "&") parser.state = S.TEXT_ENTITY;
+							else parser.textNode += c;
+						}
+						continue;
+					case S.SCRIPT:
+						if (c === "<") parser.state = S.SCRIPT_ENDING;
+						else parser.script += c;
+						continue;
+					case S.SCRIPT_ENDING:
+						if (c === "/") parser.state = S.CLOSE_TAG;
+						else {
+							parser.script += "<" + c;
+							parser.state = S.SCRIPT;
+						}
+						continue;
+					case S.OPEN_WAKA:
+						if (c === "!") {
+							parser.state = S.SGML_DECL;
+							parser.sgmlDecl = "";
+						} else if (isWhitespace(c)) {} else if (isMatch(nameStart, c)) {
+							parser.state = S.OPEN_TAG;
+							parser.tagName = c;
+						} else if (c === "/") {
+							parser.state = S.CLOSE_TAG;
+							parser.tagName = "";
+						} else if (c === "?") {
+							parser.state = S.PROC_INST;
+							parser.procInstName = parser.procInstBody = "";
+						} else {
+							strictFail(parser, "Unencoded <");
+							if (parser.startTagPosition + 1 < parser.position) {
+								var pad = parser.position - parser.startTagPosition;
+								c = new Array(pad).join(" ") + c;
+							}
+							parser.textNode += "<" + c;
+							parser.state = S.TEXT;
+						}
+						continue;
+					case S.SGML_DECL:
+						if (parser.sgmlDecl + c === "--") {
+							parser.state = S.COMMENT;
+							parser.comment = "";
+							parser.sgmlDecl = "";
+							continue;
+						}
+						if (parser.doctype && parser.doctype !== true && parser.sgmlDecl) {
+							parser.state = S.DOCTYPE_DTD;
+							parser.doctype += "<!" + parser.sgmlDecl + c;
+							parser.sgmlDecl = "";
+						} else if ((parser.sgmlDecl + c).toUpperCase() === CDATA) {
+							emitNode(parser, "onopencdata");
+							parser.state = S.CDATA;
+							parser.sgmlDecl = "";
+							parser.cdata = "";
+						} else if ((parser.sgmlDecl + c).toUpperCase() === DOCTYPE) {
+							parser.state = S.DOCTYPE;
+							if (parser.doctype || parser.sawRoot) strictFail(parser, "Inappropriately located doctype declaration");
+							parser.doctype = "";
+							parser.sgmlDecl = "";
+						} else if (c === ">") {
+							emitNode(parser, "onsgmldeclaration", parser.sgmlDecl);
+							parser.sgmlDecl = "";
+							parser.state = S.TEXT;
+						} else if (isQuote(c)) {
+							parser.state = S.SGML_DECL_QUOTED;
+							parser.sgmlDecl += c;
+						} else parser.sgmlDecl += c;
+						continue;
+					case S.SGML_DECL_QUOTED:
+						if (c === parser.q) {
+							parser.state = S.SGML_DECL;
+							parser.q = "";
+						}
+						parser.sgmlDecl += c;
+						continue;
+					case S.DOCTYPE:
+						if (c === ">") {
+							parser.state = S.TEXT;
+							emitNode(parser, "ondoctype", parser.doctype);
+							parser.doctype = true;
+						} else {
+							parser.doctype += c;
+							if (c === "[") parser.state = S.DOCTYPE_DTD;
+							else if (isQuote(c)) {
+								parser.state = S.DOCTYPE_QUOTED;
+								parser.q = c;
+							}
+						}
+						continue;
+					case S.DOCTYPE_QUOTED:
+						parser.doctype += c;
+						if (c === parser.q) {
+							parser.q = "";
+							parser.state = S.DOCTYPE;
+						}
+						continue;
+					case S.DOCTYPE_DTD:
+						if (c === "]") {
+							parser.doctype += c;
+							parser.state = S.DOCTYPE;
+						} else if (c === "<") {
+							parser.state = S.OPEN_WAKA;
+							parser.startTagPosition = parser.position;
+						} else if (isQuote(c)) {
+							parser.doctype += c;
+							parser.state = S.DOCTYPE_DTD_QUOTED;
+							parser.q = c;
+						} else parser.doctype += c;
+						continue;
+					case S.DOCTYPE_DTD_QUOTED:
+						parser.doctype += c;
+						if (c === parser.q) {
+							parser.state = S.DOCTYPE_DTD;
+							parser.q = "";
+						}
+						continue;
+					case S.COMMENT:
+						if (c === "-") parser.state = S.COMMENT_ENDING;
+						else parser.comment += c;
+						continue;
+					case S.COMMENT_ENDING:
+						if (c === "-") {
+							parser.state = S.COMMENT_ENDED;
+							parser.comment = textopts(parser.opt, parser.comment);
+							if (parser.comment) emitNode(parser, "oncomment", parser.comment);
+							parser.comment = "";
+						} else {
+							parser.comment += "-" + c;
+							parser.state = S.COMMENT;
+						}
+						continue;
+					case S.COMMENT_ENDED:
+						if (c !== ">") {
+							strictFail(parser, "Malformed comment");
+							parser.comment += "--" + c;
+							parser.state = S.COMMENT;
+						} else if (parser.doctype && parser.doctype !== true) parser.state = S.DOCTYPE_DTD;
+						else parser.state = S.TEXT;
+						continue;
+					case S.CDATA:
+						var starti = i - 1;
+						while (c && c !== "]") {
+							c = charAt(chunk, i++);
+							if (c && parser.trackPosition) {
+								parser.position++;
+								if (c === "\n") {
+									parser.line++;
+									parser.column = 0;
+								} else parser.column++;
+							}
+						}
+						parser.cdata += chunk.substring(starti, i - 1);
+						if (c === "]") parser.state = S.CDATA_ENDING;
+						continue;
+					case S.CDATA_ENDING:
+						if (c === "]") parser.state = S.CDATA_ENDING_2;
+						else {
+							parser.cdata += "]" + c;
+							parser.state = S.CDATA;
+						}
+						continue;
+					case S.CDATA_ENDING_2:
+						if (c === ">") {
+							if (parser.cdata) emitNode(parser, "oncdata", parser.cdata);
+							emitNode(parser, "onclosecdata");
+							parser.cdata = "";
+							parser.state = S.TEXT;
+						} else if (c === "]") parser.cdata += "]";
+						else {
+							parser.cdata += "]]" + c;
+							parser.state = S.CDATA;
+						}
+						continue;
+					case S.PROC_INST:
+						if (c === "?") parser.state = S.PROC_INST_ENDING;
+						else if (isWhitespace(c)) parser.state = S.PROC_INST_BODY;
+						else parser.procInstName += c;
+						continue;
+					case S.PROC_INST_BODY:
+						if (!parser.procInstBody && isWhitespace(c)) continue;
+						else if (c === "?") parser.state = S.PROC_INST_ENDING;
+						else parser.procInstBody += c;
+						continue;
+					case S.PROC_INST_ENDING:
+						if (c === ">") {
+							emitNode(parser, "onprocessinginstruction", {
+								name: parser.procInstName,
+								body: parser.procInstBody
+							});
+							parser.procInstName = parser.procInstBody = "";
+							parser.state = S.TEXT;
+						} else {
+							parser.procInstBody += "?" + c;
+							parser.state = S.PROC_INST_BODY;
+						}
+						continue;
+					case S.OPEN_TAG:
+						if (isMatch(nameBody, c)) parser.tagName += c;
+						else {
+							newTag(parser);
+							if (c === ">") openTag(parser);
+							else if (c === "/") parser.state = S.OPEN_TAG_SLASH;
+							else {
+								if (!isWhitespace(c)) strictFail(parser, "Invalid character in tag name");
+								parser.state = S.ATTRIB;
+							}
+						}
+						continue;
+					case S.OPEN_TAG_SLASH:
+						if (c === ">") {
+							openTag(parser, true);
+							closeTag(parser);
+						} else {
+							strictFail(parser, "Forward-slash in opening tag not followed by >");
+							parser.state = S.ATTRIB;
+						}
+						continue;
+					case S.ATTRIB:
+						if (isWhitespace(c)) continue;
+						else if (c === ">") openTag(parser);
+						else if (c === "/") parser.state = S.OPEN_TAG_SLASH;
+						else if (isMatch(nameStart, c)) {
+							parser.attribName = c;
+							parser.attribValue = "";
+							parser.state = S.ATTRIB_NAME;
+						} else strictFail(parser, "Invalid attribute name");
+						continue;
+					case S.ATTRIB_NAME:
+						if (c === "=") parser.state = S.ATTRIB_VALUE;
+						else if (c === ">") {
+							strictFail(parser, "Attribute without value");
+							parser.attribValue = parser.attribName;
+							attrib(parser);
+							openTag(parser);
+						} else if (isWhitespace(c)) parser.state = S.ATTRIB_NAME_SAW_WHITE;
+						else if (isMatch(nameBody, c)) parser.attribName += c;
+						else strictFail(parser, "Invalid attribute name");
+						continue;
+					case S.ATTRIB_NAME_SAW_WHITE:
+						if (c === "=") parser.state = S.ATTRIB_VALUE;
+						else if (isWhitespace(c)) continue;
+						else {
+							strictFail(parser, "Attribute without value");
+							parser.tag.attributes[parser.attribName] = "";
+							parser.attribValue = "";
+							emitNode(parser, "onattribute", {
+								name: parser.attribName,
+								value: ""
+							});
+							parser.attribName = "";
+							if (c === ">") openTag(parser);
+							else if (isMatch(nameStart, c)) {
+								parser.attribName = c;
+								parser.state = S.ATTRIB_NAME;
+							} else {
+								strictFail(parser, "Invalid attribute name");
+								parser.state = S.ATTRIB;
+							}
+						}
+						continue;
+					case S.ATTRIB_VALUE:
+						if (isWhitespace(c)) continue;
+						else if (isQuote(c)) {
+							parser.q = c;
+							parser.state = S.ATTRIB_VALUE_QUOTED;
+						} else {
+							if (!parser.opt.unquotedAttributeValues) error(parser, "Unquoted attribute value");
+							parser.state = S.ATTRIB_VALUE_UNQUOTED;
+							parser.attribValue = c;
+						}
+						continue;
+					case S.ATTRIB_VALUE_QUOTED:
+						if (c !== parser.q) {
+							if (c === "&") parser.state = S.ATTRIB_VALUE_ENTITY_Q;
+							else parser.attribValue += c;
+							continue;
+						}
+						attrib(parser);
+						parser.q = "";
+						parser.state = S.ATTRIB_VALUE_CLOSED;
+						continue;
+					case S.ATTRIB_VALUE_CLOSED:
+						if (isWhitespace(c)) parser.state = S.ATTRIB;
+						else if (c === ">") openTag(parser);
+						else if (c === "/") parser.state = S.OPEN_TAG_SLASH;
+						else if (isMatch(nameStart, c)) {
+							strictFail(parser, "No whitespace between attributes");
+							parser.attribName = c;
+							parser.attribValue = "";
+							parser.state = S.ATTRIB_NAME;
+						} else strictFail(parser, "Invalid attribute name");
+						continue;
+					case S.ATTRIB_VALUE_UNQUOTED:
+						if (!isAttribEnd(c)) {
+							if (c === "&") parser.state = S.ATTRIB_VALUE_ENTITY_U;
+							else parser.attribValue += c;
+							continue;
+						}
+						attrib(parser);
+						if (c === ">") openTag(parser);
+						else parser.state = S.ATTRIB;
+						continue;
+					case S.CLOSE_TAG:
+						if (!parser.tagName) if (isWhitespace(c)) continue;
+						else if (notMatch(nameStart, c)) if (parser.script) {
+							parser.script += "</" + c;
+							parser.state = S.SCRIPT;
+						} else strictFail(parser, "Invalid tagname in closing tag.");
+						else parser.tagName = c;
+						else if (c === ">") closeTag(parser);
+						else if (isMatch(nameBody, c)) parser.tagName += c;
+						else if (parser.script) {
+							parser.script += "</" + parser.tagName;
+							parser.tagName = "";
+							parser.state = S.SCRIPT;
+						} else {
+							if (!isWhitespace(c)) strictFail(parser, "Invalid tagname in closing tag");
+							parser.state = S.CLOSE_TAG_SAW_WHITE;
+						}
+						continue;
+					case S.CLOSE_TAG_SAW_WHITE:
+						if (isWhitespace(c)) continue;
+						if (c === ">") closeTag(parser);
+						else strictFail(parser, "Invalid characters in closing tag");
+						continue;
+					case S.TEXT_ENTITY:
+					case S.ATTRIB_VALUE_ENTITY_Q:
+					case S.ATTRIB_VALUE_ENTITY_U:
+						var returnState;
+						var buffer;
+						switch (parser.state) {
+							case S.TEXT_ENTITY:
+								returnState = S.TEXT;
+								buffer = "textNode";
+								break;
+							case S.ATTRIB_VALUE_ENTITY_Q:
+								returnState = S.ATTRIB_VALUE_QUOTED;
+								buffer = "attribValue";
+								break;
+							case S.ATTRIB_VALUE_ENTITY_U:
+								returnState = S.ATTRIB_VALUE_UNQUOTED;
+								buffer = "attribValue";
+								break;
+						}
+						if (c === ";") {
+							var parsedEntity = parseEntity(parser);
+							if (parser.opt.unparsedEntities && !Object.values(sax.XML_ENTITIES).includes(parsedEntity)) {
+								parser.entity = "";
+								parser.state = returnState;
+								parser.write(parsedEntity);
+							} else {
+								parser[buffer] += parsedEntity;
+								parser.entity = "";
+								parser.state = returnState;
+							}
+						} else if (isMatch(parser.entity.length ? entityBody : entityStart, c)) parser.entity += c;
+						else {
+							strictFail(parser, "Invalid character in entity name");
+							parser[buffer] += "&" + parser.entity + c;
+							parser.entity = "";
+							parser.state = returnState;
+						}
+						continue;
+					default: throw new Error(parser, "Unknown state: " + parser.state);
+				}
+			}
+			if (parser.position >= parser.bufferCheckPosition) checkBufferLength(parser);
+			return parser;
+		}
+		/*! http://mths.be/fromcodepoint v0.1.0 by @mathias */
+		/* istanbul ignore next */
+		if (!String.fromCodePoint) (function() {
+			var stringFromCharCode = String.fromCharCode;
+			var floor = Math.floor;
+			var fromCodePoint = function() {
+				var MAX_SIZE = 16384;
+				var codeUnits = [];
+				var highSurrogate;
+				var lowSurrogate;
+				var index = -1;
+				var length = arguments.length;
+				if (!length) return "";
+				var result = "";
+				while (++index < length) {
+					var codePoint = Number(arguments[index]);
+					if (!isFinite(codePoint) || codePoint < 0 || codePoint > 1114111 || floor(codePoint) !== codePoint) throw RangeError("Invalid code point: " + codePoint);
+					if (codePoint <= 65535) codeUnits.push(codePoint);
+					else {
+						codePoint -= 65536;
+						highSurrogate = (codePoint >> 10) + 55296;
+						lowSurrogate = codePoint % 1024 + 56320;
+						codeUnits.push(highSurrogate, lowSurrogate);
+					}
+					if (index + 1 === length || codeUnits.length > MAX_SIZE) {
+						result += stringFromCharCode.apply(null, codeUnits);
+						codeUnits.length = 0;
+					}
+				}
+				return result;
+			};
+			/* istanbul ignore next */
+			if (Object.defineProperty) Object.defineProperty(String, "fromCodePoint", {
+				value: fromCodePoint,
+				configurable: true,
+				writable: true
+			});
+			else String.fromCodePoint = fromCodePoint;
+		})();
+	})(typeof exports === "undefined" ? exports.sax = {} : exports);
+}));
+
+//#endregion
+//#region node_modules/xml2js/lib/bom.js
+var require_bom = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function() {
+		"use strict";
+		exports.stripBOM = function(str) {
+			if (str[0] === "﻿") return str.substring(1);
+			else return str;
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xml2js/lib/processors.js
+var require_processors = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function() {
+		"use strict";
+		var prefixMatch = /* @__PURE__ */ new RegExp(/(?!xmlns)^.*:/);
+		exports.normalize = function(str) {
+			return str.toLowerCase();
+		};
+		exports.firstCharLowerCase = function(str) {
+			return str.charAt(0).toLowerCase() + str.slice(1);
+		};
+		exports.stripPrefix = function(str) {
+			return str.replace(prefixMatch, "");
+		};
+		exports.parseNumbers = function(str) {
+			if (!isNaN(str)) str = str % 1 === 0 ? parseInt(str, 10) : parseFloat(str);
+			return str;
+		};
+		exports.parseBooleans = function(str) {
+			if (/^(?:true|false)$/i.test(str)) str = str.toLowerCase() === "true";
+			return str;
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xml2js/lib/parser.js
+var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function() {
+		"use strict";
+		var bom, defaults, defineProperty, events, isEmpty, processItem, processors, sax, setImmediate$1, bind = function(fn, me) {
+			return function() {
+				return fn.apply(me, arguments);
+			};
+		}, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		sax = require_sax();
+		events = __require("events");
+		bom = require_bom();
+		processors = require_processors();
+		setImmediate$1 = __require("timers").setImmediate;
+		defaults = require_defaults().defaults;
+		isEmpty = function(thing) {
+			return typeof thing === "object" && thing != null && Object.keys(thing).length === 0;
+		};
+		processItem = function(processors$1, item, key) {
+			var i, len, process$1;
+			for (i = 0, len = processors$1.length; i < len; i++) {
+				process$1 = processors$1[i];
+				item = process$1(item, key);
+			}
+			return item;
+		};
+		defineProperty = function(obj, key, value) {
+			var descriptor = Object.create(null);
+			descriptor.value = value;
+			descriptor.writable = true;
+			descriptor.enumerable = true;
+			descriptor.configurable = true;
+			return Object.defineProperty(obj, key, descriptor);
+		};
+		exports.Parser = (function(superClass) {
+			extend(Parser, superClass);
+			function Parser(opts) {
+				this.parseStringPromise = bind(this.parseStringPromise, this);
+				this.parseString = bind(this.parseString, this);
+				this.reset = bind(this.reset, this);
+				this.assignOrPush = bind(this.assignOrPush, this);
+				this.processAsync = bind(this.processAsync, this);
+				var key, ref, value;
+				if (!(this instanceof exports.Parser)) return new exports.Parser(opts);
+				this.options = {};
+				ref = defaults["0.2"];
+				for (key in ref) {
+					if (!hasProp.call(ref, key)) continue;
+					value = ref[key];
+					this.options[key] = value;
+				}
+				for (key in opts) {
+					if (!hasProp.call(opts, key)) continue;
+					value = opts[key];
+					this.options[key] = value;
+				}
+				if (this.options.xmlns) this.options.xmlnskey = this.options.attrkey + "ns";
+				if (this.options.normalizeTags) {
+					if (!this.options.tagNameProcessors) this.options.tagNameProcessors = [];
+					this.options.tagNameProcessors.unshift(processors.normalize);
+				}
+				this.reset();
+			}
+			Parser.prototype.processAsync = function() {
+				var chunk, err;
+				try {
+					if (this.remaining.length <= this.options.chunkSize) {
+						chunk = this.remaining;
+						this.remaining = "";
+						this.saxParser = this.saxParser.write(chunk);
+						return this.saxParser.close();
+					} else {
+						chunk = this.remaining.substr(0, this.options.chunkSize);
+						this.remaining = this.remaining.substr(this.options.chunkSize, this.remaining.length);
+						this.saxParser = this.saxParser.write(chunk);
+						return setImmediate$1(this.processAsync);
+					}
+				} catch (error1) {
+					err = error1;
+					if (!this.saxParser.errThrown) {
+						this.saxParser.errThrown = true;
+						return this.emit(err);
+					}
+				}
+			};
+			Parser.prototype.assignOrPush = function(obj, key, newValue) {
+				if (!(key in obj)) if (!this.options.explicitArray) return defineProperty(obj, key, newValue);
+				else return defineProperty(obj, key, [newValue]);
+				else {
+					if (!(obj[key] instanceof Array)) defineProperty(obj, key, [obj[key]]);
+					return obj[key].push(newValue);
+				}
+			};
+			Parser.prototype.reset = function() {
+				var attrkey, charkey, ontext, stack;
+				this.removeAllListeners();
+				this.saxParser = sax.parser(this.options.strict, {
+					trim: false,
+					normalize: false,
+					xmlns: this.options.xmlns
+				});
+				this.saxParser.errThrown = false;
+				this.saxParser.onerror = (function(_this) {
+					return function(error) {
+						_this.saxParser.resume();
+						if (!_this.saxParser.errThrown) {
+							_this.saxParser.errThrown = true;
+							return _this.emit("error", error);
+						}
+					};
+				})(this);
+				this.saxParser.onend = (function(_this) {
+					return function() {
+						if (!_this.saxParser.ended) {
+							_this.saxParser.ended = true;
+							return _this.emit("end", _this.resultObject);
+						}
+					};
+				})(this);
+				this.saxParser.ended = false;
+				this.EXPLICIT_CHARKEY = this.options.explicitCharkey;
+				this.resultObject = null;
+				stack = [];
+				attrkey = this.options.attrkey;
+				charkey = this.options.charkey;
+				this.saxParser.onopentag = (function(_this) {
+					return function(node) {
+						var key, newValue, obj = {}, processedKey, ref;
+						obj[charkey] = "";
+						if (!_this.options.ignoreAttrs) {
+							ref = node.attributes;
+							for (key in ref) {
+								if (!hasProp.call(ref, key)) continue;
+								if (!(attrkey in obj) && !_this.options.mergeAttrs) obj[attrkey] = {};
+								newValue = _this.options.attrValueProcessors ? processItem(_this.options.attrValueProcessors, node.attributes[key], key) : node.attributes[key];
+								processedKey = _this.options.attrNameProcessors ? processItem(_this.options.attrNameProcessors, key) : key;
+								if (_this.options.mergeAttrs) _this.assignOrPush(obj, processedKey, newValue);
+								else defineProperty(obj[attrkey], processedKey, newValue);
+							}
+						}
+						obj["#name"] = _this.options.tagNameProcessors ? processItem(_this.options.tagNameProcessors, node.name) : node.name;
+						if (_this.options.xmlns) obj[_this.options.xmlnskey] = {
+							uri: node.uri,
+							local: node.local
+						};
+						return stack.push(obj);
+					};
+				})(this);
+				this.saxParser.onclosetag = (function(_this) {
+					return function() {
+						var cdata, emptyStr, key, node, nodeName, obj = stack.pop(), objClone, old, s, xpath;
+						nodeName = obj["#name"];
+						if (!_this.options.explicitChildren || !_this.options.preserveChildrenOrder) delete obj["#name"];
+						if (obj.cdata === true) {
+							cdata = obj.cdata;
+							delete obj.cdata;
+						}
+						s = stack[stack.length - 1];
+						if (obj[charkey].match(/^\s*$/) && !cdata) {
+							emptyStr = obj[charkey];
+							delete obj[charkey];
+						} else {
+							if (_this.options.trim) obj[charkey] = obj[charkey].trim();
+							if (_this.options.normalize) obj[charkey] = obj[charkey].replace(/\s{2,}/g, " ").trim();
+							obj[charkey] = _this.options.valueProcessors ? processItem(_this.options.valueProcessors, obj[charkey], nodeName) : obj[charkey];
+							if (Object.keys(obj).length === 1 && charkey in obj && !_this.EXPLICIT_CHARKEY) obj = obj[charkey];
+						}
+						if (isEmpty(obj)) if (typeof _this.options.emptyTag === "function") obj = _this.options.emptyTag();
+						else obj = _this.options.emptyTag !== "" ? _this.options.emptyTag : emptyStr;
+						if (_this.options.validator != null) {
+							xpath = "/" + (function() {
+								var i, len, results = [];
+								for (i = 0, len = stack.length; i < len; i++) {
+									node = stack[i];
+									results.push(node["#name"]);
+								}
+								return results;
+							})().concat(nodeName).join("/");
+							(function() {
+								var err;
+								try {
+									return obj = _this.options.validator(xpath, s && s[nodeName], obj);
+								} catch (error1) {
+									err = error1;
+									return _this.emit("error", err);
+								}
+							})();
+						}
+						if (_this.options.explicitChildren && !_this.options.mergeAttrs && typeof obj === "object") {
+							if (!_this.options.preserveChildrenOrder) {
+								node = {};
+								if (_this.options.attrkey in obj) {
+									node[_this.options.attrkey] = obj[_this.options.attrkey];
+									delete obj[_this.options.attrkey];
+								}
+								if (!_this.options.charsAsChildren && _this.options.charkey in obj) {
+									node[_this.options.charkey] = obj[_this.options.charkey];
+									delete obj[_this.options.charkey];
+								}
+								if (Object.getOwnPropertyNames(obj).length > 0) node[_this.options.childkey] = obj;
+								obj = node;
+							} else if (s) {
+								s[_this.options.childkey] = s[_this.options.childkey] || [];
+								objClone = {};
+								for (key in obj) {
+									if (!hasProp.call(obj, key)) continue;
+									defineProperty(objClone, key, obj[key]);
+								}
+								s[_this.options.childkey].push(objClone);
+								delete obj["#name"];
+								if (Object.keys(obj).length === 1 && charkey in obj && !_this.EXPLICIT_CHARKEY) obj = obj[charkey];
+							}
+						}
+						if (stack.length > 0) return _this.assignOrPush(s, nodeName, obj);
+						else {
+							if (_this.options.explicitRoot) {
+								old = obj;
+								obj = {};
+								defineProperty(obj, nodeName, old);
+							}
+							_this.resultObject = obj;
+							_this.saxParser.ended = true;
+							return _this.emit("end", _this.resultObject);
+						}
+					};
+				})(this);
+				ontext = (function(_this) {
+					return function(text) {
+						var charChild, s = stack[stack.length - 1];
+						if (s) {
+							s[charkey] += text;
+							if (_this.options.explicitChildren && _this.options.preserveChildrenOrder && _this.options.charsAsChildren && (_this.options.includeWhiteChars || text.replace(/\\n/g, "").trim() !== "")) {
+								s[_this.options.childkey] = s[_this.options.childkey] || [];
+								charChild = { "#name": "__text__" };
+								charChild[charkey] = text;
+								if (_this.options.normalize) charChild[charkey] = charChild[charkey].replace(/\s{2,}/g, " ").trim();
+								s[_this.options.childkey].push(charChild);
+							}
+							return s;
+						}
+					};
+				})(this);
+				this.saxParser.ontext = ontext;
+				return this.saxParser.oncdata = (function(_this) {
+					return function(text) {
+						var s = ontext(text);
+						if (s) return s.cdata = true;
+					};
+				})(this);
+			};
+			Parser.prototype.parseString = function(str, cb) {
+				var err;
+				if (cb != null && typeof cb === "function") {
+					this.on("end", function(result) {
+						this.reset();
+						return cb(null, result);
+					});
+					this.on("error", function(err$1) {
+						this.reset();
+						return cb(err$1);
+					});
+				}
+				try {
+					str = str.toString();
+					if (str.trim() === "") {
+						this.emit("end", null);
+						return true;
+					}
+					str = bom.stripBOM(str);
+					if (this.options.async) {
+						this.remaining = str;
+						setImmediate$1(this.processAsync);
+						return this.saxParser;
+					}
+					return this.saxParser.write(str).close();
+				} catch (error1) {
+					err = error1;
+					if (!(this.saxParser.errThrown || this.saxParser.ended)) {
+						this.emit("error", err);
+						return this.saxParser.errThrown = true;
+					} else if (this.saxParser.ended) throw err;
+				}
+			};
+			Parser.prototype.parseStringPromise = function(str) {
+				return new Promise((function(_this) {
+					return function(resolve, reject) {
+						return _this.parseString(str, function(err, value) {
+							if (err) return reject(err);
+							else return resolve(value);
+						});
+					};
+				})(this));
+			};
+			return Parser;
+		})(events);
+		exports.parseString = function(str, a, b) {
+			var cb, options, parser;
+			if (b != null) {
+				if (typeof b === "function") cb = b;
+				if (typeof a === "object") options = a;
+			} else {
+				if (typeof a === "function") cb = a;
+				options = {};
+			}
+			parser = new exports.Parser(options);
+			return parser.parseString(str, cb);
+		};
+		exports.parseStringPromise = function(str, a) {
+			var options, parser;
+			if (typeof a === "object") options = a;
+			parser = new exports.Parser(options);
+			return parser.parseStringPromise(str);
+		};
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/xml2js/lib/xml2js.js
+var require_xml2js = /* @__PURE__ */ __commonJSMin(((exports) => {
+	(function() {
+		"use strict";
+		var builder, defaults, parser, processors, extend = function(child, parent) {
+			for (var key in parent) if (hasProp.call(parent, key)) child[key] = parent[key];
+			function ctor() {
+				this.constructor = child;
+			}
+			ctor.prototype = parent.prototype;
+			child.prototype = new ctor();
+			child.__super__ = parent.prototype;
+			return child;
+		}, hasProp = {}.hasOwnProperty;
+		defaults = require_defaults();
+		builder = require_builder();
+		parser = require_parser();
+		processors = require_processors();
+		exports.defaults = defaults.defaults;
+		exports.processors = processors;
+		exports.ValidationError = (function(superClass) {
+			extend(ValidationError, superClass);
+			function ValidationError(message) {
+				this.message = message;
+			}
+			return ValidationError;
+		})(Error);
+		exports.Builder = builder.Builder;
+		exports.Parser = parser.Parser;
+		exports.parseString = parser.parseString;
+		exports.parseStringPromise = parser.parseStringPromise;
+	}).call(exports);
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/xml/node_parser.js
+var require_node_parser = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var AWS = require_core();
+	var util = AWS.util;
+	var Shape = AWS.Model.Shape;
+	var xml2js = require_xml2js();
+	/**
+	* @api private
+	*/
+	var options = {
+		explicitCharkey: false,
+		trim: false,
+		normalize: false,
+		explicitRoot: false,
+		emptyTag: null,
+		explicitArray: true,
+		ignoreAttrs: false,
+		mergeAttrs: false,
+		validator: null
+	};
+	function NodeXmlParser() {}
+	NodeXmlParser.prototype.parse = function(xml, shape) {
+		shape = shape || {};
+		var result = null;
+		var error = null;
+		new xml2js.Parser(options).parseString(xml, function(e, r) {
+			error = e;
+			result = r;
+		});
+		if (result) {
+			var data = parseXml(result, shape);
+			if (result.ResponseMetadata) data.ResponseMetadata = parseXml(result.ResponseMetadata[0], {});
 			return data;
-		} else if (error) throw util.error(error || /* @__PURE__ */ new Error(), {
+		} else if (error) throw util.error(error, {
 			code: "XMLParserError",
 			retryable: true
 		});
-		else return {};
+		else return parseXml({}, shape);
 	};
-	function getElementByTagName(xml, tag) {
-		var elements = xml.getElementsByTagName(tag);
-		for (var i = 0, iLen = elements.length; i < iLen; i++) if (elements[i].parentNode === xml) return elements[i];
-	}
 	function parseXml(xml, shape) {
-		if (!shape) shape = {};
 		switch (shape.type) {
 			case "structure": return parseStructure(xml, shape);
 			case "map": return parseMap(xml, shape);
@@ -15702,371 +16284,1593 @@ var require_browser_parser = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 		var data = {};
 		if (xml === null) return data;
 		util.each(shape.members, function(memberName, memberShape) {
-			if (memberShape.isXmlAttribute) {
-				if (Object.prototype.hasOwnProperty.call(xml.attributes, memberShape.name)) {
-					var value = xml.attributes[memberShape.name].value;
-					data[memberName] = parseXml({ textContent: value }, memberShape);
-				}
-			} else {
-				var xmlChild = memberShape.flattened ? xml : getElementByTagName(xml, memberShape.name);
-				if (xmlChild) data[memberName] = parseXml(xmlChild, memberShape);
-				else if (!memberShape.flattened && memberShape.type === "list" && !shape.api.xmlNoDefaultLists) data[memberName] = memberShape.defaultValue;
-			}
+			var xmlName = memberShape.name;
+			if (Object.prototype.hasOwnProperty.call(xml, xmlName) && Array.isArray(xml[xmlName])) {
+				var xmlChild = xml[xmlName];
+				if (!memberShape.flattened) xmlChild = xmlChild[0];
+				data[memberName] = parseXml(xmlChild, memberShape);
+			} else if (memberShape.isXmlAttribute && xml.$ && Object.prototype.hasOwnProperty.call(xml.$, xmlName)) data[memberName] = parseScalar(xml.$[xmlName], memberShape);
+			else if (memberShape.type === "list" && !shape.api.xmlNoDefaultLists) data[memberName] = memberShape.defaultValue;
 		});
 		return data;
 	}
 	function parseMap(xml, shape) {
 		var data = {};
+		if (xml === null) return data;
 		var xmlKey = shape.key.name || "key";
 		var xmlValue = shape.value.name || "value";
-		var tagName = shape.flattened ? shape.name : "entry";
-		var child = xml.firstElementChild;
-		while (child) {
-			if (child.nodeName === tagName) {
-				var key = getElementByTagName(child, xmlKey).textContent;
-				data[key] = parseXml(getElementByTagName(child, xmlValue), shape.value);
-			}
-			child = child.nextElementSibling;
-		}
+		var iterable = shape.flattened ? xml : xml.entry;
+		if (Array.isArray(iterable)) util.arrayEach(iterable, function(child) {
+			data[child[xmlKey][0]] = parseXml(child[xmlValue][0], shape.value);
+		});
 		return data;
 	}
 	function parseList(xml, shape) {
 		var data = [];
-		var tagName = shape.flattened ? shape.name : shape.member.name || "member";
-		var child = xml.firstElementChild;
-		while (child) {
-			if (child.nodeName === tagName) data.push(parseXml(child, shape.member));
-			child = child.nextElementSibling;
-		}
+		var name = shape.member.name || "member";
+		if (shape.flattened) util.arrayEach(xml, function(xmlChild) {
+			data.push(parseXml(xmlChild, shape.member));
+		});
+		else if (xml && Array.isArray(xml[name])) util.arrayEach(xml[name], function(child) {
+			data.push(parseXml(child, shape.member));
+		});
 		return data;
 	}
-	function parseScalar(xml, shape) {
-		if (xml.getAttribute) {
-			var encoding = xml.getAttribute("encoding");
-			if (encoding === "base64") shape = new Shape.create({ type: encoding });
-		}
-		var text = xml.textContent;
-		if (text === "") text = null;
+	function parseScalar(text, shape) {
+		if (text && text.$ && text.$.encoding === "base64") shape = new Shape.create({ type: text.$.encoding });
+		if (text && text._) text = text._;
 		if (typeof shape.toType === "function") return shape.toType(text);
 		else return text;
 	}
 	function parseUnknown(xml) {
 		if (xml === void 0 || xml === null) return "";
-		if (!xml.firstElementChild) {
-			if (xml.parentNode.parentNode === null) return {};
-			if (xml.childNodes.length === 0) return "";
-			else return xml.textContent;
+		if (typeof xml === "string") return xml;
+		if (Array.isArray(xml)) {
+			var arr = [];
+			for (i = 0; i < xml.length; i++) arr.push(parseXml(xml[i], {}));
+			return arr;
 		}
-		var shape = {
-			type: "structure",
-			members: {}
-		};
-		var child = xml.firstElementChild;
-		while (child) {
-			var tag = child.nodeName;
-			if (Object.prototype.hasOwnProperty.call(shape.members, tag)) shape.members[tag].type = "list";
-			else shape.members[tag] = { name: tag };
-			child = child.nextElementSibling;
+		var keys = Object.keys(xml), i;
+		if (keys.length === 0 || keys.length === 1 && keys[0] === "$") return {};
+		var data = {};
+		for (i = 0; i < keys.length; i++) {
+			var key = keys[i], value = xml[key];
+			if (key === "$") continue;
+			if (value.length > 1) data[key] = parseList(value, { member: {} });
+			else data[key] = parseXml(value[0], {});
 		}
-		return parseStructure(xml, shape);
+		return data;
 	}
 	/**
 	* @api private
 	*/
-	module.exports = DomXmlParser;
+	module.exports = NodeXmlParser;
 }));
 
 //#endregion
-//#region node_modules/events/events.js
-var require_events = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	function EventEmitter() {
-		this._events = this._events || {};
-		this._maxListeners = this._maxListeners || void 0;
-	}
-	module.exports = EventEmitter;
-	EventEmitter.EventEmitter = EventEmitter;
-	EventEmitter.prototype._events = void 0;
-	EventEmitter.prototype._maxListeners = void 0;
-	EventEmitter.defaultMaxListeners = 10;
-	EventEmitter.prototype.setMaxListeners = function(n) {
-		if (!isNumber(n) || n < 0 || isNaN(n)) throw TypeError("n must be a positive number");
-		this._maxListeners = n;
-		return this;
-	};
-	EventEmitter.prototype.emit = function(type) {
-		var er, handler$1, len, args, i, listeners;
-		if (!this._events) this._events = {};
-		if (type === "error") {
-			if (!this._events.error || isObject(this._events.error) && !this._events.error.length) {
-				er = arguments[1];
-				if (er instanceof Error) throw er;
-				else {
-					var err = /* @__PURE__ */ new Error("Uncaught, unspecified \"error\" event. (" + er + ")");
-					err.context = er;
-					throw err;
-				}
-			}
-		}
-		handler$1 = this._events[type];
-		if (isUndefined(handler$1)) return false;
-		if (isFunction(handler$1)) switch (arguments.length) {
-			case 1:
-				handler$1.call(this);
-				break;
-			case 2:
-				handler$1.call(this, arguments[1]);
-				break;
-			case 3:
-				handler$1.call(this, arguments[1], arguments[2]);
-				break;
-			default:
-				args = Array.prototype.slice.call(arguments, 1);
-				handler$1.apply(this, args);
-		}
-		else if (isObject(handler$1)) {
-			args = Array.prototype.slice.call(arguments, 1);
-			listeners = handler$1.slice();
-			len = listeners.length;
-			for (i = 0; i < len; i++) listeners[i].apply(this, args);
-		}
-		return true;
-	};
-	EventEmitter.prototype.addListener = function(type, listener) {
-		var m;
-		if (!isFunction(listener)) throw TypeError("listener must be a function");
-		if (!this._events) this._events = {};
-		if (this._events.newListener) this.emit("newListener", type, isFunction(listener.listener) ? listener.listener : listener);
-		if (!this._events[type]) this._events[type] = listener;
-		else if (isObject(this._events[type])) this._events[type].push(listener);
-		else this._events[type] = [this._events[type], listener];
-		if (isObject(this._events[type]) && !this._events[type].warned) {
-			if (!isUndefined(this._maxListeners)) m = this._maxListeners;
-			else m = EventEmitter.defaultMaxListeners;
-			if (m && m > 0 && this._events[type].length > m) {
-				this._events[type].warned = true;
-				console.error("(node) warning: possible EventEmitter memory leak detected. %d listeners added. Use emitter.setMaxListeners() to increase limit.", this._events[type].length);
-				if (typeof console.trace === "function") console.trace();
-			}
-		}
-		return this;
-	};
-	EventEmitter.prototype.on = EventEmitter.prototype.addListener;
-	EventEmitter.prototype.once = function(type, listener) {
-		if (!isFunction(listener)) throw TypeError("listener must be a function");
-		var fired = false;
-		function g() {
-			this.removeListener(type, g);
-			if (!fired) {
-				fired = true;
-				listener.apply(this, arguments);
-			}
-		}
-		g.listener = listener;
-		this.on(type, g);
-		return this;
-	};
-	EventEmitter.prototype.removeListener = function(type, listener) {
-		var list, position, length, i;
-		if (!isFunction(listener)) throw TypeError("listener must be a function");
-		if (!this._events || !this._events[type]) return this;
-		list = this._events[type];
-		length = list.length;
-		position = -1;
-		if (list === listener || isFunction(list.listener) && list.listener === listener) {
-			delete this._events[type];
-			if (this._events.removeListener) this.emit("removeListener", type, listener);
-		} else if (isObject(list)) {
-			for (i = length; i-- > 0;) if (list[i] === listener || list[i].listener && list[i].listener === listener) {
-				position = i;
-				break;
-			}
-			if (position < 0) return this;
-			if (list.length === 1) {
-				list.length = 0;
-				delete this._events[type];
-			} else list.splice(position, 1);
-			if (this._events.removeListener) this.emit("removeListener", type, listener);
-		}
-		return this;
-	};
-	EventEmitter.prototype.removeAllListeners = function(type) {
-		var key, listeners;
-		if (!this._events) return this;
-		if (!this._events.removeListener) {
-			if (arguments.length === 0) this._events = {};
-			else if (this._events[type]) delete this._events[type];
-			return this;
-		}
-		if (arguments.length === 0) {
-			for (key in this._events) {
-				if (key === "removeListener") continue;
-				this.removeAllListeners(key);
-			}
-			this.removeAllListeners("removeListener");
-			this._events = {};
-			return this;
-		}
-		listeners = this._events[type];
-		if (isFunction(listeners)) this.removeListener(type, listeners);
-		else if (listeners) while (listeners.length) this.removeListener(type, listeners[listeners.length - 1]);
-		delete this._events[type];
-		return this;
-	};
-	EventEmitter.prototype.listeners = function(type) {
-		var ret;
-		if (!this._events || !this._events[type]) ret = [];
-		else if (isFunction(this._events[type])) ret = [this._events[type]];
-		else ret = this._events[type].slice();
-		return ret;
-	};
-	EventEmitter.prototype.listenerCount = function(type) {
-		if (this._events) {
-			var evlistener = this._events[type];
-			if (isFunction(evlistener)) return 1;
-			else if (evlistener) return evlistener.length;
-		}
-		return 0;
-	};
-	EventEmitter.listenerCount = function(emitter, type) {
-		return emitter.listenerCount(type);
-	};
-	function isFunction(arg) {
-		return typeof arg === "function";
-	}
-	function isNumber(arg) {
-		return typeof arg === "number";
-	}
-	function isObject(arg) {
-		return typeof arg === "object" && arg !== null;
-	}
-	function isUndefined(arg) {
-		return arg === void 0;
-	}
-}));
-
-//#endregion
-//#region node_modules/aws-sdk/lib/http/xhr.js
-var require_xhr = /* @__PURE__ */ __commonJSMin((() => {
+//#region node_modules/aws-sdk/lib/http/node.js
+var require_node = /* @__PURE__ */ __commonJSMin((() => {
 	var AWS = require_core();
-	var EventEmitter = require_events().EventEmitter;
+	var Stream = AWS.util.stream.Stream;
+	var TransformStream = AWS.util.stream.Transform;
+	var ReadableStream = AWS.util.stream.Readable;
 	require_http();
+	var CONNECTION_REUSE_ENV_NAME = "AWS_NODEJS_CONNECTION_REUSE_ENABLED";
 	/**
 	* @api private
 	*/
-	AWS.XHRClient = AWS.util.inherit({
+	AWS.NodeHttpClient = AWS.util.inherit({
 		handleRequest: function handleRequest(httpRequest, httpOptions, callback, errCallback) {
 			var self = this;
 			var endpoint = httpRequest.endpoint;
-			var emitter = new EventEmitter();
-			var href = endpoint.protocol + "//" + endpoint.hostname;
-			if (endpoint.port !== 80 && endpoint.port !== 443) href += ":" + endpoint.port;
-			href += httpRequest.path;
-			var xhr = new XMLHttpRequest(), headersEmitted = false;
-			httpRequest.stream = xhr;
-			xhr.addEventListener("readystatechange", function() {
+			var pathPrefix = "";
+			if (!httpOptions) httpOptions = {};
+			if (httpOptions.proxy) {
+				pathPrefix = endpoint.protocol + "//" + endpoint.hostname;
+				if (endpoint.port !== 80 && endpoint.port !== 443) pathPrefix += ":" + endpoint.port;
+				endpoint = new AWS.Endpoint(httpOptions.proxy);
+			}
+			var useSSL = endpoint.protocol === "https:";
+			var http = useSSL ? __require("https") : __require("http");
+			var options = {
+				host: endpoint.hostname,
+				port: endpoint.port,
+				method: httpRequest.method,
+				headers: httpRequest.headers,
+				path: pathPrefix + httpRequest.path
+			};
+			AWS.util.update(options, httpOptions);
+			if (!httpOptions.agent) options.agent = this.getAgent(useSSL, { keepAlive: process.env[CONNECTION_REUSE_ENV_NAME] === "1" ? true : false });
+			delete options.proxy;
+			delete options.timeout;
+			var stream = http.request(options, function(httpResp) {
+				if (stream.didCallback) return;
+				callback(httpResp);
+				httpResp.emit("headers", httpResp.statusCode, httpResp.headers, httpResp.statusMessage);
+			});
+			httpRequest.stream = stream;
+			stream.didCallback = false;
+			if (httpOptions.connectTimeout) {
+				var connectTimeoutId;
+				stream.on("socket", function(socket) {
+					if (socket.connecting) {
+						connectTimeoutId = setTimeout(function connectTimeout() {
+							if (stream.didCallback) return;
+							stream.didCallback = true;
+							stream.abort();
+							errCallback(AWS.util.error(/* @__PURE__ */ new Error("Socket timed out without establishing a connection"), { code: "TimeoutError" }));
+						}, httpOptions.connectTimeout);
+						socket.on("connect", function() {
+							clearTimeout(connectTimeoutId);
+							connectTimeoutId = null;
+						});
+					}
+				});
+			}
+			stream.setTimeout(httpOptions.timeout || 0, function() {
+				if (stream.didCallback) return;
+				stream.didCallback = true;
+				var msg = "Connection timed out after " + httpOptions.timeout + "ms";
+				errCallback(AWS.util.error(new Error(msg), { code: "TimeoutError" }));
+				stream.abort();
+			});
+			stream.on("error", function(err) {
+				if (connectTimeoutId) {
+					clearTimeout(connectTimeoutId);
+					connectTimeoutId = null;
+				}
+				if (stream.didCallback) return;
+				stream.didCallback = true;
+				if ("ECONNRESET" === err.code || "EPIPE" === err.code || "ETIMEDOUT" === err.code) errCallback(AWS.util.error(err, { code: "TimeoutError" }));
+				else errCallback(err);
+			});
+			if ((httpRequest.headers.Expect || httpRequest.headers.expect) === "100-continue") stream.once("continue", function() {
+				self.writeBody(stream, httpRequest);
+			});
+			else this.writeBody(stream, httpRequest);
+			return stream;
+		},
+		writeBody: function writeBody(stream, httpRequest) {
+			var body = httpRequest.body;
+			var totalBytes = parseInt(httpRequest.headers["Content-Length"], 10);
+			if (body instanceof Stream) {
+				var progressStream = this.progressStream(stream, totalBytes);
+				if (progressStream) body.pipe(progressStream).pipe(stream);
+				else body.pipe(stream);
+			} else if (body) {
+				stream.once("finish", function() {
+					stream.emit("sendProgress", {
+						loaded: totalBytes,
+						total: totalBytes
+					});
+				});
+				stream.end(body);
+			} else stream.end();
+		},
+		getAgent: function getAgent(useSSL, agentOptions) {
+			var http = useSSL ? __require("https") : __require("http");
+			if (useSSL) {
+				if (!AWS.NodeHttpClient.sslAgent) {
+					AWS.NodeHttpClient.sslAgent = new http.Agent(AWS.util.merge({ rejectUnauthorized: process.env.NODE_TLS_REJECT_UNAUTHORIZED === "0" ? false : true }, agentOptions || {}));
+					AWS.NodeHttpClient.sslAgent.setMaxListeners(0);
+					Object.defineProperty(AWS.NodeHttpClient.sslAgent, "maxSockets", {
+						enumerable: true,
+						get: function() {
+							var defaultMaxSockets = 50;
+							var globalAgent = http.globalAgent;
+							if (globalAgent && globalAgent.maxSockets !== Infinity && typeof globalAgent.maxSockets === "number") return globalAgent.maxSockets;
+							return defaultMaxSockets;
+						}
+					});
+				}
+				return AWS.NodeHttpClient.sslAgent;
+			} else {
+				if (!AWS.NodeHttpClient.agent) AWS.NodeHttpClient.agent = new http.Agent(agentOptions);
+				return AWS.NodeHttpClient.agent;
+			}
+		},
+		progressStream: function progressStream(stream, totalBytes) {
+			if (typeof TransformStream === "undefined") return;
+			var loadedBytes = 0;
+			var reporter = new TransformStream();
+			reporter._transform = function(chunk, encoding, callback) {
+				if (chunk) {
+					loadedBytes += chunk.length;
+					stream.emit("sendProgress", {
+						loaded: loadedBytes,
+						total: totalBytes
+					});
+				}
+				callback(null, chunk);
+			};
+			return reporter;
+		},
+		emitter: null
+	});
+	/**
+	* @!ignore
+	*/
+	/**
+	* @api private
+	*/
+	AWS.HttpClient.prototype = AWS.NodeHttpClient.prototype;
+	/**
+	* @api private
+	*/
+	AWS.HttpClient.streamsApiVersion = ReadableStream ? 2 : 1;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/token_file_web_identity_credentials.js
+var require_token_file_web_identity_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	var fs$2 = __require("fs");
+	var STS = require_sts();
+	var iniLoader = AWS.util.iniLoader;
+	/**
+	* Represents OIDC credentials from a file on disk
+	* If the credentials expire, the SDK can {refresh} the credentials
+	* from the file.
+	*
+	* ## Using the web identity token file
+	*
+	* This provider is checked by default in the Node.js environment. To use
+	* the provider simply add your OIDC token to a file (ASCII encoding) and
+	* share the filename in either AWS_WEB_IDENTITY_TOKEN_FILE environment
+	* variable or web_identity_token_file shared config variable
+	*
+	* The file contains encoded OIDC token and the characters are
+	* ASCII encoded. OIDC tokens are JSON Web Tokens (JWT).
+	* JWT's are 3 base64 encoded strings joined by the '.' character.
+	*
+	* This class will read filename from AWS_WEB_IDENTITY_TOKEN_FILE
+	* environment variable or web_identity_token_file shared config variable,
+	* and get the OIDC token from filename.
+	* It will also read IAM role to be assumed from AWS_ROLE_ARN
+	* environment variable or role_arn shared config variable.
+	* This provider gets credetials using the {AWS.STS.assumeRoleWithWebIdentity}
+	* service operation
+	*
+	* @!macro nobrowser
+	*/
+	AWS.TokenFileWebIdentityCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function TokenFileWebIdentityCredentials(clientConfig) {
+			AWS.Credentials.call(this);
+			this.data = null;
+			this.clientConfig = AWS.util.copy(clientConfig || {});
+		},
+		getParamsFromEnv: function getParamsFromEnv() {
+			var ENV_TOKEN_FILE = "AWS_WEB_IDENTITY_TOKEN_FILE", ENV_ROLE_ARN = "AWS_ROLE_ARN";
+			if (process.env[ENV_TOKEN_FILE] && process.env[ENV_ROLE_ARN]) return [{
+				envTokenFile: process.env[ENV_TOKEN_FILE],
+				roleArn: process.env[ENV_ROLE_ARN],
+				roleSessionName: process.env["AWS_ROLE_SESSION_NAME"]
+			}];
+		},
+		getParamsFromSharedConfig: function getParamsFromSharedConfig() {
+			var profiles = AWS.util.getProfilesFromSharedConfig(iniLoader);
+			var profileName = process.env.AWS_PROFILE || AWS.util.defaultProfile;
+			var profile = profiles[profileName] || {};
+			if (Object.keys(profile).length === 0) throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + profileName + " not found"), { code: "TokenFileWebIdentityCredentialsProviderFailure" });
+			var paramsArray = [];
+			while (!profile["web_identity_token_file"] && profile["source_profile"]) {
+				paramsArray.unshift({
+					roleArn: profile["role_arn"],
+					roleSessionName: profile["role_session_name"]
+				});
+				profile = profiles[profile["source_profile"]];
+			}
+			paramsArray.unshift({
+				envTokenFile: profile["web_identity_token_file"],
+				roleArn: profile["role_arn"],
+				roleSessionName: profile["role_session_name"]
+			});
+			return paramsArray;
+		},
+		refresh: function refresh(callback) {
+			this.coalesceRefresh(callback || AWS.util.fn.callback);
+		},
+		assumeRoleChaining: function assumeRoleChaining(paramsArray, callback) {
+			var self = this;
+			if (paramsArray.length === 0) {
+				self.service.credentialsFrom(self.data, self);
+				callback();
+			} else {
+				var params = paramsArray.shift();
+				self.service.config.credentials = self.service.credentialsFrom(self.data, self);
+				self.service.assumeRole({
+					RoleArn: params.roleArn,
+					RoleSessionName: params.roleSessionName || "token-file-web-identity"
+				}, function(err, data) {
+					self.data = null;
+					if (err) callback(err);
+					else {
+						self.data = data;
+						self.assumeRoleChaining(paramsArray, callback);
+					}
+				});
+			}
+		},
+		load: function load(callback) {
+			var self = this;
+			try {
+				var paramsArray = self.getParamsFromEnv();
+				if (!paramsArray) paramsArray = self.getParamsFromSharedConfig();
+				if (paramsArray) {
+					var params = paramsArray.shift();
+					var oidcToken = fs$2.readFileSync(params.envTokenFile, { encoding: "ascii" });
+					if (!self.service) self.createClients();
+					self.service.assumeRoleWithWebIdentity({
+						WebIdentityToken: oidcToken,
+						RoleArn: params.roleArn,
+						RoleSessionName: params.roleSessionName || "token-file-web-identity"
+					}, function(err, data) {
+						self.data = null;
+						if (err) callback(err);
+						else {
+							self.data = data;
+							self.assumeRoleChaining(paramsArray, callback);
+						}
+					});
+				}
+			} catch (err) {
+				callback(err);
+			}
+		},
+		createClients: function() {
+			if (!this.service) {
+				this.service = new STS(AWS.util.merge({}, this.clientConfig));
+				this.service.retryableError = function(error) {
+					if (error.code === "IDPCommunicationErrorException" || error.code === "InvalidIdentityToken") return true;
+					else return AWS.Service.prototype.retryableError.call(this, error);
+				};
+			}
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/metadata_service/get_endpoint.js
+var require_get_endpoint = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var getEndpoint = function() {
+		return {
+			IPv4: "http://169.254.169.254",
+			IPv6: "http://[fd00:ec2::254]"
+		};
+	};
+	module.exports = getEndpoint;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/metadata_service/get_endpoint_mode.js
+var require_get_endpoint_mode = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var getEndpointMode = function() {
+		return {
+			IPv4: "IPv4",
+			IPv6: "IPv6"
+		};
+	};
+	module.exports = getEndpointMode;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/metadata_service/get_endpoint_config_options.js
+var require_get_endpoint_config_options = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var ENV_ENDPOINT_NAME = "AWS_EC2_METADATA_SERVICE_ENDPOINT";
+	var CONFIG_ENDPOINT_NAME = "ec2_metadata_service_endpoint";
+	var getEndpointConfigOptions = function() {
+		return {
+			environmentVariableSelector: function(env) {
+				return env[ENV_ENDPOINT_NAME];
+			},
+			configFileSelector: function(profile) {
+				return profile[CONFIG_ENDPOINT_NAME];
+			},
+			default: void 0
+		};
+	};
+	module.exports = getEndpointConfigOptions;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/metadata_service/get_endpoint_mode_config_options.js
+var require_get_endpoint_mode_config_options = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var EndpointMode = require_get_endpoint_mode()();
+	var ENV_ENDPOINT_MODE_NAME = "AWS_EC2_METADATA_SERVICE_ENDPOINT_MODE";
+	var CONFIG_ENDPOINT_MODE_NAME = "ec2_metadata_service_endpoint_mode";
+	var getEndpointModeConfigOptions = function() {
+		return {
+			environmentVariableSelector: function(env) {
+				return env[ENV_ENDPOINT_MODE_NAME];
+			},
+			configFileSelector: function(profile) {
+				return profile[CONFIG_ENDPOINT_MODE_NAME];
+			},
+			default: EndpointMode.IPv4
+		};
+	};
+	module.exports = getEndpointModeConfigOptions;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/metadata_service/get_metadata_service_endpoint.js
+var require_get_metadata_service_endpoint = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var AWS = require_core();
+	var Endpoint = require_get_endpoint()();
+	var EndpointMode = require_get_endpoint_mode()();
+	var ENDPOINT_CONFIG_OPTIONS = require_get_endpoint_config_options()();
+	var ENDPOINT_MODE_CONFIG_OPTIONS = require_get_endpoint_mode_config_options()();
+	var getMetadataServiceEndpoint = function() {
+		var endpoint = AWS.util.loadConfig(ENDPOINT_CONFIG_OPTIONS);
+		if (endpoint !== void 0) return endpoint;
+		var endpointMode = AWS.util.loadConfig(ENDPOINT_MODE_CONFIG_OPTIONS);
+		switch (endpointMode) {
+			case EndpointMode.IPv4: return Endpoint.IPv4;
+			case EndpointMode.IPv6: return Endpoint.IPv6;
+			default: throw new Error("Unsupported endpoint mode: " + endpointMode);
+		}
+	};
+	module.exports = getMetadataServiceEndpoint;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/metadata_service.js
+var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var AWS = require_core();
+	require_http();
+	var inherit = AWS.util.inherit;
+	var getMetadataServiceEndpoint = require_get_metadata_service_endpoint();
+	var URL = __require("url").URL;
+	/**
+	* Represents a metadata service available on EC2 instances. Using the
+	* {request} method, you can receieve metadata about any available resource
+	* on the metadata service.
+	*
+	* You can disable the use of the IMDS by setting the AWS_EC2_METADATA_DISABLED
+	* environment variable to a truthy value.
+	*
+	* @!attribute [r] httpOptions
+	*   @return [map] a map of options to pass to the underlying HTTP request:
+	*
+	*     * **timeout** (Number) &mdash; a timeout value in milliseconds to wait
+	*       before aborting the connection. Set to 0 for no timeout.
+	*
+	* @!macro nobrowser
+	*/
+	AWS.MetadataService = inherit({
+		endpoint: getMetadataServiceEndpoint(),
+		httpOptions: { timeout: 0 },
+		disableFetchToken: false,
+		constructor: function MetadataService(options) {
+			if (options && options.host) {
+				options.endpoint = "http://" + options.host;
+				delete options.host;
+			}
+			this.profile = options && options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
+			this.ec2MetadataV1Disabled = !!(options && options.ec2MetadataV1Disabled);
+			this.filename = options && options.filename;
+			AWS.util.update(this, options);
+		},
+		request: function request(path$3, options, callback) {
+			if (arguments.length === 2) {
+				callback = options;
+				options = {};
+			}
+			if (process.env[AWS.util.imdsDisabledEnv]) {
+				callback(/* @__PURE__ */ new Error("EC2 Instance Metadata Service access disabled"));
+				return;
+			}
+			path$3 = path$3 || "/";
+			if (URL) new URL(this.endpoint);
+			var httpRequest = new AWS.HttpRequest(this.endpoint + path$3);
+			httpRequest.method = options.method || "GET";
+			if (options.headers) httpRequest.headers = options.headers;
+			AWS.util.handleRequestWithRetries(httpRequest, this, callback);
+		},
+		loadCredentialsCallbacks: [],
+		fetchMetadataToken: function fetchMetadataToken(callback) {
+			this.request("/latest/api/token", {
+				"method": "PUT",
+				"headers": { "x-aws-ec2-metadata-token-ttl-seconds": "21600" }
+			}, callback);
+		},
+		fetchCredentials: function fetchCredentials(options, cb) {
+			var self = this;
+			var basePath = "/latest/meta-data/iam/security-credentials/";
+			if ((self.disableFetchToken || !(options && options.headers && options.headers["x-aws-ec2-metadata-token"])) && !process.env.AWS_EC2_METADATA_DISABLED) {
 				try {
-					if (xhr.status === 0) return;
+					var profileSettings = AWS.util.getProfilesFromSharedConfig(AWS.util.iniLoader, this.filename)[this.profile] || {};
 				} catch (e) {
+					profileSettings = {};
+				}
+				if (profileSettings.ec2_metadata_v1_disabled && profileSettings.ec2_metadata_v1_disabled !== "false") return cb(AWS.util.error(/* @__PURE__ */ new Error("AWS EC2 Metadata v1 fallback has been blocked by AWS config file profile.")));
+				if (self.ec2MetadataV1Disabled) return cb(AWS.util.error(/* @__PURE__ */ new Error("AWS EC2 Metadata v1 fallback has been blocked by AWS.MetadataService::options.ec2MetadataV1Disabled=true.")));
+				if (process.env.AWS_EC2_METADATA_V1_DISABLED && process.env.AWS_EC2_METADATA_V1_DISABLED !== "false") return cb(AWS.util.error(/* @__PURE__ */ new Error("AWS EC2 Metadata v1 fallback has been blocked by process.env.AWS_EC2_METADATA_V1_DISABLED.")));
+			}
+			self.request(basePath, options, function(err, roleName) {
+				if (err) {
+					self.disableFetchToken = !(err.statusCode === 401);
+					cb(AWS.util.error(err, { message: "EC2 Metadata roleName request returned error" }));
 					return;
 				}
-				if (this.readyState >= this.HEADERS_RECEIVED && !headersEmitted) {
-					emitter.statusCode = xhr.status;
-					emitter.headers = self.parseHeaders(xhr.getAllResponseHeaders());
-					emitter.emit("headers", emitter.statusCode, emitter.headers, xhr.statusText);
-					headersEmitted = true;
+				roleName = roleName.split("\n")[0];
+				self.request(basePath + roleName, options, function(credErr, credData) {
+					if (credErr) {
+						self.disableFetchToken = !(credErr.statusCode === 401);
+						cb(AWS.util.error(credErr, { message: "EC2 Metadata creds request returned error" }));
+						return;
+					}
+					try {
+						cb(null, JSON.parse(credData));
+					} catch (parseError) {
+						cb(parseError);
+					}
+				});
+			});
+		},
+		loadCredentials: function loadCredentials(callback) {
+			var self = this;
+			self.loadCredentialsCallbacks.push(callback);
+			if (self.loadCredentialsCallbacks.length > 1) return;
+			function callbacks(err, creds) {
+				var cb;
+				while ((cb = self.loadCredentialsCallbacks.shift()) !== void 0) cb(err, creds);
+			}
+			if (self.disableFetchToken) self.fetchCredentials({}, callbacks);
+			else self.fetchMetadataToken(function(tokenError, token) {
+				if (tokenError) {
+					if (tokenError.code === "TimeoutError") self.disableFetchToken = true;
+					else if (tokenError.retryable === true) {
+						callbacks(AWS.util.error(tokenError, { message: "EC2 Metadata token request returned error" }));
+						return;
+					} else if (tokenError.statusCode === 400) {
+						callbacks(AWS.util.error(tokenError, { message: "EC2 Metadata token request returned 400" }));
+						return;
+					}
 				}
-				if (this.readyState === this.DONE) self.finishRequest(xhr, emitter);
-			}, false);
-			xhr.upload.addEventListener("progress", function(evt) {
-				emitter.emit("sendProgress", evt);
+				var options = {};
+				if (token) options.headers = { "x-aws-ec2-metadata-token": token };
+				self.fetchCredentials(options, callbacks);
 			});
-			xhr.addEventListener("progress", function(evt) {
-				emitter.emit("receiveProgress", evt);
-			}, false);
-			xhr.addEventListener("timeout", function() {
-				errCallback(AWS.util.error(/* @__PURE__ */ new Error("Timeout"), { code: "TimeoutError" }));
-			}, false);
-			xhr.addEventListener("error", function() {
-				errCallback(AWS.util.error(/* @__PURE__ */ new Error("Network Failure"), { code: "NetworkingError" }));
-			}, false);
-			xhr.addEventListener("abort", function() {
-				errCallback(AWS.util.error(/* @__PURE__ */ new Error("Request aborted"), { code: "RequestAbortedError" }));
-			}, false);
-			callback(emitter);
-			xhr.open(httpRequest.method, href, httpOptions.xhrAsync !== false);
-			AWS.util.each(httpRequest.headers, function(key, value) {
-				if (key !== "Content-Length" && key !== "User-Agent" && key !== "Host") xhr.setRequestHeader(key, value);
-			});
-			if (httpOptions.timeout && httpOptions.xhrAsync !== false) xhr.timeout = httpOptions.timeout;
-			if (httpOptions.xhrWithCredentials) xhr.withCredentials = true;
-			try {
-				xhr.responseType = "arraybuffer";
-			} catch (e) {}
-			try {
-				if (httpRequest.body) xhr.send(httpRequest.body);
-				else xhr.send();
-			} catch (err) {
-				if (httpRequest.body && typeof httpRequest.body.buffer === "object") xhr.send(httpRequest.body.buffer);
-				else throw err;
-			}
-			return emitter;
-		},
-		parseHeaders: function parseHeaders(rawHeaders) {
-			var headers = {};
-			AWS.util.arrayEach(rawHeaders.split(/\r?\n/), function(line) {
-				var key = line.split(":", 1)[0];
-				var value = line.substring(key.length + 2);
-				if (key.length > 0) headers[key.toLowerCase()] = value;
-			});
-			return headers;
-		},
-		finishRequest: function finishRequest(xhr, emitter) {
-			var buffer;
-			if (xhr.responseType === "arraybuffer" && xhr.response) {
-				var ab = xhr.response;
-				buffer = new AWS.util.Buffer(ab.byteLength);
-				var view = new Uint8Array(ab);
-				for (var i = 0; i < buffer.length; ++i) buffer[i] = view[i];
-			}
-			try {
-				if (!buffer && typeof xhr.responseText === "string") buffer = new AWS.util.Buffer(xhr.responseText);
-			} catch (e) {}
-			if (buffer) emitter.emit("data", buffer);
-			emitter.emit("end");
 		}
 	});
 	/**
 	* @api private
 	*/
-	AWS.HttpClient.prototype = AWS.XHRClient.prototype;
-	/**
-	* @api private
-	*/
-	AWS.HttpClient.streamsApiVersion = 1;
+	module.exports = AWS.MetadataService;
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/lib/browser_loader.js
-var require_browser_loader = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	var util = require_util();
-	util.crypto.lib = require_browserCryptoLib();
-	util.Buffer = require_buffer().Buffer;
-	util.url = require_url();
-	util.querystring = require_querystring();
-	util.realClock = require_browserClock();
-	util.environment = "js";
-	util.createEventStream = require_buffered_create_event_stream().createEventStream;
-	util.isBrowser = function() {
-		return true;
-	};
-	util.isNode = function() {
-		return false;
-	};
+//#region node_modules/aws-sdk/lib/credentials/ec2_metadata_credentials.js
+var require_ec2_metadata_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	var AWS = require_core();
+	require_metadata_service();
+	/**
+	* Represents credentials received from the metadata service on an EC2 instance.
+	*
+	* By default, this class will connect to the metadata service using
+	* {AWS.MetadataService} and attempt to load any available credentials. If it
+	* can connect, and credentials are available, these will be used with zero
+	* configuration.
+	*
+	* This credentials class will by default timeout after 1 second of inactivity
+	* and retry 3 times.
+	* If your requests to the EC2 metadata service are timing out, you can increase
+	* these values by configuring them directly:
+	*
+	* ```javascript
+	* AWS.config.credentials = new AWS.EC2MetadataCredentials({
+	*   httpOptions: { timeout: 5000 }, // 5 second timeout
+	*   maxRetries: 10, // retry 10 times
+	*   retryDelayOptions: { base: 200 }, // see AWS.Config for information
+	*   logger: console // see AWS.Config for information
+	*   ec2MetadataV1Disabled: false // whether to block IMDS v1 fallback.
+	* });
+	* ```
+	*
+	* If your requests are timing out in connecting to the metadata service, such
+	* as when testing on a development machine, you can use the connectTimeout
+	* option, specified in milliseconds, which also defaults to 1 second.
+	*
+	* If the requests failed or returns expired credentials, it will
+	* extend the expiration of current credential, with a warning message. For more
+	* information, please go to:
+	* https://docs.aws.amazon.com/sdkref/latest/guide/feature-static-credentials.html
+	*
+	* @!attribute originalExpiration
+	*   @return [Date] The optional original expiration of the current credential.
+	*   In case of AWS outage, the EC2 metadata will extend expiration of the
+	*   existing credential.
+	*
+	* @see AWS.Config.retryDelayOptions
+	* @see AWS.Config.logger
+	*
+	* @!macro nobrowser
+	*/
+	AWS.EC2MetadataCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function EC2MetadataCredentials(options) {
+			AWS.Credentials.call(this);
+			options = options ? AWS.util.copy(options) : {};
+			options = AWS.util.merge({ maxRetries: this.defaultMaxRetries }, options);
+			if (!options.httpOptions) options.httpOptions = {};
+			options.httpOptions = AWS.util.merge({
+				timeout: this.defaultTimeout,
+				connectTimeout: this.defaultConnectTimeout
+			}, options.httpOptions);
+			this.metadataService = new AWS.MetadataService(options);
+			this.logger = options.logger || AWS.config && AWS.config.logger;
+		},
+		defaultTimeout: 1e3,
+		defaultConnectTimeout: 1e3,
+		defaultMaxRetries: 3,
+		originalExpiration: void 0,
+		refresh: function refresh(callback) {
+			this.coalesceRefresh(callback || AWS.util.fn.callback);
+		},
+		load: function load(callback) {
+			var self = this;
+			self.metadataService.loadCredentials(function(err, creds) {
+				if (err) if (self.hasLoadedCredentials()) {
+					self.extendExpirationIfExpired();
+					callback();
+				} else callback(err);
+				else {
+					self.setCredentials(creds);
+					self.extendExpirationIfExpired();
+					callback();
+				}
+			});
+		},
+		hasLoadedCredentials: function hasLoadedCredentials() {
+			return this.AccessKeyId && this.secretAccessKey;
+		},
+		extendExpirationIfExpired: function extendExpirationIfExpired() {
+			if (this.needsRefresh()) {
+				this.originalExpiration = this.originalExpiration || this.expireTime;
+				this.expired = false;
+				var nextTimeout = 900 + Math.floor(Math.random() * 5 * 60);
+				var currentTime = AWS.util.date.getDate().getTime();
+				this.expireTime = new Date(currentTime + nextTimeout * 1e3);
+				this.logger.warn("Attempting credential expiration extension due to a credential service availability issue. A refresh of these credentials will be attempted again at " + this.expireTime + "\nFor more information, please visit: https://docs.aws.amazon.com/sdkref/latest/guide/feature-static-credentials.html");
+			}
+		},
+		setCredentials: function setCredentials(creds) {
+			var currentTime = AWS.util.date.getDate().getTime();
+			var expireTime = new Date(creds.Expiration);
+			this.expired = currentTime >= expireTime ? true : false;
+			this.metadata = creds;
+			this.accessKeyId = creds.AccessKeyId;
+			this.secretAccessKey = creds.SecretAccessKey;
+			this.sessionToken = creds.Token;
+			this.expireTime = expireTime;
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/remote_credentials.js
+var require_remote_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var fs$1 = __require("fs");
+	var AWS = require_core(), ENV_RELATIVE_URI = "AWS_CONTAINER_CREDENTIALS_RELATIVE_URI", ENV_FULL_URI = "AWS_CONTAINER_CREDENTIALS_FULL_URI", ENV_AUTH_TOKEN = "AWS_CONTAINER_AUTHORIZATION_TOKEN", ENV_AUTH_TOKEN_FILE = "AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE", FULL_URI_UNRESTRICTED_PROTOCOLS = ["https:"], FULL_URI_ALLOWED_PROTOCOLS = ["http:", "https:"], FULL_URI_ALLOWED_HOSTNAMES = [
+		"localhost",
+		"127.0.0.1",
+		"169.254.170.23"
+	], RELATIVE_URI_HOST = "169.254.170.2";
+	/**
+	* Represents credentials received from specified URI.
+	*
+	* This class will request refreshable credentials from the relative URI
+	* specified by the AWS_CONTAINER_CREDENTIALS_RELATIVE_URI or the
+	* AWS_CONTAINER_CREDENTIALS_FULL_URI environment variable. If valid credentials
+	* are returned in the response, these will be used with zero configuration.
+	*
+	* This credentials class will by default timeout after 1 second of inactivity
+	* and retry 3 times.
+	* If your requests to the relative URI are timing out, you can increase
+	* the value by configuring them directly:
+	*
+	* ```javascript
+	* AWS.config.credentials = new AWS.RemoteCredentials({
+	*   httpOptions: { timeout: 5000 }, // 5 second timeout
+	*   maxRetries: 10, // retry 10 times
+	*   retryDelayOptions: { base: 200 } // see AWS.Config for information
+	* });
+	* ```
+	*
+	* @see AWS.Config.retryDelayOptions
+	*
+	* @!macro nobrowser
+	*/
+	AWS.RemoteCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function RemoteCredentials(options) {
+			AWS.Credentials.call(this);
+			options = options ? AWS.util.copy(options) : {};
+			if (!options.httpOptions) options.httpOptions = {};
+			options.httpOptions = AWS.util.merge(this.httpOptions, options.httpOptions);
+			AWS.util.update(this, options);
+		},
+		httpOptions: { timeout: 1e3 },
+		maxRetries: 3,
+		isConfiguredForEcsCredentials: function isConfiguredForEcsCredentials() {
+			return Boolean(process && process.env && (process.env[ENV_RELATIVE_URI] || process.env[ENV_FULL_URI]));
+		},
+		getECSFullUri: function getECSFullUri() {
+			if (process && process.env) {
+				var relative = process.env[ENV_RELATIVE_URI], full = process.env[ENV_FULL_URI];
+				if (relative) return "http://" + RELATIVE_URI_HOST + relative;
+				else if (full) {
+					var parsed = AWS.util.urlParse(full);
+					if (FULL_URI_ALLOWED_PROTOCOLS.indexOf(parsed.protocol) < 0) throw AWS.util.error(/* @__PURE__ */ new Error("Unsupported protocol:  AWS.RemoteCredentials supports " + FULL_URI_ALLOWED_PROTOCOLS.join(",") + " only; " + parsed.protocol + " requested."), { code: "ECSCredentialsProviderFailure" });
+					if (FULL_URI_UNRESTRICTED_PROTOCOLS.indexOf(parsed.protocol) < 0 && FULL_URI_ALLOWED_HOSTNAMES.indexOf(parsed.hostname) < 0) throw AWS.util.error(/* @__PURE__ */ new Error("Unsupported hostname: AWS.RemoteCredentials only supports " + FULL_URI_ALLOWED_HOSTNAMES.join(",") + " for " + parsed.protocol + "; " + parsed.protocol + "//" + parsed.hostname + " requested."), { code: "ECSCredentialsProviderFailure" });
+					return full;
+				} else throw AWS.util.error(/* @__PURE__ */ new Error("Variable " + ENV_RELATIVE_URI + " or " + ENV_FULL_URI + " must be set to use AWS.RemoteCredentials."), { code: "ECSCredentialsProviderFailure" });
+			} else throw AWS.util.error(/* @__PURE__ */ new Error("No process info available"), { code: "ECSCredentialsProviderFailure" });
+		},
+		getECSAuthToken: function getECSAuthToken() {
+			if (process && process.env && (process.env[ENV_FULL_URI] || process.env[ENV_AUTH_TOKEN_FILE])) {
+				if (!process.env[ENV_AUTH_TOKEN] && process.env[ENV_AUTH_TOKEN_FILE]) try {
+					return fs$1.readFileSync(process.env[ENV_AUTH_TOKEN_FILE]).toString();
+				} catch (error) {
+					console.error("Error reading token file:", error);
+					throw error;
+				}
+				return process.env[ENV_AUTH_TOKEN];
+			}
+		},
+		credsFormatIsValid: function credsFormatIsValid(credData) {
+			return !!credData.accessKeyId && !!credData.secretAccessKey && !!credData.sessionToken && !!credData.expireTime;
+		},
+		formatCreds: function formatCreds(credData) {
+			if (!!credData.credentials) credData = credData.credentials;
+			return {
+				expired: false,
+				accessKeyId: credData.accessKeyId || credData.AccessKeyId,
+				secretAccessKey: credData.secretAccessKey || credData.SecretAccessKey,
+				sessionToken: credData.sessionToken || credData.Token,
+				expireTime: new Date(credData.expiration || credData.Expiration)
+			};
+		},
+		request: function request(url, callback) {
+			var httpRequest = new AWS.HttpRequest(url);
+			httpRequest.method = "GET";
+			httpRequest.headers.Accept = "application/json";
+			var token = this.getECSAuthToken();
+			if (token) httpRequest.headers.Authorization = token;
+			AWS.util.handleRequestWithRetries(httpRequest, this, callback);
+		},
+		refresh: function refresh(callback) {
+			this.coalesceRefresh(callback || AWS.util.fn.callback);
+		},
+		load: function load(callback) {
+			var self = this;
+			var fullUri;
+			try {
+				fullUri = this.getECSFullUri();
+			} catch (err) {
+				callback(err);
+				return;
+			}
+			this.request(fullUri, function(err, data) {
+				if (!err) try {
+					data = JSON.parse(data);
+					var creds = self.formatCreds(data);
+					if (!self.credsFormatIsValid(creds)) throw AWS.util.error(/* @__PURE__ */ new Error("Response data is not in valid format"), { code: "ECSCredentialsProviderFailure" });
+					AWS.util.update(self, creds);
+				} catch (dataError) {
+					err = dataError;
+				}
+				callback(err, creds);
+			});
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/ecs_credentials.js
+var require_ecs_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	/**
+	* Represents credentials received from relative URI specified in the ECS container.
+	*
+	* This class will request refreshable credentials from the relative URI
+	* specified by the AWS_CONTAINER_CREDENTIALS_RELATIVE_URI or the
+	* AWS_CONTAINER_CREDENTIALS_FULL_URI environment variable. If valid credentials
+	* are returned in the response, these will be used with zero configuration.
+	*
+	* This credentials class will by default timeout after 1 second of inactivity
+	* and retry 3 times.
+	* If your requests to the relative URI are timing out, you can increase
+	* the value by configuring them directly:
+	*
+	* ```javascript
+	* AWS.config.credentials = new AWS.ECSCredentials({
+	*   httpOptions: { timeout: 5000 }, // 5 second timeout
+	*   maxRetries: 10, // retry 10 times
+	*   retryDelayOptions: { base: 200 } // see AWS.Config for information
+	* });
+	* ```
+	*
+	* @see AWS.Config.retryDelayOptions
+	*
+	* @!macro nobrowser
+	*/
+	AWS.ECSCredentials = AWS.RemoteCredentials;
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/environment_credentials.js
+var require_environment_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	/**
+	* Represents credentials from the environment.
+	*
+	* By default, this class will look for the matching environment variables
+	* prefixed by a given {envPrefix}. The un-prefixed environment variable names
+	* for each credential value is listed below:
+	*
+	* ```javascript
+	* accessKeyId: ACCESS_KEY_ID
+	* secretAccessKey: SECRET_ACCESS_KEY
+	* sessionToken: SESSION_TOKEN
+	* ```
+	*
+	* With the default prefix of 'AWS', the environment variables would be:
+	*
+	*     AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
+	*
+	* @!attribute envPrefix
+	*   @readonly
+	*   @return [String] the prefix for the environment variable names excluding
+	*     the separating underscore ('_').
+	*/
+	AWS.EnvironmentCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function EnvironmentCredentials(envPrefix) {
+			AWS.Credentials.call(this);
+			this.envPrefix = envPrefix;
+			this.get(function() {});
+		},
+		refresh: function refresh(callback) {
+			if (!callback) callback = AWS.util.fn.callback;
+			if (!process || !process.env) {
+				callback(AWS.util.error(/* @__PURE__ */ new Error("No process info or environment variables available"), { code: "EnvironmentCredentialsProviderFailure" }));
+				return;
+			}
+			var keys = [
+				"ACCESS_KEY_ID",
+				"SECRET_ACCESS_KEY",
+				"SESSION_TOKEN"
+			];
+			var values = [];
+			for (var i = 0; i < keys.length; i++) {
+				var prefix = "";
+				if (this.envPrefix) prefix = this.envPrefix + "_";
+				values[i] = process.env[prefix + keys[i]];
+				if (!values[i] && keys[i] !== "SESSION_TOKEN") {
+					callback(AWS.util.error(/* @__PURE__ */ new Error("Variable " + prefix + keys[i] + " not set."), { code: "EnvironmentCredentialsProviderFailure" }));
+					return;
+				}
+			}
+			this.expired = false;
+			AWS.Credentials.apply(this, values);
+			callback();
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/file_system_credentials.js
+var require_file_system_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	/**
+	* Represents credentials from a JSON file on disk.
+	* If the credentials expire, the SDK can {refresh} the credentials
+	* from the file.
+	*
+	* The format of the file should be similar to the options passed to
+	* {AWS.Config}:
+	*
+	* ```javascript
+	* {accessKeyId: 'akid', secretAccessKey: 'secret', sessionToken: 'optional'}
+	* ```
+	*
+	* @example Loading credentials from disk
+	*   var creds = new AWS.FileSystemCredentials('./configuration.json');
+	*   creds.accessKeyId == 'AKID'
+	*
+	* @!attribute filename
+	*   @readonly
+	*   @return [String] the path to the JSON file on disk containing the
+	*     credentials.
+	* @!macro nobrowser
+	*/
+	AWS.FileSystemCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function FileSystemCredentials(filename) {
+			AWS.Credentials.call(this);
+			this.filename = filename;
+			this.get(function() {});
+		},
+		refresh: function refresh(callback) {
+			if (!callback) callback = AWS.util.fn.callback;
+			try {
+				var creds = JSON.parse(AWS.util.readFileSync(this.filename));
+				AWS.Credentials.call(this, creds);
+				if (!this.accessKeyId || !this.secretAccessKey) throw AWS.util.error(/* @__PURE__ */ new Error("Credentials not set in " + this.filename), { code: "FileSystemCredentialsProviderFailure" });
+				this.expired = false;
+				callback();
+			} catch (err) {
+				callback(err);
+			}
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/shared_ini_file_credentials.js
+var require_shared_ini_file_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	var STS = require_sts();
+	var iniLoader = AWS.util.iniLoader;
+	var ASSUME_ROLE_DEFAULT_REGION = "us-east-1";
+	/**
+	* Represents credentials loaded from shared credentials file
+	* (defaulting to ~/.aws/credentials or defined by the
+	* `AWS_SHARED_CREDENTIALS_FILE` environment variable).
+	*
+	* ## Using the shared credentials file
+	*
+	* This provider is checked by default in the Node.js environment. To use the
+	* credentials file provider, simply add your access and secret keys to the
+	* ~/.aws/credentials file in the following format:
+	*
+	*     [default]
+	*     aws_access_key_id = AKID...
+	*     aws_secret_access_key = YOUR_SECRET_KEY
+	*
+	* ## Using custom profiles
+	*
+	* The SDK supports loading credentials for separate profiles. This can be done
+	* in two ways:
+	*
+	* 1. Set the `AWS_PROFILE` environment variable in your process prior to
+	*    loading the SDK.
+	* 2. Directly load the AWS.SharedIniFileCredentials provider:
+	*
+	* ```javascript
+	* var creds = new AWS.SharedIniFileCredentials({profile: 'myprofile'});
+	* AWS.config.credentials = creds;
+	* ```
+	*
+	* @!macro nobrowser
+	*/
+	AWS.SharedIniFileCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function SharedIniFileCredentials(options) {
+			AWS.Credentials.call(this);
+			options = options || {};
+			this.filename = options.filename;
+			this.profile = options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
+			this.disableAssumeRole = Boolean(options.disableAssumeRole);
+			this.preferStaticCredentials = Boolean(options.preferStaticCredentials);
+			this.tokenCodeFn = options.tokenCodeFn || null;
+			this.httpOptions = options.httpOptions || null;
+			this.get(options.callback || AWS.util.fn.noop);
+		},
+		load: function load(callback) {
+			var self = this;
+			try {
+				var profiles = AWS.util.getProfilesFromSharedConfig(iniLoader, this.filename);
+				var profile = profiles[this.profile] || {};
+				if (Object.keys(profile).length === 0) throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + this.profile + " not found"), { code: "SharedIniFileCredentialsProviderFailure" });
+				var preferStaticCredentialsToRoleArn = Boolean(this.preferStaticCredentials && profile["aws_access_key_id"] && profile["aws_secret_access_key"]);
+				if (profile["role_arn"] && !preferStaticCredentialsToRoleArn) {
+					this.loadRoleProfile(profiles, profile, function(err, data) {
+						if (err) callback(err);
+						else {
+							self.expired = false;
+							self.accessKeyId = data.Credentials.AccessKeyId;
+							self.secretAccessKey = data.Credentials.SecretAccessKey;
+							self.sessionToken = data.Credentials.SessionToken;
+							self.expireTime = data.Credentials.Expiration;
+							callback(null);
+						}
+					});
+					return;
+				}
+				this.accessKeyId = profile["aws_access_key_id"];
+				this.secretAccessKey = profile["aws_secret_access_key"];
+				this.sessionToken = profile["aws_session_token"];
+				if (!this.accessKeyId || !this.secretAccessKey) throw AWS.util.error(/* @__PURE__ */ new Error("Credentials not set for profile " + this.profile), { code: "SharedIniFileCredentialsProviderFailure" });
+				this.expired = false;
+				callback(null);
+			} catch (err) {
+				callback(err);
+			}
+		},
+		refresh: function refresh(callback) {
+			iniLoader.clearCachedFiles();
+			this.coalesceRefresh(callback || AWS.util.fn.callback, this.disableAssumeRole);
+		},
+		loadRoleProfile: function loadRoleProfile(creds, roleProfile, callback) {
+			if (this.disableAssumeRole) throw AWS.util.error(/* @__PURE__ */ new Error("Role assumption profiles are disabled. Failed to load profile " + this.profile + " from " + creds.filename), { code: "SharedIniFileCredentialsProviderFailure" });
+			var self = this;
+			var roleArn = roleProfile["role_arn"];
+			var roleSessionName = roleProfile["role_session_name"];
+			var externalId = roleProfile["external_id"];
+			var mfaSerial = roleProfile["mfa_serial"];
+			var sourceProfileName = roleProfile["source_profile"];
+			var durationSeconds = parseInt(roleProfile["duration_seconds"], 10) || void 0;
+			var profileRegion = roleProfile["region"] || ASSUME_ROLE_DEFAULT_REGION;
+			if (!sourceProfileName) throw AWS.util.error(/* @__PURE__ */ new Error("source_profile is not set using profile " + this.profile), { code: "SharedIniFileCredentialsProviderFailure" });
+			if (typeof creds[sourceProfileName] !== "object") throw AWS.util.error(/* @__PURE__ */ new Error("source_profile " + sourceProfileName + " using profile " + this.profile + " does not exist"), { code: "SharedIniFileCredentialsProviderFailure" });
+			var sourceCredentials = new AWS.SharedIniFileCredentials(AWS.util.merge(this.options || {}, {
+				profile: sourceProfileName,
+				preferStaticCredentials: true
+			}));
+			this.roleArn = roleArn;
+			var sts = new STS({
+				credentials: sourceCredentials,
+				region: profileRegion,
+				httpOptions: this.httpOptions
+			});
+			var roleParams = {
+				DurationSeconds: durationSeconds,
+				RoleArn: roleArn,
+				RoleSessionName: roleSessionName || "aws-sdk-js-" + Date.now()
+			};
+			if (externalId) roleParams.ExternalId = externalId;
+			if (mfaSerial && self.tokenCodeFn) {
+				roleParams.SerialNumber = mfaSerial;
+				self.tokenCodeFn(mfaSerial, function(err, token) {
+					if (err) {
+						var message;
+						if (err instanceof Error) message = err.message;
+						else message = err;
+						callback(AWS.util.error(/* @__PURE__ */ new Error("Error fetching MFA token: " + message), { code: "SharedIniFileCredentialsProviderFailure" }));
+						return;
+					}
+					roleParams.TokenCode = token;
+					sts.assumeRole(roleParams, callback);
+				});
+				return;
+			}
+			sts.assumeRole(roleParams, callback);
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/credentials/sso_credentials.js
+var require_sso_credentials = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	var path$1 = __require("path");
+	var crypto$1 = __require("crypto");
+	var iniLoader = AWS.util.iniLoader;
+	/**
+	*  Represents credentials from sso.getRoleCredentials API for
+	* `sso_*` values defined in shared credentials file.
+	*
+	* ## Using SSO credentials
+	*
+	* The credentials file must specify the information below to use sso:
+	*
+	*     [profile sso-profile]
+	*     sso_account_id = 012345678901
+	*     sso_region = **-****-*
+	*     sso_role_name = SampleRole
+	*     sso_start_url = https://d-******.awsapps.com/start
+	*
+	* or using the session format:
+	*
+	*     [profile sso-token]
+	*     sso_session = prod
+	*     sso_account_id = 012345678901
+	*     sso_role_name = SampleRole
+	*
+	*     [sso-session prod]
+	*     sso_region = **-****-*
+	*     sso_start_url = https://d-******.awsapps.com/start
+	*
+	* This information will be automatically added to your shared credentials file by running
+	* `aws configure sso`.
+	*
+	* ## Using custom profiles
+	*
+	* The SDK supports loading credentials for separate profiles. This can be done
+	* in two ways:
+	*
+	* 1. Set the `AWS_PROFILE` environment variable in your process prior to
+	*    loading the SDK.
+	* 2. Directly load the AWS.SsoCredentials provider:
+	*
+	* ```javascript
+	* var creds = new AWS.SsoCredentials({profile: 'myprofile'});
+	* AWS.config.credentials = creds;
+	* ```
+	*
+	* @!macro nobrowser
+	*/
+	AWS.SsoCredentials = AWS.util.inherit(AWS.Credentials, {
+		constructor: function SsoCredentials(options) {
+			AWS.Credentials.call(this);
+			options = options || {};
+			this.errorCode = "SsoCredentialsProviderFailure";
+			this.expired = true;
+			this.filename = options.filename;
+			this.profile = options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
+			this.service = options.ssoClient;
+			this.httpOptions = options.httpOptions || null;
+			this.get(options.callback || AWS.util.fn.noop);
+		},
+		load: function load(callback) {
+			var self = this;
+			try {
+				var profile = AWS.util.getProfilesFromSharedConfig(iniLoader, this.filename)[this.profile] || {};
+				if (Object.keys(profile).length === 0) throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + this.profile + " not found"), { code: self.errorCode });
+				if (profile.sso_session) {
+					if (!profile.sso_account_id || !profile.sso_role_name) throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + this.profile + " with session " + profile.sso_session + " does not have valid SSO credentials. Required parameters \"sso_account_id\", \"sso_session\", \"sso_role_name\". Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html"), { code: self.errorCode });
+				} else if (!profile.sso_start_url || !profile.sso_account_id || !profile.sso_region || !profile.sso_role_name) throw AWS.util.error(/* @__PURE__ */ new Error("Profile " + this.profile + " does not have valid SSO credentials. Required parameters \"sso_account_id\", \"sso_region\", \"sso_role_name\", \"sso_start_url\". Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html"), { code: self.errorCode });
+				this.getToken(this.profile, profile, function(err, token) {
+					if (err) return callback(err);
+					var request = {
+						accessToken: token,
+						accountId: profile.sso_account_id,
+						roleName: profile.sso_role_name
+					};
+					if (!self.service || self.service.config.region !== profile.sso_region) self.service = new AWS.SSO({
+						region: profile.sso_region,
+						httpOptions: self.httpOptions
+					});
+					self.service.getRoleCredentials(request, function(err$1, data) {
+						if (err$1 || !data || !data.roleCredentials) callback(AWS.util.error(err$1 || /* @__PURE__ */ new Error("Please log in using \"aws sso login\""), { code: self.errorCode }), null);
+						else if (!data.roleCredentials.accessKeyId || !data.roleCredentials.secretAccessKey || !data.roleCredentials.sessionToken || !data.roleCredentials.expiration) throw AWS.util.error(/* @__PURE__ */ new Error("SSO returns an invalid temporary credential."));
+						else {
+							self.expired = false;
+							self.accessKeyId = data.roleCredentials.accessKeyId;
+							self.secretAccessKey = data.roleCredentials.secretAccessKey;
+							self.sessionToken = data.roleCredentials.sessionToken;
+							self.expireTime = new Date(data.roleCredentials.expiration);
+							callback(null);
+						}
+					});
+				});
+			} catch (err) {
+				callback(err);
+			}
+		},
+		getToken: function getToken(profileName, profile, callback) {
+			var self = this;
+			if (profile.sso_session) {
+				var ssoSession = AWS.util.iniLoader.loadSsoSessionsFrom()[profile.sso_session];
+				Object.assign(profile, ssoSession);
+				var ssoTokenProvider = new AWS.SSOTokenProvider({ profile: profileName });
+				ssoTokenProvider.get(function(err) {
+					if (err) return callback(err);
+					return callback(null, ssoTokenProvider.token);
+				});
+				return;
+			}
+			try {
+				/**
+				* The time window (15 mins) that SDK will treat the SSO token expires in before the defined expiration date in token.
+				* This is needed because server side may have invalidated the token before the defined expiration date.
+				*/
+				var EXPIRE_WINDOW_MS = 900 * 1e3;
+				var fileName = crypto$1.createHash("sha1").update(profile.sso_start_url).digest("hex") + ".json";
+				var cachePath = path$1.join(iniLoader.getHomeDir(), ".aws", "sso", "cache", fileName);
+				var cacheFile = AWS.util.readFileSync(cachePath);
+				var cacheContent = null;
+				if (cacheFile) cacheContent = JSON.parse(cacheFile);
+				if (!cacheContent) throw AWS.util.error(/* @__PURE__ */ new Error("Cached credentials not found under " + this.profile + " profile. Please make sure you log in with aws sso login first"), { code: self.errorCode });
+				if (!cacheContent.startUrl || !cacheContent.region || !cacheContent.accessToken || !cacheContent.expiresAt) throw AWS.util.error(/* @__PURE__ */ new Error("Cached credentials are missing required properties. Try running aws sso login."));
+				if (new Date(cacheContent.expiresAt).getTime() - Date.now() <= EXPIRE_WINDOW_MS) throw AWS.util.error(/* @__PURE__ */ new Error("The SSO session associated with this profile has expired. To refresh this SSO session run aws sso login with the corresponding profile."));
+				return callback(null, cacheContent.accessToken);
+			} catch (err) {
+				return callback(err, null);
+			}
+		},
+		refresh: function refresh(callback) {
+			iniLoader.clearCachedFiles();
+			this.coalesceRefresh(callback || AWS.util.fn.callback);
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/token.js
+var require_token = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	/**
+	* Represents AWS token object, which contains {token}, and optional
+	* {expireTime}.
+	* Creating a `Token` object allows you to pass around your
+	* token to configuration and service objects.
+	*
+	* Note that this class typically does not need to be constructed manually,
+	* as the {AWS.Config} and {AWS.Service} classes both accept simple
+	* options hashes with the two keys. The token from this object will be used
+	* automatically in operations which require them.
+	*
+	* ## Expiring and Refreshing Token
+	*
+	* Occasionally token can expire in the middle of a long-running
+	* application. In this case, the SDK will automatically attempt to
+	* refresh the token from the storage location if the Token
+	* class implements the {refresh} method.
+	*
+	* If you are implementing a token storage location, you
+	* will want to create a subclass of the `Token` class and
+	* override the {refresh} method. This method allows token to be
+	* retrieved from the backing store, be it a file system, database, or
+	* some network storage. The method should reset the token attributes
+	* on the object.
+	*
+	* @!attribute token
+	*   @return [String] represents the literal token string. This will typically
+	*     be a base64 encoded string.
+	* @!attribute expireTime
+	*   @return [Date] a time when token should be considered expired. Used
+	*     in conjunction with {expired}.
+	* @!attribute expired
+	*   @return [Boolean] whether the token is expired and require a refresh. Used
+	*     in conjunction with {expireTime}.
+	*/
+	AWS.Token = AWS.util.inherit({
+		constructor: function Token(options) {
+			AWS.util.hideProperties(this, ["token"]);
+			this.expired = false;
+			this.expireTime = null;
+			this.refreshCallbacks = [];
+			if (arguments.length === 1) {
+				var options = arguments[0];
+				this.token = options.token;
+				this.expireTime = options.expireTime;
+			}
+		},
+		expiryWindow: 15,
+		needsRefresh: function needsRefresh() {
+			var currentTime = AWS.util.date.getDate().getTime();
+			var adjustedTime = new Date(currentTime + this.expiryWindow * 1e3);
+			if (this.expireTime && adjustedTime > this.expireTime) return true;
+			return this.expired || !this.token;
+		},
+		get: function get(callback) {
+			var self = this;
+			if (this.needsRefresh()) this.refresh(function(err) {
+				if (!err) self.expired = false;
+				if (callback) callback(err);
+			});
+			else if (callback) callback();
+		},
+		refresh: function refresh(callback) {
+			this.expired = false;
+			callback();
+		},
+		coalesceRefresh: function coalesceRefresh(callback, sync) {
+			var self = this;
+			if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
+				AWS.util.arrayEach(self.refreshCallbacks, function(callback$1) {
+					if (sync) callback$1(err);
+					else AWS.util.defer(function() {
+						callback$1(err);
+					});
+				});
+				self.refreshCallbacks.length = 0;
+			});
+		},
+		load: function load(callback) {
+			callback();
+		}
+	});
 	/**
 	* @api private
 	*/
-	module.exports = AWS;
+	AWS.Token.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+		this.prototype.getPromise = AWS.util.promisifyMethod("get", PromiseDependency);
+		this.prototype.refreshPromise = AWS.util.promisifyMethod("refresh", PromiseDependency);
+	};
+	/**
+	* @api private
+	*/
+	AWS.Token.deletePromisesFromClass = function deletePromisesFromClass() {
+		delete this.prototype.getPromise;
+		delete this.prototype.refreshPromise;
+	};
+	AWS.util.addPromises(AWS.Token);
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/token/token_provider_chain.js
+var require_token_provider_chain = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	/**
+	* Creates a token provider chain that searches for token in a list of
+	* token providers specified by the {providers} property.
+	*
+	* By default, the chain will use the {defaultProviders} to resolve token.
+	*
+	* ## Setting Providers
+	*
+	* Each provider in the {providers} list should be a function that returns
+	* a {AWS.Token} object, or a hardcoded token object. The function
+	* form allows for delayed execution of the Token construction.
+	*
+	* ## Resolving Token from a Chain
+	*
+	* Call {resolve} to return the first valid token object that can be
+	* loaded by the provider chain.
+	*
+	* For example, to resolve a chain with a custom provider that checks a file
+	* on disk after the set of {defaultProviders}:
+	*
+	* ```javascript
+	* var diskProvider = new FileTokenProvider('./token.json');
+	* var chain = new AWS.TokenProviderChain();
+	* chain.providers.push(diskProvider);
+	* chain.resolve();
+	* ```
+	*
+	* The above code will return the `diskProvider` object if the
+	* file contains token and the `defaultProviders` do not contain
+	* any token.
+	*
+	* @!attribute providers
+	*   @return [Array<AWS.Token, Function>]
+	*     a list of token objects or functions that return token
+	*     objects. If the provider is a function, the function will be
+	*     executed lazily when the provider needs to be checked for valid
+	*     token. By default, this object will be set to the {defaultProviders}.
+	*   @see defaultProviders
+	*/
+	AWS.TokenProviderChain = AWS.util.inherit(AWS.Token, {
+		constructor: function TokenProviderChain(providers) {
+			if (providers) this.providers = providers;
+			else this.providers = AWS.TokenProviderChain.defaultProviders.slice(0);
+			this.resolveCallbacks = [];
+		},
+		resolve: function resolve(callback) {
+			var self = this;
+			if (self.providers.length === 0) {
+				callback(/* @__PURE__ */ new Error("No providers"));
+				return self;
+			}
+			if (self.resolveCallbacks.push(callback) === 1) {
+				var index = 0;
+				var providers = self.providers.slice(0);
+				function resolveNext(err, token) {
+					if (!err && token || index === providers.length) {
+						AWS.util.arrayEach(self.resolveCallbacks, function(callback$1) {
+							callback$1(err, token);
+						});
+						self.resolveCallbacks.length = 0;
+						return;
+					}
+					var provider = providers[index++];
+					if (typeof provider === "function") token = provider.call();
+					else token = provider;
+					if (token.get) token.get(function(getErr) {
+						resolveNext(getErr, getErr ? null : token);
+					});
+					else resolveNext(null, token);
+				}
+				resolveNext();
+			}
+			return self;
+		}
+	});
+	/**
+	* The default set of providers used by a vanilla TokenProviderChain.
+	*
+	* In the browser:
+	*
+	* ```javascript
+	* AWS.TokenProviderChain.defaultProviders = []
+	* ```
+	*
+	* In Node.js:
+	*
+	* ```javascript
+	* AWS.TokenProviderChain.defaultProviders = [
+	*   function () { return new AWS.SSOTokenProvider(); },
+	* ]
+	* ```
+	*/
+	AWS.TokenProviderChain.defaultProviders = [];
+	/**
+	* @api private
+	*/
+	AWS.TokenProviderChain.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+		this.prototype.resolvePromise = AWS.util.promisifyMethod("resolve", PromiseDependency);
+	};
+	/**
+	* @api private
+	*/
+	AWS.TokenProviderChain.deletePromisesFromClass = function deletePromisesFromClass() {
+		delete this.prototype.resolvePromise;
+	};
+	AWS.util.addPromises(AWS.TokenProviderChain);
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/token/sso_token_provider.js
+var require_sso_token_provider = /* @__PURE__ */ __commonJSMin((() => {
+	var AWS = require_core();
+	var crypto = __require("crypto");
+	var fs = __require("fs");
+	var path = __require("path");
+	var iniLoader = AWS.util.iniLoader;
+	var lastRefreshAttemptTime = 0;
+	/**
+	* Throws error is key is not present in token object.
+	*
+	* @param token [Object] Object to be validated.
+	* @param key [String] The key to be validated on the object.
+	*/
+	var validateTokenKey = function validateTokenKey(token, key) {
+		if (!token[key]) throw AWS.util.error(/* @__PURE__ */ new Error("Key \"" + key + "\" not present in SSO Token"), { code: "SSOTokenProviderFailure" });
+	};
+	/**
+	* Calls callback function with or without error based on provided times in case
+	* of unsuccessful refresh.
+	*
+	* @param currentTime [number] current time in milliseconds since ECMAScript epoch.
+	* @param tokenExpireTime [number] token expire time in milliseconds since ECMAScript epoch.
+	* @param callback [Function] Callback to call in case of error.
+	*/
+	var refreshUnsuccessful = function refreshUnsuccessful(currentTime, tokenExpireTime, callback) {
+		if (tokenExpireTime > currentTime) callback(null);
+		else throw AWS.util.error(/* @__PURE__ */ new Error("SSO Token refresh failed. Please log in using \"aws sso login\""), { code: "SSOTokenProviderFailure" });
+	};
+	/**
+	* Represents token loaded from disk derived from the AWS SSO device grant authorication flow.
+	*
+	* ## Using SSO Token Provider
+	*
+	* This provider is checked by default in the Node.js environment in TokenProviderChain.
+	* To use the SSO Token Provider, simply add your SSO Start URL and Region to the
+	* ~/.aws/config file in the following format:
+	*
+	*     [default]
+	*     sso_start_url = https://d-abc123.awsapps.com/start
+	*     sso_region = us-east-1
+	*
+	* ## Using custom profiles
+	*
+	* The SDK supports loading token for separate profiles. This can be done in two ways:
+	*
+	* 1. Set the `AWS_PROFILE` environment variable in your process prior to loading the SDK.
+	* 2. Directly load the AWS.SSOTokenProvider:
+	*
+	* ```javascript
+	* var ssoTokenProvider = new AWS.SSOTokenProvider({profile: 'myprofile'});
+	* ```
+	*
+	* @!macro nobrowser
+	*/
+	AWS.SSOTokenProvider = AWS.util.inherit(AWS.Token, {
+		expiryWindow: 300,
+		constructor: function SSOTokenProvider(options) {
+			AWS.Token.call(this);
+			options = options || {};
+			this.expired = true;
+			this.profile = options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
+			this.get(options.callback || AWS.util.fn.noop);
+		},
+		load: function load(callback) {
+			var self = this;
+			var profile = iniLoader.loadFrom({ isConfig: true })[this.profile] || {};
+			if (Object.keys(profile).length === 0) throw AWS.util.error(/* @__PURE__ */ new Error("Profile \"" + this.profile + "\" not found"), { code: "SSOTokenProviderFailure" });
+			else if (!profile["sso_session"]) throw AWS.util.error(/* @__PURE__ */ new Error("Profile \"" + this.profile + "\" is missing required property \"sso_session\"."), { code: "SSOTokenProviderFailure" });
+			var ssoSessionName = profile["sso_session"];
+			var ssoSession = iniLoader.loadSsoSessionsFrom()[ssoSessionName];
+			if (!ssoSession) throw AWS.util.error(/* @__PURE__ */ new Error("Sso session \"" + ssoSessionName + "\" not found"), { code: "SSOTokenProviderFailure" });
+			else if (!ssoSession["sso_start_url"]) throw AWS.util.error(/* @__PURE__ */ new Error("Sso session \"" + this.profile + "\" is missing required property \"sso_start_url\"."), { code: "SSOTokenProviderFailure" });
+			else if (!ssoSession["sso_region"]) throw AWS.util.error(/* @__PURE__ */ new Error("Sso session \"" + this.profile + "\" is missing required property \"sso_region\"."), { code: "SSOTokenProviderFailure" });
+			var fileName = crypto.createHash("sha1").update(ssoSessionName).digest("hex") + ".json";
+			var cachePath = path.join(iniLoader.getHomeDir(), ".aws", "sso", "cache", fileName);
+			var tokenFromCache = JSON.parse(fs.readFileSync(cachePath));
+			if (!tokenFromCache) throw AWS.util.error(/* @__PURE__ */ new Error("Cached token not found. Please log in using \"aws sso login\" for profile \"" + this.profile + "\"."), { code: "SSOTokenProviderFailure" });
+			validateTokenKey(tokenFromCache, "accessToken");
+			validateTokenKey(tokenFromCache, "expiresAt");
+			var currentTime = AWS.util.date.getDate().getTime();
+			var adjustedTime = new Date(currentTime + this.expiryWindow * 1e3);
+			var tokenExpireTime = new Date(tokenFromCache["expiresAt"]);
+			if (tokenExpireTime > adjustedTime) {
+				self.token = tokenFromCache.accessToken;
+				self.expireTime = tokenExpireTime;
+				self.expired = false;
+				callback(null);
+				return;
+			}
+			if (currentTime - lastRefreshAttemptTime < 30 * 1e3) {
+				refreshUnsuccessful(currentTime, tokenExpireTime, callback);
+				return;
+			}
+			validateTokenKey(tokenFromCache, "clientId");
+			validateTokenKey(tokenFromCache, "clientSecret");
+			validateTokenKey(tokenFromCache, "refreshToken");
+			if (!self.service || self.service.config.region !== ssoSession.sso_region) self.service = new AWS.SSOOIDC({ region: ssoSession.sso_region });
+			var params = {
+				clientId: tokenFromCache.clientId,
+				clientSecret: tokenFromCache.clientSecret,
+				refreshToken: tokenFromCache.refreshToken,
+				grantType: "refresh_token"
+			};
+			lastRefreshAttemptTime = AWS.util.date.getDate().getTime();
+			self.service.createToken(params, function(err, data) {
+				if (err || !data) refreshUnsuccessful(currentTime, tokenExpireTime, callback);
+				else try {
+					validateTokenKey(data, "accessToken");
+					validateTokenKey(data, "expiresIn");
+					self.expired = false;
+					self.token = data.accessToken;
+					self.expireTime = new Date(Date.now() + data.expiresIn * 1e3);
+					callback(null);
+					try {
+						tokenFromCache.accessToken = data.accessToken;
+						tokenFromCache.expiresAt = self.expireTime.toISOString();
+						tokenFromCache.refreshToken = data.refreshToken;
+						fs.writeFileSync(cachePath, JSON.stringify(tokenFromCache, null, 2));
+					} catch (error) {}
+				} catch (error) {
+					refreshUnsuccessful(currentTime, tokenExpireTime, callback);
+				}
+			});
+		},
+		refresh: function refresh(callback) {
+			iniLoader.clearCachedFiles();
+			this.coalesceRefresh(callback || AWS.util.fn.callback);
+		}
+	});
+}));
+
+//#endregion
+//#region node_modules/aws-sdk/lib/node_loader.js
+var require_node_loader = /* @__PURE__ */ __commonJSMin(((exports, module) => {
+	var util = require_util();
+	var region_utils = require_utils();
+	var isFipsRegion = region_utils.isFipsRegion;
+	var getRealRegion = region_utils.getRealRegion;
+	util.isBrowser = function() {
+		return false;
+	};
+	util.isNode = function() {
+		return true;
+	};
+	util.crypto.lib = __require("crypto");
+	util.Buffer = __require("buffer").Buffer;
+	util.domain = __require("domain");
+	util.stream = __require("stream");
+	util.url = __require("url");
+	util.querystring = __require("querystring");
+	util.environment = "nodejs";
+	util.createEventStream = util.stream.Readable ? require_streaming_create_event_stream().createEventStream : require_buffered_create_event_stream().createEventStream;
+	util.realClock = require_nodeClock();
+	util.clientSideMonitoring = {
+		Publisher: require_publisher().Publisher,
+		configProvider: require_configuration()
+	};
+	util.iniLoader = require_shared_ini().iniLoader;
+	util.getSystemErrorName = __require("util").getSystemErrorName;
+	util.loadConfig = function(options) {
+		var envValue = options.environmentVariableSelector(process.env);
+		if (envValue !== void 0) return envValue;
+		var configFile = {};
+		try {
+			configFile = util.iniLoader ? util.iniLoader.loadFrom({
+				isConfig: true,
+				filename: process.env[util.sharedConfigFileEnv]
+			}) : {};
+		} catch (e) {}
+		var sharedFileConfig = configFile[process.env.AWS_PROFILE || util.defaultProfile] || {};
+		var configValue = options.configFileSelector(sharedFileConfig);
+		if (configValue !== void 0) return configValue;
+		if (typeof options.default === "function") return options.default();
+		return options.default;
+	};
+	var AWS;
+	/**
+	* @api private
+	*/
+	module.exports = AWS = require_core();
 	require_credentials();
 	require_credential_provider_chain();
 	require_temporary_credentials();
@@ -16074,8 +17878,134 @@ var require_browser_loader = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 	require_web_identity_credentials();
 	require_cognito_identity_credentials();
 	require_saml_credentials();
-	AWS.XML.Parser = require_browser_parser();
-	require_xhr();
+	require_process_credentials();
+	AWS.XML.Parser = require_node_parser();
+	require_node();
+	require_ini_loader();
+	require_token_file_web_identity_credentials();
+	require_ec2_metadata_credentials();
+	require_remote_credentials();
+	require_ecs_credentials();
+	require_environment_credentials();
+	require_file_system_credentials();
+	require_shared_ini_file_credentials();
+	require_process_credentials();
+	require_sso_credentials();
+	AWS.CredentialProviderChain.defaultProviders = [
+		function() {
+			return new AWS.EnvironmentCredentials("AWS");
+		},
+		function() {
+			return new AWS.EnvironmentCredentials("AMAZON");
+		},
+		function() {
+			return new AWS.SsoCredentials();
+		},
+		function() {
+			return new AWS.SharedIniFileCredentials();
+		},
+		function() {
+			return new AWS.ECSCredentials();
+		},
+		function() {
+			return new AWS.ProcessCredentials();
+		},
+		function() {
+			return new AWS.TokenFileWebIdentityCredentials();
+		},
+		function() {
+			return new AWS.EC2MetadataCredentials();
+		}
+	];
+	require_token();
+	require_token_provider_chain();
+	require_sso_token_provider();
+	AWS.TokenProviderChain.defaultProviders = [function() {
+		return new AWS.SSOTokenProvider();
+	}];
+	var getRegion = function() {
+		var env = process.env;
+		var region = env.AWS_REGION || env.AMAZON_REGION;
+		if (env[AWS.util.configOptInEnv]) {
+			var toCheck = [{ filename: env[AWS.util.sharedCredentialsFileEnv] }, {
+				isConfig: true,
+				filename: env[AWS.util.sharedConfigFileEnv]
+			}];
+			var iniLoader = AWS.util.iniLoader;
+			while (!region && toCheck.length) {
+				var configFile = {};
+				var fileInfo = toCheck.shift();
+				try {
+					configFile = iniLoader.loadFrom(fileInfo);
+				} catch (err) {
+					if (fileInfo.isConfig) throw err;
+				}
+				var profile = configFile[env.AWS_PROFILE || AWS.util.defaultProfile];
+				region = profile && profile.region;
+			}
+		}
+		return region;
+	};
+	var getBooleanValue = function(value) {
+		return value === "true" ? true : value === "false" ? false : void 0;
+	};
+	var USE_FIPS_ENDPOINT_CONFIG_OPTIONS = {
+		environmentVariableSelector: function(env) {
+			return getBooleanValue(env["AWS_USE_FIPS_ENDPOINT"]);
+		},
+		configFileSelector: function(profile) {
+			return getBooleanValue(profile["use_fips_endpoint"]);
+		},
+		default: false
+	};
+	var USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS = {
+		environmentVariableSelector: function(env) {
+			return getBooleanValue(env["AWS_USE_DUALSTACK_ENDPOINT"]);
+		},
+		configFileSelector: function(profile) {
+			return getBooleanValue(profile["use_dualstack_endpoint"]);
+		},
+		default: false
+	};
+	AWS.util.update(AWS.Config.prototype.keys, {
+		credentials: function() {
+			var credentials = null;
+			new AWS.CredentialProviderChain([
+				function() {
+					return new AWS.EnvironmentCredentials("AWS");
+				},
+				function() {
+					return new AWS.EnvironmentCredentials("AMAZON");
+				},
+				function() {
+					return new AWS.SharedIniFileCredentials({ disableAssumeRole: true });
+				}
+			]).resolve(function(err, creds) {
+				if (!err) credentials = creds;
+			});
+			return credentials;
+		},
+		credentialProvider: function() {
+			return new AWS.CredentialProviderChain();
+		},
+		logger: function() {
+			return process.env.AWSJS_DEBUG ? console : null;
+		},
+		region: function() {
+			var region = getRegion();
+			return region ? getRealRegion(region) : void 0;
+		},
+		tokenProvider: function() {
+			return new AWS.TokenProviderChain();
+		},
+		useFipsEndpoint: function() {
+			return isFipsRegion(getRegion()) ? true : util.loadConfig(USE_FIPS_ENDPOINT_CONFIG_OPTIONS);
+		},
+		useDualstackEndpoint: function() {
+			return util.loadConfig(USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS);
+		}
+	});
+	AWS.config = new AWS.Config();
 }));
 
 //#endregion
@@ -16460,7 +18390,7 @@ var require_sts_2011_06_15_paginators = /* @__PURE__ */ __commonJSMin(((exports,
 //#endregion
 //#region node_modules/aws-sdk/clients/sts.js
 var require_sts = /* @__PURE__ */ __commonJSMin(((exports, module) => {
-	require_browser_loader();
+	require_node_loader();
 	var AWS = require_core();
 	var Service = AWS.Service;
 	var apiLoader = AWS.apiLoader;

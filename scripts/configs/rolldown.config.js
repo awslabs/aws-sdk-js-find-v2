@@ -15,6 +15,8 @@ const createConfig = (version, minify, moduleSystem) =>
       inlineDynamicImports: true,
       minify,
     },
+    // rolldown defaults to "browser" platform for non-cjs formats: https://rolldown.rs/options/platform#platform
+    platform: "node",
   });
 
 const configs = [];
