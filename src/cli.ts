@@ -48,7 +48,6 @@ export const createProgram = (): Command => {
         }
         return value;
       },
-      ">=2.0.0",
     )
     .option("--region <region>", "AWS region to scan")
     .option("--profile <profile>", "AWS profile to use")

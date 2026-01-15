@@ -38,11 +38,16 @@ const AWS_SDK_ENV_VARS = [
  * @param sdkVersionRange - Semver range string to check for AWS SDK for JavaScript v2
  * @returns boolean - Returns true if all AWS SDK v2 environment variables are found in the bundle content, false otherwise.
  */
-export const hasSdkV2InBundle = (bundleContent: string, sdkVersionRange: string): boolean => {
+export const hasSdkV2InBundle = (bundleContent: string, sdkVersionRange?: string): boolean => {
   for (const envVar of AWS_SDK_ENV_VARS) {
     if (!bundleContent.includes(envVar)) {
       return false;
     }
+  }
+
+  if (!sdkVersionRange) {
+    // Checking for all versions by default.
+    return true;
   }
 
   // Get version number from `VERSION:'2.X.Y'` or `VERSION: '2.X.Y'`, including double quotes and backticks.

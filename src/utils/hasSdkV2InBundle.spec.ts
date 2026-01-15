@@ -12,6 +12,8 @@ describe("hasSdkV2InBundle", () => {
     [true, "v2", sdkVersionRange],
     [false, "v3", sdkVersionRange],
     [false, "v2", `<${sdkVersionRange}`],
+    [true, "v2", undefined],
+    [false, "v3", undefined],
   ])(
     "should return %s for '%s' with sdk version range '%s'",
     (output, version, sdkVersionRange) => {

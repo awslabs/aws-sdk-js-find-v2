@@ -20,7 +20,7 @@ export interface ScanLambdaFunctionsOptions {
   node: string;
 
   // Semver range string to check for AWS SDK for JavaScript v2
-  sdk: string;
+  sdk?: string;
 
   // AWS region to scan
   region?: string;

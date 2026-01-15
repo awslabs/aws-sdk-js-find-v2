@@ -35,6 +35,7 @@ describe("getLambdaFunctionContents", () => {
     const result = await getLambdaFunctionContents(mockClient, {
       codeLocation: mockCodeLocation,
       runtime: "nodejs20.x",
+      includePackageJson: false,
     });
     expect(result).toEqual({ codeMap: new Map() });
     expect(processRemoteZip).toHaveBeenCalledWith(mockCodeLocation, expect.any(Function));
@@ -52,6 +53,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map() });
     });
@@ -67,6 +69,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map() });
     });
@@ -85,6 +88,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map() });
     });
@@ -105,6 +109,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
       });
       expect(result).toEqual({
         codeMap: new Map([["index.js", mockCode]]),
@@ -126,6 +131,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
       });
       expect(result).toEqual({
         codeMap: new Map(),
@@ -144,8 +150,30 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map() });
+    });
+
+    it("skips package.json files when includePackageJson is false", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
+      vi.mocked(processZipEntries).mockImplementation(async (_zipPath, processor) => {
+        await processor({ name: "package.json", isFile: true } as never, () =>
+          Promise.resolve(Buffer.from(mockPackageJson)),
+        );
+        await processor({ name: "index.js", isFile: true } as never, () =>
+          Promise.resolve(Buffer.from(mockCode)),
+        );
+      });
+
+      const result = await getLambdaFunctionContents(mockClient, {
+        codeLocation: mockCodeLocation,
+        runtime: "nodejs20.x",
+        includePackageJson: false,
+      });
+      expect(result).toEqual({
+        codeMap: new Map([["index.js", mockCode]]),
+      });
     });
 
     it("returns multiple package.json files", async () => {
@@ -166,6 +194,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
       });
       expect(result).toEqual({
         codeMap: new Map(),
@@ -191,6 +220,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
       });
       expect(result).toEqual({
         codeMap: new Map(),
@@ -215,6 +245,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
       });
       expect(result).toEqual({
         codeMap: new Map(),
@@ -238,6 +269,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map([["index.js", mockCode]]) });
     });
@@ -253,6 +285,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map([["index.mjs", mockCode]]) });
     });
@@ -268,6 +301,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map([["index.cjs", mockCode]]) });
     });
@@ -283,6 +317,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map([["index.ts", mockCode]]) });
     });
@@ -301,6 +336,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({
         codeMap: new Map([
@@ -321,6 +357,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map() });
     });
@@ -336,6 +373,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
       });
       expect(result).toEqual({ codeMap: new Map() });
     });
@@ -359,6 +397,7 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
         layers: [{ Arn: mockLayerArn }],
       });
 
@@ -380,10 +419,28 @@ describe("getLambdaFunctionContents", () => {
       const result = await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: false,
         layers: [{}],
       });
 
       expect(mockClient.getLayerVersionByArn).not.toHaveBeenCalled();
+      expect(result).toEqual({ codeMap: new Map() });
+    });
+
+    it("skips layer processing when includePackageJson is false", async () => {
+      const { getLambdaFunctionContents } = await import("./getLambdaFunctionContents.ts");
+      const mockLayerArn = "arn:aws:lambda:us-east-1:123456789012:layer:test-layer:1";
+      vi.mocked(processZipEntries).mockResolvedValue();
+
+      const result = await getLambdaFunctionContents(mockClient, {
+        codeLocation: mockCodeLocation,
+        runtime: "nodejs20.x",
+        includePackageJson: false,
+        layers: [{ Arn: mockLayerArn }],
+      });
+
+      expect(mockClient.getLayerVersionByArn).not.toHaveBeenCalled();
+      expect(getLambdaLayerContents).not.toHaveBeenCalled();
       expect(result).toEqual({ codeMap: new Map() });
     });
 
@@ -402,6 +459,7 @@ describe("getLambdaFunctionContents", () => {
       await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
         layers: [{ Arn: mockLayerArn }],
       });
 
@@ -409,6 +467,7 @@ describe("getLambdaFunctionContents", () => {
       await getLambdaFunctionContents(mockClient, {
         codeLocation: mockCodeLocation,
         runtime: "nodejs20.x",
+        includePackageJson: true,
         layers: [{ Arn: mockLayerArn }],
       });
 
