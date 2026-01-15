@@ -1,5 +1,11 @@
 # @aws-sdk/find-v2
 
+## 0.8.0
+
+### Minor Changes
+
+- Skip extraction of package.json files and checking for version numbers by default ([ae063be02d2dc7758172f8d23e6c472e0df29ee7](https://github.com/awslabs/aws-sdk-js-find-v2/commit/ae063be02d2dc7758172f8d23e6c472e0df29ee7))
+
 ## 0.7.3
 
 ### Patch Changes
