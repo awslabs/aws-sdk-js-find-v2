@@ -9,7 +9,6 @@ describe("CLI", () => {
   const mockOptions = {
     yes: false,
     node: ">=20",
-    sdk: ">=2.0.0",
     jobs: cpus().length,
     output: LambdaCommandOutputType.json,
   };
