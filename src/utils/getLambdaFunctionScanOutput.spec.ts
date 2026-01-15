@@ -42,14 +42,13 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Function Code location not found.",
     });
@@ -66,46 +65,46 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Locations: ["index.js"],
     });
-    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, { codeLocation, runtime });
-    expect(hasSdkV2InBundle).toHaveBeenCalledWith("bundle content", sdkVersionRange);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: false,
+    });
+    expect(hasSdkV2InBundle).toHaveBeenCalledWith("bundle content", undefined);
     expect(hasSdkV2InFile).not.toHaveBeenCalled();
   });
 
-  it("detects aws-sdk in source code with exact version in package.json dependencies", async () => {
+  it("detects aws-sdk in source code", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.mjs", 'import AWS from "aws-sdk";']]),
-      packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"2.0.0"}}']]),
     });
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: true,
       AwsSdkJsV2Locations: ["index.mjs"],
     });
-    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, { codeLocation, runtime });
   });
 
-  it("ignores aws-sdk in source code if exact version of SDK version can't be found", async () => {
+  it("ignores aws-sdk in source code if exact version of SDK version can't be found when sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.mjs", 'import AWS from "aws-sdk";']]),
       packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
@@ -124,27 +123,29 @@ describe("getLambdaFunctionScanOutput", () => {
       SdkVersion: sdkVersionRange,
       ContainsAwsSdkJsV2: false,
     });
-    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, { codeLocation, runtime });
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
   it("returns false when aws-sdk not found in code", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", "no sdk here"]]),
-      packageJsonMap: new Map([["package.json", '{"dependencies":{}}']]),
     });
     vi.mocked(hasSdkV2InFile).mockReturnValue(false);
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: false,
     });
   });
@@ -155,38 +156,36 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: false,
     });
     expect(hasSdkV2InBundle).not.toHaveBeenCalled();
     expect(hasSdkV2InFile).not.toHaveBeenCalled();
   });
 
-  it("returns false for invalid package.json", async () => {
+  it("detects aws-sdk when sdkVersionRange not defined even with invalid package.json", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
-      packageJsonMap: new Map([["package.json", "invalid json"]]),
     });
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
-      ContainsAwsSdkJsV2: false,
+      SdkVersion: ">=2.0.0",
+      ContainsAwsSdkJsV2: true,
+      AwsSdkJsV2Locations: ["index.js"],
     });
   });
 
@@ -196,14 +195,13 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error downloading or reading Lambda function code: Download failed",
     });
@@ -215,14 +213,13 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result).toEqual({
       FunctionName: functionName,
       Region: region,
       Runtime: runtime,
-      SdkVersion: sdkVersionRange,
+      SdkVersion: ">=2.0.0",
       ContainsAwsSdkJsV2: null,
       AwsSdkJsV2Error: "Error downloading or reading Lambda function code",
     });
@@ -248,9 +245,14 @@ describe("getLambdaFunctionScanOutput", () => {
       SdkVersion: `<${sdkVersion}`,
       ContainsAwsSdkJsV2: false,
     });
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
-  it("returns false when version satisfies check throws", async () => {
+  it("returns false when version satisfies check throws when sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
       packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"invalid"}}']]),
@@ -263,9 +265,14 @@ describe("getLambdaFunctionScanOutput", () => {
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(false);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
-  it("uses version from node_modules/aws-sdk/package.json when dependency is a range", async () => {
+  it("uses version from node_modules/aws-sdk/package.json when dependency is a range and sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
       packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
@@ -276,10 +283,16 @@ describe("getLambdaFunctionScanOutput", () => {
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
+      region,
       sdkVersionRange: ">=2.1692.0",
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(true);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
   it("uses version from node_modules/aws-sdk/package.json when package.json is not defined", async () => {
@@ -293,13 +306,12 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(true);
   });
 
-  it("uses version from nested node_modules/aws-sdk/package.json", async () => {
+  it("uses version from nested node_modules/aws-sdk/package.json when sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["subdir/index.js", 'require("aws-sdk")']]),
       packageJsonMap: new Map([["subdir/package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
@@ -310,13 +322,19 @@ describe("getLambdaFunctionScanOutput", () => {
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
+      region,
       sdkVersionRange: ">=2.1000.0",
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(true);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
-  it("falls back to root node_modules when nested not found", async () => {
+  it("falls back to root node_modules when nested not found and sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["subdir/index.js", 'require("aws-sdk")']]),
       packageJsonMap: new Map([["subdir/package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
@@ -327,13 +345,19 @@ describe("getLambdaFunctionScanOutput", () => {
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
+      region,
       sdkVersionRange: ">=2.500.0",
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(true);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
-  it("ignores invalid aws-sdk package.json in node_modules if version in package.json dependencies is exact", async () => {
+  it("detects aws-sdk with exact version in package.json when sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
       packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"2.0.0"}}']]),
@@ -347,9 +371,14 @@ describe("getLambdaFunctionScanOutput", () => {
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(true);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
-  it("returns false for invalid aws-sdk package.json in node_modules if version in package.json dependencies is not exact", async () => {
+  it("returns false for invalid aws-sdk package.json in node_modules when version in package.json is not exact and sdkVersionRange is defined", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
       packageJsonMap: new Map([["package.json", '{"dependencies":{"aws-sdk":"^2.0.0"}}']]),
@@ -363,21 +392,24 @@ describe("getLambdaFunctionScanOutput", () => {
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(false);
+    expect(getLambdaFunctionContents).toHaveBeenCalledWith(mockClient, {
+      codeLocation,
+      runtime,
+      includePackageJson: true,
+    });
   });
 
-  it("returns false when sdk found in code but not in package.json dependencies", async () => {
+  it("detects aws-sdk in code even without package.json dependencies", async () => {
     vi.mocked(getLambdaFunctionContents).mockResolvedValue({
       codeMap: new Map([["index.js", 'require("aws-sdk")']]),
-      packageJsonMap: new Map([["package.json", '{"dependencies":{}}']]),
     });
 
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
-    expect(result.ContainsAwsSdkJsV2).toBe(false);
+    expect(result.ContainsAwsSdkJsV2).toBe(true);
   });
 
   it("checks multiple handler file extensions", async () => {
@@ -396,7 +428,6 @@ describe("getLambdaFunctionScanOutput", () => {
     const result = await getLambdaFunctionScanOutput(mockClient, {
       functionName,
       region,
-      sdkVersionRange,
     });
 
     expect(result.ContainsAwsSdkJsV2).toBe(true);

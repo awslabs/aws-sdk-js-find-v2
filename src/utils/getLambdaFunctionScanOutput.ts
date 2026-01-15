@@ -84,7 +84,7 @@ export const getLambdaFunctionScanOutput = async (
     lambdaFunctionContents = await getLambdaFunctionContents(client, {
       codeLocation,
       runtime,
-      includePackageJson: !sdkVersionRange,
+      includePackageJson: !!sdkVersionRange,
       layers: response.Configuration?.Layers,
     });
   } catch (error) {
