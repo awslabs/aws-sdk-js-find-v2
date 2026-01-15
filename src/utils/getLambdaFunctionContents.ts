@@ -18,6 +18,11 @@ export interface LambdaFunctionContentsOptions {
   runtime: Runtime;
 
   /**
+   * Include package.json files.
+   */
+  includePackageJson: boolean;
+
+  /**
    * The function's layers
    */
   layers?: Layer[];
@@ -58,32 +63,35 @@ const lambdaLayerCache = new Map<string, LambdaLayerContents>();
  * @param options - Configuration options for content extraction
  * @param options.codeLocation - Presigned URL to download the Lambda function code
  * @param options.runtime - Lambda runtime identifier (e.g., 'nodejs20.x')
+ * @param options.includePackageJson - Whether to include package.json files in the extraction
  * @param options.layers - Array of Lambda layers attached to the function
  * @returns Promise resolving to categorized file contents with optional maps for package.json and AWS SDK files
  */
 export const getLambdaFunctionContents = async (
   client: Lambda,
-  { codeLocation, runtime, layers = [] }: LambdaFunctionContentsOptions,
+  { codeLocation, runtime, includePackageJson, layers = [] }: LambdaFunctionContentsOptions,
 ): Promise<LambdaFunctionContents> => {
   const codeMap = new Map<string, string>();
   const packageJsonMap = new Map<string, string>();
   const awsSdkPackageJsonMap = new Map<string, string>();
 
-  // Populate awsSdkPackageJsonMap with layers first.
-  for (const layer of layers) {
-    if (!layer.Arn) continue;
+  if (includePackageJson) {
+    // Populate awsSdkPackageJsonMap with layers.
+    for (const layer of layers) {
+      if (!layer.Arn) continue;
 
-    if (!lambdaLayerCache.has(layer.Arn)) {
-      const response = await client.getLayerVersionByArn({ Arn: layer.Arn });
-      const layerContents = response.Content?.Location
-        ? await getLambdaLayerContents(response.Content.Location)
-        : new Map();
-      lambdaLayerCache.set(layer.Arn, layerContents);
+      if (!lambdaLayerCache.has(layer.Arn)) {
+        const response = await client.getLayerVersionByArn({ Arn: layer.Arn });
+        const layerContents = response.Content?.Location
+          ? await getLambdaLayerContents(response.Content.Location)
+          : new Map();
+        lambdaLayerCache.set(layer.Arn, layerContents);
+      }
+
+      const layerContents = lambdaLayerCache.get(layer.Arn) || new Map();
+      const version = getSdkVersionFromLambdaLayerContents(layerContents, runtime);
+      if (version) awsSdkPackageJsonMap.set(AWS_SDK_PACKAGE_JSON, JSON.stringify({ version }));
     }
-
-    const layerContents = lambdaLayerCache.get(layer.Arn) || new Map();
-    const version = getSdkVersionFromLambdaLayerContents(layerContents, runtime);
-    if (version) awsSdkPackageJsonMap.set(AWS_SDK_PACKAGE_JSON, JSON.stringify({ version }));
   }
 
   await processRemoteZip(codeLocation, async (zipPath) => {
@@ -91,21 +99,21 @@ export const getLambdaFunctionContents = async (
       if (!entry.isFile) return;
 
       try {
-        // Handle aws-sdk package.json in node_modules
-        if (entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) {
-          awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
-        }
-
-        // Handle files outside of node_modules
-        else if (!entry.name.includes(`${NODE_MODULES}/`)) {
-          // Handle package.json
-          if (entry.name.endsWith(PACKAGE_JSON)) {
-            packageJsonMap.set(entry.name, (await getData()).toString());
-          }
+        if (!entry.name.includes(`${NODE_MODULES}/`)) {
           // Handle JS/TS files
-          else if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
+          if (entry.name.match(/\.(js|ts|mjs|cjs)$/)) {
             codeMap.set(entry.name, (await getData()).toString());
           }
+
+          // Handle package.json
+          if (includePackageJson && entry.name.endsWith(PACKAGE_JSON)) {
+            packageJsonMap.set(entry.name, (await getData()).toString());
+          }
+        }
+
+        // Handle aws-sdk package.json in node_modules
+        if (includePackageJson && entry.name.endsWith(AWS_SDK_PACKAGE_JSON)) {
+          awsSdkPackageJsonMap.set(entry.name, (await getData()).toString());
         }
       } catch {
         // Continue if entry data can't be read.

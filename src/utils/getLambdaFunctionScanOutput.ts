@@ -18,7 +18,7 @@ export interface LambdaFunctionScanOptions {
   region: string;
 
   // Semver range string to check for AWS SDK for JavaScript v2
-  sdkVersionRange: string;
+  sdkVersionRange?: string;
 }
 
 export interface LambdaFunctionScanOutput {
@@ -69,7 +69,7 @@ export const getLambdaFunctionScanOutput = async (
     FunctionName: functionName,
     Region: region,
     Runtime: runtime,
-    SdkVersion: sdkVersionRange,
+    SdkVersion: sdkVersionRange || ">=2.0.0",
     ContainsAwsSdkJsV2: null,
   };
 
@@ -84,6 +84,7 @@ export const getLambdaFunctionScanOutput = async (
     lambdaFunctionContents = await getLambdaFunctionContents(client, {
       codeLocation,
       runtime,
+      includePackageJson: !sdkVersionRange,
       layers: response.Configuration?.Layers,
     });
   } catch (error) {
@@ -127,6 +128,12 @@ export const getLambdaFunctionScanOutput = async (
   // JS SDK v2 not found in source code.
   if (filesWithJsSdkV2.length === 0) {
     output.ContainsAwsSdkJsV2 = false;
+    return output;
+  }
+
+  if (!sdkVersionRange) {
+    output.ContainsAwsSdkJsV2 = true;
+    output.AwsSdkJsV2Locations = filesWithJsSdkV2;
     return output;
   }
 
