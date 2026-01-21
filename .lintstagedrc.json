@@ -1,4 +1,4 @@
 {
-  "*": "oxfmt --check --no-error-on-unmatched-pattern",
+  "*": "oxfmt --no-error-on-unmatched-pattern",
   "src/**/*.ts": "oxlint"
 }
