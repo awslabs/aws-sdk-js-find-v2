@@ -46,7 +46,8 @@
     "format": "oxfmt",
     "test": "vitest",
     "test:generate:bundles": "sh scripts/generateBundles.sh",
-    "release": "yarn build && changeset publish"
+    "release": "yarn build && changeset publish",
+    "prepare": "husky"
   },
   "repository": {
     "type": "git",
