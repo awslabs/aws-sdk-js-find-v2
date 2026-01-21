@@ -1,2 +1,1 @@
-yarn format --check
-yarn lint
+npx lint-staged
