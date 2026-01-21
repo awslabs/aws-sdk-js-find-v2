@@ -1,4 +1,4 @@
 {
-  "*": "yarn format --check --no-error-on-unmatched-pattern",
-  "src/**/*.ts": "yarn lint"
+  "*": "oxfmt --check --no-error-on-unmatched-pattern",
+  "src/**/*.ts": "oxlint"
 }
