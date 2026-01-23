@@ -265,7 +265,7 @@ var require_json = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 					writable: true
 				});
 			}
-		} catch (e$1) {
+		} catch (e) {
 			error.statusCode = httpResponse.statusCode;
 			error.message = httpResponse.statusMessage;
 		}
@@ -785,7 +785,7 @@ var require_rest = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			var paramValue = params[name];
 			if (paramValue === null || paramValue === void 0) return;
 			if (member.location === "uri") {
-				var regex = /* @__PURE__ */ new RegExp("\\{" + member.name + "(\\+)?\\}");
+				var regex = new RegExp("\\{" + member.name + "(\\+)?\\}");
 				uri = uri.replace(regex, function(_, plus) {
 					return (plus ? util.uriEscapePath : util.uriEscape)(String(paramValue));
 				});
@@ -1070,10 +1070,10 @@ var require_xml_node = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* Represents an XML node.
 	* @api private
 	*/
-	function XmlNode(name, children$1) {
-		if (children$1 === void 0) children$1 = [];
+	function XmlNode(name, children) {
+		if (children === void 0) children = [];
 		this.name = name;
-		this.children = children$1;
+		this.children = children;
 		this.attributes = {};
 	}
 	XmlNode.prototype.addAttribute = function(name, value) {
@@ -1268,9 +1268,9 @@ var require_operation = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			var input = self.input;
 			var members = input.members;
 			if (!input.members) return idempotentMembers;
-			for (var name$1 in members) {
-				if (!members.hasOwnProperty(name$1)) continue;
-				if (members[name$1].isIdempotent === true) idempotentMembers.push(name$1);
+			for (var name in members) {
+				if (!members.hasOwnProperty(name)) continue;
+				if (members[name].isIdempotent === true) idempotentMembers.push(name);
 			}
 			return idempotentMembers;
 		});
@@ -3674,10 +3674,10 @@ var require_credentials = /* @__PURE__ */ __commonJSMin((() => {
 		coalesceRefresh: function coalesceRefresh(callback, sync) {
 			var self = this;
 			if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
-				AWS.util.arrayEach(self.refreshCallbacks, function(callback$1) {
-					if (sync) callback$1(err);
+				AWS.util.arrayEach(self.refreshCallbacks, function(callback) {
+					if (sync) callback(err);
 					else AWS.util.defer(function() {
-						callback$1(err);
+						callback(err);
 					});
 				});
 				self.refreshCallbacks.length = 0;
@@ -3767,8 +3767,8 @@ var require_credential_provider_chain = /* @__PURE__ */ __commonJSMin((() => {
 				var providers = self.providers.slice(0);
 				function resolveNext(err, creds) {
 					if (!err && creds || index === providers.length) {
-						AWS.util.arrayEach(self.resolveCallbacks, function(callback$1) {
-							callback$1(err, creds);
+						AWS.util.arrayEach(self.resolveCallbacks, function(callback) {
+							callback(err, creds);
 						});
 						self.resolveCallbacks.length = 0;
 						return;
@@ -4102,10 +4102,10 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 				if (allowUnknownKeys || Object.prototype.hasOwnProperty.call(this.keys, key) || AWS.Service.hasService(key)) this.set(key, value);
 			});
 		},
-		loadFromPath: function loadFromPath(path$3) {
+		loadFromPath: function loadFromPath(path) {
 			this.clear();
-			var options = JSON.parse(AWS.util.readFileSync(path$3));
-			var fileSystemCreds = new AWS.FileSystemCredentials(path$3);
+			var options = JSON.parse(AWS.util.readFileSync(path));
+			var fileSystemCreds = new AWS.FileSystemCredentials(path);
 			var chain = new AWS.CredentialProviderChain();
 			chain.providers.unshift(fileSystemCreds);
 			chain.resolve(function(err, creds) {
@@ -4551,13 +4551,13 @@ var require_discover_endpoint = /* @__PURE__ */ __commonJSMin(((exports, module)
 	* @param [object] client Service client object.
 	* @api private
 	*/
-	function hasCustomEndpoint(client$1) {
-		if (client$1._originalConfig && client$1._originalConfig.endpoint && client$1._originalConfig.endpointDiscoveryEnabled === true) throw util.error(/* @__PURE__ */ new Error(), {
+	function hasCustomEndpoint(client) {
+		if (client._originalConfig && client._originalConfig.endpoint && client._originalConfig.endpointDiscoveryEnabled === true) throw util.error(/* @__PURE__ */ new Error(), {
 			code: "ConfigurationException",
 			message: "Custom endpoint is supplied; endpointDiscoveryEnabled must not be true."
 		});
-		var svcConfig = AWS.config[client$1.serviceIdentifier] || {};
-		return Boolean(AWS.config.endpoint || svcConfig.endpoint || client$1._originalConfig && client$1._originalConfig.endpoint);
+		var svcConfig = AWS.config[client.serviceIdentifier] || {};
+		return Boolean(AWS.config.endpoint || svcConfig.endpoint || client._originalConfig && client._originalConfig.endpoint);
 	}
 	/**
 	* @api private
@@ -4640,7 +4640,6 @@ var require_discover_endpoint = /* @__PURE__ */ __commonJSMin(((exports, module)
 				request.addNamedListener("INVALIDATE_CACHED_ENDPOINTS", "extractError", invalidateCachedEndpoints);
 				requiredDiscoverEndpoint(request, done);
 				break;
-			case "NULL":
 			default:
 				done();
 				break;
@@ -5037,8 +5036,8 @@ var require_event_listeners = /* @__PURE__ */ __commonJSMin((() => {
 			add("EXTRACT_REQUEST_ID", "extractData", AWS.util.extractRequestId);
 			add("EXTRACT_REQUEST_ID", "extractError", AWS.util.extractRequestId);
 			add("ENOTFOUND_ERROR", "httpError", function ENOTFOUND_ERROR(err) {
-				function isDNSError(err$1) {
-					return err$1.errno === "ENOTFOUND" || typeof err$1.errno === "number" && typeof AWS.util.getSystemErrorName === "function" && ["EAI_NONAME", "EAI_NODATA"].indexOf(AWS.util.getSystemErrorName(err$1.errno) >= 0);
+				function isDNSError(err) {
+					return err.errno === "ENOTFOUND" || typeof err.errno === "number" && typeof AWS.util.getSystemErrorName === "function" && ["EAI_NONAME", "EAI_NODATA"].indexOf(AWS.util.getSystemErrorName(err.errno) >= 0);
 				}
 				if (err.code === "NetworkingError" && isDNSError(err)) {
 					var message = "Inaccessible host: `" + err.hostname + "' at port `" + err.port + "'. This service may not be available in the `" + err.region + "' region.";
@@ -6985,7 +6984,7 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 						shouldCheckContentLength = true;
 						var receivedLen = 0;
 					}
-					var checkContentLengthAndEmit = function checkContentLengthAndEmit$1() {
+					var checkContentLengthAndEmit = function checkContentLengthAndEmit() {
 						if (shouldCheckContentLength && receivedLen !== expectedLen) stream.emit("error", AWS.util.error(/* @__PURE__ */ new Error("Stream content length mismatch. Received " + receivedLen + " of " + expectedLen + " bytes."), { code: "StreamContentLengthMismatch" }));
 						else if (AWS.HttpClient.streamsApiVersion === 2) stream.end();
 						else stream.emit("end");
@@ -7828,11 +7827,11 @@ var require_s3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		canonicalizedResource: function canonicalizedResource() {
 			var r = this.request;
 			var parts = r.path.split("?");
-			var path$3 = parts[0];
+			var path = parts[0];
 			var querystring = parts[1];
 			var resource = "";
 			if (r.virtualHostedBucket) resource += "/" + r.virtualHostedBucket;
-			resource += path$3;
+			resource += path;
 			if (querystring) {
 				var resources = [];
 				AWS.util.arrayEach.call(this, querystring.split("&"), function(param) {
@@ -8615,9 +8614,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		engine: function engine() {
 			if (util.isBrowser() && typeof navigator !== "undefined") return navigator.userAgent;
 			else {
-				var engine$1 = process.platform + "/" + process.version;
-				if (process.env.AWS_EXECUTION_ENV) engine$1 += " exec-env/" + process.env.AWS_EXECUTION_ENV;
-				return engine$1;
+				var engine = process.platform + "/" + process.version;
+				if (process.env.AWS_EXECUTION_ENV) engine += " exec-env/" + process.env.AWS_EXECUTION_ENV;
+				return engine;
 			}
 		},
 		userAgent: function userAgent() {
@@ -8652,26 +8651,26 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		},
 		queryParamsToString: function queryParamsToString(params) {
 			var items = [];
-			var escape$1 = util.uriEscape;
+			var escape = util.uriEscape;
 			var sortedKeys = Object.keys(params).sort();
 			util.arrayEach(sortedKeys, function(name) {
 				var value = params[name];
-				var ename = escape$1(name);
+				var ename = escape(name);
 				var result = ename + "=";
 				if (Array.isArray(value)) {
 					var vals = [];
 					util.arrayEach(value, function(item) {
-						vals.push(escape$1(item));
+						vals.push(escape(item));
 					});
 					result = ename + "=" + vals.sort().join("&" + ename + "=");
-				} else if (value !== void 0 && value !== null) result = ename + "=" + escape$1(value);
+				} else if (value !== void 0 && value !== null) result = ename + "=" + escape(value);
 				items.push(result);
 			});
 			return items.join("&");
 		},
-		readFileSync: function readFileSync(path$3) {
+		readFileSync: function readFileSync(path) {
 			if (util.isBrowser()) return null;
-			return require("fs").readFileSync(path$3, "utf-8");
+			return require("fs").readFileSync(path, "utf-8");
 		},
 		base64: {
 			encode: function encode64(string) {
@@ -9299,12 +9298,12 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		computeSha256: function computeSha256(body, done) {
 			if (util.isNode()) {
 				var Stream = util.stream.Stream;
-				var fs$3 = require("fs");
+				var fs = require("fs");
 				if (typeof Stream === "function" && body instanceof Stream) if (typeof body.path === "string") {
 					var settings = {};
 					if (typeof body.start === "number") settings.start = body.start;
 					if (typeof body.end === "number") settings.end = body.end;
-					body = fs$3.createReadStream(body.path, settings);
+					body = fs.createReadStream(body.path, settings);
 				} else return done(/* @__PURE__ */ new Error("Non-file stream objects are not supported with SigV4"));
 			}
 			util.crypto.sha256(body, "hex", function(err, sha) {
@@ -9449,7 +9448,7 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			* Roughly the semantics of `Object.assign(target, source)`
 			*/
 			function objectAssign(target, source) {
-				for (var i$1 = 0, keys = Object.keys(source); i$1 < keys.length; i$1++) target[keys[i$1]] = source[keys[i$1]];
+				for (var i = 0, keys = Object.keys(source); i < keys.length; i++) target[keys[i]] = source[keys[i]];
 				return target;
 			}
 		},
@@ -10388,9 +10387,9 @@ var require_chainable_temporary_credentials = /* @__PURE__ */ __commonJSMin((() 
 					return;
 				}
 				if (tokenCode) params.TokenCode = tokenCode;
-				self.service[operation](params, function(err$1, data) {
-					if (!err$1) self.service.credentialsFrom(data, self);
-					callback(err$1);
+				self.service[operation](params, function(err, data) {
+					if (!err) self.service.credentialsFrom(data, self);
+					callback(err);
 				});
 			});
 		},
@@ -11411,8 +11410,8 @@ var require_process_credentials = /* @__PURE__ */ __commonJSMin((() => {
 					}
 					if (credData.Version !== 1) throw Error("credential_process does not return Version == 1");
 					callback(null, credData);
-				} catch (err$1) {
-					callback(AWS.util.error(new Error(err$1.message), { code: "ProcessCredentialsProviderFailure" }), null);
+				} catch (err) {
+					callback(AWS.util.error(new Error(err.message), { code: "ProcessCredentialsProviderFailure" }), null);
 				}
 			});
 		},
@@ -13150,7 +13149,7 @@ var require_XMLNode = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			XMLNode.prototype.getFeature = function(feature, version) {
 				throw new Error("This DOM method is not implemented." + this.debugInfo());
 			};
-			XMLNode.prototype.setUserData = function(key, data, handler$1) {
+			XMLNode.prototype.setUserData = function(key, data, handler) {
 				throw new Error("This DOM method is not implemented." + this.debugInfo());
 			};
 			XMLNode.prototype.getUserData = function(key) {
@@ -14790,14 +14789,14 @@ var require_sax = /* @__PURE__ */ __commonJSMin(((exports) => {
 			this._parser.end();
 			return true;
 		};
-		SAXStream.prototype.on = function(ev, handler$1) {
+		SAXStream.prototype.on = function(ev, handler) {
 			var me = this;
 			if (!me._parser["on" + ev] && streamWraps.indexOf(ev) !== -1) me._parser["on" + ev] = function() {
 				var args = arguments.length === 1 ? [arguments[0]] : Array.apply(null, arguments);
 				args.splice(0, 0, ev);
 				me.emit.apply(me, args);
 			};
-			return Stream.prototype.on.call(me, ev, handler$1);
+			return Stream.prototype.on.call(me, ev, handler);
 		};
 		var CDATA = "[CDATA[";
 		var DOCTYPE = "DOCTYPE";
@@ -15129,8 +15128,8 @@ var require_sax = /* @__PURE__ */ __commonJSMin(((exports) => {
 		};
 		Object.keys(sax.ENTITIES).forEach(function(key) {
 			var e = sax.ENTITIES[key];
-			var s$1 = typeof e === "number" ? String.fromCharCode(e) : e;
-			sax.ENTITIES[key] = s$1;
+			var s = typeof e === "number" ? String.fromCharCode(e) : e;
+			sax.ENTITIES[key] = s;
 		});
 		for (var s in sax.STATE) sax.STATE[sax.STATE[s]] = s;
 		S = sax.STATE;
@@ -15310,8 +15309,8 @@ var require_sax = /* @__PURE__ */ __commonJSMin(((exports) => {
 				return;
 			}
 			parser.tagName = tagName;
-			var s$1 = parser.tags.length;
-			while (s$1-- > t) {
+			var s = parser.tags.length;
+			while (s-- > t) {
 				var tag = parser.tag = parser.tags.pop();
 				parser.tagName = parser.tag.name;
 				emitNode(parser, "onclosetag", parser.tagName);
@@ -15872,7 +15871,7 @@ var require_processors = /* @__PURE__ */ __commonJSMin(((exports) => {
 var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 	(function() {
 		"use strict";
-		var bom, defaults, defineProperty, events, isEmpty, processItem, processors, sax, setImmediate$1, bind = function(fn, me) {
+		var bom, defaults, defineProperty, events, isEmpty, processItem, processors, sax, setImmediate, bind = function(fn, me) {
 			return function() {
 				return fn.apply(me, arguments);
 			};
@@ -15890,16 +15889,16 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 		events = require("events");
 		bom = require_bom();
 		processors = require_processors();
-		setImmediate$1 = require("timers").setImmediate;
+		setImmediate = require("timers").setImmediate;
 		defaults = require_defaults().defaults;
 		isEmpty = function(thing) {
 			return typeof thing === "object" && thing != null && Object.keys(thing).length === 0;
 		};
-		processItem = function(processors$1, item, key) {
-			var i, len, process$1;
-			for (i = 0, len = processors$1.length; i < len; i++) {
-				process$1 = processors$1[i];
-				item = process$1(item, key);
+		processItem = function(processors, item, key) {
+			var i, len, process;
+			for (i = 0, len = processors.length; i < len; i++) {
+				process = processors[i];
+				item = process(item, key);
 			}
 			return item;
 		};
@@ -15952,7 +15951,7 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 						chunk = this.remaining.substr(0, this.options.chunkSize);
 						this.remaining = this.remaining.substr(this.options.chunkSize, this.remaining.length);
 						this.saxParser = this.saxParser.write(chunk);
-						return setImmediate$1(this.processAsync);
+						return setImmediate(this.processAsync);
 					}
 				} catch (error1) {
 					err = error1;
@@ -16134,9 +16133,9 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 						this.reset();
 						return cb(null, result);
 					});
-					this.on("error", function(err$1) {
+					this.on("error", function(err) {
 						this.reset();
-						return cb(err$1);
+						return cb(err);
 					});
 				}
 				try {
@@ -16148,7 +16147,7 @@ var require_parser = /* @__PURE__ */ __commonJSMin(((exports) => {
 					str = bom.stripBOM(str);
 					if (this.options.async) {
 						this.remaining = str;
-						setImmediate$1(this.processAsync);
+						setImmediate(this.processAsync);
 						return this.saxParser;
 					}
 					return this.saxParser.write(str).close();
@@ -16749,7 +16748,7 @@ var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) 
 			this.filename = options && options.filename;
 			AWS.util.update(this, options);
 		},
-		request: function request(path$3, options, callback) {
+		request: function request(path, options, callback) {
 			if (arguments.length === 2) {
 				callback = options;
 				options = {};
@@ -16758,9 +16757,9 @@ var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) 
 				callback(/* @__PURE__ */ new Error("EC2 Instance Metadata Service access disabled"));
 				return;
 			}
-			path$3 = path$3 || "/";
+			path = path || "/";
 			if (URL) new URL(this.endpoint);
-			var httpRequest = new AWS.HttpRequest(this.endpoint + path$3);
+			var httpRequest = new AWS.HttpRequest(this.endpoint + path);
 			httpRequest.method = options.method || "GET";
 			if (options.headers) httpRequest.headers = options.headers;
 			AWS.util.handleRequestWithRetries(httpRequest, this, callback);
@@ -17417,8 +17416,8 @@ var require_sso_credentials = /* @__PURE__ */ __commonJSMin((() => {
 						region: profile.sso_region,
 						httpOptions: self.httpOptions
 					});
-					self.service.getRoleCredentials(request, function(err$1, data) {
-						if (err$1 || !data || !data.roleCredentials) callback(AWS.util.error(err$1 || /* @__PURE__ */ new Error("Please log in using \"aws sso login\""), { code: self.errorCode }), null);
+					self.service.getRoleCredentials(request, function(err, data) {
+						if (err || !data || !data.roleCredentials) callback(AWS.util.error(err || /* @__PURE__ */ new Error("Please log in using \"aws sso login\""), { code: self.errorCode }), null);
 						else if (!data.roleCredentials.accessKeyId || !data.roleCredentials.secretAccessKey || !data.roleCredentials.sessionToken || !data.roleCredentials.expiration) throw AWS.util.error(/* @__PURE__ */ new Error("SSO returns an invalid temporary credential."));
 						else {
 							self.expired = false;
@@ -17545,10 +17544,10 @@ var require_token = /* @__PURE__ */ __commonJSMin((() => {
 		coalesceRefresh: function coalesceRefresh(callback, sync) {
 			var self = this;
 			if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
-				AWS.util.arrayEach(self.refreshCallbacks, function(callback$1) {
-					if (sync) callback$1(err);
+				AWS.util.arrayEach(self.refreshCallbacks, function(callback) {
+					if (sync) callback(err);
 					else AWS.util.defer(function() {
-						callback$1(err);
+						callback(err);
 					});
 				});
 				self.refreshCallbacks.length = 0;
@@ -17635,8 +17634,8 @@ var require_token_provider_chain = /* @__PURE__ */ __commonJSMin((() => {
 				var providers = self.providers.slice(0);
 				function resolveNext(err, token) {
 					if (!err && token || index === providers.length) {
-						AWS.util.arrayEach(self.resolveCallbacks, function(callback$1) {
-							callback$1(err, token);
+						AWS.util.arrayEach(self.resolveCallbacks, function(callback) {
+							callback(err, token);
 						});
 						self.resolveCallbacks.length = 0;
 						return;

@@ -319,7 +319,7 @@ const getSigningKey = async (sha256Constructor, credentials, shortDate, region, 
         return signingKeyCache[cacheKey];
     }
     cacheQueue.push(cacheKey);
-    while (cacheQueue.length > /* inlined export .MAX_CACHE_SIZE */ (50)) {
+    while (cacheQueue.length > (/* inlined export .MAX_CACHE_SIZE */50)) {
         delete signingKeyCache[cacheQueue.shift()];
     }
     let key = `AWS4${credentials.secretAccessKey}`;
@@ -741,7 +741,7 @@ class SignatureV4 extends SignatureV4Base {
         this.validateResolvedCredentials(credentials);
         const region = signingRegion ?? (await this.regionProvider());
         const { longDate, shortDate } = this.formatDate(signingDate);
-        if (expiresIn > /* inlined export .MAX_PRESIGNED_TTL */ (604800)) {
+        if (expiresIn > (/* inlined export .MAX_PRESIGNED_TTL */604800)) {
             return Promise.reject("Signature version 4 presigned URLs" + " must have an expiration date less than one week in" + " the future");
         }
         const scope = createScope(shortDate, region, signingService ?? this.service);
@@ -5788,8 +5788,8 @@ var dist_es_profile = __webpack_require__(5578);
 
 
 const getSsoSessionData = (data) => Object.entries(data)
-    .filter(([key]) => key.startsWith(dist_es_profile/* .IniSectionType.SSO_SESSION */.I.SSO_SESSION + /* inlined export .CONFIG_PREFIX_SEPARATOR */ (".")))
-    .reduce((acc, [key, value]) => ({ ...acc, [key.substring(key.indexOf(/* inlined export .CONFIG_PREFIX_SEPARATOR */ (".")) + 1)]: value }), {});
+    .filter(([key]) => key.startsWith(dist_es_profile/* .IniSectionType.SSO_SESSION */.I.SSO_SESSION + (/* inlined export .CONFIG_PREFIX_SEPARATOR */".")))
+    .reduce((acc, [key, value]) => ({ ...acc, [key.substring(key.indexOf((/* inlined export .CONFIG_PREFIX_SEPARATOR */".")) + 1)]: value }), {});
 
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseIni.js
 var parseIni = __webpack_require__(1476);
@@ -5937,7 +5937,7 @@ const fromSso = (init = {}) => async ({ callerClientConfig } = {}) => {
     validateTokenKey("expiresAt", ssoToken.expiresAt);
     const { accessToken, expiresAt } = ssoToken;
     const existingToken = { token: accessToken, expiration: new Date(expiresAt) };
-    if (existingToken.expiration.getTime() - Date.now() > /* inlined export .EXPIRE_WINDOW_MS */ (300000)) {
+    if (existingToken.expiration.getTime() - Date.now() > (/* inlined export .EXPIRE_WINDOW_MS */300000)) {
         return existingToken;
     }
     if (Date.now() - lastRefreshAttemptTime.getTime() < 30 * 1000) {
@@ -7350,11 +7350,11 @@ const userAgentMiddleware = (options) => (next, context) => async (args) => {
     const prefix = (0,dist_es/* .getUserAgentPrefix */.vL)();
     const sdkUserAgentValue = (prefix ? [prefix] : [])
         .concat([...defaultUserAgent, ...userAgent, ...customUserAgent])
-        .join(/* inlined export .SPACE */ (" "));
+        .join((/* inlined export .SPACE */" "));
     const normalUAValue = [
         ...defaultUserAgent.filter((section) => section.startsWith("aws-sdk-")),
         ...customUserAgent,
-    ].join(/* inlined export .SPACE */ (" "));
+    ].join((/* inlined export .SPACE */" "));
     if (options.runtime !== "browser") {
         if (normalUAValue) {
             headers[X_AMZ_USER_AGENT] = headers[X_AMZ_USER_AGENT]
@@ -7373,11 +7373,11 @@ const userAgentMiddleware = (options) => (next, context) => async (args) => {
 };
 const escapeUserAgent = (userAgentPair) => {
     const name = userAgentPair[0]
-        .split(/* inlined export .UA_NAME_SEPARATOR */ ("/"))
-        .map((part) => part.replace(UA_NAME_ESCAPE_REGEX, /* inlined export .UA_ESCAPE_CHAR */ ("-")))
-        .join(/* inlined export .UA_NAME_SEPARATOR */ ("/"));
-    const version = userAgentPair[1]?.replace(UA_VALUE_ESCAPE_REGEX, /* inlined export .UA_ESCAPE_CHAR */ ("-"));
-    const prefixSeparatorIndex = name.indexOf(/* inlined export .UA_NAME_SEPARATOR */ ("/"));
+        .split((/* inlined export .UA_NAME_SEPARATOR */"/"))
+        .map((part) => part.replace(UA_NAME_ESCAPE_REGEX, (/* inlined export .UA_ESCAPE_CHAR */"-")))
+        .join((/* inlined export .UA_NAME_SEPARATOR */"/"));
+    const version = userAgentPair[1]?.replace(UA_VALUE_ESCAPE_REGEX, (/* inlined export .UA_ESCAPE_CHAR */"-"));
+    const prefixSeparatorIndex = name.indexOf((/* inlined export .UA_NAME_SEPARATOR */"/"));
     const prefix = name.substring(0, prefixSeparatorIndex);
     let uaName = name.substring(prefixSeparatorIndex + 1);
     if (prefix === "api") {
@@ -12647,10 +12647,10 @@ const getEndpointUrlConfig = (serviceId) => ({
     },
     configFileSelector: (profile, config) => {
         if (config && profile.services) {
-            const servicesSection = config[["services", profile.services].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."))];
+            const servicesSection = config[["services", profile.services].join((/* inlined export .CONFIG_PREFIX_SEPARATOR */"."))];
             if (servicesSection) {
                 const servicePrefixParts = serviceId.split(" ").map((w) => w.toLowerCase());
-                const endpointUrl = servicesSection[[servicePrefixParts.join("_"), CONFIG_ENDPOINT_URL].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."))];
+                const endpointUrl = servicesSection[[servicePrefixParts.join("_"), CONFIG_ENDPOINT_URL].join((/* inlined export .CONFIG_PREFIX_SEPARATOR */"."))];
                 if (endpointUrl)
                     return endpointUrl;
             }
@@ -13113,9 +13113,9 @@ class DefaultRateLimiter {
 ;// CONCATENATED MODULE: ./node_modules/@smithy/util-retry/dist-es/defaultRetryBackoffStrategy.js
 
 const getDefaultRetryBackoffStrategy = () => {
-    let delayBase = /* inlined export .DEFAULT_RETRY_DELAY_BASE */ (100);
+    let delayBase = (/* inlined export .DEFAULT_RETRY_DELAY_BASE */100);
     const computeNextBackoffDelay = (attempts) => {
-        return Math.floor(Math.min(/* inlined export .MAXIMUM_RETRY_DELAY */ (20000), Math.random() * 2 ** attempts * delayBase));
+        return Math.floor(Math.min((/* inlined export .MAXIMUM_RETRY_DELAY */20000), Math.random() * 2 ** attempts * delayBase));
     };
     const setDelayBase = (delay) => {
         delayBase = delay;
@@ -13130,7 +13130,7 @@ const getDefaultRetryBackoffStrategy = () => {
 
 const createDefaultRetryToken = ({ retryDelay, retryCount, retryCost, }) => {
     const getRetryCount = () => retryCount;
-    const getRetryDelay = () => Math.min(/* inlined export .MAXIMUM_RETRY_DELAY */ (20000), retryDelay);
+    const getRetryDelay = () => Math.min((/* inlined export .MAXIMUM_RETRY_DELAY */20000), retryDelay);
     const getRetryCost = () => retryCost;
     return {
         getRetryCount,
@@ -13147,7 +13147,7 @@ const createDefaultRetryToken = ({ retryDelay, retryCount, retryCost, }) => {
 class StandardRetryStrategy {
     maxAttempts;
     mode = config/* .RETRY_MODES.STANDARD */.c.STANDARD;
-    capacity = /* inlined export .INITIAL_RETRY_TOKENS */ (500);
+    capacity = (/* inlined export .INITIAL_RETRY_TOKENS */500);
     retryBackoffStrategy = getDefaultRetryBackoffStrategy();
     maxAttemptsProvider;
     constructor(maxAttempts) {
@@ -13156,7 +13156,7 @@ class StandardRetryStrategy {
     }
     async acquireInitialRetryToken(retryTokenScope) {
         return createDefaultRetryToken({
-            retryDelay: /* inlined export .DEFAULT_RETRY_DELAY_BASE */ (100),
+            retryDelay: (/* inlined export .DEFAULT_RETRY_DELAY_BASE */100),
             retryCount: 0,
         });
     }
@@ -13164,7 +13164,7 @@ class StandardRetryStrategy {
         const maxAttempts = await this.getMaxAttempts();
         if (this.shouldRetry(token, errorInfo, maxAttempts)) {
             const errorType = errorInfo.errorType;
-            this.retryBackoffStrategy.setDelayBase(errorType === "THROTTLING" ? /* inlined export .THROTTLING_RETRY_DELAY_BASE */ (500) : /* inlined export .DEFAULT_RETRY_DELAY_BASE */ (100));
+            this.retryBackoffStrategy.setDelayBase(errorType === "THROTTLING" ? (/* inlined export .THROTTLING_RETRY_DELAY_BASE */500) : (/* inlined export .DEFAULT_RETRY_DELAY_BASE */100));
             const delayFromErrorType = this.retryBackoffStrategy.computeNextBackoffDelay(token.getRetryCount());
             const retryDelay = errorInfo.retryAfterHint
                 ? Math.max(errorInfo.retryAfterHint.getTime() - Date.now() || 0, delayFromErrorType)
@@ -13180,7 +13180,7 @@ class StandardRetryStrategy {
         throw new Error("No retry token available");
     }
     recordSuccess(token) {
-        this.capacity = Math.max(/* inlined export .INITIAL_RETRY_TOKENS */ (500), this.capacity + (token.getRetryCost() ?? /* inlined export .NO_RETRY_INCREMENT */ (1)));
+        this.capacity = Math.max((/* inlined export .INITIAL_RETRY_TOKENS */500), this.capacity + (token.getRetryCost() ?? (/* inlined export .NO_RETRY_INCREMENT */1)));
     }
     getCapacity() {
         return this.capacity;
@@ -13190,8 +13190,8 @@ class StandardRetryStrategy {
             return await this.maxAttemptsProvider();
         }
         catch (error) {
-            console.warn(`Max attempts provider could not resolve. Using default of ${/* inlined export .DEFAULT_MAX_ATTEMPTS */ (3)}`);
-            return /* inlined export .DEFAULT_MAX_ATTEMPTS */ (3);
+            console.warn(`Max attempts provider could not resolve. Using default of ${(/* inlined export .DEFAULT_MAX_ATTEMPTS */3)}`);
+            return (/* inlined export .DEFAULT_MAX_ATTEMPTS */3);
         }
     }
     shouldRetry(tokenToRenew, errorInfo, maxAttempts) {
@@ -13201,7 +13201,7 @@ class StandardRetryStrategy {
             this.isRetryableError(errorInfo.errorType));
     }
     getCapacityCost(errorType) {
-        return errorType === "TRANSIENT" ? /* inlined export .TIMEOUT_RETRY_COST */ (10) : /* inlined export .RETRY_COST */ (5);
+        return errorType === "TRANSIENT" ? (/* inlined export .TIMEOUT_RETRY_COST */10) : (/* inlined export .RETRY_COST */5);
     }
     isRetryableError(errorType) {
         return errorType === "THROTTLING" || errorType === "TRANSIENT";
@@ -13263,11 +13263,11 @@ const NODE_MAX_ATTEMPT_CONFIG_OPTIONS = {
         }
         return maxAttempt;
     },
-    default: /* inlined export .DEFAULT_MAX_ATTEMPTS */ (3),
+    default: (/* inlined export .DEFAULT_MAX_ATTEMPTS */3),
 };
 const resolveRetryConfig = (input) => {
     const { retryStrategy, retryMode: _retryMode, maxAttempts: _maxAttempts } = input;
-    const maxAttempts = (0,normalizeProvider/* .normalizeProvider */.t)(_maxAttempts ?? /* inlined export .DEFAULT_MAX_ATTEMPTS */ (3));
+    const maxAttempts = (0,normalizeProvider/* .normalizeProvider */.t)(_maxAttempts ?? (/* inlined export .DEFAULT_MAX_ATTEMPTS */3));
     return Object.assign(input, {
         maxAttempts,
         retryStrategy: async () => {
@@ -14838,14 +14838,14 @@ var profile = __webpack_require__(5578);
 
 const getConfigData = (data) => Object.entries(data)
     .filter(([key]) => {
-    const indexOfSeparator = key.indexOf(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."));
+    const indexOfSeparator = key.indexOf((/* inlined export .CONFIG_PREFIX_SEPARATOR */"."));
     if (indexOfSeparator === -1) {
         return false;
     }
     return Object.values(profile/* .IniSectionType */.I).includes(key.substring(0, indexOfSeparator));
 })
     .reduce((acc, [key, value]) => {
-    const indexOfSeparator = key.indexOf(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."));
+    const indexOfSeparator = key.indexOf((/* inlined export .CONFIG_PREFIX_SEPARATOR */"."));
     const updatedKey = key.substring(0, indexOfSeparator) === profile/* .IniSectionType.PROFILE */.I.PROFILE ? key.substring(indexOfSeparator + 1) : key;
     acc[updatedKey] = value;
     return acc;
@@ -14934,7 +14934,7 @@ const parseIni = (iniData) => {
             if (matches) {
                 const [, prefix, , name] = matches;
                 if (Object.values(_smithy_types__rspack_import_0/* .IniSectionType */.I).includes(prefix)) {
-                    currentSection = [prefix, name].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ ("."));
+                    currentSection = [prefix, name].join((/* inlined export .CONFIG_PREFIX_SEPARATOR */"."));
                 }
             }
             else {
@@ -14959,7 +14959,7 @@ const parseIni = (iniData) => {
                         currentSubSection = undefined;
                     }
                     map[currentSection] = map[currentSection] || {};
-                    const key = currentSubSection ? [currentSubSection, name].join(/* inlined export .CONFIG_PREFIX_SEPARATOR */ (".")) : name;
+                    const key = currentSubSection ? [currentSubSection, name].join((/* inlined export .CONFIG_PREFIX_SEPARATOR */".")) : name;
                     map[currentSection][key] = value;
                 }
             }
