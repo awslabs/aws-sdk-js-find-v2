@@ -3,7 +3,6 @@
   "version": "0.8.0",
   "description": "CLI to find resources which call AWS using JavaScript SDK v2",
   "main": "dist/cli.js",
-  "types": "dist/cli.d.ts",
   "bin": "bin/@aws-sdk/find-v2",
   "dependencies": {
     "@aws-sdk/client-lambda": "^3.942.0",
