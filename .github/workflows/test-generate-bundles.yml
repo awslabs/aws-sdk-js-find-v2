@@ -16,17 +16,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
-      - uses: docker/setup-buildx-action@v3
-      - name: build docker image
-        uses: docker/build-push-action@v6
-        with:
-          context: scripts
-          load: true
-          tags: generate-bundles
-          cache-from: type=gha,scope=${{ hashFiles('yarn.lock') }}
-          cache-to: type=gha,mode=max,scope=${{ hashFiles('yarn.lock') }}
+      - uses: runfinch/finch-action@v1
       - name: test generate bundles
-        run: sh scripts/generateBundles.sh --skip-build
+        run: sh scripts/generateBundles.sh
       - name: check for changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
