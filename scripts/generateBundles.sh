@@ -1,6 +1,4 @@
 #!/bin/sh
 set -e
-if [ "$1" != "--skip-build" ]; then
-  finch build -t generate-bundles scripts
-fi
+finch build -t generate-bundles scripts
 finch run --rm -v "$(pwd)":/app generate-bundles
