@@ -26,7 +26,7 @@ jobs:
           cache-from: type=gha,scope=${{ hashFiles('yarn.lock') }}
           cache-to: type=gha,mode=max,scope=${{ hashFiles('yarn.lock') }}
       - name: test generate bundles
-        run: sh scripts/generateBundles.sh --skip-build
+        run: docker run --rm -v "$(pwd)":/app generate-bundles
       - name: check for changes
         run: |
           if [ -n "$(git status --porcelain)" ]; then
