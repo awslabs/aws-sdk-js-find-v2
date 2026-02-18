@@ -787,8 +787,15 @@ function writeBody(httpRequest, body) {
         return;
     }
     if (body) {
-        if (Buffer.isBuffer(body) || typeof body === "string") {
-            httpRequest.end(body);
+        const isBuffer = Buffer.isBuffer(body);
+        const isString = typeof body === "string";
+        if (isBuffer || isString) {
+            if (isBuffer && body.byteLength === 0) {
+                httpRequest.end();
+            }
+            else {
+                httpRequest.end(body);
+            }
             return;
         }
         const uint8 = body;
@@ -855,7 +862,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
         });
     }
     resolveDefaultConfig(options) {
-        const { requestTimeout, connectionTimeout, socketTimeout, socketAcquisitionWarningTimeout, httpAgent, httpsAgent, throwOnRequestTimeout, } = options || {};
+        const { requestTimeout, connectionTimeout, socketTimeout, socketAcquisitionWarningTimeout, httpAgent, httpsAgent, throwOnRequestTimeout, logger, } = options || {};
         const keepAlive = true;
         const maxSockets = 50;
         return {
@@ -878,7 +885,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
                 }
                 return new Agent({ keepAlive, maxSockets, ...httpsAgent });
             })(),
-            logger: console,
+            logger,
         };
     }
     destroy() {
@@ -1417,6 +1424,9 @@ function translateTraits(indicator) {
     return traits;
 }
 
+const anno = {
+    it: Symbol.for("@smithy/nor-struct-it"),
+};
 class NormalizedSchema {
     ref;
     memberName;
@@ -1497,7 +1507,7 @@ class NormalizedSchema {
     }
     getSchema() {
         const sc = this.schema;
-        if (sc[0] === 0) {
+        if (Array.isArray(sc) && sc[0] === 0) {
             return sc[4];
         }
         return sc;
@@ -1527,6 +1537,9 @@ class NormalizedSchema {
     }
     isStructSchema() {
         const sc = this.getSchema();
+        if (typeof sc !== "object") {
+            return false;
+        }
         const id = sc[0];
         return (id === 3 ||
             id === -3 ||
@@ -1534,6 +1547,9 @@ class NormalizedSchema {
     }
     isUnionSchema() {
         const sc = this.getSchema();
+        if (typeof sc !== "object") {
+            return false;
+        }
         return sc[0] === 4;
     }
     isBlobSchema() {
@@ -1572,10 +1588,7 @@ class NormalizedSchema {
         return !!streaming || this.getSchema() === 42;
     }
     isIdempotencyToken() {
-        const match = (traits) => (traits & 0b0100) === 0b0100 ||
-            !!traits?.idempotencyToken;
-        const { normalizedTraits, traits, memberTraits } = this;
-        return match(normalizedTraits) || match(traits) || match(memberTraits);
+        return !!this.getMergedTraits().idempotencyToken;
     }
     getMergedTraits() {
         return (this.normalizedTraits ??
@@ -1656,9 +1669,19 @@ class NormalizedSchema {
             throw new Error("@smithy/core/schema - cannot iterate non-struct schema.");
         }
         const struct = this.getSchema();
-        for (let i = 0; i < struct[4].length; ++i) {
-            yield [struct[4][i], member([struct[5][i], 0], struct[4][i])];
+        const z = struct[4].length;
+        let it = struct[anno.it];
+        if (it && z === it.length) {
+            yield* it;
+            return;
         }
+        it = Array(z);
+        for (let i = 0; i < z; ++i) {
+            const k = struct[4][i];
+            const v = member([struct[5][i], 0], k);
+            yield (it[i] = [k, v]);
+        }
+        struct[anno.it] = it;
     }
 }
 function member(memberSchema, memberName) {
@@ -1690,10 +1713,24 @@ class TypeRegistry {
         }
         return TypeRegistry.registries.get(namespace);
     }
+    copyFrom(other) {
+        const { schemas, exceptions } = this;
+        for (const [k, v] of other.schemas) {
+            if (!schemas.has(k)) {
+                schemas.set(k, v);
+            }
+        }
+        for (const [k, v] of other.exceptions) {
+            if (!exceptions.has(k)) {
+                exceptions.set(k, v);
+            }
+        }
+    }
     register(shapeId, schema) {
         const qualifiedName = this.normalizeShapeId(shapeId);
-        const registry = TypeRegistry.for(qualifiedName.split("#")[0]);
-        registry.schemas.set(qualifiedName, schema);
+        for (const r of [this, TypeRegistry.for(qualifiedName.split("#")[0])]) {
+            r.schemas.set(qualifiedName, schema);
+        }
     }
     getSchema(shapeId) {
         const id = this.normalizeShapeId(shapeId);
@@ -1704,12 +1741,17 @@ class TypeRegistry {
     }
     registerError(es, ctor) {
         const $error = es;
-        const registry = TypeRegistry.for($error[1]);
-        registry.schemas.set($error[1] + "#" + $error[2], $error);
-        registry.exceptions.set($error, ctor);
+        const ns = $error[1];
+        for (const r of [this, TypeRegistry.for(ns)]) {
+            r.schemas.set(ns + "#" + $error[2], $error);
+            r.exceptions.set($error, ctor);
+        }
     }
     getErrorCtor(es) {
         const $error = es;
+        if (this.exceptions.has($error)) {
+            return this.exceptions.get($error);
+        }
         const registry = TypeRegistry.for($error[1]);
         return registry.exceptions.get($error);
     }
@@ -2290,9 +2332,14 @@ class SerdeContext {
 
 class HttpProtocol extends SerdeContext {
     options;
+    compositeErrorRegistry;
     constructor(options) {
         super();
         this.options = options;
+        this.compositeErrorRegistry = TypeRegistry.for(options.defaultNamespace);
+        for (const etr of options.errorTypeRegistries ?? []) {
+            this.compositeErrorRegistry.copyFrom(etr);
+        }
     }
     getRequestType() {
         return HttpRequest;
@@ -2337,6 +2384,9 @@ class HttpProtocol extends SerdeContext {
         }
     }
     setHostPrefix(request, operationSchema, input) {
+        if (this.serdeContext?.disableHostPrefix) {
+            return;
+        }
         const inputNs = NormalizedSchema.of(operationSchema.input);
         const opTraits = translateTraits(operationSchema.traits ?? {});
         if (opTraits.endpoint) {
@@ -2447,6 +2497,11 @@ class HttpBindingProtocol extends HttpProtocol {
             const memberTraits = memberNs.getMergedTraits() ?? {};
             const inputMemberValue = input[memberName];
             if (inputMemberValue == null && !memberNs.isIdempotencyToken()) {
+                if (memberTraits.httpLabel) {
+                    if (request.path.includes(`{${memberName}+}`) || request.path.includes(`{${memberName}}`)) {
+                        throw new Error(`No value provided for input HTTP label: ${memberName}.`);
+                    }
+                }
                 continue;
             }
             if (memberTraits.httpPayload) {
@@ -2569,7 +2624,9 @@ class HttpBindingProtocol extends HttpProtocol {
             if (bytes.byteLength > 0) {
                 const dataFromBody = await deserializer.read(ns, bytes);
                 for (const member of nonHttpBindingMembers) {
-                    dataObject[member] = dataFromBody[member];
+                    if (dataFromBody[member] != null) {
+                        dataObject[member] = dataFromBody[member];
+                    }
                 }
             }
         }
@@ -3571,10 +3628,10 @@ const resolveEndpoint = (ruleSetObject, options) => {
     return endpoint;
 };
 
-const isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
+const isVirtualHostableS3Bucket$1 = (value, allowSubDomains = false) => {
     if (allowSubDomains) {
         for (const label of value.split(".")) {
-            if (!isVirtualHostableS3Bucket(label)) {
+            if (!isVirtualHostableS3Bucket$1(label)) {
                 return false;
             }
         }
@@ -3595,16 +3652,16 @@ const isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
     return true;
 };
 
-const ARN_DELIMITER = ":";
-const RESOURCE_DELIMITER = "/";
-const parseArn = (value) => {
-    const segments = value.split(ARN_DELIMITER);
+const ARN_DELIMITER$1 = ":";
+const RESOURCE_DELIMITER$1 = "/";
+const parseArn$1 = (value) => {
+    const segments = value.split(ARN_DELIMITER$1);
     if (segments.length < 6)
         return null;
     const [arn, partition, service, region, accountId, ...resourcePath] = segments;
-    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER) === "")
+    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER$1) === "")
         return null;
-    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER)).flat();
+    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER$1)).flat();
     return {
         partition,
         service,
@@ -3614,7 +3671,7 @@ const parseArn = (value) => {
     };
 };
 
-var partitions = [
+var partitions$1 = [
 	{
 		id: "aws",
 		outputs: {
@@ -3770,7 +3827,7 @@ var partitions = [
 		regionRegex: "^eusc\\-(de)\\-\\w+\\-\\d+$",
 		regions: {
 			"eusc-de-east-1": {
-				description: "EU (Germany)"
+				description: "AWS European Sovereign Cloud (Germany)"
 			}
 		}
 	},
@@ -3887,12 +3944,12 @@ var partitions = [
 		}
 	}
 ];
-var partitionsInfo = {
-	partitions: partitions};
+var partitionsInfo$1 = {
+	partitions: partitions$1};
 
-let selectedPartitionsInfo = partitionsInfo;
-const partition = (value) => {
-    const { partitions } = selectedPartitionsInfo;
+let selectedPartitionsInfo$1 = partitionsInfo$1;
+const partition$1 = (value) => {
+    const { partitions } = selectedPartitionsInfo$1;
     for (const partition of partitions) {
         const { regions, outputs } = partition;
         for (const [region, regionData] of Object.entries(regions)) {
@@ -3922,12 +3979,12 @@ const partition = (value) => {
     };
 };
 
-const awsEndpointFunctions = {
-    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket,
-    parseArn: parseArn,
-    partition: partition,
+const awsEndpointFunctions$1 = {
+    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket$1,
+    parseArn: parseArn$1,
+    partition: partition$1,
 };
-customEndpointFunctions.aws = awsEndpointFunctions;
+customEndpointFunctions.aws = awsEndpointFunctions$1;
 
 function parseQueryString(querystring) {
     const query = {};
@@ -4731,7 +4788,15 @@ const resolveAwsSdkSigV4Config = (config) => {
             });
             const boundProvider = bindCallerConfig(config, memoizedProvider);
             if (isUserSupplied && !boundProvider.attributed) {
-                resolvedCredentials = async (options) => boundProvider(options).then((creds) => setCredentialFeature(creds, "CREDENTIALS_CODE", "e"));
+                const isCredentialObject = typeof inputCredentials === "object" && inputCredentials !== null;
+                resolvedCredentials = async (options) => {
+                    const creds = await boundProvider(options);
+                    const attributedCreds = creds;
+                    if (isCredentialObject && (!attributedCreds.$source || Object.keys(attributedCreds.$source).length === 0)) {
+                        return setCredentialFeature(attributedCreds, "CREDENTIALS_CODE", "e");
+                    }
+                    return attributedCreds;
+                };
                 resolvedCredentials.memoized = boundProvider.memoized;
                 resolvedCredentials.configBound = boundProvider.configBound;
                 resolvedCredentials.attributed = true;
@@ -5618,46 +5683,6 @@ class SerdeContextConfig {
     }
 }
 
-function* serializingStructIterator(ns, sourceObject) {
-    if (ns.isUnitSchema()) {
-        return;
-    }
-    const struct = ns.getSchema();
-    for (let i = 0; i < struct[4].length; ++i) {
-        const key = struct[4][i];
-        const memberSchema = struct[5][i];
-        const memberNs = new NormalizedSchema([memberSchema, 0], key);
-        if (!(key in sourceObject) && !memberNs.isIdempotencyToken()) {
-            continue;
-        }
-        yield [key, memberNs];
-    }
-}
-function* deserializingStructIterator(ns, sourceObject, nameTrait) {
-    if (ns.isUnitSchema()) {
-        return;
-    }
-    const struct = ns.getSchema();
-    let keysRemaining = Object.keys(sourceObject).filter((k) => k !== "__type").length;
-    for (let i = 0; i < struct[4].length; ++i) {
-        if (keysRemaining === 0) {
-            break;
-        }
-        const key = struct[4][i];
-        const memberSchema = struct[5][i];
-        const memberNs = new NormalizedSchema([memberSchema, 0], key);
-        let serializationKey = key;
-        if (nameTrait) {
-            serializationKey = memberNs.getMergedTraits()[nameTrait] ?? key;
-        }
-        if (!(serializationKey in sourceObject)) {
-            continue;
-        }
-        yield [key, memberNs];
-        keysRemaining -= 1;
-    }
-}
-
 class UnionSerde {
     from;
     to;
@@ -5768,23 +5793,41 @@ class JsonShapeDeserializer extends SerdeContextConfig {
         const ns = NormalizedSchema.of(schema);
         if (isObject) {
             if (ns.isStructSchema()) {
+                const record = value;
                 const union = ns.isUnionSchema();
                 const out = {};
+                let nameMap = void 0;
+                const { jsonName } = this.settings;
+                if (jsonName) {
+                    nameMap = {};
+                }
                 let unionSerde;
                 if (union) {
-                    unionSerde = new UnionSerde(value, out);
+                    unionSerde = new UnionSerde(record, out);
                 }
-                for (const [memberName, memberSchema] of deserializingStructIterator(ns, value, this.settings.jsonName ? "jsonName" : false)) {
-                    const fromKey = this.settings.jsonName ? memberSchema.getMergedTraits().jsonName ?? memberName : memberName;
+                for (const [memberName, memberSchema] of ns.structIterator()) {
+                    let fromKey = memberName;
+                    if (jsonName) {
+                        fromKey = memberSchema.getMergedTraits().jsonName ?? fromKey;
+                        nameMap[fromKey] = memberName;
+                    }
                     if (union) {
                         unionSerde.mark(fromKey);
                     }
-                    if (value[fromKey] != null) {
-                        out[memberName] = this._read(memberSchema, value[fromKey]);
+                    if (record[fromKey] != null) {
+                        out[memberName] = this._read(memberSchema, record[fromKey]);
                     }
                 }
                 if (union) {
                     unionSerde.writeUnknown();
+                }
+                else if (typeof record.__type === "string") {
+                    for (const [k, v] of Object.entries(record)) {
+                        const t = jsonName ? nameMap[k] ?? k : k;
+                        if (!(t in out)) {
+                            out[t] = v;
+                        }
+                    }
                 }
                 return out;
             }
@@ -5964,20 +6007,37 @@ class JsonShapeSerializer extends SerdeContextConfig {
         const ns = NormalizedSchema.of(schema);
         if (isObject) {
             if (ns.isStructSchema()) {
+                const record = value;
                 const out = {};
-                for (const [memberName, memberSchema] of serializingStructIterator(ns, value)) {
-                    const serializableValue = this._write(memberSchema, value[memberName], ns);
+                const { jsonName } = this.settings;
+                let nameMap = void 0;
+                if (jsonName) {
+                    nameMap = {};
+                }
+                for (const [memberName, memberSchema] of ns.structIterator()) {
+                    const serializableValue = this._write(memberSchema, record[memberName], ns);
                     if (serializableValue !== undefined) {
-                        const jsonName = memberSchema.getMergedTraits().jsonName;
-                        const targetKey = this.settings.jsonName ? jsonName ?? memberName : memberName;
+                        let targetKey = memberName;
+                        if (jsonName) {
+                            targetKey = memberSchema.getMergedTraits().jsonName ?? memberName;
+                            nameMap[memberName] = targetKey;
+                        }
                         out[targetKey] = serializableValue;
                     }
                 }
                 if (ns.isUnionSchema() && Object.keys(out).length === 0) {
-                    const { $unknown } = value;
+                    const { $unknown } = record;
                     if (Array.isArray($unknown)) {
                         const [k, v] = $unknown;
                         out[k] = this._write(15, v);
+                    }
+                }
+                else if (typeof record.__type === "string") {
+                    for (const [k, v] of Object.entries(record)) {
+                        const targetKey = jsonName ? nameMap[k] ?? k : k;
+                        if (!(targetKey in out)) {
+                            out[targetKey] = this._write(15, v);
+                        }
                     }
                 }
                 return out;
@@ -6712,76 +6772,360 @@ class XmlNode{
   }
 }
 
-//TODO: handle comments
-function readDocType(xmlData, i){
+class DocTypeReader{
+    constructor(processEntities){
+        this.suppressValidationErr = !processEntities;
+    }
     
-    const entities = {};
-    if( xmlData[i + 3] === 'O' &&
-         xmlData[i + 4] === 'C' &&
-         xmlData[i + 5] === 'T' &&
-         xmlData[i + 6] === 'Y' &&
-         xmlData[i + 7] === 'P' &&
-         xmlData[i + 8] === 'E')
-    {    
-        i = i+9;
-        let angleBracketsCount = 1;
-        let hasBody = false, comment = false;
-        let exp = "";
-        for(;i<xmlData.length;i++){
-            if (xmlData[i] === '<' && !comment) { //Determine the tag type
-                if( hasBody && hasSeq(xmlData, "!ENTITY",i)){
-                    i += 7; 
-                    let entityName, val;
-                    [entityName, val,i] = readEntityExp(xmlData,i+1);
-                    if(val.indexOf("&") === -1) //Parameter entities are not supported
-                        entities[ entityName ] = {
-                            regx : RegExp( `&${entityName};`,"g"),
-                            val: val
-                        };
-                }
-                else if( hasBody && hasSeq(xmlData, "!ELEMENT",i))  {
-                    i += 8;//Not supported
-                    const {index} = readElementExp(xmlData,i+1);
-                    i = index;
-                }else if( hasBody && hasSeq(xmlData, "!ATTLIST",i)){
-                    i += 8;//Not supported
-                    // const {index} = readAttlistExp(xmlData,i+1);
-                    // i = index;
-                }else if( hasBody && hasSeq(xmlData, "!NOTATION",i)) {
-                    i += 9;//Not supported
-                    const {index} = readNotationExp(xmlData,i+1);
-                    i = index;
-                }else if( hasSeq(xmlData, "!--",i) ) comment = true;
-                else throw new Error(`Invalid DOCTYPE`);
+    readDocType(xmlData, i){
+    
+        const entities = {};
+        if( xmlData[i + 3] === 'O' &&
+            xmlData[i + 4] === 'C' &&
+            xmlData[i + 5] === 'T' &&
+            xmlData[i + 6] === 'Y' &&
+            xmlData[i + 7] === 'P' &&
+            xmlData[i + 8] === 'E')
+        {    
+            i = i+9;
+            let angleBracketsCount = 1;
+            let hasBody = false, comment = false;
+            let exp = "";
+            for(;i<xmlData.length;i++){
+                if (xmlData[i] === '<' && !comment) { //Determine the tag type
+                    if( hasBody && hasSeq(xmlData, "!ENTITY",i)){
+                        i += 7; 
+                        let entityName, val;
+                        [entityName, val,i] = this.readEntityExp(xmlData,i+1,this.suppressValidationErr);
+                        if(val.indexOf("&") === -1) //Parameter entities are not supported
+                            entities[ entityName ] = {
+                                regx : RegExp( `&${entityName};`,"g"),
+                                val: val
+                            };
+                    }
+                    else if( hasBody && hasSeq(xmlData, "!ELEMENT",i))  {
+                        i += 8;//Not supported
+                        const {index} = this.readElementExp(xmlData,i+1);
+                        i = index;
+                    }else if( hasBody && hasSeq(xmlData, "!ATTLIST",i)){
+                        i += 8;//Not supported
+                        // const {index} = this.readAttlistExp(xmlData,i+1);
+                        // i = index;
+                    }else if( hasBody && hasSeq(xmlData, "!NOTATION",i)) {
+                        i += 9;//Not supported
+                        const {index} = this.readNotationExp(xmlData,i+1,this.suppressValidationErr);
+                        i = index;
+                    }else if( hasSeq(xmlData, "!--",i) ) comment = true;
+                    else throw new Error(`Invalid DOCTYPE`);
 
-                angleBracketsCount++;
-                exp = "";
-            } else if (xmlData[i] === '>') { //Read tag content
-                if(comment){
-                    if( xmlData[i - 1] === "-" && xmlData[i - 2] === "-"){
-                        comment = false;
+                    angleBracketsCount++;
+                    exp = "";
+                } else if (xmlData[i] === '>') { //Read tag content
+                    if(comment){
+                        if( xmlData[i - 1] === "-" && xmlData[i - 2] === "-"){
+                            comment = false;
+                            angleBracketsCount--;
+                        }
+                    }else {
                         angleBracketsCount--;
                     }
+                    if (angleBracketsCount === 0) {
+                    break;
+                    }
+                }else if( xmlData[i] === '['){
+                    hasBody = true;
                 }else {
-                    angleBracketsCount--;
+                    exp += xmlData[i];
                 }
-                if (angleBracketsCount === 0) {
-                  break;
-                }
-            }else if( xmlData[i] === '['){
-                hasBody = true;
-            }else {
-                exp += xmlData[i];
+            }
+            if(angleBracketsCount !== 0){
+                throw new Error(`Unclosed DOCTYPE`);
+            }
+        }else {
+            throw new Error(`Invalid Tag instead of DOCTYPE`);
+        }
+        return {entities, i};
+    }
+    readEntityExp(xmlData, i) {    
+        //External entities are not supported
+        //    <!ENTITY ext SYSTEM "http://normal-website.com" >
+
+        //Parameter entities are not supported
+        //    <!ENTITY entityname "&anotherElement;">
+
+        //Internal entities are supported
+        //    <!ENTITY entityname "replacement text">
+
+        // Skip leading whitespace after <!ENTITY
+        i = skipWhitespace(xmlData, i);
+
+        // Read entity name
+        let entityName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i]) && xmlData[i] !== '"' && xmlData[i] !== "'") {
+            entityName += xmlData[i];
+            i++;
+        }
+        validateEntityName(entityName);
+
+        // Skip whitespace after entity name
+        i = skipWhitespace(xmlData, i);
+
+        // Check for unsupported constructs (external entities or parameter entities)
+        if(!this.suppressValidationErr){
+            if (xmlData.substring(i, i + 6).toUpperCase() === "SYSTEM") {
+                throw new Error("External entities are not supported");
+            }else if (xmlData[i] === "%") {
+                throw new Error("Parameter entities are not supported");
             }
         }
-        if(angleBracketsCount !== 0){
-            throw new Error(`Unclosed DOCTYPE`);
-        }
-    }else {
-        throw new Error(`Invalid Tag instead of DOCTYPE`);
+
+        // Read entity value (internal entity)
+        let entityValue = "";
+        [i, entityValue] = this.readIdentifierVal(xmlData, i, "entity");
+        i--;
+        return [entityName, entityValue, i ];
     }
-    return {entities, i};
+
+    readNotationExp(xmlData, i) {
+        // Skip leading whitespace after <!NOTATION
+        i = skipWhitespace(xmlData, i);
+
+        // Read notation name
+        let notationName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            notationName += xmlData[i];
+            i++;
+        }
+        !this.suppressValidationErr && validateEntityName(notationName);
+
+        // Skip whitespace after notation name
+        i = skipWhitespace(xmlData, i);
+
+        // Check identifier type (SYSTEM or PUBLIC)
+        const identifierType = xmlData.substring(i, i + 6).toUpperCase();
+        if (!this.suppressValidationErr && identifierType !== "SYSTEM" && identifierType !== "PUBLIC") {
+            throw new Error(`Expected SYSTEM or PUBLIC, found "${identifierType}"`);
+        }
+        i += identifierType.length;
+
+        // Skip whitespace after identifier type
+        i = skipWhitespace(xmlData, i);
+
+        // Read public identifier (if PUBLIC)
+        let publicIdentifier = null;
+        let systemIdentifier = null;
+
+        if (identifierType === "PUBLIC") {
+            [i, publicIdentifier ] = this.readIdentifierVal(xmlData, i, "publicIdentifier");
+
+            // Skip whitespace after public identifier
+            i = skipWhitespace(xmlData, i);
+
+            // Optionally read system identifier
+            if (xmlData[i] === '"' || xmlData[i] === "'") {
+                [i, systemIdentifier ] = this.readIdentifierVal(xmlData, i,"systemIdentifier");
+            }
+        } else if (identifierType === "SYSTEM") {
+            // Read system identifier (mandatory for SYSTEM)
+            [i, systemIdentifier ] = this.readIdentifierVal(xmlData, i, "systemIdentifier");
+
+            if (!this.suppressValidationErr && !systemIdentifier) {
+                throw new Error("Missing mandatory system identifier for SYSTEM notation");
+            }
+        }
+        
+        return {notationName, publicIdentifier, systemIdentifier, index: --i};
+    }
+
+    readIdentifierVal(xmlData, i, type) {
+        let identifierVal = "";
+        const startChar = xmlData[i];
+        if (startChar !== '"' && startChar !== "'") {
+            throw new Error(`Expected quoted string, found "${startChar}"`);
+        }
+        i++;
+
+        while (i < xmlData.length && xmlData[i] !== startChar) {
+            identifierVal += xmlData[i];
+            i++;
+        }
+
+        if (xmlData[i] !== startChar) {
+            throw new Error(`Unterminated ${type} value`);
+        }
+        i++;
+        return [i, identifierVal];
+    }
+
+    readElementExp(xmlData, i) {
+        // <!ELEMENT br EMPTY>
+        // <!ELEMENT div ANY>
+        // <!ELEMENT title (#PCDATA)>
+        // <!ELEMENT book (title, author+)>
+        // <!ELEMENT name (content-model)>
+        
+        // Skip leading whitespace after <!ELEMENT
+        i = skipWhitespace(xmlData, i);
+
+        // Read element name
+        let elementName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            elementName += xmlData[i];
+            i++;
+        }
+
+        // Validate element name
+        if (!this.suppressValidationErr && !isName(elementName)) {
+            throw new Error(`Invalid element name: "${elementName}"`);
+        }
+
+        // Skip whitespace after element name
+        i = skipWhitespace(xmlData, i);
+        let contentModel = "";
+        // Expect '(' to start content model
+        if(xmlData[i] === "E" && hasSeq(xmlData, "MPTY",i)) i+=4;
+        else if(xmlData[i] === "A" && hasSeq(xmlData, "NY",i)) i+=2;
+        else if (xmlData[i] === "(") {
+            i++; // Move past '('
+
+            // Read content model
+            while (i < xmlData.length && xmlData[i] !== ")") {
+                contentModel += xmlData[i];
+                i++;
+            }
+            if (xmlData[i] !== ")") {
+                throw new Error("Unterminated content model");
+            }
+
+        }else if(!this.suppressValidationErr){
+            throw new Error(`Invalid Element Expression, found "${xmlData[i]}"`);
+        }
+        
+        return {
+            elementName,
+            contentModel: contentModel.trim(),
+            index: i
+        };
+    }
+
+    readAttlistExp(xmlData, i) {
+        // Skip leading whitespace after <!ATTLIST
+        i = skipWhitespace(xmlData, i);
+
+        // Read element name
+        let elementName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            elementName += xmlData[i];
+            i++;
+        }
+
+        // Validate element name
+        validateEntityName(elementName);
+
+        // Skip whitespace after element name
+        i = skipWhitespace(xmlData, i);
+
+        // Read attribute name
+        let attributeName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            attributeName += xmlData[i];
+            i++;
+        }
+
+        // Validate attribute name
+        if (!validateEntityName(attributeName)) {
+            throw new Error(`Invalid attribute name: "${attributeName}"`);
+        }
+
+        // Skip whitespace after attribute name
+        i = skipWhitespace(xmlData, i);
+
+        // Read attribute type
+        let attributeType = "";
+        if (xmlData.substring(i, i + 8).toUpperCase() === "NOTATION") {
+            attributeType = "NOTATION";
+            i += 8; // Move past "NOTATION"
+
+            // Skip whitespace after "NOTATION"
+            i = skipWhitespace(xmlData, i);
+
+            // Expect '(' to start the list of notations
+            if (xmlData[i] !== "(") {
+                throw new Error(`Expected '(', found "${xmlData[i]}"`);
+            }
+            i++; // Move past '('
+
+            // Read the list of allowed notations
+            let allowedNotations = [];
+            while (i < xmlData.length && xmlData[i] !== ")") {
+                let notation = "";
+                while (i < xmlData.length && xmlData[i] !== "|" && xmlData[i] !== ")") {
+                    notation += xmlData[i];
+                    i++;
+                }
+
+                // Validate notation name
+                notation = notation.trim();
+                if (!validateEntityName(notation)) {
+                    throw new Error(`Invalid notation name: "${notation}"`);
+                }
+
+                allowedNotations.push(notation);
+
+                // Skip '|' separator or exit loop
+                if (xmlData[i] === "|") {
+                    i++; // Move past '|'
+                    i = skipWhitespace(xmlData, i); // Skip optional whitespace after '|'
+                }
+            }
+
+            if (xmlData[i] !== ")") {
+                throw new Error("Unterminated list of notations");
+            }
+            i++; // Move past ')'
+
+            // Store the allowed notations as part of the attribute type
+            attributeType += " (" + allowedNotations.join("|") + ")";
+        } else {
+            // Handle simple types (e.g., CDATA, ID, IDREF, etc.)
+            while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+                attributeType += xmlData[i];
+                i++;
+            }
+
+            // Validate simple attribute type
+            const validTypes = ["CDATA", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES", "NMTOKEN", "NMTOKENS"];
+            if (!this.suppressValidationErr && !validTypes.includes(attributeType.toUpperCase())) {
+                throw new Error(`Invalid attribute type: "${attributeType}"`);
+            }
+        }
+
+        // Skip whitespace after attribute type
+        i = skipWhitespace(xmlData, i);
+
+        // Read default value
+        let defaultValue = "";
+        if (xmlData.substring(i, i + 8).toUpperCase() === "#REQUIRED") {
+            defaultValue = "#REQUIRED";
+            i += 8;
+        } else if (xmlData.substring(i, i + 7).toUpperCase() === "#IMPLIED") {
+            defaultValue = "#IMPLIED";
+            i += 7;
+        } else {
+            [i, defaultValue] = this.readIdentifierVal(xmlData, i, "ATTLIST");
+        }
+
+        return {
+            elementName,
+            attributeName,
+            attributeType,
+            defaultValue,
+            index: i
+        }
+    }
 }
+
+
 
 const skipWhitespace = (data, index) => {
     while (index < data.length && /\s/.test(data[index])) {
@@ -6790,165 +7134,7 @@ const skipWhitespace = (data, index) => {
     return index;
 };
 
-function readEntityExp(xmlData, i) {    
-    //External entities are not supported
-    //    <!ENTITY ext SYSTEM "http://normal-website.com" >
 
-    //Parameter entities are not supported
-    //    <!ENTITY entityname "&anotherElement;">
-
-    //Internal entities are supported
-    //    <!ENTITY entityname "replacement text">
-
-    // Skip leading whitespace after <!ENTITY
-    i = skipWhitespace(xmlData, i);
-
-    // Read entity name
-    let entityName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i]) && xmlData[i] !== '"' && xmlData[i] !== "'") {
-        entityName += xmlData[i];
-        i++;
-    }
-    validateEntityName(entityName);
-
-    // Skip whitespace after entity name
-    i = skipWhitespace(xmlData, i);
-
-    // Check for unsupported constructs (external entities or parameter entities)
-    if (xmlData.substring(i, i + 6).toUpperCase() === "SYSTEM") {
-        throw new Error("External entities are not supported");
-    }else if (xmlData[i] === "%") {
-        throw new Error("Parameter entities are not supported");
-    }
-
-    // Read entity value (internal entity)
-    let entityValue = "";
-    [i, entityValue] = readIdentifierVal(xmlData, i, "entity");
-    i--;
-    return [entityName, entityValue, i ];
-}
-
-function readNotationExp(xmlData, i) {
-    // Skip leading whitespace after <!NOTATION
-    i = skipWhitespace(xmlData, i);
-
-    // Read notation name
-    let notationName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-        notationName += xmlData[i];
-        i++;
-    }
-    validateEntityName(notationName);
-
-    // Skip whitespace after notation name
-    i = skipWhitespace(xmlData, i);
-
-    // Check identifier type (SYSTEM or PUBLIC)
-    const identifierType = xmlData.substring(i, i + 6).toUpperCase();
-    if (identifierType !== "SYSTEM" && identifierType !== "PUBLIC") {
-        throw new Error(`Expected SYSTEM or PUBLIC, found "${identifierType}"`);
-    }
-    i += identifierType.length;
-
-    // Skip whitespace after identifier type
-    i = skipWhitespace(xmlData, i);
-
-    // Read public identifier (if PUBLIC)
-    let publicIdentifier = null;
-    let systemIdentifier = null;
-
-    if (identifierType === "PUBLIC") {
-        [i, publicIdentifier ] = readIdentifierVal(xmlData, i, "publicIdentifier");
-
-        // Skip whitespace after public identifier
-        i = skipWhitespace(xmlData, i);
-
-        // Optionally read system identifier
-        if (xmlData[i] === '"' || xmlData[i] === "'") {
-            [i, systemIdentifier ] = readIdentifierVal(xmlData, i,"systemIdentifier");
-        }
-    } else if (identifierType === "SYSTEM") {
-        // Read system identifier (mandatory for SYSTEM)
-        [i, systemIdentifier ] = readIdentifierVal(xmlData, i, "systemIdentifier");
-
-        if (!systemIdentifier) {
-            throw new Error("Missing mandatory system identifier for SYSTEM notation");
-        }
-    }
-    
-    return {notationName, publicIdentifier, systemIdentifier, index: --i};
-}
-
-function readIdentifierVal(xmlData, i, type) {
-    let identifierVal = "";
-    const startChar = xmlData[i];
-    if (startChar !== '"' && startChar !== "'") {
-        throw new Error(`Expected quoted string, found "${startChar}"`);
-    }
-    i++;
-
-    while (i < xmlData.length && xmlData[i] !== startChar) {
-        identifierVal += xmlData[i];
-        i++;
-    }
-
-    if (xmlData[i] !== startChar) {
-        throw new Error(`Unterminated ${type} value`);
-    }
-    i++;
-    return [i, identifierVal];
-}
-
-function readElementExp(xmlData, i) {
-    // <!ELEMENT br EMPTY>
-    // <!ELEMENT div ANY>
-    // <!ELEMENT title (#PCDATA)>
-    // <!ELEMENT book (title, author+)>
-    // <!ELEMENT name (content-model)>
-    
-    // Skip leading whitespace after <!ELEMENT
-    i = skipWhitespace(xmlData, i);
-
-    // Read element name
-    let elementName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-        elementName += xmlData[i];
-        i++;
-    }
-
-    // Validate element name
-    if (!validateEntityName(elementName)) {
-        throw new Error(`Invalid element name: "${elementName}"`);
-    }
-
-    // Skip whitespace after element name
-    i = skipWhitespace(xmlData, i);
-    let contentModel = "";
-    // Expect '(' to start content model
-    if(xmlData[i] === "E" && hasSeq(xmlData, "MPTY",i)) i+=4;
-    else if(xmlData[i] === "A" && hasSeq(xmlData, "NY",i)) i+=2;
-    else if (xmlData[i] === "(") {
-        i++; // Move past '('
-
-        // Read content model
-        while (i < xmlData.length && xmlData[i] !== ")") {
-            contentModel += xmlData[i];
-            i++;
-        }
-        if (xmlData[i] !== ")") {
-            throw new Error("Unterminated content model");
-        }
-
-    }else {
-        throw new Error(`Invalid Element Expression, found "${xmlData[i]}"`);
-    }
-    
-    return {
-        elementName,
-        contentModel: contentModel.trim(),
-        index: i
-    };
-}
 
 function hasSeq(data, seq,i){
     for(let j=0;j<seq.length;j++){
@@ -6959,7 +7145,7 @@ function hasSeq(data, seq,i){
 
 function validateEntityName(name){
     if (isName(name))
-	return name;
+	    return name;
     else
         throw new Error(`Invalid entity name ${name}`);
 }
@@ -7147,8 +7333,8 @@ class OrderedObjParser{
       "copyright" : { regex: /&(copy|#169);/g, val: "©" },
       "reg" : { regex: /&(reg|#174);/g, val: "®" },
       "inr" : { regex: /&(inr|#8377);/g, val: "₹" },
-      "num_dec": { regex: /&#([0-9]{1,7});/g, val : (_, str) => String.fromCodePoint(Number.parseInt(str, 10)) },
-      "num_hex": { regex: /&#x([0-9a-fA-F]{1,6});/g, val : (_, str) => String.fromCodePoint(Number.parseInt(str, 16)) },
+      "num_dec": { regex: /&#([0-9]{1,7});/g, val : (_, str) => fromCodePoint(str, 10, "&#") },
+      "num_hex": { regex: /&#x([0-9a-fA-F]{1,6});/g, val : (_, str) => fromCodePoint(str, 16, "&#x") },
     };
     this.addExternalEntities = addExternalEntities;
     this.parseXml = parseXml;
@@ -7161,6 +7347,20 @@ class OrderedObjParser{
     this.saveTextToParentTag = saveTextToParentTag;
     this.addChild = addChild;
     this.ignoreAttributesFn = getIgnoreAttributesFn(this.options.ignoreAttributes);
+
+    if(this.options.stopNodes && this.options.stopNodes.length > 0){
+      this.stopNodesExact = new Set();
+      this.stopNodesWildcard = new Set();
+      for(let i = 0; i < this.options.stopNodes.length; i++){
+        const stopNodeExp = this.options.stopNodes[i];
+        if(typeof stopNodeExp !== 'string') continue;
+        if(stopNodeExp.startsWith("*.")){
+          this.stopNodesWildcard.add(stopNodeExp.substring(2));
+        }else {
+          this.stopNodesExact.add(stopNodeExp);
+        }
+      }
+    }
   }
 
 }
@@ -7232,7 +7432,7 @@ function resolveNameSpace(tagname) {
 //const attrsRegx = new RegExp("([\\w\\-\\.\\:]+)\\s*=\\s*(['\"])((.|\n)*?)\\2","gm");
 const attrsRegx = new RegExp('([^\\s=]+)\\s*(=\\s*([\'"])([\\s\\S]*?)\\3)?', 'gm');
 
-function buildAttributesMap(attrStr, jPath, tagName) {
+function buildAttributesMap(attrStr, jPath) {
   if (this.options.ignoreAttributes !== true && typeof attrStr === 'string') {
     // attrStr = attrStr.replace(/\r?\n/g, ' ');
     //attrStr = attrStr || attrStr.trim();
@@ -7295,6 +7495,7 @@ const parseXml = function(xmlData) {
   let currentNode = xmlObj;
   let textData = "";
   let jPath = "";
+  const docTypeReader = new DocTypeReader(this.options.processEntities);
   for(let i=0; i< xmlData.length; i++){//for each char in XML data
     const ch = xmlData[i];
     if(ch === '<'){
@@ -7348,7 +7549,7 @@ const parseXml = function(xmlData) {
           childNode.add(this.options.textNodeName, "");
           
           if(tagData.tagName !== tagData.tagExp && tagData.attrExpPresent){
-            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath, tagData.tagName);
+            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath);
           }
           this.addChild(currentNode, childNode, jPath, i);
         }
@@ -7366,7 +7567,7 @@ const parseXml = function(xmlData) {
         }
         i = endIndex;
       } else if( xmlData.substr(i + 1, 2) === '!D') {
-        const result = readDocType(xmlData, i);
+        const result = docTypeReader.readDocType(xmlData, i);
         this.docTypeEntities = result.entities;
         i = result.i;
       }else if(xmlData.substr(i + 1, 2) === '![') {
@@ -7395,7 +7596,12 @@ const parseXml = function(xmlData) {
         let closeIndex = result.closeIndex;
 
         if (this.options.transformTagName) {
-          tagName = this.options.transformTagName(tagName);
+          //console.log(tagExp, tagName)
+          const newTagName = this.options.transformTagName(tagName);
+          if(tagExp === tagName) {
+            tagExp = newTagName;
+          }
+          tagName = newTagName;
         }
         
         //save text as child node
@@ -7416,7 +7622,7 @@ const parseXml = function(xmlData) {
           jPath += jPath ? "." + tagName : tagName;
         }
         const startIndex = i;
-        if (this.isItStopNode(this.options.stopNodes, jPath, tagName)) {
+        if (this.isItStopNode(this.stopNodesExact, this.stopNodesWildcard, jPath, tagName)) {
           let tagContent = "";
           //self-closing tag
           if(tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1){
@@ -7446,7 +7652,8 @@ const parseXml = function(xmlData) {
           const childNode = new XmlNode(tagName);
 
           if(tagName !== tagExp && attrExpPresent){
-            childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+            childNode[":@"] = this.buildAttributesMap(tagExp, jPath
+            );
           }
           if(tagContent) {
             tagContent = this.parseTextData(tagContent, tagName, jPath, true, attrExpPresent, true, true);
@@ -7468,12 +7675,16 @@ const parseXml = function(xmlData) {
             }
             
             if(this.options.transformTagName) {
-              tagName = this.options.transformTagName(tagName);
+              const newTagName = this.options.transformTagName(tagName);
+              if(tagExp === tagName) {
+                tagExp = newTagName;
+              }
+              tagName = newTagName;
             }
 
             const childNode = new XmlNode(tagName);
             if(tagName !== tagExp && attrExpPresent){
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+              childNode[":@"] = this.buildAttributesMap(tagExp, jPath);
             }
             this.addChild(currentNode, childNode, jPath, startIndex);
             jPath = jPath.substr(0, jPath.lastIndexOf("."));
@@ -7484,7 +7695,7 @@ const parseXml = function(xmlData) {
             this.tagsNodeStack.push(currentNode);
             
             if(tagName !== tagExp && attrExpPresent){
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+              childNode[":@"] = this.buildAttributesMap(tagExp, jPath);
             }
             this.addChild(currentNode, childNode, jPath, startIndex);
             currentNode = childNode;
@@ -7553,17 +7764,14 @@ function saveTextToParentTag(textData, currentNode, jPath, isLeafNode) {
 
 //TODO: use jPath to simplify the logic
 /**
- * 
- * @param {string[]} stopNodes 
+ * @param {Set} stopNodesExact
+ * @param {Set} stopNodesWildcard
  * @param {string} jPath
- * @param {string} currentTagName 
+ * @param {string} currentTagName
  */
-function isItStopNode(stopNodes, jPath, currentTagName){
-  const allNodesExp = "*." + currentTagName;
-  for (const stopNodePath in stopNodes) {
-    const stopNodeExp = stopNodes[stopNodePath];
-    if( allNodesExp === stopNodeExp || jPath === stopNodeExp  ) return true;
-  }
+function isItStopNode(stopNodesExact, stopNodesWildcard, jPath, currentTagName){
+  if(stopNodesWildcard && stopNodesWildcard.has(currentTagName)) return true;
+  if(stopNodesExact && stopNodesExact.has(jPath)) return true;
   return false;
 }
 
@@ -7708,6 +7916,16 @@ function parseValue(val, shouldParse, options) {
   }
 }
 
+function fromCodePoint(str, base, prefix){
+  const codePoint = Number.parseInt(str, base);
+
+  if (codePoint >= 0 && codePoint <= 0x10FFFF) {
+      return String.fromCodePoint(codePoint);
+  } else {
+      return prefix +str + ";";
+  }
+}
+
 const METADATA_SYMBOL = XmlNode.getMetaDataSymbol();
 
 /**
@@ -7833,15 +8051,16 @@ class XMLParser{
     }
     /**
      * Parse XML dats to JS object 
-     * @param {string|Buffer} xmlData 
+     * @param {string|Uint8Array} xmlData 
      * @param {boolean|Object} validationOption 
      */
     parse(xmlData,validationOption){
-        if(typeof xmlData === "string");else if( xmlData.toString){
+        if(typeof xmlData !== "string" && xmlData.toString){
             xmlData = xmlData.toString();
-        }else {
+        }else if(typeof xmlData !== "string"){
             throw new Error("XML data is accepted in String or Bytes[] form.")
         }
+        
         if( validationOption){
             if(validationOption === true) validationOption = {}; //validate with default options
             
@@ -8147,7 +8366,8 @@ class QueryShapeSerializer extends SerdeContextConfig {
                         if (item == null) {
                             continue;
                         }
-                        const suffix = this.getKey("member", member.getMergedTraits().xmlName);
+                        const traits = member.getMergedTraits();
+                        const suffix = this.getKey("member", traits.xmlName, traits.ec2QueryName);
                         const key = flat ? `${prefix}${i}` : `${prefix}${suffix}.${i}`;
                         this.write(member, item, key);
                         ++i;
@@ -8165,9 +8385,11 @@ class QueryShapeSerializer extends SerdeContextConfig {
                     if (v == null) {
                         continue;
                     }
-                    const keySuffix = this.getKey("key", keySchema.getMergedTraits().xmlName);
+                    const keyTraits = keySchema.getMergedTraits();
+                    const keySuffix = this.getKey("key", keyTraits.xmlName, keyTraits.ec2QueryName);
                     const key = flat ? `${prefix}${i}.${keySuffix}` : `${prefix}entry.${i}.${keySuffix}`;
-                    const valueSuffix = this.getKey("value", memberSchema.getMergedTraits().xmlName);
+                    const valTraits = memberSchema.getMergedTraits();
+                    const valueSuffix = this.getKey("value", valTraits.xmlName, valTraits.ec2QueryName);
                     const valueKey = flat ? `${prefix}${i}.${valueSuffix}` : `${prefix}entry.${i}.${valueSuffix}`;
                     this.write(keySchema, k, key);
                     this.write(memberSchema, v, valueKey);
@@ -8178,11 +8400,12 @@ class QueryShapeSerializer extends SerdeContextConfig {
         else if (ns.isStructSchema()) {
             if (value && typeof value === "object") {
                 let didWriteMember = false;
-                for (const [memberName, member] of serializingStructIterator(ns, value)) {
+                for (const [memberName, member] of ns.structIterator()) {
                     if (value[memberName] == null && !member.isIdempotencyToken()) {
                         continue;
                     }
-                    const suffix = this.getKey(memberName, member.getMergedTraits().xmlName);
+                    const traits = member.getMergedTraits();
+                    const suffix = this.getKey(memberName, traits.xmlName, traits.ec2QueryName, "struct");
                     const key = `${prefix}${suffix}`;
                     this.write(member, value[memberName], key);
                     didWriteMember = true;
@@ -8210,9 +8433,13 @@ class QueryShapeSerializer extends SerdeContextConfig {
         delete this.buffer;
         return str;
     }
-    getKey(memberName, xmlName) {
+    getKey(memberName, xmlName, ec2QueryName, keySource) {
+        const { ec2, capitalizeKeys } = this.settings;
+        if (ec2 && ec2QueryName) {
+            return ec2QueryName;
+        }
         const key = xmlName ?? memberName;
-        if (this.settings.capitalizeKeys) {
+        if (capitalizeKeys && keySource === "struct") {
             return key[0].toUpperCase() + key.slice(1);
         }
         return key;
@@ -9702,7 +9929,7 @@ const commonParams$4 = {
     UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" },
 };
 
-var version$2 = "3.958.0";
+var version$2 = "3.992.0";
 var packageInfo$2 = {
 	version: version$2};
 
@@ -9783,15 +10010,21 @@ function memoizeChain(providers, treatAsExpired) {
         else if (!credentials || treatAsExpired?.(credentials)) {
             if (credentials) {
                 if (!passiveLock) {
-                    passiveLock = chain(options).then((c) => {
+                    passiveLock = chain(options)
+                        .then((c) => {
                         credentials = c;
+                    })
+                        .finally(() => {
                         passiveLock = undefined;
                     });
                 }
             }
             else {
-                activeLock = chain(options).then((c) => {
+                activeLock = chain(options)
+                    .then((c) => {
                     credentials = c;
+                })
+                    .finally(() => {
                     activeLock = undefined;
                 });
                 return provider(options);
@@ -10052,6 +10285,364 @@ const inferPhysicalRegion = async () => {
     }
 };
 
+const isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
+    if (allowSubDomains) {
+        for (const label of value.split(".")) {
+            if (!isVirtualHostableS3Bucket(label)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (!isValidHostLabel(value)) {
+        return false;
+    }
+    if (value.length < 3 || value.length > 63) {
+        return false;
+    }
+    if (value !== value.toLowerCase()) {
+        return false;
+    }
+    if (isIpAddress(value)) {
+        return false;
+    }
+    return true;
+};
+
+const ARN_DELIMITER = ":";
+const RESOURCE_DELIMITER = "/";
+const parseArn = (value) => {
+    const segments = value.split(ARN_DELIMITER);
+    if (segments.length < 6)
+        return null;
+    const [arn, partition, service, region, accountId, ...resourcePath] = segments;
+    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER) === "")
+        return null;
+    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER)).flat();
+    return {
+        partition,
+        service,
+        region,
+        accountId,
+        resourceId,
+    };
+};
+
+var partitions = [
+	{
+		id: "aws",
+		outputs: {
+			dnsSuffix: "amazonaws.com",
+			dualStackDnsSuffix: "api.aws",
+			implicitGlobalRegion: "us-east-1",
+			name: "aws",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^(us|eu|ap|sa|ca|me|af|il|mx)\\-\\w+\\-\\d+$",
+		regions: {
+			"af-south-1": {
+				description: "Africa (Cape Town)"
+			},
+			"ap-east-1": {
+				description: "Asia Pacific (Hong Kong)"
+			},
+			"ap-east-2": {
+				description: "Asia Pacific (Taipei)"
+			},
+			"ap-northeast-1": {
+				description: "Asia Pacific (Tokyo)"
+			},
+			"ap-northeast-2": {
+				description: "Asia Pacific (Seoul)"
+			},
+			"ap-northeast-3": {
+				description: "Asia Pacific (Osaka)"
+			},
+			"ap-south-1": {
+				description: "Asia Pacific (Mumbai)"
+			},
+			"ap-south-2": {
+				description: "Asia Pacific (Hyderabad)"
+			},
+			"ap-southeast-1": {
+				description: "Asia Pacific (Singapore)"
+			},
+			"ap-southeast-2": {
+				description: "Asia Pacific (Sydney)"
+			},
+			"ap-southeast-3": {
+				description: "Asia Pacific (Jakarta)"
+			},
+			"ap-southeast-4": {
+				description: "Asia Pacific (Melbourne)"
+			},
+			"ap-southeast-5": {
+				description: "Asia Pacific (Malaysia)"
+			},
+			"ap-southeast-6": {
+				description: "Asia Pacific (New Zealand)"
+			},
+			"ap-southeast-7": {
+				description: "Asia Pacific (Thailand)"
+			},
+			"aws-global": {
+				description: "aws global region"
+			},
+			"ca-central-1": {
+				description: "Canada (Central)"
+			},
+			"ca-west-1": {
+				description: "Canada West (Calgary)"
+			},
+			"eu-central-1": {
+				description: "Europe (Frankfurt)"
+			},
+			"eu-central-2": {
+				description: "Europe (Zurich)"
+			},
+			"eu-north-1": {
+				description: "Europe (Stockholm)"
+			},
+			"eu-south-1": {
+				description: "Europe (Milan)"
+			},
+			"eu-south-2": {
+				description: "Europe (Spain)"
+			},
+			"eu-west-1": {
+				description: "Europe (Ireland)"
+			},
+			"eu-west-2": {
+				description: "Europe (London)"
+			},
+			"eu-west-3": {
+				description: "Europe (Paris)"
+			},
+			"il-central-1": {
+				description: "Israel (Tel Aviv)"
+			},
+			"me-central-1": {
+				description: "Middle East (UAE)"
+			},
+			"me-south-1": {
+				description: "Middle East (Bahrain)"
+			},
+			"mx-central-1": {
+				description: "Mexico (Central)"
+			},
+			"sa-east-1": {
+				description: "South America (Sao Paulo)"
+			},
+			"us-east-1": {
+				description: "US East (N. Virginia)"
+			},
+			"us-east-2": {
+				description: "US East (Ohio)"
+			},
+			"us-west-1": {
+				description: "US West (N. California)"
+			},
+			"us-west-2": {
+				description: "US West (Oregon)"
+			}
+		}
+	},
+	{
+		id: "aws-cn",
+		outputs: {
+			dnsSuffix: "amazonaws.com.cn",
+			dualStackDnsSuffix: "api.amazonwebservices.com.cn",
+			implicitGlobalRegion: "cn-northwest-1",
+			name: "aws-cn",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^cn\\-\\w+\\-\\d+$",
+		regions: {
+			"aws-cn-global": {
+				description: "aws-cn global region"
+			},
+			"cn-north-1": {
+				description: "China (Beijing)"
+			},
+			"cn-northwest-1": {
+				description: "China (Ningxia)"
+			}
+		}
+	},
+	{
+		id: "aws-eusc",
+		outputs: {
+			dnsSuffix: "amazonaws.eu",
+			dualStackDnsSuffix: "api.amazonwebservices.eu",
+			implicitGlobalRegion: "eusc-de-east-1",
+			name: "aws-eusc",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^eusc\\-(de)\\-\\w+\\-\\d+$",
+		regions: {
+			"eusc-de-east-1": {
+				description: "AWS European Sovereign Cloud (Germany)"
+			}
+		}
+	},
+	{
+		id: "aws-iso",
+		outputs: {
+			dnsSuffix: "c2s.ic.gov",
+			dualStackDnsSuffix: "api.aws.ic.gov",
+			implicitGlobalRegion: "us-iso-east-1",
+			name: "aws-iso",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^us\\-iso\\-\\w+\\-\\d+$",
+		regions: {
+			"aws-iso-global": {
+				description: "aws-iso global region"
+			},
+			"us-iso-east-1": {
+				description: "US ISO East"
+			},
+			"us-iso-west-1": {
+				description: "US ISO WEST"
+			}
+		}
+	},
+	{
+		id: "aws-iso-b",
+		outputs: {
+			dnsSuffix: "sc2s.sgov.gov",
+			dualStackDnsSuffix: "api.aws.scloud",
+			implicitGlobalRegion: "us-isob-east-1",
+			name: "aws-iso-b",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^us\\-isob\\-\\w+\\-\\d+$",
+		regions: {
+			"aws-iso-b-global": {
+				description: "aws-iso-b global region"
+			},
+			"us-isob-east-1": {
+				description: "US ISOB East (Ohio)"
+			},
+			"us-isob-west-1": {
+				description: "US ISOB West"
+			}
+		}
+	},
+	{
+		id: "aws-iso-e",
+		outputs: {
+			dnsSuffix: "cloud.adc-e.uk",
+			dualStackDnsSuffix: "api.cloud-aws.adc-e.uk",
+			implicitGlobalRegion: "eu-isoe-west-1",
+			name: "aws-iso-e",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^eu\\-isoe\\-\\w+\\-\\d+$",
+		regions: {
+			"aws-iso-e-global": {
+				description: "aws-iso-e global region"
+			},
+			"eu-isoe-west-1": {
+				description: "EU ISOE West"
+			}
+		}
+	},
+	{
+		id: "aws-iso-f",
+		outputs: {
+			dnsSuffix: "csp.hci.ic.gov",
+			dualStackDnsSuffix: "api.aws.hci.ic.gov",
+			implicitGlobalRegion: "us-isof-south-1",
+			name: "aws-iso-f",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^us\\-isof\\-\\w+\\-\\d+$",
+		regions: {
+			"aws-iso-f-global": {
+				description: "aws-iso-f global region"
+			},
+			"us-isof-east-1": {
+				description: "US ISOF EAST"
+			},
+			"us-isof-south-1": {
+				description: "US ISOF SOUTH"
+			}
+		}
+	},
+	{
+		id: "aws-us-gov",
+		outputs: {
+			dnsSuffix: "amazonaws.com",
+			dualStackDnsSuffix: "api.aws",
+			implicitGlobalRegion: "us-gov-west-1",
+			name: "aws-us-gov",
+			supportsDualStack: true,
+			supportsFIPS: true
+		},
+		regionRegex: "^us\\-gov\\-\\w+\\-\\d+$",
+		regions: {
+			"aws-us-gov-global": {
+				description: "aws-us-gov global region"
+			},
+			"us-gov-east-1": {
+				description: "AWS GovCloud (US-East)"
+			},
+			"us-gov-west-1": {
+				description: "AWS GovCloud (US-West)"
+			}
+		}
+	}
+];
+var partitionsInfo = {
+	partitions: partitions};
+
+let selectedPartitionsInfo = partitionsInfo;
+const partition = (value) => {
+    const { partitions } = selectedPartitionsInfo;
+    for (const partition of partitions) {
+        const { regions, outputs } = partition;
+        for (const [region, regionData] of Object.entries(regions)) {
+            if (region === value) {
+                return {
+                    ...outputs,
+                    ...regionData,
+                };
+            }
+        }
+    }
+    for (const partition of partitions) {
+        const { regionRegex, outputs } = partition;
+        if (new RegExp(regionRegex).test(value)) {
+            return {
+                ...outputs,
+            };
+        }
+    }
+    const DEFAULT_PARTITION = partitions.find((partition) => partition.id === "aws");
+    if (!DEFAULT_PARTITION) {
+        throw new Error("Provided region was not found in the partition array or regex," +
+            " and default partition with id 'aws' doesn't exist.");
+    }
+    return {
+        ...DEFAULT_PARTITION.outputs,
+    };
+};
+
+const awsEndpointFunctions = {
+    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket,
+    parseArn: parseArn,
+    partition: partition,
+};
+customEndpointFunctions.aws = awsEndpointFunctions;
+
 const F$1 = "required", G$1 = "type", H$1 = "fn", I$1 = "argv", J$1 = "ref";
 const a$4 = false, b$4 = true, c$4 = "booleanEquals", d$4 = "stringEquals", e$4 = "sigv4", f$4 = "sts", g$4 = "us-east-1", h$4 = "endpoint", i$4 = "https://sts.{Region}.{PartitionResult#dnsSuffix}", j$4 = "tree", k$4 = "error", l$4 = "getAttr", m$4 = { [F$1]: false, [G$1]: "string" }, n$4 = { [F$1]: true, "default": false, [G$1]: "boolean" }, o$4 = { [J$1]: "Endpoint" }, p$4 = { [H$1]: "isSet", [I$1]: [{ [J$1]: "Region" }] }, q$4 = { [J$1]: "Region" }, r$4 = { [H$1]: "aws.partition", [I$1]: [q$4], "assign": "PartitionResult" }, s$4 = { [J$1]: "UseFIPS" }, t$4 = { [J$1]: "UseDualStack" }, u$4 = { "url": "https://sts.amazonaws.com", "properties": { "authSchemes": [{ "name": e$4, "signingName": f$4, "signingRegion": g$4 }] }, "headers": {} }, v$4 = {}, w$4 = { "conditions": [{ [H$1]: d$4, [I$1]: [q$4, "aws-global"] }], [h$4]: u$4, [G$1]: h$4 }, x$4 = { [H$1]: c$4, [I$1]: [s$4, true] }, y$1 = { [H$1]: c$4, [I$1]: [t$4, true] }, z$1 = { [H$1]: l$4, [I$1]: [{ [J$1]: "PartitionResult" }, "supportsFIPS"] }, A$1 = { [J$1]: "PartitionResult" }, B$1 = { [H$1]: c$4, [I$1]: [true, { [H$1]: l$4, [I$1]: [A$1, "supportsDualStack"] }] }, C$1 = [{ [H$1]: "isSet", [I$1]: [o$4] }], D$1 = [x$4], E$1 = [y$1];
 const _data$4 = { parameters: { Region: m$4, UseDualStack: n$4, UseFIPS: n$4, Endpoint: m$4, UseGlobalEndpoint: n$4 }, rules: [{ conditions: [{ [H$1]: c$4, [I$1]: [{ [J$1]: "UseGlobalEndpoint" }, b$4] }, { [H$1]: "not", [I$1]: C$1 }, p$4, r$4, { [H$1]: c$4, [I$1]: [s$4, a$4] }, { [H$1]: c$4, [I$1]: [t$4, a$4] }], rules: [{ conditions: [{ [H$1]: d$4, [I$1]: [q$4, "ap-northeast-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "ap-south-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "ap-southeast-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "ap-southeast-2"] }], endpoint: u$4, [G$1]: h$4 }, w$4, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "ca-central-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "eu-central-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "eu-north-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "eu-west-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "eu-west-2"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "eu-west-3"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "sa-east-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, g$4] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "us-east-2"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "us-west-1"] }], endpoint: u$4, [G$1]: h$4 }, { conditions: [{ [H$1]: d$4, [I$1]: [q$4, "us-west-2"] }], endpoint: u$4, [G$1]: h$4 }, { endpoint: { url: i$4, properties: { authSchemes: [{ name: e$4, signingName: f$4, signingRegion: "{Region}" }] }, headers: v$4 }, [G$1]: h$4 }], [G$1]: j$4 }, { conditions: C$1, rules: [{ conditions: D$1, error: "Invalid Configuration: FIPS and custom endpoint are not supported", [G$1]: k$4 }, { conditions: E$1, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", [G$1]: k$4 }, { endpoint: { url: o$4, properties: v$4, headers: v$4 }, [G$1]: h$4 }], [G$1]: j$4 }, { conditions: [p$4], rules: [{ conditions: [r$4], rules: [{ conditions: [x$4, y$1], rules: [{ conditions: [{ [H$1]: c$4, [I$1]: [b$4, z$1] }, B$1], rules: [{ endpoint: { url: "https://sts-fips.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: v$4, headers: v$4 }, [G$1]: h$4 }], [G$1]: j$4 }, { error: "FIPS and DualStack are enabled, but this partition does not support one or both", [G$1]: k$4 }], [G$1]: j$4 }, { conditions: D$1, rules: [{ conditions: [{ [H$1]: c$4, [I$1]: [z$1, b$4] }], rules: [{ conditions: [{ [H$1]: d$4, [I$1]: [{ [H$1]: l$4, [I$1]: [A$1, "name"] }, "aws-us-gov"] }], endpoint: { url: "https://sts.{Region}.amazonaws.com", properties: v$4, headers: v$4 }, [G$1]: h$4 }, { endpoint: { url: "https://sts-fips.{Region}.{PartitionResult#dnsSuffix}", properties: v$4, headers: v$4 }, [G$1]: h$4 }], [G$1]: j$4 }, { error: "FIPS is enabled but this partition does not support FIPS", [G$1]: k$4 }], [G$1]: j$4 }, { conditions: E$1, rules: [{ conditions: [B$1], rules: [{ endpoint: { url: "https://sts.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: v$4, headers: v$4 }, [G$1]: h$4 }], [G$1]: j$4 }, { error: "DualStack is enabled but this partition does not support DualStack", [G$1]: k$4 }], [G$1]: j$4 }, w$4, { endpoint: { url: i$4, properties: v$4, headers: v$4 }, [G$1]: h$4 }], [G$1]: j$4 }], [G$1]: j$4 }, { error: "Invalid Configuration: Missing Region", [G$1]: k$4 }] };
@@ -10068,197 +10659,6 @@ const defaultEndpointResolver$4 = (endpointParams, context = {}) => {
     }));
 };
 customEndpointFunctions.aws = awsEndpointFunctions;
-
-const getRuntimeConfig$9 = (config) => {
-    return {
-        apiVersion: "2011-06-15",
-        base64Decoder: config?.base64Decoder ?? fromBase64,
-        base64Encoder: config?.base64Encoder ?? toBase64,
-        disableHostPrefix: config?.disableHostPrefix ?? false,
-        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver$4,
-        extensions: config?.extensions ?? [],
-        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSTSHttpAuthSchemeProvider$1,
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
-                signer: new AwsSdkSigV4Signer(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new NoAuthSigner(),
-            },
-        ],
-        logger: config?.logger ?? new NoOpLogger(),
-        protocol: config?.protocol ?? AwsQueryProtocol,
-        protocolSettings: config?.protocolSettings ?? {
-            defaultNamespace: "com.amazonaws.sts",
-            xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
-            version: "2011-06-15",
-            serviceTarget: "AWSSecurityTokenServiceV20110615",
-        },
-        serviceId: config?.serviceId ?? "STS",
-        urlParser: config?.urlParser ?? parseUrl,
-        utf8Decoder: config?.utf8Decoder ?? fromUtf8,
-        utf8Encoder: config?.utf8Encoder ?? toUtf8,
-    };
-};
-
-const getRuntimeConfig$8 = (config) => {
-    emitWarningIfUnsupportedVersion(process.version);
-    const defaultsMode = resolveDefaultsModeConfig(config);
-    const defaultConfigProvider = () => defaultsMode().then(loadConfigsForDefaultMode);
-    const clientSharedValues = getRuntimeConfig$9(config);
-    emitWarningIfUnsupportedVersion$1(process.version);
-    const loaderConfig = {
-        profile: config?.profile,
-        logger: clientSharedValues.logger,
-    };
-    return {
-        ...clientSharedValues,
-        ...config,
-        runtime: "node",
-        defaultsMode,
-        authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
-        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
-        credentialDefaultProvider: config?.credentialDefaultProvider ?? defaultProvider,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$2.version }),
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4") || (async (idProps) => await defaultProvider(idProps?.__config || {})()),
-                signer: new AwsSdkSigV4Signer(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new NoAuthSigner(),
-            },
-        ],
-        maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
-        region: config?.region ?? loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
-        requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
-        retryMode: config?.retryMode ??
-            loadConfig({
-                ...NODE_RETRY_MODE_CONFIG_OPTIONS,
-                default: async () => (await defaultConfigProvider()).retryMode || DEFAULT_RETRY_MODE,
-            }, config),
-        sha256: config?.sha256 ?? Hash.bind(null, "sha256"),
-        streamCollector: config?.streamCollector ?? streamCollector$1,
-        useDualstackEndpoint: config?.useDualstackEndpoint ?? loadConfig(NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
-        useFipsEndpoint: config?.useFipsEndpoint ?? loadConfig(NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
-        userAgentAppId: config?.userAgentAppId ?? loadConfig(NODE_APP_ID_CONFIG_OPTIONS, loaderConfig),
-    };
-};
-
-const getAwsRegionExtensionConfiguration = (runtimeConfig) => {
-    return {
-        setRegion(region) {
-            runtimeConfig.region = region;
-        },
-        region() {
-            return runtimeConfig.region;
-        },
-    };
-};
-const resolveAwsRegionExtensionConfiguration = (awsRegionExtensionConfiguration) => {
-    return {
-        region: awsRegionExtensionConfiguration.region(),
-    };
-};
-
-function stsRegionDefaultResolver(loaderConfig = {}) {
-    return loadConfig({
-        ...NODE_REGION_CONFIG_OPTIONS,
-        async default() {
-            {
-                console.warn("@aws-sdk - WARN - default STS region of us-east-1 used. See @aws-sdk/credential-providers README and set a region explicitly.");
-            }
-            return "us-east-1";
-        },
-    }, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig });
-}
-
-const getHttpAuthExtensionConfiguration$4 = (runtimeConfig) => {
-    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
-    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
-    let _credentials = runtimeConfig.credentials;
-    return {
-        setHttpAuthScheme(httpAuthScheme) {
-            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
-            if (index === -1) {
-                _httpAuthSchemes.push(httpAuthScheme);
-            }
-            else {
-                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
-            }
-        },
-        httpAuthSchemes() {
-            return _httpAuthSchemes;
-        },
-        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
-            _httpAuthSchemeProvider = httpAuthSchemeProvider;
-        },
-        httpAuthSchemeProvider() {
-            return _httpAuthSchemeProvider;
-        },
-        setCredentials(credentials) {
-            _credentials = credentials;
-        },
-        credentials() {
-            return _credentials;
-        },
-    };
-};
-const resolveHttpAuthRuntimeConfig$4 = (config) => {
-    return {
-        httpAuthSchemes: config.httpAuthSchemes(),
-        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
-        credentials: config.credentials(),
-    };
-};
-
-const resolveRuntimeExtensions$4 = (runtimeConfig, extensions) => {
-    const extensionConfiguration = Object.assign(getAwsRegionExtensionConfiguration(runtimeConfig), getDefaultExtensionConfiguration(runtimeConfig), getHttpHandlerExtensionConfiguration(runtimeConfig), getHttpAuthExtensionConfiguration$4(runtimeConfig));
-    extensions.forEach((extension) => extension.configure(extensionConfiguration));
-    return Object.assign(runtimeConfig, resolveAwsRegionExtensionConfiguration(extensionConfiguration), resolveDefaultRuntimeConfig(extensionConfiguration), resolveHttpHandlerRuntimeConfig(extensionConfiguration), resolveHttpAuthRuntimeConfig$4(extensionConfiguration));
-};
-
-let STSClient$1 = class STSClient extends Client {
-    config;
-    constructor(...[configuration]) {
-        const _config_0 = getRuntimeConfig$8(configuration || {});
-        super(_config_0);
-        this.initConfig = _config_0;
-        const _config_1 = resolveClientEndpointParameters$4(_config_0);
-        const _config_2 = resolveUserAgentConfig(_config_1);
-        const _config_3 = resolveRetryConfig(_config_2);
-        const _config_4 = resolveRegionConfig(_config_3);
-        const _config_5 = resolveHostHeaderConfig(_config_4);
-        const _config_6 = resolveEndpointConfig(_config_5);
-        const _config_7 = resolveHttpAuthSchemeConfig$4(_config_6);
-        const _config_8 = resolveRuntimeExtensions$4(_config_7, configuration?.extensions || []);
-        this.config = _config_8;
-        this.middlewareStack.use(getSchemaSerdePlugin(this.config));
-        this.middlewareStack.use(getUserAgentPlugin(this.config));
-        this.middlewareStack.use(getRetryPlugin(this.config));
-        this.middlewareStack.use(getContentLengthPlugin(this.config));
-        this.middlewareStack.use(getHostHeaderPlugin(this.config));
-        this.middlewareStack.use(getLoggerPlugin(this.config));
-        this.middlewareStack.use(getRecursionDetectionPlugin(this.config));
-        this.middlewareStack.use(getHttpAuthSchemeEndpointRuleSetPlugin(this.config, {
-            httpAuthSchemeParametersProvider: defaultSTSHttpAuthSchemeParametersProvider$1,
-            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig({
-                "aws.auth#sigv4": config.credentials,
-            }),
-        }));
-        this.middlewareStack.use(getHttpSigningPlugin(this.config));
-    }
-    destroy() {
-        super.destroy();
-    }
-};
 
 let STSServiceException$1 = class STSServiceException extends ServiceException {
     constructor(options) {
@@ -10437,18 +10837,86 @@ const _hE$4 = "httpError";
 const _m$3 = "message";
 const _s$4 = "smithy.ts.sdk.synthetic.com.amazonaws.sts";
 const n0$4 = "com.amazonaws.sts";
+const _s_registry$4 = TypeRegistry.for(_s$4);
+var STSServiceException$$1 = [-3, _s$4, "STSServiceException", 0, [], []];
+_s_registry$4.registerError(STSServiceException$$1, STSServiceException$1);
+const n0_registry$4 = TypeRegistry.for(n0$4);
 var ExpiredTokenException$$2 = [-3, n0$4, _ETE$2,
     { [_aQE$1]: [`ExpiredTokenException`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
     [_m$3],
     [0]
 ];
-TypeRegistry.for(n0$4).registerError(ExpiredTokenException$$2, ExpiredTokenException$2);
+n0_registry$4.registerError(ExpiredTokenException$$2, ExpiredTokenException$2);
 var ExpiredTradeInTokenException$ = [-3, n0$4, _ETITE,
     { [_aQE$1]: [`ExpiredTradeInTokenException`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
     [_m$3],
     [0]
 ];
-TypeRegistry.for(n0$4).registerError(ExpiredTradeInTokenException$, ExpiredTradeInTokenException);
+n0_registry$4.registerError(ExpiredTradeInTokenException$, ExpiredTradeInTokenException);
+var IDPCommunicationErrorException$$1 = [-3, n0$4, _IDPCEE$1,
+    { [_aQE$1]: [`IDPCommunicationError`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(IDPCommunicationErrorException$$1, IDPCommunicationErrorException$1);
+var IDPRejectedClaimException$$1 = [-3, n0$4, _IDPRCE$1,
+    { [_aQE$1]: [`IDPRejectedClaim`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(IDPRejectedClaimException$$1, IDPRejectedClaimException$1);
+var InvalidAuthorizationMessageException$ = [-3, n0$4, _IAME,
+    { [_aQE$1]: [`InvalidAuthorizationMessageException`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(InvalidAuthorizationMessageException$, InvalidAuthorizationMessageException);
+var InvalidIdentityTokenException$$1 = [-3, n0$4, _IITE$1,
+    { [_aQE$1]: [`InvalidIdentityToken`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(InvalidIdentityTokenException$$1, InvalidIdentityTokenException$1);
+var JWTPayloadSizeExceededException$ = [-3, n0$4, _JWTPSEE,
+    { [_aQE$1]: [`JWTPayloadSizeExceededException`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(JWTPayloadSizeExceededException$, JWTPayloadSizeExceededException);
+var MalformedPolicyDocumentException$$1 = [-3, n0$4, _MPDE$1,
+    { [_aQE$1]: [`MalformedPolicyDocument`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(MalformedPolicyDocumentException$$1, MalformedPolicyDocumentException$1);
+var OutboundWebIdentityFederationDisabledException$ = [-3, n0$4, _OWIFDE,
+    { [_aQE$1]: [`OutboundWebIdentityFederationDisabledException`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(OutboundWebIdentityFederationDisabledException$, OutboundWebIdentityFederationDisabledException);
+var PackedPolicyTooLargeException$$1 = [-3, n0$4, _PPTLE$1,
+    { [_aQE$1]: [`PackedPolicyTooLarge`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(PackedPolicyTooLargeException$$1, PackedPolicyTooLargeException$1);
+var RegionDisabledException$$1 = [-3, n0$4, _RDE$1,
+    { [_aQE$1]: [`RegionDisabledException`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(RegionDisabledException$$1, RegionDisabledException$1);
+var SessionDurationEscalationException$ = [-3, n0$4, _SDEE,
+    { [_aQE$1]: [`SessionDurationEscalationException`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
+    [_m$3],
+    [0]
+];
+n0_registry$4.registerError(SessionDurationEscalationException$, SessionDurationEscalationException);
+const errorTypeRegistries$4 = [
+    _s_registry$4,
+    n0_registry$4,
+];
 var GetCallerIdentityRequest$ = [3, n0$4, _GCIR,
     0,
     [],
@@ -10459,71 +10927,201 @@ var GetCallerIdentityResponse$ = [3, n0$4, _GCIRe,
     [_UI, _Ac, _A$1],
     [0, 0, 0]
 ];
-var IDPCommunicationErrorException$$1 = [-3, n0$4, _IDPCEE$1,
-    { [_aQE$1]: [`IDPCommunicationError`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(IDPCommunicationErrorException$$1, IDPCommunicationErrorException$1);
-var IDPRejectedClaimException$$1 = [-3, n0$4, _IDPRCE$1,
-    { [_aQE$1]: [`IDPRejectedClaim`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(IDPRejectedClaimException$$1, IDPRejectedClaimException$1);
-var InvalidAuthorizationMessageException$ = [-3, n0$4, _IAME,
-    { [_aQE$1]: [`InvalidAuthorizationMessageException`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(InvalidAuthorizationMessageException$, InvalidAuthorizationMessageException);
-var InvalidIdentityTokenException$$1 = [-3, n0$4, _IITE$1,
-    { [_aQE$1]: [`InvalidIdentityToken`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(InvalidIdentityTokenException$$1, InvalidIdentityTokenException$1);
-var JWTPayloadSizeExceededException$ = [-3, n0$4, _JWTPSEE,
-    { [_aQE$1]: [`JWTPayloadSizeExceededException`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(JWTPayloadSizeExceededException$, JWTPayloadSizeExceededException);
-var MalformedPolicyDocumentException$$1 = [-3, n0$4, _MPDE$1,
-    { [_aQE$1]: [`MalformedPolicyDocument`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(MalformedPolicyDocumentException$$1, MalformedPolicyDocumentException$1);
-var OutboundWebIdentityFederationDisabledException$ = [-3, n0$4, _OWIFDE,
-    { [_aQE$1]: [`OutboundWebIdentityFederationDisabledException`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(OutboundWebIdentityFederationDisabledException$, OutboundWebIdentityFederationDisabledException);
-var PackedPolicyTooLargeException$$1 = [-3, n0$4, _PPTLE$1,
-    { [_aQE$1]: [`PackedPolicyTooLarge`, 400], [_e$4]: _c$4, [_hE$4]: 400 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(PackedPolicyTooLargeException$$1, PackedPolicyTooLargeException$1);
-var RegionDisabledException$$1 = [-3, n0$4, _RDE$1,
-    { [_aQE$1]: [`RegionDisabledException`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(RegionDisabledException$$1, RegionDisabledException$1);
-var SessionDurationEscalationException$ = [-3, n0$4, _SDEE,
-    { [_aQE$1]: [`SessionDurationEscalationException`, 403], [_e$4]: _c$4, [_hE$4]: 403 },
-    [_m$3],
-    [0]
-];
-TypeRegistry.for(n0$4).registerError(SessionDurationEscalationException$, SessionDurationEscalationException);
-var STSServiceException$$1 = [-3, _s$4, "STSServiceException", 0, [], []];
-TypeRegistry.for(_s$4).registerError(STSServiceException$$1, STSServiceException$1);
 var GetCallerIdentity$ = [9, n0$4, _GCI,
     0, () => GetCallerIdentityRequest$, () => GetCallerIdentityResponse$
 ];
+
+const getRuntimeConfig$9 = (config) => {
+    return {
+        apiVersion: "2011-06-15",
+        base64Decoder: config?.base64Decoder ?? fromBase64,
+        base64Encoder: config?.base64Encoder ?? toBase64,
+        disableHostPrefix: config?.disableHostPrefix ?? false,
+        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver$4,
+        extensions: config?.extensions ?? [],
+        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSTSHttpAuthSchemeProvider$1,
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
+                signer: new AwsSdkSigV4Signer(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new NoAuthSigner(),
+            },
+        ],
+        logger: config?.logger ?? new NoOpLogger(),
+        protocol: config?.protocol ?? AwsQueryProtocol,
+        protocolSettings: config?.protocolSettings ?? {
+            defaultNamespace: "com.amazonaws.sts",
+            errorTypeRegistries: errorTypeRegistries$4,
+            xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
+            version: "2011-06-15",
+            serviceTarget: "AWSSecurityTokenServiceV20110615",
+        },
+        serviceId: config?.serviceId ?? "STS",
+        urlParser: config?.urlParser ?? parseUrl,
+        utf8Decoder: config?.utf8Decoder ?? fromUtf8,
+        utf8Encoder: config?.utf8Encoder ?? toUtf8,
+    };
+};
+
+const getRuntimeConfig$8 = (config) => {
+    emitWarningIfUnsupportedVersion(process.version);
+    const defaultsMode = resolveDefaultsModeConfig(config);
+    const defaultConfigProvider = () => defaultsMode().then(loadConfigsForDefaultMode);
+    const clientSharedValues = getRuntimeConfig$9(config);
+    emitWarningIfUnsupportedVersion$1(process.version);
+    const loaderConfig = {
+        profile: config?.profile,
+        logger: clientSharedValues.logger,
+    };
+    return {
+        ...clientSharedValues,
+        ...config,
+        runtime: "node",
+        defaultsMode,
+        authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
+        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
+        credentialDefaultProvider: config?.credentialDefaultProvider ?? defaultProvider,
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$2.version }),
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4") || (async (idProps) => await defaultProvider(idProps?.__config || {})()),
+                signer: new AwsSdkSigV4Signer(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new NoAuthSigner(),
+            },
+        ],
+        maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
+        region: config?.region ?? loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
+        requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
+        retryMode: config?.retryMode ??
+            loadConfig({
+                ...NODE_RETRY_MODE_CONFIG_OPTIONS,
+                default: async () => (await defaultConfigProvider()).retryMode || DEFAULT_RETRY_MODE,
+            }, config),
+        sha256: config?.sha256 ?? Hash.bind(null, "sha256"),
+        streamCollector: config?.streamCollector ?? streamCollector$1,
+        useDualstackEndpoint: config?.useDualstackEndpoint ?? loadConfig(NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
+        useFipsEndpoint: config?.useFipsEndpoint ?? loadConfig(NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
+        userAgentAppId: config?.userAgentAppId ?? loadConfig(NODE_APP_ID_CONFIG_OPTIONS, loaderConfig),
+    };
+};
+
+const getAwsRegionExtensionConfiguration = (runtimeConfig) => {
+    return {
+        setRegion(region) {
+            runtimeConfig.region = region;
+        },
+        region() {
+            return runtimeConfig.region;
+        },
+    };
+};
+const resolveAwsRegionExtensionConfiguration = (awsRegionExtensionConfiguration) => {
+    return {
+        region: awsRegionExtensionConfiguration.region(),
+    };
+};
+
+function stsRegionDefaultResolver(loaderConfig = {}) {
+    return loadConfig({
+        ...NODE_REGION_CONFIG_OPTIONS,
+        async default() {
+            {
+                console.warn("@aws-sdk - WARN - default STS region of us-east-1 used. See @aws-sdk/credential-providers README and set a region explicitly.");
+            }
+            return "us-east-1";
+        },
+    }, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig });
+}
+
+const getHttpAuthExtensionConfiguration$4 = (runtimeConfig) => {
+    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
+    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
+    let _credentials = runtimeConfig.credentials;
+    return {
+        setHttpAuthScheme(httpAuthScheme) {
+            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
+            if (index === -1) {
+                _httpAuthSchemes.push(httpAuthScheme);
+            }
+            else {
+                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
+            }
+        },
+        httpAuthSchemes() {
+            return _httpAuthSchemes;
+        },
+        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
+            _httpAuthSchemeProvider = httpAuthSchemeProvider;
+        },
+        httpAuthSchemeProvider() {
+            return _httpAuthSchemeProvider;
+        },
+        setCredentials(credentials) {
+            _credentials = credentials;
+        },
+        credentials() {
+            return _credentials;
+        },
+    };
+};
+const resolveHttpAuthRuntimeConfig$4 = (config) => {
+    return {
+        httpAuthSchemes: config.httpAuthSchemes(),
+        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
+        credentials: config.credentials(),
+    };
+};
+
+const resolveRuntimeExtensions$4 = (runtimeConfig, extensions) => {
+    const extensionConfiguration = Object.assign(getAwsRegionExtensionConfiguration(runtimeConfig), getDefaultExtensionConfiguration(runtimeConfig), getHttpHandlerExtensionConfiguration(runtimeConfig), getHttpAuthExtensionConfiguration$4(runtimeConfig));
+    extensions.forEach((extension) => extension.configure(extensionConfiguration));
+    return Object.assign(runtimeConfig, resolveAwsRegionExtensionConfiguration(extensionConfiguration), resolveDefaultRuntimeConfig(extensionConfiguration), resolveHttpHandlerRuntimeConfig(extensionConfiguration), resolveHttpAuthRuntimeConfig$4(extensionConfiguration));
+};
+
+let STSClient$1 = class STSClient extends Client {
+    config;
+    constructor(...[configuration]) {
+        const _config_0 = getRuntimeConfig$8(configuration || {});
+        super(_config_0);
+        this.initConfig = _config_0;
+        const _config_1 = resolveClientEndpointParameters$4(_config_0);
+        const _config_2 = resolveUserAgentConfig(_config_1);
+        const _config_3 = resolveRetryConfig(_config_2);
+        const _config_4 = resolveRegionConfig(_config_3);
+        const _config_5 = resolveHostHeaderConfig(_config_4);
+        const _config_6 = resolveEndpointConfig(_config_5);
+        const _config_7 = resolveHttpAuthSchemeConfig$4(_config_6);
+        const _config_8 = resolveRuntimeExtensions$4(_config_7, configuration?.extensions || []);
+        this.config = _config_8;
+        this.middlewareStack.use(getSchemaSerdePlugin(this.config));
+        this.middlewareStack.use(getUserAgentPlugin(this.config));
+        this.middlewareStack.use(getRetryPlugin(this.config));
+        this.middlewareStack.use(getContentLengthPlugin(this.config));
+        this.middlewareStack.use(getHostHeaderPlugin(this.config));
+        this.middlewareStack.use(getLoggerPlugin(this.config));
+        this.middlewareStack.use(getRecursionDetectionPlugin(this.config));
+        this.middlewareStack.use(getHttpAuthSchemeEndpointRuleSetPlugin(this.config, {
+            httpAuthSchemeParametersProvider: defaultSTSHttpAuthSchemeParametersProvider$1,
+            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig({
+                "aws.auth#sigv4": config.credentials,
+            }),
+        }));
+        this.middlewareStack.use(getHttpSigningPlugin(this.config));
+    }
+    destroy() {
+        super.destroy();
+    }
+};
 
 class GetCallerIdentityCommand extends Command
     .classBuilder()
@@ -10665,6 +11263,11 @@ class EventStreamSerde {
                             [unionMember]: out,
                         };
                     }
+                    if (body.byteLength === 0) {
+                        return {
+                            [unionMember]: {},
+                        };
+                    }
                 }
                 return {
                     [unionMember]: await this.deserializer.read(eventStreamSchema, body),
@@ -10769,6 +11372,9 @@ class EventStreamSerde {
                 else {
                     serializer.write(eventSchema, event[unionMember]);
                 }
+            }
+            else if (eventSchema.isUnitSchema()) {
+                serializer.write(eventSchema, {});
             }
             else {
                 throw new Error("@smithy/core/event-streams - non-struct member not supported in event stream union.");
@@ -12323,7 +12929,7 @@ const commonParams$3 = {
     UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" },
 };
 
-var version$1 = "3.958.0";
+var version$1 = "3.990.0";
 var packageInfo$1 = {
 	version: version$1};
 
@@ -12342,158 +12948,7 @@ const defaultEndpointResolver$3 = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions;
-
-const getRuntimeConfig$7 = (config) => {
-    return {
-        apiVersion: "2019-06-10",
-        base64Decoder: config?.base64Decoder ?? fromBase64,
-        base64Encoder: config?.base64Encoder ?? toBase64,
-        disableHostPrefix: config?.disableHostPrefix ?? false,
-        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver$3,
-        extensions: config?.extensions ?? [],
-        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSSOOIDCHttpAuthSchemeProvider,
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
-                signer: new AwsSdkSigV4Signer(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new NoAuthSigner(),
-            },
-        ],
-        logger: config?.logger ?? new NoOpLogger(),
-        protocol: config?.protocol ?? AwsRestJsonProtocol,
-        protocolSettings: config?.protocolSettings ?? {
-            defaultNamespace: "com.amazonaws.ssooidc",
-            version: "2019-06-10",
-            serviceTarget: "AWSSSOOIDCService",
-        },
-        serviceId: config?.serviceId ?? "SSO OIDC",
-        urlParser: config?.urlParser ?? parseUrl,
-        utf8Decoder: config?.utf8Decoder ?? fromUtf8,
-        utf8Encoder: config?.utf8Encoder ?? toUtf8,
-    };
-};
-
-const getRuntimeConfig$6 = (config) => {
-    emitWarningIfUnsupportedVersion(process.version);
-    const defaultsMode = resolveDefaultsModeConfig(config);
-    const defaultConfigProvider = () => defaultsMode().then(loadConfigsForDefaultMode);
-    const clientSharedValues = getRuntimeConfig$7(config);
-    emitWarningIfUnsupportedVersion$1(process.version);
-    const loaderConfig = {
-        profile: config?.profile,
-        logger: clientSharedValues.logger,
-    };
-    return {
-        ...clientSharedValues,
-        ...config,
-        runtime: "node",
-        defaultsMode,
-        authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
-        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
-            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
-        maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
-        region: config?.region ??
-            loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
-        requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
-        retryMode: config?.retryMode ??
-            loadConfig({
-                ...NODE_RETRY_MODE_CONFIG_OPTIONS,
-                default: async () => (await defaultConfigProvider()).retryMode || DEFAULT_RETRY_MODE,
-            }, config),
-        sha256: config?.sha256 ?? Hash.bind(null, "sha256"),
-        streamCollector: config?.streamCollector ?? streamCollector$1,
-        useDualstackEndpoint: config?.useDualstackEndpoint ?? loadConfig(NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
-        useFipsEndpoint: config?.useFipsEndpoint ?? loadConfig(NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
-        userAgentAppId: config?.userAgentAppId ?? loadConfig(NODE_APP_ID_CONFIG_OPTIONS, loaderConfig),
-    };
-};
-
-const getHttpAuthExtensionConfiguration$3 = (runtimeConfig) => {
-    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
-    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
-    let _credentials = runtimeConfig.credentials;
-    return {
-        setHttpAuthScheme(httpAuthScheme) {
-            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
-            if (index === -1) {
-                _httpAuthSchemes.push(httpAuthScheme);
-            }
-            else {
-                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
-            }
-        },
-        httpAuthSchemes() {
-            return _httpAuthSchemes;
-        },
-        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
-            _httpAuthSchemeProvider = httpAuthSchemeProvider;
-        },
-        httpAuthSchemeProvider() {
-            return _httpAuthSchemeProvider;
-        },
-        setCredentials(credentials) {
-            _credentials = credentials;
-        },
-        credentials() {
-            return _credentials;
-        },
-    };
-};
-const resolveHttpAuthRuntimeConfig$3 = (config) => {
-    return {
-        httpAuthSchemes: config.httpAuthSchemes(),
-        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
-        credentials: config.credentials(),
-    };
-};
-
-const resolveRuntimeExtensions$3 = (runtimeConfig, extensions) => {
-    const extensionConfiguration = Object.assign(getAwsRegionExtensionConfiguration(runtimeConfig), getDefaultExtensionConfiguration(runtimeConfig), getHttpHandlerExtensionConfiguration(runtimeConfig), getHttpAuthExtensionConfiguration$3(runtimeConfig));
-    extensions.forEach((extension) => extension.configure(extensionConfiguration));
-    return Object.assign(runtimeConfig, resolveAwsRegionExtensionConfiguration(extensionConfiguration), resolveDefaultRuntimeConfig(extensionConfiguration), resolveHttpHandlerRuntimeConfig(extensionConfiguration), resolveHttpAuthRuntimeConfig$3(extensionConfiguration));
-};
-
-class SSOOIDCClient extends Client {
-    config;
-    constructor(...[configuration]) {
-        const _config_0 = getRuntimeConfig$6(configuration || {});
-        super(_config_0);
-        this.initConfig = _config_0;
-        const _config_1 = resolveClientEndpointParameters$3(_config_0);
-        const _config_2 = resolveUserAgentConfig(_config_1);
-        const _config_3 = resolveRetryConfig(_config_2);
-        const _config_4 = resolveRegionConfig(_config_3);
-        const _config_5 = resolveHostHeaderConfig(_config_4);
-        const _config_6 = resolveEndpointConfig(_config_5);
-        const _config_7 = resolveHttpAuthSchemeConfig$3(_config_6);
-        const _config_8 = resolveRuntimeExtensions$3(_config_7, configuration?.extensions || []);
-        this.config = _config_8;
-        this.middlewareStack.use(getSchemaSerdePlugin(this.config));
-        this.middlewareStack.use(getUserAgentPlugin(this.config));
-        this.middlewareStack.use(getRetryPlugin(this.config));
-        this.middlewareStack.use(getContentLengthPlugin(this.config));
-        this.middlewareStack.use(getHostHeaderPlugin(this.config));
-        this.middlewareStack.use(getLoggerPlugin(this.config));
-        this.middlewareStack.use(getRecursionDetectionPlugin(this.config));
-        this.middlewareStack.use(getHttpAuthSchemeEndpointRuleSetPlugin(this.config, {
-            httpAuthSchemeParametersProvider: defaultSSOOIDCHttpAuthSchemeParametersProvider,
-            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig({
-                "aws.auth#sigv4": config.credentials,
-            }),
-        }));
-        this.middlewareStack.use(getHttpSigningPlugin(this.config));
-    }
-    destroy() {
-        super.destroy();
-    }
-}
+customEndpointFunctions.aws = awsEndpointFunctions$1;
 
 class SSOOIDCServiceException extends ServiceException {
     constructor(options) {
@@ -12719,16 +13174,15 @@ const _iT$1 = "idToken";
 const _r = "reason";
 const _rT$1 = "refreshToken";
 const _rU$1 = "redirectUri";
-const _s$3 = "scope";
-const _se = "server";
-const _sm$1 = "smithy.ts.sdk.synthetic.com.amazonaws.ssooidc";
+const _s$3 = "smithy.ts.sdk.synthetic.com.amazonaws.ssooidc";
+const _sc = "scope";
+const _se$1 = "server";
 const _tT$1 = "tokenType";
 const n0$3 = "com.amazonaws.ssooidc";
-var AccessToken = [0, n0$3, _AT$1, 8, 0];
-var ClientSecret = [0, n0$3, _CS, 8, 0];
-var CodeVerifier = [0, n0$3, _CV, 8, 0];
-var IdToken = [0, n0$3, _IT, 8, 0];
-var RefreshToken$1 = [0, n0$3, _RT$1, 8, 0];
+const _s_registry$3 = TypeRegistry.for(_s$3);
+var SSOOIDCServiceException$ = [-3, _s$3, "SSOOIDCServiceException", 0, [], []];
+_s_registry$3.registerError(SSOOIDCServiceException$, SSOOIDCServiceException);
+const n0_registry$3 = TypeRegistry.for(n0$3);
 var AccessDeniedException$$1 = [
     -3,
     n0$3,
@@ -12737,7 +13191,7 @@ var AccessDeniedException$$1 = [
     [_e$3, _r, _ed],
     [0, 0, 0],
 ];
-TypeRegistry.for(n0$3).registerError(AccessDeniedException$$1, AccessDeniedException$1);
+n0_registry$3.registerError(AccessDeniedException$$1, AccessDeniedException$1);
 var AuthorizationPendingException$ = [
     -3,
     n0$3,
@@ -12746,14 +13200,60 @@ var AuthorizationPendingException$ = [
     [_e$3, _ed],
     [0, 0],
 ];
-TypeRegistry.for(n0$3).registerError(AuthorizationPendingException$, AuthorizationPendingException);
+n0_registry$3.registerError(AuthorizationPendingException$, AuthorizationPendingException);
+var ExpiredTokenException$$1 = [-3, n0$3, _ETE$1, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
+n0_registry$3.registerError(ExpiredTokenException$$1, ExpiredTokenException$1);
+var InternalServerException$$1 = [-3, n0$3, _ISE$1, { [_e$3]: _se$1, [_hE$3]: 500 }, [_e$3, _ed], [0, 0]];
+n0_registry$3.registerError(InternalServerException$$1, InternalServerException$1);
+var InvalidClientException$ = [-3, n0$3, _ICE, { [_e$3]: _c$3, [_hE$3]: 401 }, [_e$3, _ed], [0, 0]];
+n0_registry$3.registerError(InvalidClientException$, InvalidClientException);
+var InvalidGrantException$ = [-3, n0$3, _IGE, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
+n0_registry$3.registerError(InvalidGrantException$, InvalidGrantException);
+var InvalidRequestException$$1 = [
+    -3,
+    n0$3,
+    _IRE$1,
+    { [_e$3]: _c$3, [_hE$3]: 400 },
+    [_e$3, _r, _ed],
+    [0, 0, 0],
+];
+n0_registry$3.registerError(InvalidRequestException$$1, InvalidRequestException$1);
+var InvalidScopeException$ = [-3, n0$3, _ISEn, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
+n0_registry$3.registerError(InvalidScopeException$, InvalidScopeException);
+var SlowDownException$ = [-3, n0$3, _SDE, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
+n0_registry$3.registerError(SlowDownException$, SlowDownException);
+var UnauthorizedClientException$ = [
+    -3,
+    n0$3,
+    _UCE,
+    { [_e$3]: _c$3, [_hE$3]: 400 },
+    [_e$3, _ed],
+    [0, 0],
+];
+n0_registry$3.registerError(UnauthorizedClientException$, UnauthorizedClientException);
+var UnsupportedGrantTypeException$ = [
+    -3,
+    n0$3,
+    _UGTE,
+    { [_e$3]: _c$3, [_hE$3]: 400 },
+    [_e$3, _ed],
+    [0, 0],
+];
+n0_registry$3.registerError(UnsupportedGrantTypeException$, UnsupportedGrantTypeException);
+const errorTypeRegistries$3 = [_s_registry$3, n0_registry$3];
+var AccessToken = [0, n0$3, _AT$1, 8, 0];
+var ClientSecret = [0, n0$3, _CS, 8, 0];
+var CodeVerifier = [0, n0$3, _CV, 8, 0];
+var IdToken = [0, n0$3, _IT, 8, 0];
+var RefreshToken$1 = [0, n0$3, _RT$1, 8, 0];
 var CreateTokenRequest$ = [
     3,
     n0$3,
     _CTR,
     0,
-    [_cI$1, _cS, _gT$1, _dC, _co$1, _rT$1, _s$3, _rU$1, _cV$1],
+    [_cI$1, _cS, _gT$1, _dC, _co$1, _rT$1, _sc, _rU$1, _cV$1],
     [0, [() => ClientSecret, 0], 0, 0, 0, [() => RefreshToken$1, 0], 64 | 0, 0, [() => CodeVerifier, 0]],
+    3,
 ];
 var CreateTokenResponse$ = [
     3,
@@ -12763,47 +13263,6 @@ var CreateTokenResponse$ = [
     [_aT$2, _tT$1, _eI$1, _rT$1, _iT$1],
     [[() => AccessToken, 0], 0, 1, [() => RefreshToken$1, 0], [() => IdToken, 0]],
 ];
-var ExpiredTokenException$$1 = [-3, n0$3, _ETE$1, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
-TypeRegistry.for(n0$3).registerError(ExpiredTokenException$$1, ExpiredTokenException$1);
-var InternalServerException$$1 = [-3, n0$3, _ISE$1, { [_e$3]: _se, [_hE$3]: 500 }, [_e$3, _ed], [0, 0]];
-TypeRegistry.for(n0$3).registerError(InternalServerException$$1, InternalServerException$1);
-var InvalidClientException$ = [-3, n0$3, _ICE, { [_e$3]: _c$3, [_hE$3]: 401 }, [_e$3, _ed], [0, 0]];
-TypeRegistry.for(n0$3).registerError(InvalidClientException$, InvalidClientException);
-var InvalidGrantException$ = [-3, n0$3, _IGE, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
-TypeRegistry.for(n0$3).registerError(InvalidGrantException$, InvalidGrantException);
-var InvalidRequestException$$1 = [
-    -3,
-    n0$3,
-    _IRE$1,
-    { [_e$3]: _c$3, [_hE$3]: 400 },
-    [_e$3, _r, _ed],
-    [0, 0, 0],
-];
-TypeRegistry.for(n0$3).registerError(InvalidRequestException$$1, InvalidRequestException$1);
-var InvalidScopeException$ = [-3, n0$3, _ISEn, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
-TypeRegistry.for(n0$3).registerError(InvalidScopeException$, InvalidScopeException);
-var SlowDownException$ = [-3, n0$3, _SDE, { [_e$3]: _c$3, [_hE$3]: 400 }, [_e$3, _ed], [0, 0]];
-TypeRegistry.for(n0$3).registerError(SlowDownException$, SlowDownException);
-var UnauthorizedClientException$ = [
-    -3,
-    n0$3,
-    _UCE,
-    { [_e$3]: _c$3, [_hE$3]: 400 },
-    [_e$3, _ed],
-    [0, 0],
-];
-TypeRegistry.for(n0$3).registerError(UnauthorizedClientException$, UnauthorizedClientException);
-var UnsupportedGrantTypeException$ = [
-    -3,
-    n0$3,
-    _UGTE,
-    { [_e$3]: _c$3, [_hE$3]: 400 },
-    [_e$3, _ed],
-    [0, 0],
-];
-TypeRegistry.for(n0$3).registerError(UnsupportedGrantTypeException$, UnsupportedGrantTypeException);
-var SSOOIDCServiceException$ = [-3, _sm$1, "SSOOIDCServiceException", 0, [], []];
-TypeRegistry.for(_sm$1).registerError(SSOOIDCServiceException$, SSOOIDCServiceException);
 var CreateToken$ = [
     9,
     n0$3,
@@ -12812,6 +13271,158 @@ var CreateToken$ = [
     () => CreateTokenRequest$,
     () => CreateTokenResponse$,
 ];
+
+const getRuntimeConfig$7 = (config) => {
+    return {
+        apiVersion: "2019-06-10",
+        base64Decoder: config?.base64Decoder ?? fromBase64,
+        base64Encoder: config?.base64Encoder ?? toBase64,
+        disableHostPrefix: config?.disableHostPrefix ?? false,
+        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver$3,
+        extensions: config?.extensions ?? [],
+        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSSOOIDCHttpAuthSchemeProvider,
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
+                signer: new AwsSdkSigV4Signer(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new NoAuthSigner(),
+            },
+        ],
+        logger: config?.logger ?? new NoOpLogger(),
+        protocol: config?.protocol ?? AwsRestJsonProtocol,
+        protocolSettings: config?.protocolSettings ?? {
+            defaultNamespace: "com.amazonaws.ssooidc",
+            errorTypeRegistries: errorTypeRegistries$3,
+            version: "2019-06-10",
+            serviceTarget: "AWSSSOOIDCService",
+        },
+        serviceId: config?.serviceId ?? "SSO OIDC",
+        urlParser: config?.urlParser ?? parseUrl,
+        utf8Decoder: config?.utf8Decoder ?? fromUtf8,
+        utf8Encoder: config?.utf8Encoder ?? toUtf8,
+    };
+};
+
+const getRuntimeConfig$6 = (config) => {
+    emitWarningIfUnsupportedVersion(process.version);
+    const defaultsMode = resolveDefaultsModeConfig(config);
+    const defaultConfigProvider = () => defaultsMode().then(loadConfigsForDefaultMode);
+    const clientSharedValues = getRuntimeConfig$7(config);
+    emitWarningIfUnsupportedVersion$1(process.version);
+    const loaderConfig = {
+        profile: config?.profile,
+        logger: clientSharedValues.logger,
+    };
+    return {
+        ...clientSharedValues,
+        ...config,
+        runtime: "node",
+        defaultsMode,
+        authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
+        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
+            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
+        maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
+        region: config?.region ??
+            loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
+        requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
+        retryMode: config?.retryMode ??
+            loadConfig({
+                ...NODE_RETRY_MODE_CONFIG_OPTIONS,
+                default: async () => (await defaultConfigProvider()).retryMode || DEFAULT_RETRY_MODE,
+            }, config),
+        sha256: config?.sha256 ?? Hash.bind(null, "sha256"),
+        streamCollector: config?.streamCollector ?? streamCollector$1,
+        useDualstackEndpoint: config?.useDualstackEndpoint ?? loadConfig(NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
+        useFipsEndpoint: config?.useFipsEndpoint ?? loadConfig(NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
+        userAgentAppId: config?.userAgentAppId ?? loadConfig(NODE_APP_ID_CONFIG_OPTIONS, loaderConfig),
+    };
+};
+
+const getHttpAuthExtensionConfiguration$3 = (runtimeConfig) => {
+    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
+    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
+    let _credentials = runtimeConfig.credentials;
+    return {
+        setHttpAuthScheme(httpAuthScheme) {
+            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
+            if (index === -1) {
+                _httpAuthSchemes.push(httpAuthScheme);
+            }
+            else {
+                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
+            }
+        },
+        httpAuthSchemes() {
+            return _httpAuthSchemes;
+        },
+        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
+            _httpAuthSchemeProvider = httpAuthSchemeProvider;
+        },
+        httpAuthSchemeProvider() {
+            return _httpAuthSchemeProvider;
+        },
+        setCredentials(credentials) {
+            _credentials = credentials;
+        },
+        credentials() {
+            return _credentials;
+        },
+    };
+};
+const resolveHttpAuthRuntimeConfig$3 = (config) => {
+    return {
+        httpAuthSchemes: config.httpAuthSchemes(),
+        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
+        credentials: config.credentials(),
+    };
+};
+
+const resolveRuntimeExtensions$3 = (runtimeConfig, extensions) => {
+    const extensionConfiguration = Object.assign(getAwsRegionExtensionConfiguration(runtimeConfig), getDefaultExtensionConfiguration(runtimeConfig), getHttpHandlerExtensionConfiguration(runtimeConfig), getHttpAuthExtensionConfiguration$3(runtimeConfig));
+    extensions.forEach((extension) => extension.configure(extensionConfiguration));
+    return Object.assign(runtimeConfig, resolveAwsRegionExtensionConfiguration(extensionConfiguration), resolveDefaultRuntimeConfig(extensionConfiguration), resolveHttpHandlerRuntimeConfig(extensionConfiguration), resolveHttpAuthRuntimeConfig$3(extensionConfiguration));
+};
+
+class SSOOIDCClient extends Client {
+    config;
+    constructor(...[configuration]) {
+        const _config_0 = getRuntimeConfig$6(configuration || {});
+        super(_config_0);
+        this.initConfig = _config_0;
+        const _config_1 = resolveClientEndpointParameters$3(_config_0);
+        const _config_2 = resolveUserAgentConfig(_config_1);
+        const _config_3 = resolveRetryConfig(_config_2);
+        const _config_4 = resolveRegionConfig(_config_3);
+        const _config_5 = resolveHostHeaderConfig(_config_4);
+        const _config_6 = resolveEndpointConfig(_config_5);
+        const _config_7 = resolveHttpAuthSchemeConfig$3(_config_6);
+        const _config_8 = resolveRuntimeExtensions$3(_config_7, configuration?.extensions || []);
+        this.config = _config_8;
+        this.middlewareStack.use(getSchemaSerdePlugin(this.config));
+        this.middlewareStack.use(getUserAgentPlugin(this.config));
+        this.middlewareStack.use(getRetryPlugin(this.config));
+        this.middlewareStack.use(getContentLengthPlugin(this.config));
+        this.middlewareStack.use(getHostHeaderPlugin(this.config));
+        this.middlewareStack.use(getLoggerPlugin(this.config));
+        this.middlewareStack.use(getRecursionDetectionPlugin(this.config));
+        this.middlewareStack.use(getHttpAuthSchemeEndpointRuleSetPlugin(this.config, {
+            httpAuthSchemeParametersProvider: defaultSSOOIDCHttpAuthSchemeParametersProvider,
+            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig({
+                "aws.auth#sigv4": config.credentials,
+            }),
+        }));
+        this.middlewareStack.use(getHttpSigningPlugin(this.config));
+    }
+    destroy() {
+        super.destroy();
+    }
+}
 
 class CreateTokenCommand extends Command
     .classBuilder()
@@ -12857,7 +13468,8 @@ var index$2 = /*#__PURE__*/Object.freeze({
     UnauthorizedClientException$: UnauthorizedClientException$,
     UnsupportedGrantTypeException: UnsupportedGrantTypeException,
     UnsupportedGrantTypeException$: UnsupportedGrantTypeException$,
-    __Client: Client
+    __Client: Client,
+    errorTypeRegistries: errorTypeRegistries$3
 });
 
 const defaultSSOHttpAuthSchemeParametersProvider = async (config, context, input) => {
@@ -12938,7 +13550,7 @@ const commonParams$2 = {
     UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" },
 };
 
-var version = "3.958.0";
+var version = "3.990.0";
 var packageInfo = {
 	version: version};
 
@@ -12957,7 +13569,148 @@ const defaultEndpointResolver$2 = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions;
+customEndpointFunctions.aws = awsEndpointFunctions$1;
+
+class SSOServiceException extends ServiceException {
+    constructor(options) {
+        super(options);
+        Object.setPrototypeOf(this, SSOServiceException.prototype);
+    }
+}
+
+class InvalidRequestException extends SSOServiceException {
+    name = "InvalidRequestException";
+    $fault = "client";
+    constructor(opts) {
+        super({
+            name: "InvalidRequestException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, InvalidRequestException.prototype);
+    }
+}
+class ResourceNotFoundException extends SSOServiceException {
+    name = "ResourceNotFoundException";
+    $fault = "client";
+    constructor(opts) {
+        super({
+            name: "ResourceNotFoundException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, ResourceNotFoundException.prototype);
+    }
+}
+class TooManyRequestsException extends SSOServiceException {
+    name = "TooManyRequestsException";
+    $fault = "client";
+    constructor(opts) {
+        super({
+            name: "TooManyRequestsException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, TooManyRequestsException.prototype);
+    }
+}
+class UnauthorizedException extends SSOServiceException {
+    name = "UnauthorizedException";
+    $fault = "client";
+    constructor(opts) {
+        super({
+            name: "UnauthorizedException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, UnauthorizedException.prototype);
+    }
+}
+
+const _ATT = "AccessTokenType";
+const _GRC = "GetRoleCredentials";
+const _GRCR = "GetRoleCredentialsRequest";
+const _GRCRe = "GetRoleCredentialsResponse";
+const _IRE = "InvalidRequestException";
+const _RC = "RoleCredentials";
+const _RNFE = "ResourceNotFoundException";
+const _SAKT = "SecretAccessKeyType";
+const _STT = "SessionTokenType";
+const _TMRE$1 = "TooManyRequestsException";
+const _UE = "UnauthorizedException";
+const _aI = "accountId";
+const _aKI$1 = "accessKeyId";
+const _aT$1 = "accessToken";
+const _ai = "account_id";
+const _c$2 = "client";
+const _e$2 = "error";
+const _ex = "expiration";
+const _h$1 = "http";
+const _hE$2 = "httpError";
+const _hH = "httpHeader";
+const _hQ = "httpQuery";
+const _m$2 = "message";
+const _rC = "roleCredentials";
+const _rN = "roleName";
+const _rn = "role_name";
+const _s$2 = "smithy.ts.sdk.synthetic.com.amazonaws.sso";
+const _sAK$1 = "secretAccessKey";
+const _sT$1 = "sessionToken";
+const _xasbt = "x-amz-sso_bearer_token";
+const n0$2 = "com.amazonaws.sso";
+const _s_registry$2 = TypeRegistry.for(_s$2);
+var SSOServiceException$ = [-3, _s$2, "SSOServiceException", 0, [], []];
+_s_registry$2.registerError(SSOServiceException$, SSOServiceException);
+const n0_registry$2 = TypeRegistry.for(n0$2);
+var InvalidRequestException$ = [-3, n0$2, _IRE,
+    { [_e$2]: _c$2, [_hE$2]: 400 },
+    [_m$2],
+    [0]
+];
+n0_registry$2.registerError(InvalidRequestException$, InvalidRequestException);
+var ResourceNotFoundException$ = [-3, n0$2, _RNFE,
+    { [_e$2]: _c$2, [_hE$2]: 404 },
+    [_m$2],
+    [0]
+];
+n0_registry$2.registerError(ResourceNotFoundException$, ResourceNotFoundException);
+var TooManyRequestsException$ = [-3, n0$2, _TMRE$1,
+    { [_e$2]: _c$2, [_hE$2]: 429 },
+    [_m$2],
+    [0]
+];
+n0_registry$2.registerError(TooManyRequestsException$, TooManyRequestsException);
+var UnauthorizedException$ = [-3, n0$2, _UE,
+    { [_e$2]: _c$2, [_hE$2]: 401 },
+    [_m$2],
+    [0]
+];
+n0_registry$2.registerError(UnauthorizedException$, UnauthorizedException);
+const errorTypeRegistries$2 = [
+    _s_registry$2,
+    n0_registry$2,
+];
+var AccessTokenType = [0, n0$2, _ATT, 8, 0];
+var SecretAccessKeyType = [0, n0$2, _SAKT, 8, 0];
+var SessionTokenType = [0, n0$2, _STT, 8, 0];
+var GetRoleCredentialsRequest$ = [3, n0$2, _GRCR,
+    0,
+    [_rN, _aI, _aT$1],
+    [[0, { [_hQ]: _rn }], [0, { [_hQ]: _ai }], [() => AccessTokenType, { [_hH]: _xasbt }]], 3
+];
+var GetRoleCredentialsResponse$ = [3, n0$2, _GRCRe,
+    0,
+    [_rC],
+    [[() => RoleCredentials$, 0]]
+];
+var RoleCredentials$ = [3, n0$2, _RC,
+    0,
+    [_aKI$1, _sAK$1, _sT$1, _ex],
+    [0, [() => SecretAccessKeyType, 0], [() => SessionTokenType, 0], 1]
+];
+var GetRoleCredentials$ = [9, n0$2, _GRC,
+    { [_h$1]: ["GET", "/federation/credentials", 200] }, () => GetRoleCredentialsRequest$, () => GetRoleCredentialsResponse$
+];
 
 const getRuntimeConfig$5 = (config) => {
     return {
@@ -12984,6 +13737,7 @@ const getRuntimeConfig$5 = (config) => {
         protocol: config?.protocol ?? AwsRestJsonProtocol,
         protocolSettings: config?.protocolSettings ?? {
             defaultNamespace: "com.amazonaws.sso",
+            errorTypeRegistries: errorTypeRegistries$2,
             version: "2019-06-10",
             serviceTarget: "SWBPortalService",
         },
@@ -13108,141 +13862,6 @@ class SSOClient extends Client {
     }
 }
 
-class SSOServiceException extends ServiceException {
-    constructor(options) {
-        super(options);
-        Object.setPrototypeOf(this, SSOServiceException.prototype);
-    }
-}
-
-class InvalidRequestException extends SSOServiceException {
-    name = "InvalidRequestException";
-    $fault = "client";
-    constructor(opts) {
-        super({
-            name: "InvalidRequestException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, InvalidRequestException.prototype);
-    }
-}
-class ResourceNotFoundException extends SSOServiceException {
-    name = "ResourceNotFoundException";
-    $fault = "client";
-    constructor(opts) {
-        super({
-            name: "ResourceNotFoundException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, ResourceNotFoundException.prototype);
-    }
-}
-class TooManyRequestsException extends SSOServiceException {
-    name = "TooManyRequestsException";
-    $fault = "client";
-    constructor(opts) {
-        super({
-            name: "TooManyRequestsException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, TooManyRequestsException.prototype);
-    }
-}
-class UnauthorizedException extends SSOServiceException {
-    name = "UnauthorizedException";
-    $fault = "client";
-    constructor(opts) {
-        super({
-            name: "UnauthorizedException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, UnauthorizedException.prototype);
-    }
-}
-
-const _ATT = "AccessTokenType";
-const _GRC = "GetRoleCredentials";
-const _GRCR = "GetRoleCredentialsRequest";
-const _GRCRe = "GetRoleCredentialsResponse";
-const _IRE = "InvalidRequestException";
-const _RC = "RoleCredentials";
-const _RNFE = "ResourceNotFoundException";
-const _SAKT = "SecretAccessKeyType";
-const _STT = "SessionTokenType";
-const _TMRE$1 = "TooManyRequestsException";
-const _UE = "UnauthorizedException";
-const _aI = "accountId";
-const _aKI$1 = "accessKeyId";
-const _aT$1 = "accessToken";
-const _ai = "account_id";
-const _c$2 = "client";
-const _e$2 = "error";
-const _ex = "expiration";
-const _h$1 = "http";
-const _hE$2 = "httpError";
-const _hH = "httpHeader";
-const _hQ = "httpQuery";
-const _m$2 = "message";
-const _rC = "roleCredentials";
-const _rN = "roleName";
-const _rn = "role_name";
-const _s$2 = "smithy.ts.sdk.synthetic.com.amazonaws.sso";
-const _sAK$1 = "secretAccessKey";
-const _sT$1 = "sessionToken";
-const _xasbt = "x-amz-sso_bearer_token";
-const n0$2 = "com.amazonaws.sso";
-var AccessTokenType = [0, n0$2, _ATT, 8, 0];
-var SecretAccessKeyType = [0, n0$2, _SAKT, 8, 0];
-var SessionTokenType = [0, n0$2, _STT, 8, 0];
-var GetRoleCredentialsRequest$ = [3, n0$2, _GRCR,
-    0,
-    [_rN, _aI, _aT$1],
-    [[0, { [_hQ]: _rn }], [0, { [_hQ]: _ai }], [() => AccessTokenType, { [_hH]: _xasbt }]]
-];
-var GetRoleCredentialsResponse$ = [3, n0$2, _GRCRe,
-    0,
-    [_rC],
-    [[() => RoleCredentials$, 0]]
-];
-var InvalidRequestException$ = [-3, n0$2, _IRE,
-    { [_e$2]: _c$2, [_hE$2]: 400 },
-    [_m$2],
-    [0]
-];
-TypeRegistry.for(n0$2).registerError(InvalidRequestException$, InvalidRequestException);
-var ResourceNotFoundException$ = [-3, n0$2, _RNFE,
-    { [_e$2]: _c$2, [_hE$2]: 404 },
-    [_m$2],
-    [0]
-];
-TypeRegistry.for(n0$2).registerError(ResourceNotFoundException$, ResourceNotFoundException);
-var RoleCredentials$ = [3, n0$2, _RC,
-    0,
-    [_aKI$1, _sAK$1, _sT$1, _ex],
-    [0, [() => SecretAccessKeyType, 0], [() => SessionTokenType, 0], 1]
-];
-var TooManyRequestsException$ = [-3, n0$2, _TMRE$1,
-    { [_e$2]: _c$2, [_hE$2]: 429 },
-    [_m$2],
-    [0]
-];
-TypeRegistry.for(n0$2).registerError(TooManyRequestsException$, TooManyRequestsException);
-var UnauthorizedException$ = [-3, n0$2, _UE,
-    { [_e$2]: _c$2, [_hE$2]: 401 },
-    [_m$2],
-    [0]
-];
-TypeRegistry.for(n0$2).registerError(UnauthorizedException$, UnauthorizedException);
-var SSOServiceException$ = [-3, _s$2, "SSOServiceException", 0, [], []];
-TypeRegistry.for(_s$2).registerError(SSOServiceException$, SSOServiceException);
-var GetRoleCredentials$ = [9, n0$2, _GRC,
-    { [_h$1]: ["GET", "/federation/credentials", 200] }, () => GetRoleCredentialsRequest$, () => GetRoleCredentialsResponse$
-];
-
 class GetRoleCredentialsCommand extends Command
     .classBuilder()
     .ep(commonParams$2)
@@ -13345,172 +13964,7 @@ const defaultEndpointResolver$1 = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions;
-
-const getRuntimeConfig$3 = (config) => {
-    return {
-        apiVersion: "2011-06-15",
-        base64Decoder: config?.base64Decoder ?? fromBase64,
-        base64Encoder: config?.base64Encoder ?? toBase64,
-        disableHostPrefix: config?.disableHostPrefix ?? false,
-        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver$1,
-        extensions: config?.extensions ?? [],
-        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSTSHttpAuthSchemeProvider,
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
-                signer: new AwsSdkSigV4Signer(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new NoAuthSigner(),
-            },
-        ],
-        logger: config?.logger ?? new NoOpLogger(),
-        protocol: config?.protocol ?? AwsQueryProtocol,
-        protocolSettings: config?.protocolSettings ?? {
-            defaultNamespace: "com.amazonaws.sts",
-            xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
-            version: "2011-06-15",
-            serviceTarget: "AWSSecurityTokenServiceV20110615",
-        },
-        serviceId: config?.serviceId ?? "STS",
-        urlParser: config?.urlParser ?? parseUrl,
-        utf8Decoder: config?.utf8Decoder ?? fromUtf8,
-        utf8Encoder: config?.utf8Encoder ?? toUtf8,
-    };
-};
-
-const getRuntimeConfig$2 = (config) => {
-    emitWarningIfUnsupportedVersion(process.version);
-    const defaultsMode = resolveDefaultsModeConfig(config);
-    const defaultConfigProvider = () => defaultsMode().then(loadConfigsForDefaultMode);
-    const clientSharedValues = getRuntimeConfig$3(config);
-    emitWarningIfUnsupportedVersion$1(process.version);
-    const loaderConfig = {
-        profile: config?.profile,
-        logger: clientSharedValues.logger,
-    };
-    return {
-        ...clientSharedValues,
-        ...config,
-        runtime: "node",
-        defaultsMode,
-        authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
-        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
-            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4") ||
-                    (async (idProps) => await config.credentialDefaultProvider(idProps?.__config || {})()),
-                signer: new AwsSdkSigV4Signer(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new NoAuthSigner(),
-            },
-        ],
-        maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
-        region: config?.region ??
-            loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
-        requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
-        retryMode: config?.retryMode ??
-            loadConfig({
-                ...NODE_RETRY_MODE_CONFIG_OPTIONS,
-                default: async () => (await defaultConfigProvider()).retryMode || DEFAULT_RETRY_MODE,
-            }, config),
-        sha256: config?.sha256 ?? Hash.bind(null, "sha256"),
-        streamCollector: config?.streamCollector ?? streamCollector$1,
-        useDualstackEndpoint: config?.useDualstackEndpoint ?? loadConfig(NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
-        useFipsEndpoint: config?.useFipsEndpoint ?? loadConfig(NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
-        userAgentAppId: config?.userAgentAppId ?? loadConfig(NODE_APP_ID_CONFIG_OPTIONS, loaderConfig),
-    };
-};
-
-const getHttpAuthExtensionConfiguration$1 = (runtimeConfig) => {
-    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
-    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
-    let _credentials = runtimeConfig.credentials;
-    return {
-        setHttpAuthScheme(httpAuthScheme) {
-            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
-            if (index === -1) {
-                _httpAuthSchemes.push(httpAuthScheme);
-            }
-            else {
-                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
-            }
-        },
-        httpAuthSchemes() {
-            return _httpAuthSchemes;
-        },
-        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
-            _httpAuthSchemeProvider = httpAuthSchemeProvider;
-        },
-        httpAuthSchemeProvider() {
-            return _httpAuthSchemeProvider;
-        },
-        setCredentials(credentials) {
-            _credentials = credentials;
-        },
-        credentials() {
-            return _credentials;
-        },
-    };
-};
-const resolveHttpAuthRuntimeConfig$1 = (config) => {
-    return {
-        httpAuthSchemes: config.httpAuthSchemes(),
-        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
-        credentials: config.credentials(),
-    };
-};
-
-const resolveRuntimeExtensions$1 = (runtimeConfig, extensions) => {
-    const extensionConfiguration = Object.assign(getAwsRegionExtensionConfiguration(runtimeConfig), getDefaultExtensionConfiguration(runtimeConfig), getHttpHandlerExtensionConfiguration(runtimeConfig), getHttpAuthExtensionConfiguration$1(runtimeConfig));
-    extensions.forEach((extension) => extension.configure(extensionConfiguration));
-    return Object.assign(runtimeConfig, resolveAwsRegionExtensionConfiguration(extensionConfiguration), resolveDefaultRuntimeConfig(extensionConfiguration), resolveHttpHandlerRuntimeConfig(extensionConfiguration), resolveHttpAuthRuntimeConfig$1(extensionConfiguration));
-};
-
-class STSClient extends Client {
-    config;
-    constructor(...[configuration]) {
-        const _config_0 = getRuntimeConfig$2(configuration || {});
-        super(_config_0);
-        this.initConfig = _config_0;
-        const _config_1 = resolveClientEndpointParameters$1(_config_0);
-        const _config_2 = resolveUserAgentConfig(_config_1);
-        const _config_3 = resolveRetryConfig(_config_2);
-        const _config_4 = resolveRegionConfig(_config_3);
-        const _config_5 = resolveHostHeaderConfig(_config_4);
-        const _config_6 = resolveEndpointConfig(_config_5);
-        const _config_7 = resolveHttpAuthSchemeConfig$1(_config_6);
-        const _config_8 = resolveRuntimeExtensions$1(_config_7, configuration?.extensions || []);
-        this.config = _config_8;
-        this.middlewareStack.use(getSchemaSerdePlugin(this.config));
-        this.middlewareStack.use(getUserAgentPlugin(this.config));
-        this.middlewareStack.use(getRetryPlugin(this.config));
-        this.middlewareStack.use(getContentLengthPlugin(this.config));
-        this.middlewareStack.use(getHostHeaderPlugin(this.config));
-        this.middlewareStack.use(getLoggerPlugin(this.config));
-        this.middlewareStack.use(getRecursionDetectionPlugin(this.config));
-        this.middlewareStack.use(getHttpAuthSchemeEndpointRuleSetPlugin(this.config, {
-            httpAuthSchemeParametersProvider: defaultSTSHttpAuthSchemeParametersProvider,
-            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig({
-                "aws.auth#sigv4": config.credentials,
-            }),
-        }));
-        this.middlewareStack.use(getHttpSigningPlugin(this.config));
-    }
-    destroy() {
-        super.destroy();
-    }
-}
+customEndpointFunctions.aws = awsEndpointFunctions$1;
 
 class STSServiceException extends ServiceException {
     constructor(options) {
@@ -13663,9 +14117,77 @@ const _pDLT = "policyDescriptorListType";
 const _s$1 = "smithy.ts.sdk.synthetic.com.amazonaws.sts";
 const _tLT = "tagListType";
 const n0$1 = "com.amazonaws.sts";
+const _s_registry$1 = TypeRegistry.for(_s$1);
+var STSServiceException$ = [-3, _s$1, "STSServiceException", 0, [], []];
+_s_registry$1.registerError(STSServiceException$, STSServiceException);
+const n0_registry$1 = TypeRegistry.for(n0$1);
+var ExpiredTokenException$ = [
+    -3,
+    n0$1,
+    _ETE,
+    { [_aQE]: [`ExpiredTokenException`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(ExpiredTokenException$, ExpiredTokenException);
+var IDPCommunicationErrorException$ = [
+    -3,
+    n0$1,
+    _IDPCEE,
+    { [_aQE]: [`IDPCommunicationError`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(IDPCommunicationErrorException$, IDPCommunicationErrorException);
+var IDPRejectedClaimException$ = [
+    -3,
+    n0$1,
+    _IDPRCE,
+    { [_aQE]: [`IDPRejectedClaim`, 403], [_e$1]: _c$1, [_hE$1]: 403 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(IDPRejectedClaimException$, IDPRejectedClaimException);
+var InvalidIdentityTokenException$ = [
+    -3,
+    n0$1,
+    _IITE,
+    { [_aQE]: [`InvalidIdentityToken`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(InvalidIdentityTokenException$, InvalidIdentityTokenException);
+var MalformedPolicyDocumentException$ = [
+    -3,
+    n0$1,
+    _MPDE,
+    { [_aQE]: [`MalformedPolicyDocument`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(MalformedPolicyDocumentException$, MalformedPolicyDocumentException);
+var PackedPolicyTooLargeException$ = [
+    -3,
+    n0$1,
+    _PPTLE,
+    { [_aQE]: [`PackedPolicyTooLarge`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(PackedPolicyTooLargeException$, PackedPolicyTooLargeException);
+var RegionDisabledException$ = [
+    -3,
+    n0$1,
+    _RDE,
+    { [_aQE]: [`RegionDisabledException`, 403], [_e$1]: _c$1, [_hE$1]: 403 },
+    [_m$1],
+    [0],
+];
+n0_registry$1.registerError(RegionDisabledException$, RegionDisabledException);
+const errorTypeRegistries$1 = [_s_registry$1, n0_registry$1];
 var accessKeySecretType = [0, n0$1, _aKST, 8, 0];
 var clientTokenType = [0, n0$1, _cTT, 8, 0];
-var AssumedRoleUser$ = [3, n0$1, _ARU, 0, [_ARI, _A], [0, 0]];
+var AssumedRoleUser$ = [3, n0$1, _ARU, 0, [_ARI, _A], [0, 0], 2];
 var AssumeRoleRequest$ = [
     3,
     n0$1,
@@ -13673,6 +14195,7 @@ var AssumeRoleRequest$ = [
     0,
     [_RA, _RSN, _PA, _P, _DS, _T, _TTK, _EI, _SN, _TC, _SI, _PC],
     [0, 0, () => policyDescriptorListType, 0, 1, () => tagListType, 64 | 0, 0, 0, 0, 0, () => ProvidedContextsListType],
+    2,
 ];
 var AssumeRoleResponse$ = [
     3,
@@ -13689,6 +14212,7 @@ var AssumeRoleWithWebIdentityRequest$ = [
     0,
     [_RA, _RSN, _WIT, _PI, _PA, _P, _DS],
     [0, 0, [() => clientTokenType, 0], 0, () => policyDescriptorListType, 0, 1],
+    3,
 ];
 var AssumeRoleWithWebIdentityResponse$ = [
     3,
@@ -13705,75 +14229,11 @@ var Credentials$ = [
     0,
     [_AKI, _SAK, _ST, _E],
     [0, [() => accessKeySecretType, 0], 0, 4],
+    4,
 ];
-var ExpiredTokenException$ = [
-    -3,
-    n0$1,
-    _ETE,
-    { [_aQE]: [`ExpiredTokenException`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(ExpiredTokenException$, ExpiredTokenException);
-var IDPCommunicationErrorException$ = [
-    -3,
-    n0$1,
-    _IDPCEE,
-    { [_aQE]: [`IDPCommunicationError`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(IDPCommunicationErrorException$, IDPCommunicationErrorException);
-var IDPRejectedClaimException$ = [
-    -3,
-    n0$1,
-    _IDPRCE,
-    { [_aQE]: [`IDPRejectedClaim`, 403], [_e$1]: _c$1, [_hE$1]: 403 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(IDPRejectedClaimException$, IDPRejectedClaimException);
-var InvalidIdentityTokenException$ = [
-    -3,
-    n0$1,
-    _IITE,
-    { [_aQE]: [`InvalidIdentityToken`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(InvalidIdentityTokenException$, InvalidIdentityTokenException);
-var MalformedPolicyDocumentException$ = [
-    -3,
-    n0$1,
-    _MPDE,
-    { [_aQE]: [`MalformedPolicyDocument`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(MalformedPolicyDocumentException$, MalformedPolicyDocumentException);
-var PackedPolicyTooLargeException$ = [
-    -3,
-    n0$1,
-    _PPTLE,
-    { [_aQE]: [`PackedPolicyTooLarge`, 400], [_e$1]: _c$1, [_hE$1]: 400 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(PackedPolicyTooLargeException$, PackedPolicyTooLargeException);
 var PolicyDescriptorType$ = [3, n0$1, _PDT, 0, [_a], [0]];
 var ProvidedContext$ = [3, n0$1, _PCr, 0, [_PAr, _CA], [0, 0]];
-var RegionDisabledException$ = [
-    -3,
-    n0$1,
-    _RDE,
-    { [_aQE]: [`RegionDisabledException`, 403], [_e$1]: _c$1, [_hE$1]: 403 },
-    [_m$1],
-    [0],
-];
-TypeRegistry.for(n0$1).registerError(RegionDisabledException$, RegionDisabledException);
-var Tag$ = [3, n0$1, _Ta, 0, [_K, _V], [0, 0]];
-var STSServiceException$ = [-3, _s$1, "STSServiceException", 0, [], []];
-TypeRegistry.for(_s$1).registerError(STSServiceException$, STSServiceException);
+var Tag$ = [3, n0$1, _Ta, 0, [_K, _V], [0, 0], 2];
 var policyDescriptorListType = [1, n0$1, _pDLT, 0, () => PolicyDescriptorType$];
 var ProvidedContextsListType = [1, n0$1, _PCLT, 0, () => ProvidedContext$];
 var tagListType = [1, n0$1, _tLT, 0, () => Tag$];
@@ -13786,6 +14246,172 @@ var AssumeRoleWithWebIdentity$ = [
     () => AssumeRoleWithWebIdentityRequest$,
     () => AssumeRoleWithWebIdentityResponse$,
 ];
+
+const getRuntimeConfig$3 = (config) => {
+    return {
+        apiVersion: "2011-06-15",
+        base64Decoder: config?.base64Decoder ?? fromBase64,
+        base64Encoder: config?.base64Encoder ?? toBase64,
+        disableHostPrefix: config?.disableHostPrefix ?? false,
+        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver$1,
+        extensions: config?.extensions ?? [],
+        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSTSHttpAuthSchemeProvider,
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
+                signer: new AwsSdkSigV4Signer(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new NoAuthSigner(),
+            },
+        ],
+        logger: config?.logger ?? new NoOpLogger(),
+        protocol: config?.protocol ?? AwsQueryProtocol,
+        protocolSettings: config?.protocolSettings ?? {
+            defaultNamespace: "com.amazonaws.sts",
+            errorTypeRegistries: errorTypeRegistries$1,
+            xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
+            version: "2011-06-15",
+            serviceTarget: "AWSSecurityTokenServiceV20110615",
+        },
+        serviceId: config?.serviceId ?? "STS",
+        urlParser: config?.urlParser ?? parseUrl,
+        utf8Decoder: config?.utf8Decoder ?? fromUtf8,
+        utf8Encoder: config?.utf8Encoder ?? toUtf8,
+    };
+};
+
+const getRuntimeConfig$2 = (config) => {
+    emitWarningIfUnsupportedVersion(process.version);
+    const defaultsMode = resolveDefaultsModeConfig(config);
+    const defaultConfigProvider = () => defaultsMode().then(loadConfigsForDefaultMode);
+    const clientSharedValues = getRuntimeConfig$3(config);
+    emitWarningIfUnsupportedVersion$1(process.version);
+    const loaderConfig = {
+        profile: config?.profile,
+        logger: clientSharedValues.logger,
+    };
+    return {
+        ...clientSharedValues,
+        ...config,
+        runtime: "node",
+        defaultsMode,
+        authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
+        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
+            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4") ||
+                    (async (idProps) => await config.credentialDefaultProvider(idProps?.__config || {})()),
+                signer: new AwsSdkSigV4Signer(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new NoAuthSigner(),
+            },
+        ],
+        maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
+        region: config?.region ??
+            loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
+        requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
+        retryMode: config?.retryMode ??
+            loadConfig({
+                ...NODE_RETRY_MODE_CONFIG_OPTIONS,
+                default: async () => (await defaultConfigProvider()).retryMode || DEFAULT_RETRY_MODE,
+            }, config),
+        sha256: config?.sha256 ?? Hash.bind(null, "sha256"),
+        streamCollector: config?.streamCollector ?? streamCollector$1,
+        useDualstackEndpoint: config?.useDualstackEndpoint ?? loadConfig(NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
+        useFipsEndpoint: config?.useFipsEndpoint ?? loadConfig(NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS, loaderConfig),
+        userAgentAppId: config?.userAgentAppId ?? loadConfig(NODE_APP_ID_CONFIG_OPTIONS, loaderConfig),
+    };
+};
+
+const getHttpAuthExtensionConfiguration$1 = (runtimeConfig) => {
+    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
+    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
+    let _credentials = runtimeConfig.credentials;
+    return {
+        setHttpAuthScheme(httpAuthScheme) {
+            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
+            if (index === -1) {
+                _httpAuthSchemes.push(httpAuthScheme);
+            }
+            else {
+                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
+            }
+        },
+        httpAuthSchemes() {
+            return _httpAuthSchemes;
+        },
+        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
+            _httpAuthSchemeProvider = httpAuthSchemeProvider;
+        },
+        httpAuthSchemeProvider() {
+            return _httpAuthSchemeProvider;
+        },
+        setCredentials(credentials) {
+            _credentials = credentials;
+        },
+        credentials() {
+            return _credentials;
+        },
+    };
+};
+const resolveHttpAuthRuntimeConfig$1 = (config) => {
+    return {
+        httpAuthSchemes: config.httpAuthSchemes(),
+        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
+        credentials: config.credentials(),
+    };
+};
+
+const resolveRuntimeExtensions$1 = (runtimeConfig, extensions) => {
+    const extensionConfiguration = Object.assign(getAwsRegionExtensionConfiguration(runtimeConfig), getDefaultExtensionConfiguration(runtimeConfig), getHttpHandlerExtensionConfiguration(runtimeConfig), getHttpAuthExtensionConfiguration$1(runtimeConfig));
+    extensions.forEach((extension) => extension.configure(extensionConfiguration));
+    return Object.assign(runtimeConfig, resolveAwsRegionExtensionConfiguration(extensionConfiguration), resolveDefaultRuntimeConfig(extensionConfiguration), resolveHttpHandlerRuntimeConfig(extensionConfiguration), resolveHttpAuthRuntimeConfig$1(extensionConfiguration));
+};
+
+class STSClient extends Client {
+    config;
+    constructor(...[configuration]) {
+        const _config_0 = getRuntimeConfig$2(configuration || {});
+        super(_config_0);
+        this.initConfig = _config_0;
+        const _config_1 = resolveClientEndpointParameters$1(_config_0);
+        const _config_2 = resolveUserAgentConfig(_config_1);
+        const _config_3 = resolveRetryConfig(_config_2);
+        const _config_4 = resolveRegionConfig(_config_3);
+        const _config_5 = resolveHostHeaderConfig(_config_4);
+        const _config_6 = resolveEndpointConfig(_config_5);
+        const _config_7 = resolveHttpAuthSchemeConfig$1(_config_6);
+        const _config_8 = resolveRuntimeExtensions$1(_config_7, configuration?.extensions || []);
+        this.config = _config_8;
+        this.middlewareStack.use(getSchemaSerdePlugin(this.config));
+        this.middlewareStack.use(getUserAgentPlugin(this.config));
+        this.middlewareStack.use(getRetryPlugin(this.config));
+        this.middlewareStack.use(getContentLengthPlugin(this.config));
+        this.middlewareStack.use(getHostHeaderPlugin(this.config));
+        this.middlewareStack.use(getLoggerPlugin(this.config));
+        this.middlewareStack.use(getRecursionDetectionPlugin(this.config));
+        this.middlewareStack.use(getHttpAuthSchemeEndpointRuleSetPlugin(this.config, {
+            httpAuthSchemeParametersProvider: defaultSTSHttpAuthSchemeParametersProvider,
+            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig({
+                "aws.auth#sigv4": config.credentials,
+            }),
+        }));
+        this.middlewareStack.use(getHttpSigningPlugin(this.config));
+    }
+    destroy() {
+        super.destroy();
+    }
+}
 
 class AssumeRoleCommand extends Command
     .classBuilder()
@@ -13960,6 +14586,7 @@ var index$1 = /*#__PURE__*/Object.freeze({
     STSServiceException$: STSServiceException$,
     Tag$: Tag$,
     __Client: Client,
+    errorTypeRegistries: errorTypeRegistries$1,
     getDefaultRoleAssumer: getDefaultRoleAssumer,
     getDefaultRoleAssumerWithWebIdentity: getDefaultRoleAssumerWithWebIdentity
 });
@@ -14042,7 +14669,191 @@ const defaultEndpointResolver = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions;
+customEndpointFunctions.aws = awsEndpointFunctions$1;
+
+class SigninServiceException extends ServiceException {
+    constructor(options) {
+        super(options);
+        Object.setPrototypeOf(this, SigninServiceException.prototype);
+    }
+}
+
+class AccessDeniedException extends SigninServiceException {
+    name = "AccessDeniedException";
+    $fault = "client";
+    error;
+    constructor(opts) {
+        super({
+            name: "AccessDeniedException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, AccessDeniedException.prototype);
+        this.error = opts.error;
+    }
+}
+class InternalServerException extends SigninServiceException {
+    name = "InternalServerException";
+    $fault = "server";
+    error;
+    constructor(opts) {
+        super({
+            name: "InternalServerException",
+            $fault: "server",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, InternalServerException.prototype);
+        this.error = opts.error;
+    }
+}
+class TooManyRequestsError extends SigninServiceException {
+    name = "TooManyRequestsError";
+    $fault = "client";
+    error;
+    constructor(opts) {
+        super({
+            name: "TooManyRequestsError",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, TooManyRequestsError.prototype);
+        this.error = opts.error;
+    }
+}
+class ValidationException extends SigninServiceException {
+    name = "ValidationException";
+    $fault = "client";
+    error;
+    constructor(opts) {
+        super({
+            name: "ValidationException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, ValidationException.prototype);
+        this.error = opts.error;
+    }
+}
+
+const _ADE = "AccessDeniedException";
+const _AT = "AccessToken";
+const _COAT = "CreateOAuth2Token";
+const _COATR = "CreateOAuth2TokenRequest";
+const _COATRB = "CreateOAuth2TokenRequestBody";
+const _COATRBr = "CreateOAuth2TokenResponseBody";
+const _COATRr = "CreateOAuth2TokenResponse";
+const _ISE = "InternalServerException";
+const _RT = "RefreshToken";
+const _TMRE = "TooManyRequestsError";
+const _VE = "ValidationException";
+const _aKI = "accessKeyId";
+const _aT = "accessToken";
+const _c = "client";
+const _cI = "clientId";
+const _cV = "codeVerifier";
+const _co = "code";
+const _e = "error";
+const _eI = "expiresIn";
+const _gT = "grantType";
+const _h = "http";
+const _hE = "httpError";
+const _iT = "idToken";
+const _jN = "jsonName";
+const _m = "message";
+const _rT = "refreshToken";
+const _rU = "redirectUri";
+const _s = "smithy.ts.sdk.synthetic.com.amazonaws.signin";
+const _sAK = "secretAccessKey";
+const _sT = "sessionToken";
+const _se = "server";
+const _tI = "tokenInput";
+const _tO = "tokenOutput";
+const _tT = "tokenType";
+const n0 = "com.amazonaws.signin";
+const _s_registry = TypeRegistry.for(_s);
+var SigninServiceException$ = [-3, _s, "SigninServiceException", 0, [], []];
+_s_registry.registerError(SigninServiceException$, SigninServiceException);
+const n0_registry = TypeRegistry.for(n0);
+var AccessDeniedException$ = [-3, n0, _ADE, { [_e]: _c }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(AccessDeniedException$, AccessDeniedException);
+var InternalServerException$ = [-3, n0, _ISE, { [_e]: _se, [_hE]: 500 }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(InternalServerException$, InternalServerException);
+var TooManyRequestsError$ = [-3, n0, _TMRE, { [_e]: _c, [_hE]: 429 }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(TooManyRequestsError$, TooManyRequestsError);
+var ValidationException$ = [-3, n0, _VE, { [_e]: _c, [_hE]: 400 }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(ValidationException$, ValidationException);
+const errorTypeRegistries = [_s_registry, n0_registry];
+var RefreshToken = [0, n0, _RT, 8, 0];
+var AccessToken$ = [
+    3,
+    n0,
+    _AT,
+    8,
+    [_aKI, _sAK, _sT],
+    [
+        [0, { [_jN]: _aKI }],
+        [0, { [_jN]: _sAK }],
+        [0, { [_jN]: _sT }],
+    ],
+    3,
+];
+var CreateOAuth2TokenRequest$ = [
+    3,
+    n0,
+    _COATR,
+    0,
+    [_tI],
+    [[() => CreateOAuth2TokenRequestBody$, 16]],
+    1,
+];
+var CreateOAuth2TokenRequestBody$ = [
+    3,
+    n0,
+    _COATRB,
+    0,
+    [_cI, _gT, _co, _rU, _cV, _rT],
+    [
+        [0, { [_jN]: _cI }],
+        [0, { [_jN]: _gT }],
+        0,
+        [0, { [_jN]: _rU }],
+        [0, { [_jN]: _cV }],
+        [() => RefreshToken, { [_jN]: _rT }],
+    ],
+    2,
+];
+var CreateOAuth2TokenResponse$ = [
+    3,
+    n0,
+    _COATRr,
+    0,
+    [_tO],
+    [[() => CreateOAuth2TokenResponseBody$, 16]],
+    1,
+];
+var CreateOAuth2TokenResponseBody$ = [
+    3,
+    n0,
+    _COATRBr,
+    0,
+    [_aT, _tT, _eI, _rT, _iT],
+    [
+        [() => AccessToken$, { [_jN]: _aT }],
+        [0, { [_jN]: _tT }],
+        [1, { [_jN]: _eI }],
+        [() => RefreshToken, { [_jN]: _rT }],
+        [0, { [_jN]: _iT }],
+    ],
+    4,
+];
+var CreateOAuth2Token$ = [
+    9,
+    n0,
+    _COAT,
+    { [_h]: ["POST", "/v1/token", 200] },
+    () => CreateOAuth2TokenRequest$,
+    () => CreateOAuth2TokenResponse$,
+];
 
 const getRuntimeConfig$1 = (config) => {
     return {
@@ -14069,6 +14880,7 @@ const getRuntimeConfig$1 = (config) => {
         protocol: config?.protocol ?? AwsRestJsonProtocol,
         protocolSettings: config?.protocolSettings ?? {
             defaultNamespace: "com.amazonaws.signin",
+            errorTypeRegistries,
             version: "2023-01-01",
             serviceTarget: "Signin",
         },
@@ -14195,182 +15007,6 @@ class SigninClient extends Client {
     }
 }
 
-class SigninServiceException extends ServiceException {
-    constructor(options) {
-        super(options);
-        Object.setPrototypeOf(this, SigninServiceException.prototype);
-    }
-}
-
-class AccessDeniedException extends SigninServiceException {
-    name = "AccessDeniedException";
-    $fault = "client";
-    error;
-    constructor(opts) {
-        super({
-            name: "AccessDeniedException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, AccessDeniedException.prototype);
-        this.error = opts.error;
-    }
-}
-class InternalServerException extends SigninServiceException {
-    name = "InternalServerException";
-    $fault = "server";
-    error;
-    constructor(opts) {
-        super({
-            name: "InternalServerException",
-            $fault: "server",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, InternalServerException.prototype);
-        this.error = opts.error;
-    }
-}
-class TooManyRequestsError extends SigninServiceException {
-    name = "TooManyRequestsError";
-    $fault = "client";
-    error;
-    constructor(opts) {
-        super({
-            name: "TooManyRequestsError",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, TooManyRequestsError.prototype);
-        this.error = opts.error;
-    }
-}
-class ValidationException extends SigninServiceException {
-    name = "ValidationException";
-    $fault = "client";
-    error;
-    constructor(opts) {
-        super({
-            name: "ValidationException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, ValidationException.prototype);
-        this.error = opts.error;
-    }
-}
-
-const _ADE = "AccessDeniedException";
-const _AT = "AccessToken";
-const _COAT = "CreateOAuth2Token";
-const _COATR = "CreateOAuth2TokenRequest";
-const _COATRB = "CreateOAuth2TokenRequestBody";
-const _COATRBr = "CreateOAuth2TokenResponseBody";
-const _COATRr = "CreateOAuth2TokenResponse";
-const _ISE = "InternalServerException";
-const _RT = "RefreshToken";
-const _TMRE = "TooManyRequestsError";
-const _VE = "ValidationException";
-const _aKI = "accessKeyId";
-const _aT = "accessToken";
-const _c = "client";
-const _cI = "clientId";
-const _cV = "codeVerifier";
-const _co = "code";
-const _e = "error";
-const _eI = "expiresIn";
-const _gT = "grantType";
-const _h = "http";
-const _hE = "httpError";
-const _iT = "idToken";
-const _jN = "jsonName";
-const _m = "message";
-const _rT = "refreshToken";
-const _rU = "redirectUri";
-const _s = "server";
-const _sAK = "secretAccessKey";
-const _sT = "sessionToken";
-const _sm = "smithy.ts.sdk.synthetic.com.amazonaws.signin";
-const _tI = "tokenInput";
-const _tO = "tokenOutput";
-const _tT = "tokenType";
-const n0 = "com.amazonaws.signin";
-var RefreshToken = [0, n0, _RT, 8, 0];
-var AccessDeniedException$ = [-3, n0, _ADE, { [_e]: _c }, [_e, _m], [0, 0]];
-TypeRegistry.for(n0).registerError(AccessDeniedException$, AccessDeniedException);
-var AccessToken$ = [
-    3,
-    n0,
-    _AT,
-    8,
-    [_aKI, _sAK, _sT],
-    [
-        [0, { [_jN]: _aKI }],
-        [0, { [_jN]: _sAK }],
-        [0, { [_jN]: _sT }],
-    ],
-];
-var CreateOAuth2TokenRequest$ = [
-    3,
-    n0,
-    _COATR,
-    0,
-    [_tI],
-    [[() => CreateOAuth2TokenRequestBody$, 16]],
-];
-var CreateOAuth2TokenRequestBody$ = [
-    3,
-    n0,
-    _COATRB,
-    0,
-    [_cI, _gT, _co, _rU, _cV, _rT],
-    [
-        [0, { [_jN]: _cI }],
-        [0, { [_jN]: _gT }],
-        0,
-        [0, { [_jN]: _rU }],
-        [0, { [_jN]: _cV }],
-        [() => RefreshToken, { [_jN]: _rT }],
-    ],
-];
-var CreateOAuth2TokenResponse$ = [
-    3,
-    n0,
-    _COATRr,
-    0,
-    [_tO],
-    [[() => CreateOAuth2TokenResponseBody$, 16]],
-];
-var CreateOAuth2TokenResponseBody$ = [
-    3,
-    n0,
-    _COATRBr,
-    0,
-    [_aT, _tT, _eI, _rT, _iT],
-    [
-        [() => AccessToken$, { [_jN]: _aT }],
-        [0, { [_jN]: _tT }],
-        [1, { [_jN]: _eI }],
-        [() => RefreshToken, { [_jN]: _rT }],
-        [0, { [_jN]: _iT }],
-    ],
-];
-var InternalServerException$ = [-3, n0, _ISE, { [_e]: _s, [_hE]: 500 }, [_e, _m], [0, 0]];
-TypeRegistry.for(n0).registerError(InternalServerException$, InternalServerException);
-var TooManyRequestsError$ = [-3, n0, _TMRE, { [_e]: _c, [_hE]: 429 }, [_e, _m], [0, 0]];
-TypeRegistry.for(n0).registerError(TooManyRequestsError$, TooManyRequestsError);
-var ValidationException$ = [-3, n0, _VE, { [_e]: _c, [_hE]: 400 }, [_e, _m], [0, 0]];
-TypeRegistry.for(n0).registerError(ValidationException$, ValidationException);
-var SigninServiceException$ = [-3, _sm, "SigninServiceException", 0, [], []];
-TypeRegistry.for(_sm).registerError(SigninServiceException$, SigninServiceException);
-var CreateOAuth2Token$ = [
-    9,
-    n0,
-    _COAT,
-    { [_h]: ["POST", "/v1/token", 200] },
-    () => CreateOAuth2TokenRequest$,
-    () => CreateOAuth2TokenResponse$,
-];
-
 class CreateOAuth2TokenCommand extends Command
     .classBuilder()
     .ep(commonParams)
@@ -14404,7 +15040,8 @@ var index = /*#__PURE__*/Object.freeze({
     TooManyRequestsError$: TooManyRequestsError$,
     ValidationException: ValidationException,
     ValidationException$: ValidationException$,
-    __Client: Client
+    __Client: Client,
+    errorTypeRegistries: errorTypeRegistries
 });
 
 export { handler };
