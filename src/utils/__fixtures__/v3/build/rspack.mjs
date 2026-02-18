@@ -868,7 +868,15 @@ const resolveAwsSdkSigV4Config = (config) => {
             });
             const boundProvider = bindCallerConfig(config, memoizedProvider);
             if (isUserSupplied && !boundProvider.attributed) {
-                resolvedCredentials = async (options) => boundProvider(options).then((creds) => (0,setCredentialFeature/* .setCredentialFeature */.g)(creds, "CREDENTIALS_CODE", "e"));
+                const isCredentialObject = typeof inputCredentials === "object" && inputCredentials !== null;
+                resolvedCredentials = async (options) => {
+                    const creds = await boundProvider(options);
+                    const attributedCreds = creds;
+                    if (isCredentialObject && (!attributedCreds.$source || Object.keys(attributedCreds.$source).length === 0)) {
+                        return (0,setCredentialFeature/* .setCredentialFeature */.g)(attributedCreds, "CREDENTIALS_CODE", "e");
+                    }
+                    return attributedCreds;
+                };
                 resolvedCredentials.memoized = boundProvider.memoized;
                 resolvedCredentials.configBound = boundProvider.configBound;
                 resolvedCredentials.attributed = true;
@@ -1262,6 +1270,11 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
             const memberTraits = memberNs.getMergedTraits() ?? {};
             const inputMemberValue = input[memberName];
             if (inputMemberValue == null && !memberNs.isIdempotencyToken()) {
+                if (memberTraits.httpLabel) {
+                    if (request.path.includes(`{${memberName}+}`) || request.path.includes(`{${memberName}}`)) {
+                        throw new Error(`No value provided for input HTTP label: ${memberName}.`);
+                    }
+                }
                 continue;
             }
             if (memberTraits.httpPayload) {
@@ -1384,7 +1397,9 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
             if (bytes.byteLength > 0) {
                 const dataFromBody = await deserializer.read(ns, bytes);
                 for (const member of nonHttpBindingMembers) {
-                    dataObject[member] = dataFromBody[member];
+                    if (dataFromBody[member] != null) {
+                        dataObject[member] = dataFromBody[member];
+                    }
                 }
             }
         }
@@ -1686,8 +1701,6 @@ var ConfigurableSerdeContext = __webpack_require__(402);
 var NumericValue = __webpack_require__(5121);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/structIterator.js
-var structIterator = __webpack_require__(1440);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/UnionSerde.js
 var UnionSerde = __webpack_require__(4447);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/jsonReviver.js
@@ -1780,7 +1793,6 @@ const loadRestJsonErrorCode = (output, data) => {
 
 
 
-
 class JsonShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConfig */.B {
     settings;
     constructor(settings) {
@@ -1798,23 +1810,41 @@ class JsonShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConf
         const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
         if (isObject) {
             if (ns.isStructSchema()) {
+                const record = value;
                 const union = ns.isUnionSchema();
                 const out = {};
+                let nameMap = void 0;
+                const { jsonName } = this.settings;
+                if (jsonName) {
+                    nameMap = {};
+                }
                 let unionSerde;
                 if (union) {
-                    unionSerde = new UnionSerde/* .UnionSerde */.F(value, out);
+                    unionSerde = new UnionSerde/* .UnionSerde */.F(record, out);
                 }
-                for (const [memberName, memberSchema] of (0,structIterator/* .deserializingStructIterator */.G)(ns, value, this.settings.jsonName ? "jsonName" : false)) {
-                    const fromKey = this.settings.jsonName ? memberSchema.getMergedTraits().jsonName ?? memberName : memberName;
+                for (const [memberName, memberSchema] of ns.structIterator()) {
+                    let fromKey = memberName;
+                    if (jsonName) {
+                        fromKey = memberSchema.getMergedTraits().jsonName ?? fromKey;
+                        nameMap[fromKey] = memberName;
+                    }
                     if (union) {
                         unionSerde.mark(fromKey);
                     }
-                    if (value[fromKey] != null) {
-                        out[memberName] = this._read(memberSchema, value[fromKey]);
+                    if (record[fromKey] != null) {
+                        out[memberName] = this._read(memberSchema, record[fromKey]);
                     }
                 }
                 if (union) {
                     unionSerde.writeUnknown();
+                }
+                else if (typeof record.__type === "string") {
+                    for (const [k, v] of Object.entries(record)) {
+                        const t = jsonName ? nameMap[k] ?? k : k;
+                        if (!(t in out)) {
+                            out[t] = v;
+                        }
+                    }
                 }
                 return out;
             }
@@ -1966,7 +1996,6 @@ class JsonReplacer {
 
 
 
-
 class JsonShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfig */.B {
     settings;
     buffer;
@@ -2004,20 +2033,37 @@ class JsonShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfig
         const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
         if (isObject) {
             if (ns.isStructSchema()) {
+                const record = value;
                 const out = {};
-                for (const [memberName, memberSchema] of (0,structIterator/* .serializingStructIterator */.R)(ns, value)) {
-                    const serializableValue = this._write(memberSchema, value[memberName], ns);
+                const { jsonName } = this.settings;
+                let nameMap = void 0;
+                if (jsonName) {
+                    nameMap = {};
+                }
+                for (const [memberName, memberSchema] of ns.structIterator()) {
+                    const serializableValue = this._write(memberSchema, record[memberName], ns);
                     if (serializableValue !== undefined) {
-                        const jsonName = memberSchema.getMergedTraits().jsonName;
-                        const targetKey = this.settings.jsonName ? jsonName ?? memberName : memberName;
+                        let targetKey = memberName;
+                        if (jsonName) {
+                            targetKey = memberSchema.getMergedTraits().jsonName ?? memberName;
+                            nameMap[memberName] = targetKey;
+                        }
                         out[targetKey] = serializableValue;
                     }
                 }
                 if (ns.isUnionSchema() && Object.keys(out).length === 0) {
-                    const { $unknown } = value;
+                    const { $unknown } = record;
                     if (Array.isArray($unknown)) {
                         const [k, v] = $unknown;
                         out[k] = this._write(15, v);
+                    }
+                }
+                else if (typeof record.__type === "string") {
+                    for (const [k, v] of Object.entries(record)) {
+                        const targetKey = jsonName ? nameMap[k] ?? k : k;
+                        if (!(targetKey in out)) {
+                            out[targetKey] = this._write(15, v);
+                        }
                     }
                 }
                 return out;
@@ -2508,76 +2554,360 @@ class XmlNode{
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/xmlparser/DocTypeReader.js
 
 
-//TODO: handle comments
-function readDocType(xmlData, i){
+class DocTypeReader{
+    constructor(processEntities){
+        this.suppressValidationErr = !processEntities;
+    }
     
-    const entities = {};
-    if( xmlData[i + 3] === 'O' &&
-         xmlData[i + 4] === 'C' &&
-         xmlData[i + 5] === 'T' &&
-         xmlData[i + 6] === 'Y' &&
-         xmlData[i + 7] === 'P' &&
-         xmlData[i + 8] === 'E')
-    {    
-        i = i+9;
-        let angleBracketsCount = 1;
-        let hasBody = false, comment = false;
-        let exp = "";
-        for(;i<xmlData.length;i++){
-            if (xmlData[i] === '<' && !comment) { //Determine the tag type
-                if( hasBody && hasSeq(xmlData, "!ENTITY",i)){
-                    i += 7; 
-                    let entityName, val;
-                    [entityName, val,i] = readEntityExp(xmlData,i+1);
-                    if(val.indexOf("&") === -1) //Parameter entities are not supported
-                        entities[ entityName ] = {
-                            regx : RegExp( `&${entityName};`,"g"),
-                            val: val
-                        };
-                }
-                else if( hasBody && hasSeq(xmlData, "!ELEMENT",i))  {
-                    i += 8;//Not supported
-                    const {index} = readElementExp(xmlData,i+1);
-                    i = index;
-                }else if( hasBody && hasSeq(xmlData, "!ATTLIST",i)){
-                    i += 8;//Not supported
-                    // const {index} = readAttlistExp(xmlData,i+1);
-                    // i = index;
-                }else if( hasBody && hasSeq(xmlData, "!NOTATION",i)) {
-                    i += 9;//Not supported
-                    const {index} = readNotationExp(xmlData,i+1);
-                    i = index;
-                }else if( hasSeq(xmlData, "!--",i) ) comment = true;
-                else throw new Error(`Invalid DOCTYPE`);
+    readDocType(xmlData, i){
+    
+        const entities = {};
+        if( xmlData[i + 3] === 'O' &&
+            xmlData[i + 4] === 'C' &&
+            xmlData[i + 5] === 'T' &&
+            xmlData[i + 6] === 'Y' &&
+            xmlData[i + 7] === 'P' &&
+            xmlData[i + 8] === 'E')
+        {    
+            i = i+9;
+            let angleBracketsCount = 1;
+            let hasBody = false, comment = false;
+            let exp = "";
+            for(;i<xmlData.length;i++){
+                if (xmlData[i] === '<' && !comment) { //Determine the tag type
+                    if( hasBody && hasSeq(xmlData, "!ENTITY",i)){
+                        i += 7; 
+                        let entityName, val;
+                        [entityName, val,i] = this.readEntityExp(xmlData,i+1,this.suppressValidationErr);
+                        if(val.indexOf("&") === -1) //Parameter entities are not supported
+                            entities[ entityName ] = {
+                                regx : RegExp( `&${entityName};`,"g"),
+                                val: val
+                            };
+                    }
+                    else if( hasBody && hasSeq(xmlData, "!ELEMENT",i))  {
+                        i += 8;//Not supported
+                        const {index} = this.readElementExp(xmlData,i+1);
+                        i = index;
+                    }else if( hasBody && hasSeq(xmlData, "!ATTLIST",i)){
+                        i += 8;//Not supported
+                        // const {index} = this.readAttlistExp(xmlData,i+1);
+                        // i = index;
+                    }else if( hasBody && hasSeq(xmlData, "!NOTATION",i)) {
+                        i += 9;//Not supported
+                        const {index} = this.readNotationExp(xmlData,i+1,this.suppressValidationErr);
+                        i = index;
+                    }else if( hasSeq(xmlData, "!--",i) ) comment = true;
+                    else throw new Error(`Invalid DOCTYPE`);
 
-                angleBracketsCount++;
-                exp = "";
-            } else if (xmlData[i] === '>') { //Read tag content
-                if(comment){
-                    if( xmlData[i - 1] === "-" && xmlData[i - 2] === "-"){
-                        comment = false;
+                    angleBracketsCount++;
+                    exp = "";
+                } else if (xmlData[i] === '>') { //Read tag content
+                    if(comment){
+                        if( xmlData[i - 1] === "-" && xmlData[i - 2] === "-"){
+                            comment = false;
+                            angleBracketsCount--;
+                        }
+                    }else{
                         angleBracketsCount--;
                     }
+                    if (angleBracketsCount === 0) {
+                    break;
+                    }
+                }else if( xmlData[i] === '['){
+                    hasBody = true;
                 }else{
-                    angleBracketsCount--;
+                    exp += xmlData[i];
                 }
-                if (angleBracketsCount === 0) {
-                  break;
-                }
-            }else if( xmlData[i] === '['){
-                hasBody = true;
-            }else{
-                exp += xmlData[i];
+            }
+            if(angleBracketsCount !== 0){
+                throw new Error(`Unclosed DOCTYPE`);
+            }
+        }else{
+            throw new Error(`Invalid Tag instead of DOCTYPE`);
+        }
+        return {entities, i};
+    }
+    readEntityExp(xmlData, i) {    
+        //External entities are not supported
+        //    <!ENTITY ext SYSTEM "http://normal-website.com" >
+
+        //Parameter entities are not supported
+        //    <!ENTITY entityname "&anotherElement;">
+
+        //Internal entities are supported
+        //    <!ENTITY entityname "replacement text">
+
+        // Skip leading whitespace after <!ENTITY
+        i = skipWhitespace(xmlData, i);
+
+        // Read entity name
+        let entityName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i]) && xmlData[i] !== '"' && xmlData[i] !== "'") {
+            entityName += xmlData[i];
+            i++;
+        }
+        validateEntityName(entityName);
+
+        // Skip whitespace after entity name
+        i = skipWhitespace(xmlData, i);
+
+        // Check for unsupported constructs (external entities or parameter entities)
+        if(!this.suppressValidationErr){
+            if (xmlData.substring(i, i + 6).toUpperCase() === "SYSTEM") {
+                throw new Error("External entities are not supported");
+            }else if (xmlData[i] === "%") {
+                throw new Error("Parameter entities are not supported");
             }
         }
-        if(angleBracketsCount !== 0){
-            throw new Error(`Unclosed DOCTYPE`);
-        }
-    }else{
-        throw new Error(`Invalid Tag instead of DOCTYPE`);
+
+        // Read entity value (internal entity)
+        let entityValue = "";
+        [i, entityValue] = this.readIdentifierVal(xmlData, i, "entity");
+        i--;
+        return [entityName, entityValue, i ];
     }
-    return {entities, i};
+
+    readNotationExp(xmlData, i) {
+        // Skip leading whitespace after <!NOTATION
+        i = skipWhitespace(xmlData, i);
+
+        // Read notation name
+        let notationName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            notationName += xmlData[i];
+            i++;
+        }
+        !this.suppressValidationErr && validateEntityName(notationName);
+
+        // Skip whitespace after notation name
+        i = skipWhitespace(xmlData, i);
+
+        // Check identifier type (SYSTEM or PUBLIC)
+        const identifierType = xmlData.substring(i, i + 6).toUpperCase();
+        if (!this.suppressValidationErr && identifierType !== "SYSTEM" && identifierType !== "PUBLIC") {
+            throw new Error(`Expected SYSTEM or PUBLIC, found "${identifierType}"`);
+        }
+        i += identifierType.length;
+
+        // Skip whitespace after identifier type
+        i = skipWhitespace(xmlData, i);
+
+        // Read public identifier (if PUBLIC)
+        let publicIdentifier = null;
+        let systemIdentifier = null;
+
+        if (identifierType === "PUBLIC") {
+            [i, publicIdentifier ] = this.readIdentifierVal(xmlData, i, "publicIdentifier");
+
+            // Skip whitespace after public identifier
+            i = skipWhitespace(xmlData, i);
+
+            // Optionally read system identifier
+            if (xmlData[i] === '"' || xmlData[i] === "'") {
+                [i, systemIdentifier ] = this.readIdentifierVal(xmlData, i,"systemIdentifier");
+            }
+        } else if (identifierType === "SYSTEM") {
+            // Read system identifier (mandatory for SYSTEM)
+            [i, systemIdentifier ] = this.readIdentifierVal(xmlData, i, "systemIdentifier");
+
+            if (!this.suppressValidationErr && !systemIdentifier) {
+                throw new Error("Missing mandatory system identifier for SYSTEM notation");
+            }
+        }
+        
+        return {notationName, publicIdentifier, systemIdentifier, index: --i};
+    }
+
+    readIdentifierVal(xmlData, i, type) {
+        let identifierVal = "";
+        const startChar = xmlData[i];
+        if (startChar !== '"' && startChar !== "'") {
+            throw new Error(`Expected quoted string, found "${startChar}"`);
+        }
+        i++;
+
+        while (i < xmlData.length && xmlData[i] !== startChar) {
+            identifierVal += xmlData[i];
+            i++;
+        }
+
+        if (xmlData[i] !== startChar) {
+            throw new Error(`Unterminated ${type} value`);
+        }
+        i++;
+        return [i, identifierVal];
+    }
+
+    readElementExp(xmlData, i) {
+        // <!ELEMENT br EMPTY>
+        // <!ELEMENT div ANY>
+        // <!ELEMENT title (#PCDATA)>
+        // <!ELEMENT book (title, author+)>
+        // <!ELEMENT name (content-model)>
+        
+        // Skip leading whitespace after <!ELEMENT
+        i = skipWhitespace(xmlData, i);
+
+        // Read element name
+        let elementName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            elementName += xmlData[i];
+            i++;
+        }
+
+        // Validate element name
+        if (!this.suppressValidationErr && !isName(elementName)) {
+            throw new Error(`Invalid element name: "${elementName}"`);
+        }
+
+        // Skip whitespace after element name
+        i = skipWhitespace(xmlData, i);
+        let contentModel = "";
+        // Expect '(' to start content model
+        if(xmlData[i] === "E" && hasSeq(xmlData, "MPTY",i)) i+=4;
+        else if(xmlData[i] === "A" && hasSeq(xmlData, "NY",i)) i+=2;
+        else if (xmlData[i] === "(") {
+            i++; // Move past '('
+
+            // Read content model
+            while (i < xmlData.length && xmlData[i] !== ")") {
+                contentModel += xmlData[i];
+                i++;
+            }
+            if (xmlData[i] !== ")") {
+                throw new Error("Unterminated content model");
+            }
+
+        }else if(!this.suppressValidationErr){
+            throw new Error(`Invalid Element Expression, found "${xmlData[i]}"`);
+        }
+        
+        return {
+            elementName,
+            contentModel: contentModel.trim(),
+            index: i
+        };
+    }
+
+    readAttlistExp(xmlData, i) {
+        // Skip leading whitespace after <!ATTLIST
+        i = skipWhitespace(xmlData, i);
+
+        // Read element name
+        let elementName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            elementName += xmlData[i];
+            i++;
+        }
+
+        // Validate element name
+        validateEntityName(elementName)
+
+        // Skip whitespace after element name
+        i = skipWhitespace(xmlData, i);
+
+        // Read attribute name
+        let attributeName = "";
+        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+            attributeName += xmlData[i];
+            i++;
+        }
+
+        // Validate attribute name
+        if (!validateEntityName(attributeName)) {
+            throw new Error(`Invalid attribute name: "${attributeName}"`);
+        }
+
+        // Skip whitespace after attribute name
+        i = skipWhitespace(xmlData, i);
+
+        // Read attribute type
+        let attributeType = "";
+        if (xmlData.substring(i, i + 8).toUpperCase() === "NOTATION") {
+            attributeType = "NOTATION";
+            i += 8; // Move past "NOTATION"
+
+            // Skip whitespace after "NOTATION"
+            i = skipWhitespace(xmlData, i);
+
+            // Expect '(' to start the list of notations
+            if (xmlData[i] !== "(") {
+                throw new Error(`Expected '(', found "${xmlData[i]}"`);
+            }
+            i++; // Move past '('
+
+            // Read the list of allowed notations
+            let allowedNotations = [];
+            while (i < xmlData.length && xmlData[i] !== ")") {
+                let notation = "";
+                while (i < xmlData.length && xmlData[i] !== "|" && xmlData[i] !== ")") {
+                    notation += xmlData[i];
+                    i++;
+                }
+
+                // Validate notation name
+                notation = notation.trim();
+                if (!validateEntityName(notation)) {
+                    throw new Error(`Invalid notation name: "${notation}"`);
+                }
+
+                allowedNotations.push(notation);
+
+                // Skip '|' separator or exit loop
+                if (xmlData[i] === "|") {
+                    i++; // Move past '|'
+                    i = skipWhitespace(xmlData, i); // Skip optional whitespace after '|'
+                }
+            }
+
+            if (xmlData[i] !== ")") {
+                throw new Error("Unterminated list of notations");
+            }
+            i++; // Move past ')'
+
+            // Store the allowed notations as part of the attribute type
+            attributeType += " (" + allowedNotations.join("|") + ")";
+        } else {
+            // Handle simple types (e.g., CDATA, ID, IDREF, etc.)
+            while (i < xmlData.length && !/\s/.test(xmlData[i])) {
+                attributeType += xmlData[i];
+                i++;
+            }
+
+            // Validate simple attribute type
+            const validTypes = ["CDATA", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES", "NMTOKEN", "NMTOKENS"];
+            if (!this.suppressValidationErr && !validTypes.includes(attributeType.toUpperCase())) {
+                throw new Error(`Invalid attribute type: "${attributeType}"`);
+            }
+        }
+
+        // Skip whitespace after attribute type
+        i = skipWhitespace(xmlData, i);
+
+        // Read default value
+        let defaultValue = "";
+        if (xmlData.substring(i, i + 8).toUpperCase() === "#REQUIRED") {
+            defaultValue = "#REQUIRED";
+            i += 8;
+        } else if (xmlData.substring(i, i + 7).toUpperCase() === "#IMPLIED") {
+            defaultValue = "#IMPLIED";
+            i += 7;
+        } else {
+            [i, defaultValue] = this.readIdentifierVal(xmlData, i, "ATTLIST");
+        }
+
+        return {
+            elementName,
+            attributeName,
+            attributeType,
+            defaultValue,
+            index: i
+        }
+    }
 }
+
+
 
 const skipWhitespace = (data, index) => {
     while (index < data.length && /\s/.test(data[index])) {
@@ -2586,281 +2916,7 @@ const skipWhitespace = (data, index) => {
     return index;
 };
 
-function readEntityExp(xmlData, i) {    
-    //External entities are not supported
-    //    <!ENTITY ext SYSTEM "http://normal-website.com" >
 
-    //Parameter entities are not supported
-    //    <!ENTITY entityname "&anotherElement;">
-
-    //Internal entities are supported
-    //    <!ENTITY entityname "replacement text">
-
-    // Skip leading whitespace after <!ENTITY
-    i = skipWhitespace(xmlData, i);
-
-    // Read entity name
-    let entityName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i]) && xmlData[i] !== '"' && xmlData[i] !== "'") {
-        entityName += xmlData[i];
-        i++;
-    }
-    validateEntityName(entityName);
-
-    // Skip whitespace after entity name
-    i = skipWhitespace(xmlData, i);
-
-    // Check for unsupported constructs (external entities or parameter entities)
-    if (xmlData.substring(i, i + 6).toUpperCase() === "SYSTEM") {
-        throw new Error("External entities are not supported");
-    }else if (xmlData[i] === "%") {
-        throw new Error("Parameter entities are not supported");
-    }
-
-    // Read entity value (internal entity)
-    let entityValue = "";
-    [i, entityValue] = readIdentifierVal(xmlData, i, "entity");
-    i--;
-    return [entityName, entityValue, i ];
-}
-
-function readNotationExp(xmlData, i) {
-    // Skip leading whitespace after <!NOTATION
-    i = skipWhitespace(xmlData, i);
-
-    // Read notation name
-    let notationName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-        notationName += xmlData[i];
-        i++;
-    }
-    validateEntityName(notationName);
-
-    // Skip whitespace after notation name
-    i = skipWhitespace(xmlData, i);
-
-    // Check identifier type (SYSTEM or PUBLIC)
-    const identifierType = xmlData.substring(i, i + 6).toUpperCase();
-    if (identifierType !== "SYSTEM" && identifierType !== "PUBLIC") {
-        throw new Error(`Expected SYSTEM or PUBLIC, found "${identifierType}"`);
-    }
-    i += identifierType.length;
-
-    // Skip whitespace after identifier type
-    i = skipWhitespace(xmlData, i);
-
-    // Read public identifier (if PUBLIC)
-    let publicIdentifier = null;
-    let systemIdentifier = null;
-
-    if (identifierType === "PUBLIC") {
-        [i, publicIdentifier ] = readIdentifierVal(xmlData, i, "publicIdentifier");
-
-        // Skip whitespace after public identifier
-        i = skipWhitespace(xmlData, i);
-
-        // Optionally read system identifier
-        if (xmlData[i] === '"' || xmlData[i] === "'") {
-            [i, systemIdentifier ] = readIdentifierVal(xmlData, i,"systemIdentifier");
-        }
-    } else if (identifierType === "SYSTEM") {
-        // Read system identifier (mandatory for SYSTEM)
-        [i, systemIdentifier ] = readIdentifierVal(xmlData, i, "systemIdentifier");
-
-        if (!systemIdentifier) {
-            throw new Error("Missing mandatory system identifier for SYSTEM notation");
-        }
-    }
-    
-    return {notationName, publicIdentifier, systemIdentifier, index: --i};
-}
-
-function readIdentifierVal(xmlData, i, type) {
-    let identifierVal = "";
-    const startChar = xmlData[i];
-    if (startChar !== '"' && startChar !== "'") {
-        throw new Error(`Expected quoted string, found "${startChar}"`);
-    }
-    i++;
-
-    while (i < xmlData.length && xmlData[i] !== startChar) {
-        identifierVal += xmlData[i];
-        i++;
-    }
-
-    if (xmlData[i] !== startChar) {
-        throw new Error(`Unterminated ${type} value`);
-    }
-    i++;
-    return [i, identifierVal];
-}
-
-function readElementExp(xmlData, i) {
-    // <!ELEMENT br EMPTY>
-    // <!ELEMENT div ANY>
-    // <!ELEMENT title (#PCDATA)>
-    // <!ELEMENT book (title, author+)>
-    // <!ELEMENT name (content-model)>
-    
-    // Skip leading whitespace after <!ELEMENT
-    i = skipWhitespace(xmlData, i);
-
-    // Read element name
-    let elementName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-        elementName += xmlData[i];
-        i++;
-    }
-
-    // Validate element name
-    if (!validateEntityName(elementName)) {
-        throw new Error(`Invalid element name: "${elementName}"`);
-    }
-
-    // Skip whitespace after element name
-    i = skipWhitespace(xmlData, i);
-    let contentModel = "";
-    // Expect '(' to start content model
-    if(xmlData[i] === "E" && hasSeq(xmlData, "MPTY",i)) i+=4;
-    else if(xmlData[i] === "A" && hasSeq(xmlData, "NY",i)) i+=2;
-    else if (xmlData[i] === "(") {
-        i++; // Move past '('
-
-        // Read content model
-        while (i < xmlData.length && xmlData[i] !== ")") {
-            contentModel += xmlData[i];
-            i++;
-        }
-        if (xmlData[i] !== ")") {
-            throw new Error("Unterminated content model");
-        }
-
-    }else{
-        throw new Error(`Invalid Element Expression, found "${xmlData[i]}"`);
-    }
-    
-    return {
-        elementName,
-        contentModel: contentModel.trim(),
-        index: i
-    };
-}
-
-function readAttlistExp(xmlData, i) {
-    // Skip leading whitespace after <!ATTLIST
-    i = skipWhitespace(xmlData, i);
-
-    // Read element name
-    let elementName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-        elementName += xmlData[i];
-        i++;
-    }
-
-    // Validate element name
-    validateEntityName(elementName)
-
-    // Skip whitespace after element name
-    i = skipWhitespace(xmlData, i);
-
-    // Read attribute name
-    let attributeName = "";
-    while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-        attributeName += xmlData[i];
-        i++;
-    }
-
-    // Validate attribute name
-    if (!validateEntityName(attributeName)) {
-        throw new Error(`Invalid attribute name: "${attributeName}"`);
-    }
-
-    // Skip whitespace after attribute name
-    i = skipWhitespace(xmlData, i);
-
-    // Read attribute type
-    let attributeType = "";
-    if (xmlData.substring(i, i + 8).toUpperCase() === "NOTATION") {
-        attributeType = "NOTATION";
-        i += 8; // Move past "NOTATION"
-
-        // Skip whitespace after "NOTATION"
-        i = skipWhitespace(xmlData, i);
-
-        // Expect '(' to start the list of notations
-        if (xmlData[i] !== "(") {
-            throw new Error(`Expected '(', found "${xmlData[i]}"`);
-        }
-        i++; // Move past '('
-
-        // Read the list of allowed notations
-        let allowedNotations = [];
-        while (i < xmlData.length && xmlData[i] !== ")") {
-            let notation = "";
-            while (i < xmlData.length && xmlData[i] !== "|" && xmlData[i] !== ")") {
-                notation += xmlData[i];
-                i++;
-            }
-
-            // Validate notation name
-            notation = notation.trim();
-            if (!validateEntityName(notation)) {
-                throw new Error(`Invalid notation name: "${notation}"`);
-            }
-
-            allowedNotations.push(notation);
-
-            // Skip '|' separator or exit loop
-            if (xmlData[i] === "|") {
-                i++; // Move past '|'
-                i = skipWhitespace(xmlData, i); // Skip optional whitespace after '|'
-            }
-        }
-
-        if (xmlData[i] !== ")") {
-            throw new Error("Unterminated list of notations");
-        }
-        i++; // Move past ')'
-
-        // Store the allowed notations as part of the attribute type
-        attributeType += " (" + allowedNotations.join("|") + ")";
-    } else {
-        // Handle simple types (e.g., CDATA, ID, IDREF, etc.)
-        while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-            attributeType += xmlData[i];
-            i++;
-        }
-
-        // Validate simple attribute type
-        const validTypes = ["CDATA", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES", "NMTOKEN", "NMTOKENS"];
-        if (!validTypes.includes(attributeType.toUpperCase())) {
-            throw new Error(`Invalid attribute type: "${attributeType}"`);
-        }
-    }
-
-    // Skip whitespace after attribute type
-    i = skipWhitespace(xmlData, i);
-
-    // Read default value
-    let defaultValue = "";
-    if (xmlData.substring(i, i + 8).toUpperCase() === "#REQUIRED") {
-        defaultValue = "#REQUIRED";
-        i += 8;
-    } else if (xmlData.substring(i, i + 7).toUpperCase() === "#IMPLIED") {
-        defaultValue = "#IMPLIED";
-        i += 7;
-    } else {
-        [i, defaultValue] = readIdentifierVal(xmlData, i, "ATTLIST");
-    }
-
-    return {
-        elementName,
-        attributeName,
-        attributeType,
-        defaultValue,
-        index: i
-    }
-}
 
 function hasSeq(data, seq,i){
     for(let j=0;j<seq.length;j++){
@@ -2871,7 +2927,7 @@ function hasSeq(data, seq,i){
 
 function validateEntityName(name){
     if (isName(name))
-	return name;
+	    return name;
     else
         throw new Error(`Invalid entity name ${name}`);
 }
@@ -3069,8 +3125,8 @@ class OrderedObjParser{
       "copyright" : { regex: /&(copy|#169);/g, val: "©" },
       "reg" : { regex: /&(reg|#174);/g, val: "®" },
       "inr" : { regex: /&(inr|#8377);/g, val: "₹" },
-      "num_dec": { regex: /&#([0-9]{1,7});/g, val : (_, str) => String.fromCodePoint(Number.parseInt(str, 10)) },
-      "num_hex": { regex: /&#x([0-9a-fA-F]{1,6});/g, val : (_, str) => String.fromCodePoint(Number.parseInt(str, 16)) },
+      "num_dec": { regex: /&#([0-9]{1,7});/g, val : (_, str) => fromCodePoint(str, 10, "&#") },
+      "num_hex": { regex: /&#x([0-9a-fA-F]{1,6});/g, val : (_, str) => fromCodePoint(str, 16, "&#x") },
     };
     this.addExternalEntities = addExternalEntities;
     this.parseXml = parseXml;
@@ -3083,6 +3139,20 @@ class OrderedObjParser{
     this.saveTextToParentTag = saveTextToParentTag;
     this.addChild = addChild;
     this.ignoreAttributesFn = getIgnoreAttributesFn(this.options.ignoreAttributes)
+
+    if(this.options.stopNodes && this.options.stopNodes.length > 0){
+      this.stopNodesExact = new Set();
+      this.stopNodesWildcard = new Set();
+      for(let i = 0; i < this.options.stopNodes.length; i++){
+        const stopNodeExp = this.options.stopNodes[i];
+        if(typeof stopNodeExp !== 'string') continue;
+        if(stopNodeExp.startsWith("*.")){
+          this.stopNodesWildcard.add(stopNodeExp.substring(2));
+        }else{
+          this.stopNodesExact.add(stopNodeExp);
+        }
+      }
+    }
   }
 
 }
@@ -3154,7 +3224,7 @@ function resolveNameSpace(tagname) {
 //const attrsRegx = new RegExp("([\\w\\-\\.\\:]+)\\s*=\\s*(['\"])((.|\n)*?)\\2","gm");
 const attrsRegx = new RegExp('([^\\s=]+)\\s*(=\\s*([\'"])([\\s\\S]*?)\\3)?', 'gm');
 
-function buildAttributesMap(attrStr, jPath, tagName) {
+function buildAttributesMap(attrStr, jPath) {
   if (this.options.ignoreAttributes !== true && typeof attrStr === 'string') {
     // attrStr = attrStr.replace(/\r?\n/g, ' ');
     //attrStr = attrStr || attrStr.trim();
@@ -3217,6 +3287,7 @@ const parseXml = function(xmlData) {
   let currentNode = xmlObj;
   let textData = "";
   let jPath = "";
+  const docTypeReader = new DocTypeReader(this.options.processEntities);
   for(let i=0; i< xmlData.length; i++){//for each char in XML data
     const ch = xmlData[i];
     if(ch === '<'){
@@ -3265,14 +3336,14 @@ const parseXml = function(xmlData) {
 
         textData = this.saveTextToParentTag(textData, currentNode, jPath);
         if( (this.options.ignoreDeclaration && tagData.tagName === "?xml") || this.options.ignorePiTags){
-
+          //do nothing
         }else{
   
           const childNode = new XmlNode(tagData.tagName);
           childNode.add(this.options.textNodeName, "");
           
           if(tagData.tagName !== tagData.tagExp && tagData.attrExpPresent){
-            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath, tagData.tagName);
+            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath);
           }
           this.addChild(currentNode, childNode, jPath, i);
         }
@@ -3290,7 +3361,7 @@ const parseXml = function(xmlData) {
         }
         i = endIndex;
       } else if( xmlData.substr(i + 1, 2) === '!D') {
-        const result = readDocType(xmlData, i);
+        const result = docTypeReader.readDocType(xmlData, i);
         this.docTypeEntities = result.entities;
         i = result.i;
       }else if(xmlData.substr(i + 1, 2) === '![') {
@@ -3319,7 +3390,12 @@ const parseXml = function(xmlData) {
         let closeIndex = result.closeIndex;
 
         if (this.options.transformTagName) {
-          tagName = this.options.transformTagName(tagName);
+          //console.log(tagExp, tagName)
+          const newTagName = this.options.transformTagName(tagName);
+          if(tagExp === tagName) {
+            tagExp = newTagName
+          }
+          tagName = newTagName;
         }
         
         //save text as child node
@@ -3340,7 +3416,7 @@ const parseXml = function(xmlData) {
           jPath += jPath ? "." + tagName : tagName;
         }
         const startIndex = i;
-        if (this.isItStopNode(this.options.stopNodes, jPath, tagName)) {
+        if (this.isItStopNode(this.stopNodesExact, this.stopNodesWildcard, jPath, tagName)) {
           let tagContent = "";
           //self-closing tag
           if(tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1){
@@ -3370,7 +3446,8 @@ const parseXml = function(xmlData) {
           const childNode = new XmlNode(tagName);
 
           if(tagName !== tagExp && attrExpPresent){
-            childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+            childNode[":@"] = this.buildAttributesMap(tagExp, jPath
+            );
           }
           if(tagContent) {
             tagContent = this.parseTextData(tagContent, tagName, jPath, true, attrExpPresent, true, true);
@@ -3392,12 +3469,16 @@ const parseXml = function(xmlData) {
             }
             
             if(this.options.transformTagName) {
-              tagName = this.options.transformTagName(tagName);
+              const newTagName = this.options.transformTagName(tagName);
+              if(tagExp === tagName) {
+                tagExp = newTagName
+              }
+              tagName = newTagName;
             }
 
             const childNode = new XmlNode(tagName);
             if(tagName !== tagExp && attrExpPresent){
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+              childNode[":@"] = this.buildAttributesMap(tagExp, jPath);
             }
             this.addChild(currentNode, childNode, jPath, startIndex);
             jPath = jPath.substr(0, jPath.lastIndexOf("."));
@@ -3408,7 +3489,7 @@ const parseXml = function(xmlData) {
             this.tagsNodeStack.push(currentNode);
             
             if(tagName !== tagExp && attrExpPresent){
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+              childNode[":@"] = this.buildAttributesMap(tagExp, jPath);
             }
             this.addChild(currentNode, childNode, jPath, startIndex);
             currentNode = childNode;
@@ -3429,6 +3510,7 @@ function addChild(currentNode, childNode, jPath, startIndex){
   if (!this.options.captureMetaData) startIndex = undefined;
   const result = this.options.updateTag(childNode.tagname, jPath, childNode[":@"])
   if(result === false){
+    //do nothing
   } else if(typeof result === "string"){
     childNode.tagname = result
     currentNode.addChild(childNode, startIndex);
@@ -3478,17 +3560,14 @@ function saveTextToParentTag(textData, currentNode, jPath, isLeafNode) {
 
 //TODO: use jPath to simplify the logic
 /**
- * 
- * @param {string[]} stopNodes 
+ * @param {Set} stopNodesExact
+ * @param {Set} stopNodesWildcard
  * @param {string} jPath
- * @param {string} currentTagName 
+ * @param {string} currentTagName
  */
-function isItStopNode(stopNodes, jPath, currentTagName){
-  const allNodesExp = "*." + currentTagName;
-  for (const stopNodePath in stopNodes) {
-    const stopNodeExp = stopNodes[stopNodePath];
-    if( allNodesExp === stopNodeExp || jPath === stopNodeExp  ) return true;
-  }
+function isItStopNode(stopNodesExact, stopNodesWildcard, jPath, currentTagName){
+  if(stopNodesWildcard && stopNodesWildcard.has(currentTagName)) return true;
+  if(stopNodesExact && stopNodesExact.has(jPath)) return true;
   return false;
 }
 
@@ -3633,6 +3712,15 @@ function parseValue(val, shouldParse, options) {
   }
 }
 
+function fromCodePoint(str, base, prefix){
+  const codePoint = Number.parseInt(str, base);
+
+  if (codePoint >= 0 && codePoint <= 0x10FFFF) {
+      return String.fromCodePoint(codePoint);
+  } else {
+      return prefix +str + ";";
+  }
+}
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/xmlparser/node2json.js
 
 
@@ -4197,16 +4285,16 @@ class XMLParser{
     }
     /**
      * Parse XML dats to JS object 
-     * @param {string|Buffer} xmlData 
+     * @param {string|Uint8Array} xmlData 
      * @param {boolean|Object} validationOption 
      */
     parse(xmlData,validationOption){
-        if(typeof xmlData === "string"){
-        }else if( xmlData.toString){
+        if(typeof xmlData !== "string" && xmlData.toString){
             xmlData = xmlData.toString();
-        }else{
+        }else if(typeof xmlData !== "string"){
             throw new Error("XML data is accepted in String or Bytes[] form.")
         }
+        
         if( validationOption){
             if(validationOption === true) validationOption = {}; //validate with default options
             
@@ -4462,10 +4550,7 @@ var NumericValue = __webpack_require__(5121);
 var date_utils = __webpack_require__(1885);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
 var toBase64 = __webpack_require__(9718);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/structIterator.js
-var structIterator = __webpack_require__(1440);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/QueryShapeSerializer.js
-
 
 
 
@@ -4566,7 +4651,8 @@ class QueryShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfi
                         if (item == null) {
                             continue;
                         }
-                        const suffix = this.getKey("member", member.getMergedTraits().xmlName);
+                        const traits = member.getMergedTraits();
+                        const suffix = this.getKey("member", traits.xmlName, traits.ec2QueryName);
                         const key = flat ? `${prefix}${i}` : `${prefix}${suffix}.${i}`;
                         this.write(member, item, key);
                         ++i;
@@ -4584,9 +4670,11 @@ class QueryShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfi
                     if (v == null) {
                         continue;
                     }
-                    const keySuffix = this.getKey("key", keySchema.getMergedTraits().xmlName);
+                    const keyTraits = keySchema.getMergedTraits();
+                    const keySuffix = this.getKey("key", keyTraits.xmlName, keyTraits.ec2QueryName);
                     const key = flat ? `${prefix}${i}.${keySuffix}` : `${prefix}entry.${i}.${keySuffix}`;
-                    const valueSuffix = this.getKey("value", memberSchema.getMergedTraits().xmlName);
+                    const valTraits = memberSchema.getMergedTraits();
+                    const valueSuffix = this.getKey("value", valTraits.xmlName, valTraits.ec2QueryName);
                     const valueKey = flat ? `${prefix}${i}.${valueSuffix}` : `${prefix}entry.${i}.${valueSuffix}`;
                     this.write(keySchema, k, key);
                     this.write(memberSchema, v, valueKey);
@@ -4597,11 +4685,12 @@ class QueryShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfi
         else if (ns.isStructSchema()) {
             if (value && typeof value === "object") {
                 let didWriteMember = false;
-                for (const [memberName, member] of (0,structIterator/* .serializingStructIterator */.R)(ns, value)) {
+                for (const [memberName, member] of ns.structIterator()) {
                     if (value[memberName] == null && !member.isIdempotencyToken()) {
                         continue;
                     }
-                    const suffix = this.getKey(memberName, member.getMergedTraits().xmlName);
+                    const traits = member.getMergedTraits();
+                    const suffix = this.getKey(memberName, traits.xmlName, traits.ec2QueryName, "struct");
                     const key = `${prefix}${suffix}`;
                     this.write(member, value[memberName], key);
                     didWriteMember = true;
@@ -4630,9 +4719,13 @@ class QueryShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfi
         delete this.buffer;
         return str;
     }
-    getKey(memberName, xmlName) {
+    getKey(memberName, xmlName, ec2QueryName, keySource) {
+        const { ec2, capitalizeKeys } = this.settings;
+        if (ec2 && ec2QueryName) {
+            return ec2QueryName;
+        }
         const key = xmlName ?? memberName;
-        if (this.settings.capitalizeKeys) {
+        if (capitalizeKeys && keySource === "struct") {
             return key[0].toUpperCase() + key.slice(1);
         }
         return key;
@@ -4783,55 +4876,6 @@ class AwsQueryProtocol extends RpcProtocol {
     }
     getDefaultContentType() {
         return "application/x-www-form-urlencoded";
-    }
-}
-
-
-},
-1440(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
-__webpack_require__.d(__webpack_exports__, {
-  G: () => (deserializingStructIterator),
-  R: () => (serializingStructIterator)
-});
-/* import */ var _smithy_core_schema__rspack_import_0 = __webpack_require__(8754);
-
-function* serializingStructIterator(ns, sourceObject) {
-    if (ns.isUnitSchema()) {
-        return;
-    }
-    const struct = ns.getSchema();
-    for (let i = 0; i < struct[4].length; ++i) {
-        const key = struct[4][i];
-        const memberSchema = struct[5][i];
-        const memberNs = new _smithy_core_schema__rspack_import_0/* .NormalizedSchema */.l([memberSchema, 0], key);
-        if (!(key in sourceObject) && !memberNs.isIdempotencyToken()) {
-            continue;
-        }
-        yield [key, memberNs];
-    }
-}
-function* deserializingStructIterator(ns, sourceObject, nameTrait) {
-    if (ns.isUnitSchema()) {
-        return;
-    }
-    const struct = ns.getSchema();
-    let keysRemaining = Object.keys(sourceObject).filter((k) => k !== "__type").length;
-    for (let i = 0; i < struct[4].length; ++i) {
-        if (keysRemaining === 0) {
-            break;
-        }
-        const key = struct[4][i];
-        const memberSchema = struct[5][i];
-        const memberNs = new _smithy_core_schema__rspack_import_0/* .NormalizedSchema */.l([memberSchema, 0], key);
-        let serializationKey = key;
-        if (nameTrait) {
-            serializationKey = memberNs.getMergedTraits()[nameTrait] ?? key;
-        }
-        if (!(serializationKey in sourceObject)) {
-            continue;
-        }
-        yield [key, memberNs];
-        keysRemaining -= 1;
     }
 }
 
@@ -6317,6 +6361,38 @@ const n0 = "com.amazonaws.sso";
 
 
 
+const _s_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s);
+var SSOServiceException$ = [-3, _s, "SSOServiceException", 0, [], []];
+_s_registry.registerError(SSOServiceException$, SSOServiceException);
+const n0_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0);
+var InvalidRequestException$ = [-3, n0, _IRE,
+    { [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(InvalidRequestException$, InvalidRequestException);
+var ResourceNotFoundException$ = [-3, n0, _RNFE,
+    { [_e]: _c, [_hE]: 404 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(ResourceNotFoundException$, ResourceNotFoundException);
+var TooManyRequestsException$ = [-3, n0, _TMRE,
+    { [_e]: _c, [_hE]: 429 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(TooManyRequestsException$, TooManyRequestsException);
+var UnauthorizedException$ = [-3, n0, _UE,
+    { [_e]: _c, [_hE]: 401 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(UnauthorizedException$, UnauthorizedException);
+const errorTypeRegistries = [
+    _s_registry,
+    n0_registry,
+];
 var AccessTokenType = [0, n0, _ATT, 8, 0];
 var SecretAccessKeyType = [0, n0, _SAKT, 8, 0];
 var SessionTokenType = [0, n0, _STT, 8, 0];
@@ -6328,23 +6404,17 @@ var AccountInfo$ = (/* unused pure expression or super */ null && ([3, n0, _AI,
 var GetRoleCredentialsRequest$ = [3, n0, _GRCR,
     0,
     [_rN, _aI, _aT],
-    [[0, { [_hQ]: _rn }], [0, { [_hQ]: _ai }], [() => AccessTokenType, { [_hH]: _xasbt }]]
+    [[0, { [_hQ]: _rn }], [0, { [_hQ]: _ai }], [() => AccessTokenType, { [_hH]: _xasbt }]], 3
 ];
 var GetRoleCredentialsResponse$ = [3, n0, _GRCRe,
     0,
     [_rC],
     [[() => RoleCredentials$, 0]]
 ];
-var InvalidRequestException$ = [-3, n0, _IRE,
-    { [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidRequestException$, InvalidRequestException);
 var ListAccountRolesRequest$ = [3, n0, _LARR,
     0,
-    [_nT, _mR, _aT, _aI],
-    [[0, { [_hQ]: _nt }], [1, { [_hQ]: _mr }], [() => AccessTokenType, { [_hH]: _xasbt }], [0, { [_hQ]: _ai }]]
+    [_aT, _aI, _nT, _mR],
+    [[() => AccessTokenType, { [_hH]: _xasbt }], [0, { [_hQ]: _ai }], [0, { [_hQ]: _nt }], [1, { [_hQ]: _mr }]], 2
 ];
 var ListAccountRolesResponse$ = (/* unused pure expression or super */ null && ([3, n0, _LARRi,
     0,
@@ -6353,8 +6423,8 @@ var ListAccountRolesResponse$ = (/* unused pure expression or super */ null && (
 ]));
 var ListAccountsRequest$ = [3, n0, _LAR,
     0,
-    [_nT, _mR, _aT],
-    [[0, { [_hQ]: _nt }], [1, { [_hQ]: _mr }], [() => AccessTokenType, { [_hH]: _xasbt }]]
+    [_aT, _nT, _mR],
+    [[() => AccessTokenType, { [_hH]: _xasbt }], [0, { [_hQ]: _nt }], [1, { [_hQ]: _mr }]], 1
 ];
 var ListAccountsResponse$ = (/* unused pure expression or super */ null && ([3, n0, _LARi,
     0,
@@ -6364,14 +6434,8 @@ var ListAccountsResponse$ = (/* unused pure expression or super */ null && ([3, 
 var LogoutRequest$ = [3, n0, _LR,
     0,
     [_aT],
-    [[() => AccessTokenType, { [_hH]: _xasbt }]]
+    [[() => AccessTokenType, { [_hH]: _xasbt }]], 1
 ];
-var ResourceNotFoundException$ = [-3, n0, _RNFE,
-    { [_e]: _c, [_hE]: 404 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(ResourceNotFoundException$, ResourceNotFoundException);
 var RoleCredentials$ = [3, n0, _RC,
     0,
     [_aKI, _sAK, _sT, _ex],
@@ -6382,21 +6446,7 @@ var RoleInfo$ = (/* unused pure expression or super */ null && ([3, n0, _RI,
     [_rN, _aI],
     [0, 0]
 ]));
-var TooManyRequestsException$ = [-3, n0, _TMRE,
-    { [_e]: _c, [_hE]: 429 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(TooManyRequestsException$, TooManyRequestsException);
-var UnauthorizedException$ = [-3, n0, _UE,
-    { [_e]: _c, [_hE]: 401 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(UnauthorizedException$, UnauthorizedException);
 var __Unit = "unit";
-var SSOServiceException$ = [-3, _s, "SSOServiceException", 0, [], []];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s).registerError(SSOServiceException$, SSOServiceException);
 var AccountListType = (/* unused pure expression or super */ null && ([1, n0, _ALT,
     0, () => AccountInfo$
 ]));
@@ -6541,7 +6591,7 @@ const resolveHttpAuthSchemeConfig = (config) => {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sso/package.json
-var package_namespaceObject = {"rE":"3.958.0"}
+var package_namespaceObject = {"rE":"3.990.0"}
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
@@ -6632,6 +6682,7 @@ customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = util_endpoints
 
 
 
+
 const getRuntimeConfig = (config) => {
     return {
         apiVersion: "2019-06-10",
@@ -6657,6 +6708,7 @@ const getRuntimeConfig = (config) => {
         protocol: config?.protocol ?? AwsRestJsonProtocol/* .AwsRestJsonProtocol */.Y,
         protocolSettings: config?.protocolSettings ?? {
             defaultNamespace: "com.amazonaws.sso",
+            errorTypeRegistries: errorTypeRegistries,
             version: "2019-06-10",
             serviceTarget: "SWBPortalService",
         },
@@ -7419,7 +7471,7 @@ __webpack_require__.d(__webpack_exports__, {
   SigninClient: () => (/* reexport */ SigninClient)
 });
 
-// UNUSED EXPORTS: Signin, __Client, AccessDeniedException, CreateOAuth2TokenResponse$, CreateOAuth2TokenRequestBody$, AccessToken$, SigninServiceException, InternalServerException, SigninServiceException$, TooManyRequestsError, TooManyRequestsError$, ValidationException$, OAuth2ErrorCode, CreateOAuth2Token$, InternalServerException$, CreateOAuth2TokenResponseBody$, $Command, CreateOAuth2TokenRequest$, AccessDeniedException$, ValidationException
+// UNUSED EXPORTS: Signin, __Client, AccessDeniedException, CreateOAuth2TokenResponse$, CreateOAuth2TokenRequestBody$, AccessToken$, SigninServiceException, InternalServerException, SigninServiceException$, TooManyRequestsError, TooManyRequestsError$, ValidationException$, errorTypeRegistries, OAuth2ErrorCode, CreateOAuth2Token$, InternalServerException$, CreateOAuth2TokenResponseBody$, $Command, CreateOAuth2TokenRequest$, AccessDeniedException$, ValidationException
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-host-header/dist-es/index.js
 var dist_es = __webpack_require__(1095);
@@ -7606,7 +7658,205 @@ const defaultEndpointResolver = (endpointParams, context = {}) => {
 };
 customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = util_endpoints_dist_es/* .awsEndpointFunctions */.UF;
 
+// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
+var TypeRegistry = __webpack_require__(7870);
+// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/exceptions.js
+var exceptions = __webpack_require__(4384);
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/models/SigninServiceException.js
+
+
+class SigninServiceException extends exceptions/* .ServiceException */.T {
+    constructor(options) {
+        super(options);
+        Object.setPrototypeOf(this, SigninServiceException.prototype);
+    }
+}
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/models/errors.js
+
+class AccessDeniedException extends SigninServiceException {
+    name = "AccessDeniedException";
+    $fault = "client";
+    error;
+    constructor(opts) {
+        super({
+            name: "AccessDeniedException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, AccessDeniedException.prototype);
+        this.error = opts.error;
+    }
+}
+class InternalServerException extends SigninServiceException {
+    name = "InternalServerException";
+    $fault = "server";
+    error;
+    constructor(opts) {
+        super({
+            name: "InternalServerException",
+            $fault: "server",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, InternalServerException.prototype);
+        this.error = opts.error;
+    }
+}
+class TooManyRequestsError extends SigninServiceException {
+    name = "TooManyRequestsError";
+    $fault = "client";
+    error;
+    constructor(opts) {
+        super({
+            name: "TooManyRequestsError",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, TooManyRequestsError.prototype);
+        this.error = opts.error;
+    }
+}
+class ValidationException extends SigninServiceException {
+    name = "ValidationException";
+    $fault = "client";
+    error;
+    constructor(opts) {
+        super({
+            name: "ValidationException",
+            $fault: "client",
+            ...opts,
+        });
+        Object.setPrototypeOf(this, ValidationException.prototype);
+        this.error = opts.error;
+    }
+}
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/schemas/schemas_0.js
+const _ADE = "AccessDeniedException";
+const _AT = "AccessToken";
+const _COAT = "CreateOAuth2Token";
+const _COATR = "CreateOAuth2TokenRequest";
+const _COATRB = "CreateOAuth2TokenRequestBody";
+const _COATRBr = "CreateOAuth2TokenResponseBody";
+const _COATRr = "CreateOAuth2TokenResponse";
+const _ISE = "InternalServerException";
+const _RT = "RefreshToken";
+const _TMRE = "TooManyRequestsError";
+const _VE = "ValidationException";
+const _aKI = "accessKeyId";
+const _aT = "accessToken";
+const _c = "client";
+const _cI = "clientId";
+const _cV = "codeVerifier";
+const _co = "code";
+const _e = "error";
+const _eI = "expiresIn";
+const _gT = "grantType";
+const _h = "http";
+const _hE = "httpError";
+const _iT = "idToken";
+const _jN = "jsonName";
+const _m = "message";
+const _rT = "refreshToken";
+const _rU = "redirectUri";
+const _s = "smithy.ts.sdk.synthetic.com.amazonaws.signin";
+const _sAK = "secretAccessKey";
+const _sT = "sessionToken";
+const _se = "server";
+const _tI = "tokenInput";
+const _tO = "tokenOutput";
+const _tT = "tokenType";
+const n0 = "com.amazonaws.signin";
+
+
+
+const _s_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s);
+var SigninServiceException$ = [-3, _s, "SigninServiceException", 0, [], []];
+_s_registry.registerError(SigninServiceException$, SigninServiceException);
+const n0_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0);
+var AccessDeniedException$ = [-3, n0, _ADE, { [_e]: _c }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(AccessDeniedException$, AccessDeniedException);
+var InternalServerException$ = [-3, n0, _ISE, { [_e]: _se, [_hE]: 500 }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(InternalServerException$, InternalServerException);
+var TooManyRequestsError$ = [-3, n0, _TMRE, { [_e]: _c, [_hE]: 429 }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(TooManyRequestsError$, TooManyRequestsError);
+var ValidationException$ = [-3, n0, _VE, { [_e]: _c, [_hE]: 400 }, [_e, _m], [0, 0], 2];
+n0_registry.registerError(ValidationException$, ValidationException);
+const errorTypeRegistries = [_s_registry, n0_registry];
+var RefreshToken = [0, n0, _RT, 8, 0];
+var AccessToken$ = [
+    3,
+    n0,
+    _AT,
+    8,
+    [_aKI, _sAK, _sT],
+    [
+        [0, { [_jN]: _aKI }],
+        [0, { [_jN]: _sAK }],
+        [0, { [_jN]: _sT }],
+    ],
+    3,
+];
+var CreateOAuth2TokenRequest$ = [
+    3,
+    n0,
+    _COATR,
+    0,
+    [_tI],
+    [[() => CreateOAuth2TokenRequestBody$, 16]],
+    1,
+];
+var CreateOAuth2TokenRequestBody$ = [
+    3,
+    n0,
+    _COATRB,
+    0,
+    [_cI, _gT, _co, _rU, _cV, _rT],
+    [
+        [0, { [_jN]: _cI }],
+        [0, { [_jN]: _gT }],
+        0,
+        [0, { [_jN]: _rU }],
+        [0, { [_jN]: _cV }],
+        [() => RefreshToken, { [_jN]: _rT }],
+    ],
+    2,
+];
+var CreateOAuth2TokenResponse$ = [
+    3,
+    n0,
+    _COATRr,
+    0,
+    [_tO],
+    [[() => CreateOAuth2TokenResponseBody$, 16]],
+    1,
+];
+var CreateOAuth2TokenResponseBody$ = [
+    3,
+    n0,
+    _COATRBr,
+    0,
+    [_aT, _tT, _eI, _rT, _iT],
+    [
+        [() => AccessToken$, { [_jN]: _aT }],
+        [0, { [_jN]: _tT }],
+        [1, { [_jN]: _eI }],
+        [() => RefreshToken, { [_jN]: _rT }],
+        [0, { [_jN]: _iT }],
+    ],
+    4,
+];
+var CreateOAuth2Token$ = [
+    9,
+    n0,
+    _COAT,
+    { [_h]: ["POST", "/v1/token", 200] },
+    () => CreateOAuth2TokenRequest$,
+    () => CreateOAuth2TokenResponse$,
+];
+
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/runtimeConfig.shared.js
+
 
 
 
@@ -7641,6 +7891,7 @@ const getRuntimeConfig = (config) => {
         protocol: config?.protocol ?? AwsRestJsonProtocol/* .AwsRestJsonProtocol */.Y,
         protocolSettings: config?.protocolSettings ?? {
             defaultNamespace: "com.amazonaws.signin",
+            errorTypeRegistries: errorTypeRegistries,
             version: "2023-01-01",
             serviceTarget: "Signin",
         },
@@ -7814,195 +8065,6 @@ class SigninClient extends client/* .Client */.K {
 var getEndpointPlugin = __webpack_require__(113);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
 var command = __webpack_require__(4388);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
-var TypeRegistry = __webpack_require__(7870);
-// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/exceptions.js
-var exceptions = __webpack_require__(4384);
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/models/SigninServiceException.js
-
-
-class SigninServiceException extends exceptions/* .ServiceException */.T {
-    constructor(options) {
-        super(options);
-        Object.setPrototypeOf(this, SigninServiceException.prototype);
-    }
-}
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/models/errors.js
-
-class AccessDeniedException extends SigninServiceException {
-    name = "AccessDeniedException";
-    $fault = "client";
-    error;
-    constructor(opts) {
-        super({
-            name: "AccessDeniedException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, AccessDeniedException.prototype);
-        this.error = opts.error;
-    }
-}
-class InternalServerException extends SigninServiceException {
-    name = "InternalServerException";
-    $fault = "server";
-    error;
-    constructor(opts) {
-        super({
-            name: "InternalServerException",
-            $fault: "server",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, InternalServerException.prototype);
-        this.error = opts.error;
-    }
-}
-class TooManyRequestsError extends SigninServiceException {
-    name = "TooManyRequestsError";
-    $fault = "client";
-    error;
-    constructor(opts) {
-        super({
-            name: "TooManyRequestsError",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, TooManyRequestsError.prototype);
-        this.error = opts.error;
-    }
-}
-class ValidationException extends SigninServiceException {
-    name = "ValidationException";
-    $fault = "client";
-    error;
-    constructor(opts) {
-        super({
-            name: "ValidationException",
-            $fault: "client",
-            ...opts,
-        });
-        Object.setPrototypeOf(this, ValidationException.prototype);
-        this.error = opts.error;
-    }
-}
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/schemas/schemas_0.js
-const _ADE = "AccessDeniedException";
-const _AT = "AccessToken";
-const _COAT = "CreateOAuth2Token";
-const _COATR = "CreateOAuth2TokenRequest";
-const _COATRB = "CreateOAuth2TokenRequestBody";
-const _COATRBr = "CreateOAuth2TokenResponseBody";
-const _COATRr = "CreateOAuth2TokenResponse";
-const _ISE = "InternalServerException";
-const _RT = "RefreshToken";
-const _TMRE = "TooManyRequestsError";
-const _VE = "ValidationException";
-const _aKI = "accessKeyId";
-const _aT = "accessToken";
-const _c = "client";
-const _cI = "clientId";
-const _cV = "codeVerifier";
-const _co = "code";
-const _e = "error";
-const _eI = "expiresIn";
-const _gT = "grantType";
-const _h = "http";
-const _hE = "httpError";
-const _iT = "idToken";
-const _jN = "jsonName";
-const _m = "message";
-const _rT = "refreshToken";
-const _rU = "redirectUri";
-const _s = "server";
-const _sAK = "secretAccessKey";
-const _sT = "sessionToken";
-const _sm = "smithy.ts.sdk.synthetic.com.amazonaws.signin";
-const _tI = "tokenInput";
-const _tO = "tokenOutput";
-const _tT = "tokenType";
-const n0 = "com.amazonaws.signin";
-
-
-
-var RefreshToken = [0, n0, _RT, 8, 0];
-var AccessDeniedException$ = [-3, n0, _ADE, { [_e]: _c }, [_e, _m], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(AccessDeniedException$, AccessDeniedException);
-var AccessToken$ = [
-    3,
-    n0,
-    _AT,
-    8,
-    [_aKI, _sAK, _sT],
-    [
-        [0, { [_jN]: _aKI }],
-        [0, { [_jN]: _sAK }],
-        [0, { [_jN]: _sT }],
-    ],
-];
-var CreateOAuth2TokenRequest$ = [
-    3,
-    n0,
-    _COATR,
-    0,
-    [_tI],
-    [[() => CreateOAuth2TokenRequestBody$, 16]],
-];
-var CreateOAuth2TokenRequestBody$ = [
-    3,
-    n0,
-    _COATRB,
-    0,
-    [_cI, _gT, _co, _rU, _cV, _rT],
-    [
-        [0, { [_jN]: _cI }],
-        [0, { [_jN]: _gT }],
-        0,
-        [0, { [_jN]: _rU }],
-        [0, { [_jN]: _cV }],
-        [() => RefreshToken, { [_jN]: _rT }],
-    ],
-];
-var CreateOAuth2TokenResponse$ = [
-    3,
-    n0,
-    _COATRr,
-    0,
-    [_tO],
-    [[() => CreateOAuth2TokenResponseBody$, 16]],
-];
-var CreateOAuth2TokenResponseBody$ = [
-    3,
-    n0,
-    _COATRBr,
-    0,
-    [_aT, _tT, _eI, _rT, _iT],
-    [
-        [() => AccessToken$, { [_jN]: _aT }],
-        [0, { [_jN]: _tT }],
-        [1, { [_jN]: _eI }],
-        [() => RefreshToken, { [_jN]: _rT }],
-        [0, { [_jN]: _iT }],
-    ],
-];
-var InternalServerException$ = [-3, n0, _ISE, { [_e]: _s, [_hE]: 500 }, [_e, _m], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InternalServerException$, InternalServerException);
-var TooManyRequestsError$ = [-3, n0, _TMRE, { [_e]: _c, [_hE]: 429 }, [_e, _m], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(TooManyRequestsError$, TooManyRequestsError);
-var ValidationException$ = [-3, n0, _VE, { [_e]: _c, [_hE]: 400 }, [_e, _m], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(ValidationException$, ValidationException);
-var SigninServiceException$ = [-3, _sm, "SigninServiceException", 0, [], []];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](_sm).registerError(SigninServiceException$, SigninServiceException);
-var CreateOAuth2Token$ = [
-    9,
-    n0,
-    _COAT,
-    { [_h]: ["POST", "/v1/token", 200] },
-    () => CreateOAuth2TokenRequest$,
-    () => CreateOAuth2TokenResponse$,
-];
-
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/commands/CreateOAuth2TokenCommand.js
 
 
@@ -8043,7 +8105,7 @@ __webpack_require__.d(__webpack_exports__, {
   SSOOIDCClient: () => (/* reexport */ SSOOIDCClient)
 });
 
-// UNUSED EXPORTS: CreateToken$, AccessDeniedException, SlowDownException, InternalServerException, AccessDeniedExceptionReason, UnauthorizedClientException, InvalidClientException$, InternalServerException$, InvalidRequestException$, InvalidRequestExceptionReason, InvalidScopeException, $Command, UnsupportedGrantTypeException$, SlowDownException$, UnauthorizedClientException$, ExpiredTokenException$, CreateTokenResponse$, __Client, UnsupportedGrantTypeException, SSOOIDCServiceException$, ExpiredTokenException, CreateTokenRequest$, AuthorizationPendingException$, AuthorizationPendingException, InvalidRequestException, SSOOIDCServiceException, SSOOIDC, InvalidScopeException$, InvalidClientException, InvalidGrantException, InvalidGrantException$, AccessDeniedException$
+// UNUSED EXPORTS: CreateToken$, AccessDeniedException, errorTypeRegistries, SlowDownException, InternalServerException, AccessDeniedExceptionReason, UnauthorizedClientException, InvalidClientException$, InternalServerException$, InvalidRequestException$, InvalidRequestExceptionReason, InvalidScopeException, $Command, UnsupportedGrantTypeException$, SlowDownException$, UnauthorizedClientException$, ExpiredTokenException$, CreateTokenResponse$, __Client, UnsupportedGrantTypeException, SSOOIDCServiceException$, ExpiredTokenException, CreateTokenRequest$, AuthorizationPendingException$, AuthorizationPendingException, InvalidRequestException, SSOOIDCServiceException, SSOOIDC, InvalidScopeException$, InvalidClientException, InvalidGrantException, InvalidGrantException$, AccessDeniedException$
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-host-header/dist-es/index.js
 var dist_es = __webpack_require__(1095);
@@ -8230,214 +8292,6 @@ const defaultEndpointResolver = (endpointParams, context = {}) => {
 };
 customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = util_endpoints_dist_es/* .awsEndpointFunctions */.UF;
 
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeConfig.shared.js
-
-
-
-
-
-
-
-
-
-const getRuntimeConfig = (config) => {
-    return {
-        apiVersion: "2019-06-10",
-        base64Decoder: config?.base64Decoder ?? fromBase64/* .fromBase64 */.E,
-        base64Encoder: config?.base64Encoder ?? toBase64/* .toBase64 */.n,
-        disableHostPrefix: config?.disableHostPrefix ?? false,
-        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver,
-        extensions: config?.extensions ?? [],
-        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSSOOIDCHttpAuthSchemeProvider,
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
-                signer: new AwsSdkSigV4Signer/* .AwsSdkSigV4Signer */.f2(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new noAuth/* .NoAuthSigner */.m(),
-            },
-        ],
-        logger: config?.logger ?? new NoOpLogger/* .NoOpLogger */.N(),
-        protocol: config?.protocol ?? AwsRestJsonProtocol/* .AwsRestJsonProtocol */.Y,
-        protocolSettings: config?.protocolSettings ?? {
-            defaultNamespace: "com.amazonaws.ssooidc",
-            version: "2019-06-10",
-            serviceTarget: "AWSSSOOIDCService",
-        },
-        serviceId: config?.serviceId ?? "SSO OIDC",
-        urlParser: config?.urlParser ?? url_parser_dist_es/* .parseUrl */.D,
-        utf8Decoder: config?.utf8Decoder ?? fromUtf8/* .fromUtf8 */.a,
-        utf8Encoder: config?.utf8Encoder ?? toUtf8/* .toUtf8 */.P,
-    };
-};
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeConfig.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-const runtimeConfig_getRuntimeConfig = (config) => {
-    (0,dist_es_emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
-    const defaultsMode = (0,resolveDefaultsModeConfig/* .resolveDefaultsModeConfig */.I)(config);
-    const defaultConfigProvider = () => defaultsMode().then(defaults_mode/* .loadConfigsForDefaultMode */.l);
-    const clientSharedValues = getRuntimeConfig(config);
-    (0,emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
-    const loaderConfig = {
-        profile: config?.profile,
-        logger: clientSharedValues.logger,
-    };
-    return {
-        ...clientSharedValues,
-        ...config,
-        runtime: "node",
-        defaultsMode,
-        authSchemePreference: config?.authSchemePreference ?? (0,configLoader/* .loadConfig */.Z)(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS/* .NODE_AUTH_SCHEME_PREFERENCE_OPTIONS */.$, loaderConfig),
-        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength/* .calculateBodyLength */.n,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
-            (0,defaultUserAgent/* .createDefaultUserAgentProvider */.pf)({ serviceId: clientSharedValues.serviceId, clientVersion: nested_clients_package/* .version */.rE }),
-        maxAttempts: config?.maxAttempts ?? (0,configLoader/* .loadConfig */.Z)(dist_es_configurations/* .NODE_MAX_ATTEMPT_CONFIG_OPTIONS */.qs, config),
-        region: config?.region ??
-            (0,configLoader/* .loadConfig */.Z)(regionConfig_config/* .NODE_REGION_CONFIG_OPTIONS */.GG, { ...regionConfig_config/* .NODE_REGION_CONFIG_FILE_OPTIONS */.zH, ...loaderConfig }),
-        requestHandler: node_http_handler/* .NodeHttpHandler.create */.$.create(config?.requestHandler ?? defaultConfigProvider),
-        retryMode: config?.retryMode ??
-            (0,configLoader/* .loadConfig */.Z)({
-                ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
-            }, config),
-        sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
-        streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
-        useDualstackEndpoint: config?.useDualstackEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseDualstackEndpointConfigOptions/* .NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS */.e$, loaderConfig),
-        useFipsEndpoint: config?.useFipsEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseFipsEndpointConfigOptions/* .NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS */.Ko, loaderConfig),
-        userAgentAppId: config?.userAgentAppId ?? (0,configLoader/* .loadConfig */.Z)(nodeAppIdConfigOptions/* .NODE_APP_ID_CONFIG_OPTIONS */.hV, loaderConfig),
-    };
-};
-
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/region-config-resolver/dist-es/extensions/index.js
-var dist_es_extensions = __webpack_require__(4163);
-// EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
-var httpExtensionConfiguration = __webpack_require__(2927);
-// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthExtensionConfiguration.js
-const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
-    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
-    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
-    let _credentials = runtimeConfig.credentials;
-    return {
-        setHttpAuthScheme(httpAuthScheme) {
-            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
-            if (index === -1) {
-                _httpAuthSchemes.push(httpAuthScheme);
-            }
-            else {
-                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
-            }
-        },
-        httpAuthSchemes() {
-            return _httpAuthSchemes;
-        },
-        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
-            _httpAuthSchemeProvider = httpAuthSchemeProvider;
-        },
-        httpAuthSchemeProvider() {
-            return _httpAuthSchemeProvider;
-        },
-        setCredentials(credentials) {
-            _credentials = credentials;
-        },
-        credentials() {
-            return _credentials;
-        },
-    };
-};
-const resolveHttpAuthRuntimeConfig = (config) => {
-    return {
-        httpAuthSchemes: config.httpAuthSchemes(),
-        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
-        credentials: config.credentials(),
-    };
-};
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeExtensions.js
-
-
-
-
-const resolveRuntimeExtensions = (runtimeConfig, extensions) => {
-    const extensionConfiguration = Object.assign((0,dist_es_extensions/* .getAwsRegionExtensionConfiguration */.R)(runtimeConfig), (0,defaultExtensionConfiguration/* .getDefaultExtensionConfiguration */.xA)(runtimeConfig), (0,httpExtensionConfiguration/* .getHttpHandlerExtensionConfiguration */.e)(runtimeConfig), getHttpAuthExtensionConfiguration(runtimeConfig));
-    extensions.forEach((extension) => extension.configure(extensionConfiguration));
-    return Object.assign(runtimeConfig, (0,dist_es_extensions/* .resolveAwsRegionExtensionConfiguration */.$)(extensionConfiguration), (0,defaultExtensionConfiguration/* .resolveDefaultRuntimeConfig */.uv)(extensionConfiguration), (0,httpExtensionConfiguration/* .resolveHttpHandlerRuntimeConfig */.j)(extensionConfiguration), resolveHttpAuthRuntimeConfig(extensionConfiguration));
-};
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/SSOOIDCClient.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class SSOOIDCClient extends client/* .Client */.K {
-    config;
-    constructor(...[configuration]) {
-        const _config_0 = runtimeConfig_getRuntimeConfig(configuration || {});
-        super(_config_0);
-        this.initConfig = _config_0;
-        const _config_1 = resolveClientEndpointParameters(_config_0);
-        const _config_2 = (0,configurations/* .resolveUserAgentConfig */.D)(_config_1);
-        const _config_3 = (0,dist_es_configurations/* .resolveRetryConfig */.$z)(_config_2);
-        const _config_4 = (0,resolveRegionConfig/* .resolveRegionConfig */.T)(_config_3);
-        const _config_5 = (0,dist_es/* .resolveHostHeaderConfig */.OV)(_config_4);
-        const _config_6 = (0,resolveEndpointConfig/* .resolveEndpointConfig */.C)(_config_5);
-        const _config_7 = resolveHttpAuthSchemeConfig(_config_6);
-        const _config_8 = resolveRuntimeExtensions(_config_7, configuration?.extensions || []);
-        this.config = _config_8;
-        this.middlewareStack.use((0,getSchemaSerdePlugin/* .getSchemaSerdePlugin */.wq)(this.config));
-        this.middlewareStack.use((0,user_agent_middleware/* .getUserAgentPlugin */.sM)(this.config));
-        this.middlewareStack.use((0,retryMiddleware/* .getRetryPlugin */.ey)(this.config));
-        this.middlewareStack.use((0,middleware_content_length_dist_es/* .getContentLengthPlugin */.vK)(this.config));
-        this.middlewareStack.use((0,dist_es/* .getHostHeaderPlugin */.TC)(this.config));
-        this.middlewareStack.use((0,loggerMiddleware/* .getLoggerPlugin */.Y7)(this.config));
-        this.middlewareStack.use((0,getRecursionDetectionPlugin/* .getRecursionDetectionPlugin */.n)(this.config));
-        this.middlewareStack.use((0,getHttpAuthSchemeEndpointRuleSetPlugin/* .getHttpAuthSchemeEndpointRuleSetPlugin */.w)(this.config, {
-            httpAuthSchemeParametersProvider: defaultSSOOIDCHttpAuthSchemeParametersProvider,
-            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig/* .DefaultIdentityProviderConfig */.h({
-                "aws.auth#sigv4": config.credentials,
-            }),
-        }));
-        this.middlewareStack.use((0,getHttpSigningMiddleware/* .getHttpSigningPlugin */.l)(this.config));
-    }
-    destroy() {
-        super.destroy();
-    }
-}
-
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 6 modules
-var getEndpointPlugin = __webpack_require__(113);
-// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
 var TypeRegistry = __webpack_require__(7870);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/exceptions.js
@@ -8672,19 +8526,18 @@ const _iT = "idToken";
 const _r = "reason";
 const _rT = "refreshToken";
 const _rU = "redirectUri";
-const _s = "scope";
+const _s = "smithy.ts.sdk.synthetic.com.amazonaws.ssooidc";
+const _sc = "scope";
 const _se = "server";
-const _sm = "smithy.ts.sdk.synthetic.com.amazonaws.ssooidc";
 const _tT = "tokenType";
 const n0 = "com.amazonaws.ssooidc";
 
 
 
-var AccessToken = [0, n0, _AT, 8, 0];
-var ClientSecret = [0, n0, _CS, 8, 0];
-var CodeVerifier = [0, n0, _CV, 8, 0];
-var IdToken = [0, n0, _IT, 8, 0];
-var RefreshToken = [0, n0, _RT, 8, 0];
+const _s_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s);
+var SSOOIDCServiceException$ = [-3, _s, "SSOOIDCServiceException", 0, [], []];
+_s_registry.registerError(SSOOIDCServiceException$, SSOOIDCServiceException);
+const n0_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0);
 var AccessDeniedException$ = [
     -3,
     n0,
@@ -8693,7 +8546,7 @@ var AccessDeniedException$ = [
     [_e, _r, _ed],
     [0, 0, 0],
 ];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(AccessDeniedException$, AccessDeniedException);
+n0_registry.registerError(AccessDeniedException$, AccessDeniedException);
 var AuthorizationPendingException$ = [
     -3,
     n0,
@@ -8702,14 +8555,60 @@ var AuthorizationPendingException$ = [
     [_e, _ed],
     [0, 0],
 ];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(AuthorizationPendingException$, AuthorizationPendingException);
+n0_registry.registerError(AuthorizationPendingException$, AuthorizationPendingException);
+var ExpiredTokenException$ = [-3, n0, _ETE, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
+n0_registry.registerError(ExpiredTokenException$, ExpiredTokenException);
+var InternalServerException$ = [-3, n0, _ISE, { [_e]: _se, [_hE]: 500 }, [_e, _ed], [0, 0]];
+n0_registry.registerError(InternalServerException$, InternalServerException);
+var InvalidClientException$ = [-3, n0, _ICE, { [_e]: _c, [_hE]: 401 }, [_e, _ed], [0, 0]];
+n0_registry.registerError(InvalidClientException$, InvalidClientException);
+var InvalidGrantException$ = [-3, n0, _IGE, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
+n0_registry.registerError(InvalidGrantException$, InvalidGrantException);
+var InvalidRequestException$ = [
+    -3,
+    n0,
+    _IRE,
+    { [_e]: _c, [_hE]: 400 },
+    [_e, _r, _ed],
+    [0, 0, 0],
+];
+n0_registry.registerError(InvalidRequestException$, InvalidRequestException);
+var InvalidScopeException$ = [-3, n0, _ISEn, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
+n0_registry.registerError(InvalidScopeException$, InvalidScopeException);
+var SlowDownException$ = [-3, n0, _SDE, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
+n0_registry.registerError(SlowDownException$, SlowDownException);
+var UnauthorizedClientException$ = [
+    -3,
+    n0,
+    _UCE,
+    { [_e]: _c, [_hE]: 400 },
+    [_e, _ed],
+    [0, 0],
+];
+n0_registry.registerError(UnauthorizedClientException$, UnauthorizedClientException);
+var UnsupportedGrantTypeException$ = [
+    -3,
+    n0,
+    _UGTE,
+    { [_e]: _c, [_hE]: 400 },
+    [_e, _ed],
+    [0, 0],
+];
+n0_registry.registerError(UnsupportedGrantTypeException$, UnsupportedGrantTypeException);
+const errorTypeRegistries = [_s_registry, n0_registry];
+var AccessToken = [0, n0, _AT, 8, 0];
+var ClientSecret = [0, n0, _CS, 8, 0];
+var CodeVerifier = [0, n0, _CV, 8, 0];
+var IdToken = [0, n0, _IT, 8, 0];
+var RefreshToken = [0, n0, _RT, 8, 0];
 var CreateTokenRequest$ = [
     3,
     n0,
     _CTR,
     0,
-    [_cI, _cS, _gT, _dC, _co, _rT, _s, _rU, _cV],
+    [_cI, _cS, _gT, _dC, _co, _rT, _sc, _rU, _cV],
     [0, [() => ClientSecret, 0], 0, 0, 0, [() => RefreshToken, 0], 64 | 0, 0, [() => CodeVerifier, 0]],
+    3,
 ];
 var CreateTokenResponse$ = [
     3,
@@ -8719,47 +8618,6 @@ var CreateTokenResponse$ = [
     [_aT, _tT, _eI, _rT, _iT],
     [[() => AccessToken, 0], 0, 1, [() => RefreshToken, 0], [() => IdToken, 0]],
 ];
-var ExpiredTokenException$ = [-3, n0, _ETE, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(ExpiredTokenException$, ExpiredTokenException);
-var InternalServerException$ = [-3, n0, _ISE, { [_e]: _se, [_hE]: 500 }, [_e, _ed], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InternalServerException$, InternalServerException);
-var InvalidClientException$ = [-3, n0, _ICE, { [_e]: _c, [_hE]: 401 }, [_e, _ed], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidClientException$, InvalidClientException);
-var InvalidGrantException$ = [-3, n0, _IGE, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidGrantException$, InvalidGrantException);
-var InvalidRequestException$ = [
-    -3,
-    n0,
-    _IRE,
-    { [_e]: _c, [_hE]: 400 },
-    [_e, _r, _ed],
-    [0, 0, 0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidRequestException$, InvalidRequestException);
-var InvalidScopeException$ = [-3, n0, _ISEn, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidScopeException$, InvalidScopeException);
-var SlowDownException$ = [-3, n0, _SDE, { [_e]: _c, [_hE]: 400 }, [_e, _ed], [0, 0]];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(SlowDownException$, SlowDownException);
-var UnauthorizedClientException$ = [
-    -3,
-    n0,
-    _UCE,
-    { [_e]: _c, [_hE]: 400 },
-    [_e, _ed],
-    [0, 0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(UnauthorizedClientException$, UnauthorizedClientException);
-var UnsupportedGrantTypeException$ = [
-    -3,
-    n0,
-    _UGTE,
-    { [_e]: _c, [_hE]: 400 },
-    [_e, _ed],
-    [0, 0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(UnsupportedGrantTypeException$, UnsupportedGrantTypeException);
-var SSOOIDCServiceException$ = [-3, _sm, "SSOOIDCServiceException", 0, [], []];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](_sm).registerError(SSOOIDCServiceException$, SSOOIDCServiceException);
 var Scopes = (/* unused pure expression or super */ null && (64 | 0));
 var CreateToken$ = [
     9,
@@ -8770,6 +8628,216 @@ var CreateToken$ = [
     () => CreateTokenResponse$,
 ];
 
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeConfig.shared.js
+
+
+
+
+
+
+
+
+
+
+const getRuntimeConfig = (config) => {
+    return {
+        apiVersion: "2019-06-10",
+        base64Decoder: config?.base64Decoder ?? fromBase64/* .fromBase64 */.E,
+        base64Encoder: config?.base64Encoder ?? toBase64/* .toBase64 */.n,
+        disableHostPrefix: config?.disableHostPrefix ?? false,
+        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver,
+        extensions: config?.extensions ?? [],
+        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSSOOIDCHttpAuthSchemeProvider,
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
+                signer: new AwsSdkSigV4Signer/* .AwsSdkSigV4Signer */.f2(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new noAuth/* .NoAuthSigner */.m(),
+            },
+        ],
+        logger: config?.logger ?? new NoOpLogger/* .NoOpLogger */.N(),
+        protocol: config?.protocol ?? AwsRestJsonProtocol/* .AwsRestJsonProtocol */.Y,
+        protocolSettings: config?.protocolSettings ?? {
+            defaultNamespace: "com.amazonaws.ssooidc",
+            errorTypeRegistries: errorTypeRegistries,
+            version: "2019-06-10",
+            serviceTarget: "AWSSSOOIDCService",
+        },
+        serviceId: config?.serviceId ?? "SSO OIDC",
+        urlParser: config?.urlParser ?? url_parser_dist_es/* .parseUrl */.D,
+        utf8Decoder: config?.utf8Decoder ?? fromUtf8/* .fromUtf8 */.a,
+        utf8Encoder: config?.utf8Encoder ?? toUtf8/* .toUtf8 */.P,
+    };
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeConfig.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+const runtimeConfig_getRuntimeConfig = (config) => {
+    (0,dist_es_emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
+    const defaultsMode = (0,resolveDefaultsModeConfig/* .resolveDefaultsModeConfig */.I)(config);
+    const defaultConfigProvider = () => defaultsMode().then(defaults_mode/* .loadConfigsForDefaultMode */.l);
+    const clientSharedValues = getRuntimeConfig(config);
+    (0,emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
+    const loaderConfig = {
+        profile: config?.profile,
+        logger: clientSharedValues.logger,
+    };
+    return {
+        ...clientSharedValues,
+        ...config,
+        runtime: "node",
+        defaultsMode,
+        authSchemePreference: config?.authSchemePreference ?? (0,configLoader/* .loadConfig */.Z)(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS/* .NODE_AUTH_SCHEME_PREFERENCE_OPTIONS */.$, loaderConfig),
+        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength/* .calculateBodyLength */.n,
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
+            (0,defaultUserAgent/* .createDefaultUserAgentProvider */.pf)({ serviceId: clientSharedValues.serviceId, clientVersion: nested_clients_package/* .version */.rE }),
+        maxAttempts: config?.maxAttempts ?? (0,configLoader/* .loadConfig */.Z)(dist_es_configurations/* .NODE_MAX_ATTEMPT_CONFIG_OPTIONS */.qs, config),
+        region: config?.region ??
+            (0,configLoader/* .loadConfig */.Z)(regionConfig_config/* .NODE_REGION_CONFIG_OPTIONS */.GG, { ...regionConfig_config/* .NODE_REGION_CONFIG_FILE_OPTIONS */.zH, ...loaderConfig }),
+        requestHandler: node_http_handler/* .NodeHttpHandler.create */.$.create(config?.requestHandler ?? defaultConfigProvider),
+        retryMode: config?.retryMode ??
+            (0,configLoader/* .loadConfig */.Z)({
+                ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
+            }, config),
+        sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
+        streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
+        useDualstackEndpoint: config?.useDualstackEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseDualstackEndpointConfigOptions/* .NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS */.e$, loaderConfig),
+        useFipsEndpoint: config?.useFipsEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseFipsEndpointConfigOptions/* .NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS */.Ko, loaderConfig),
+        userAgentAppId: config?.userAgentAppId ?? (0,configLoader/* .loadConfig */.Z)(nodeAppIdConfigOptions/* .NODE_APP_ID_CONFIG_OPTIONS */.hV, loaderConfig),
+    };
+};
+
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/region-config-resolver/dist-es/extensions/index.js
+var dist_es_extensions = __webpack_require__(4163);
+// EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
+var httpExtensionConfiguration = __webpack_require__(2927);
+// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
+var defaultExtensionConfiguration = __webpack_require__(5724);
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthExtensionConfiguration.js
+const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
+    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
+    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
+    let _credentials = runtimeConfig.credentials;
+    return {
+        setHttpAuthScheme(httpAuthScheme) {
+            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
+            if (index === -1) {
+                _httpAuthSchemes.push(httpAuthScheme);
+            }
+            else {
+                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
+            }
+        },
+        httpAuthSchemes() {
+            return _httpAuthSchemes;
+        },
+        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
+            _httpAuthSchemeProvider = httpAuthSchemeProvider;
+        },
+        httpAuthSchemeProvider() {
+            return _httpAuthSchemeProvider;
+        },
+        setCredentials(credentials) {
+            _credentials = credentials;
+        },
+        credentials() {
+            return _credentials;
+        },
+    };
+};
+const resolveHttpAuthRuntimeConfig = (config) => {
+    return {
+        httpAuthSchemes: config.httpAuthSchemes(),
+        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
+        credentials: config.credentials(),
+    };
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeExtensions.js
+
+
+
+
+const resolveRuntimeExtensions = (runtimeConfig, extensions) => {
+    const extensionConfiguration = Object.assign((0,dist_es_extensions/* .getAwsRegionExtensionConfiguration */.R)(runtimeConfig), (0,defaultExtensionConfiguration/* .getDefaultExtensionConfiguration */.xA)(runtimeConfig), (0,httpExtensionConfiguration/* .getHttpHandlerExtensionConfiguration */.e)(runtimeConfig), getHttpAuthExtensionConfiguration(runtimeConfig));
+    extensions.forEach((extension) => extension.configure(extensionConfiguration));
+    return Object.assign(runtimeConfig, (0,dist_es_extensions/* .resolveAwsRegionExtensionConfiguration */.$)(extensionConfiguration), (0,defaultExtensionConfiguration/* .resolveDefaultRuntimeConfig */.uv)(extensionConfiguration), (0,httpExtensionConfiguration/* .resolveHttpHandlerRuntimeConfig */.j)(extensionConfiguration), resolveHttpAuthRuntimeConfig(extensionConfiguration));
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/SSOOIDCClient.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class SSOOIDCClient extends client/* .Client */.K {
+    config;
+    constructor(...[configuration]) {
+        const _config_0 = runtimeConfig_getRuntimeConfig(configuration || {});
+        super(_config_0);
+        this.initConfig = _config_0;
+        const _config_1 = resolveClientEndpointParameters(_config_0);
+        const _config_2 = (0,configurations/* .resolveUserAgentConfig */.D)(_config_1);
+        const _config_3 = (0,dist_es_configurations/* .resolveRetryConfig */.$z)(_config_2);
+        const _config_4 = (0,resolveRegionConfig/* .resolveRegionConfig */.T)(_config_3);
+        const _config_5 = (0,dist_es/* .resolveHostHeaderConfig */.OV)(_config_4);
+        const _config_6 = (0,resolveEndpointConfig/* .resolveEndpointConfig */.C)(_config_5);
+        const _config_7 = resolveHttpAuthSchemeConfig(_config_6);
+        const _config_8 = resolveRuntimeExtensions(_config_7, configuration?.extensions || []);
+        this.config = _config_8;
+        this.middlewareStack.use((0,getSchemaSerdePlugin/* .getSchemaSerdePlugin */.wq)(this.config));
+        this.middlewareStack.use((0,user_agent_middleware/* .getUserAgentPlugin */.sM)(this.config));
+        this.middlewareStack.use((0,retryMiddleware/* .getRetryPlugin */.ey)(this.config));
+        this.middlewareStack.use((0,middleware_content_length_dist_es/* .getContentLengthPlugin */.vK)(this.config));
+        this.middlewareStack.use((0,dist_es/* .getHostHeaderPlugin */.TC)(this.config));
+        this.middlewareStack.use((0,loggerMiddleware/* .getLoggerPlugin */.Y7)(this.config));
+        this.middlewareStack.use((0,getRecursionDetectionPlugin/* .getRecursionDetectionPlugin */.n)(this.config));
+        this.middlewareStack.use((0,getHttpAuthSchemeEndpointRuleSetPlugin/* .getHttpAuthSchemeEndpointRuleSetPlugin */.w)(this.config, {
+            httpAuthSchemeParametersProvider: defaultSSOOIDCHttpAuthSchemeParametersProvider,
+            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig/* .DefaultIdentityProviderConfig */.h({
+                "aws.auth#sigv4": config.credentials,
+            }),
+        }));
+        this.middlewareStack.use((0,getHttpSigningMiddleware/* .getHttpSigningPlugin */.l)(this.config));
+    }
+    destroy() {
+        super.destroy();
+    }
+}
+
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 6 modules
+var getEndpointPlugin = __webpack_require__(113);
+// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
+var command = __webpack_require__(4388);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/commands/CreateTokenCommand.js
 
 
@@ -8810,7 +8878,7 @@ __webpack_require__.d(__webpack_exports__, {
   getDefaultRoleAssumer: () => (/* reexport */ defaultRoleAssumers_getDefaultRoleAssumer)
 });
 
-// UNUSED EXPORTS: decorateDefaultCredentialProvider, MalformedPolicyDocumentException$, IDPCommunicationErrorException$, AssumeRoleWithWebIdentityRequest$, Tag$, MalformedPolicyDocumentException, Credentials$, PackedPolicyTooLargeException$, STSServiceException$, $Command, PolicyDescriptorType$, RegionDisabledException$, AssumeRoleWithWebIdentityResponse$, AssumedRoleUser$, ExpiredTokenException$, RegionDisabledException, AssumeRoleRequest$, __Client, AssumeRoleCommand, IDPRejectedClaimException$, ExpiredTokenException, PackedPolicyTooLargeException, IDPCommunicationErrorException, STS, STSClient, AssumeRoleResponse$, STSServiceException, IDPRejectedClaimException, InvalidIdentityTokenException$, ProvidedContext$, AssumeRole$, AssumeRoleWithWebIdentityCommand, AssumeRoleWithWebIdentity$, InvalidIdentityTokenException
+// UNUSED EXPORTS: decorateDefaultCredentialProvider, errorTypeRegistries, MalformedPolicyDocumentException$, IDPCommunicationErrorException$, AssumeRoleWithWebIdentityRequest$, Tag$, MalformedPolicyDocumentException, Credentials$, PackedPolicyTooLargeException$, STSServiceException$, $Command, PolicyDescriptorType$, RegionDisabledException$, AssumeRoleWithWebIdentityResponse$, AssumedRoleUser$, ExpiredTokenException$, RegionDisabledException, AssumeRoleRequest$, __Client, AssumeRoleCommand, IDPRejectedClaimException$, ExpiredTokenException, PackedPolicyTooLargeException, IDPCommunicationErrorException, STS, STSClient, AssumeRoleResponse$, STSServiceException, IDPRejectedClaimException, InvalidIdentityTokenException$, ProvidedContext$, AssumeRole$, AssumeRoleWithWebIdentityCommand, AssumeRoleWithWebIdentity$, InvalidIdentityTokenException
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
@@ -9021,9 +9089,77 @@ const n0 = "com.amazonaws.sts";
 
 
 
+const _s_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s);
+var STSServiceException$ = [-3, _s, "STSServiceException", 0, [], []];
+_s_registry.registerError(STSServiceException$, STSServiceException);
+const n0_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0);
+var ExpiredTokenException$ = [
+    -3,
+    n0,
+    _ETE,
+    { [_aQE]: [`ExpiredTokenException`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(ExpiredTokenException$, ExpiredTokenException);
+var IDPCommunicationErrorException$ = [
+    -3,
+    n0,
+    _IDPCEE,
+    { [_aQE]: [`IDPCommunicationError`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(IDPCommunicationErrorException$, IDPCommunicationErrorException);
+var IDPRejectedClaimException$ = [
+    -3,
+    n0,
+    _IDPRCE,
+    { [_aQE]: [`IDPRejectedClaim`, 403], [_e]: _c, [_hE]: 403 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(IDPRejectedClaimException$, IDPRejectedClaimException);
+var InvalidIdentityTokenException$ = [
+    -3,
+    n0,
+    _IITE,
+    { [_aQE]: [`InvalidIdentityToken`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(InvalidIdentityTokenException$, InvalidIdentityTokenException);
+var MalformedPolicyDocumentException$ = [
+    -3,
+    n0,
+    _MPDE,
+    { [_aQE]: [`MalformedPolicyDocument`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(MalformedPolicyDocumentException$, MalformedPolicyDocumentException);
+var PackedPolicyTooLargeException$ = [
+    -3,
+    n0,
+    _PPTLE,
+    { [_aQE]: [`PackedPolicyTooLarge`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(PackedPolicyTooLargeException$, PackedPolicyTooLargeException);
+var RegionDisabledException$ = [
+    -3,
+    n0,
+    _RDE,
+    { [_aQE]: [`RegionDisabledException`, 403], [_e]: _c, [_hE]: 403 },
+    [_m],
+    [0],
+];
+n0_registry.registerError(RegionDisabledException$, RegionDisabledException);
+const errorTypeRegistries = [_s_registry, n0_registry];
 var accessKeySecretType = [0, n0, _aKST, 8, 0];
 var clientTokenType = [0, n0, _cTT, 8, 0];
-var AssumedRoleUser$ = [3, n0, _ARU, 0, [_ARI, _A], [0, 0]];
+var AssumedRoleUser$ = [3, n0, _ARU, 0, [_ARI, _A], [0, 0], 2];
 var AssumeRoleRequest$ = [
     3,
     n0,
@@ -9031,6 +9167,7 @@ var AssumeRoleRequest$ = [
     0,
     [_RA, _RSN, _PA, _P, _DS, _T, _TTK, _EI, _SN, _TC, _SI, _PC],
     [0, 0, () => policyDescriptorListType, 0, 1, () => tagListType, 64 | 0, 0, 0, 0, 0, () => ProvidedContextsListType],
+    2,
 ];
 var AssumeRoleResponse$ = [
     3,
@@ -9047,6 +9184,7 @@ var AssumeRoleWithWebIdentityRequest$ = [
     0,
     [_RA, _RSN, _WIT, _PI, _PA, _P, _DS],
     [0, 0, [() => clientTokenType, 0], 0, () => policyDescriptorListType, 0, 1],
+    3,
 ];
 var AssumeRoleWithWebIdentityResponse$ = [
     3,
@@ -9063,75 +9201,11 @@ var Credentials$ = [
     0,
     [_AKI, _SAK, _ST, _E],
     [0, [() => accessKeySecretType, 0], 0, 4],
+    4,
 ];
-var ExpiredTokenException$ = [
-    -3,
-    n0,
-    _ETE,
-    { [_aQE]: [`ExpiredTokenException`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(ExpiredTokenException$, ExpiredTokenException);
-var IDPCommunicationErrorException$ = [
-    -3,
-    n0,
-    _IDPCEE,
-    { [_aQE]: [`IDPCommunicationError`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(IDPCommunicationErrorException$, IDPCommunicationErrorException);
-var IDPRejectedClaimException$ = [
-    -3,
-    n0,
-    _IDPRCE,
-    { [_aQE]: [`IDPRejectedClaim`, 403], [_e]: _c, [_hE]: 403 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(IDPRejectedClaimException$, IDPRejectedClaimException);
-var InvalidIdentityTokenException$ = [
-    -3,
-    n0,
-    _IITE,
-    { [_aQE]: [`InvalidIdentityToken`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidIdentityTokenException$, InvalidIdentityTokenException);
-var MalformedPolicyDocumentException$ = [
-    -3,
-    n0,
-    _MPDE,
-    { [_aQE]: [`MalformedPolicyDocument`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(MalformedPolicyDocumentException$, MalformedPolicyDocumentException);
-var PackedPolicyTooLargeException$ = [
-    -3,
-    n0,
-    _PPTLE,
-    { [_aQE]: [`PackedPolicyTooLarge`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(PackedPolicyTooLargeException$, PackedPolicyTooLargeException);
 var PolicyDescriptorType$ = [3, n0, _PDT, 0, [_a], [0]];
 var ProvidedContext$ = [3, n0, _PCr, 0, [_PAr, _CA], [0, 0]];
-var RegionDisabledException$ = [
-    -3,
-    n0,
-    _RDE,
-    { [_aQE]: [`RegionDisabledException`, 403], [_e]: _c, [_hE]: 403 },
-    [_m],
-    [0],
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(RegionDisabledException$, RegionDisabledException);
-var Tag$ = [3, n0, _Ta, 0, [_K, _V], [0, 0]];
-var STSServiceException$ = [-3, _s, "STSServiceException", 0, [], []];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s).registerError(STSServiceException$, STSServiceException);
+var Tag$ = [3, n0, _Ta, 0, [_K, _V], [0, 0], 2];
 var policyDescriptorListType = [1, n0, _pDLT, 0, () => PolicyDescriptorType$];
 var ProvidedContextsListType = [1, n0, _PCLT, 0, () => ProvidedContext$];
 var tagKeyListType = (/* unused pure expression or super */ null && (64 | 0));
@@ -9470,6 +9544,7 @@ customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = util_endpoints
 
 
 
+
 const getRuntimeConfig = (config) => {
     return {
         apiVersion: "2011-06-15",
@@ -9495,6 +9570,7 @@ const getRuntimeConfig = (config) => {
         protocol: config?.protocol ?? AwsQueryProtocol/* .AwsQueryProtocol */.k,
         protocolSettings: config?.protocolSettings ?? {
             defaultNamespace: "com.amazonaws.sts",
+            errorTypeRegistries: errorTypeRegistries,
             xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
             version: "2011-06-15",
             serviceTarget: "AWSSecurityTokenServiceV20110615",
@@ -9805,7 +9881,7 @@ const parseArn = (value) => {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/partitions.json
-var partitions_namespaceObject = JSON.parse('{"partitions":[{"id":"aws","outputs":{"dnsSuffix":"amazonaws.com","dualStackDnsSuffix":"api.aws","implicitGlobalRegion":"us-east-1","name":"aws","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^(us|eu|ap|sa|ca|me|af|il|mx)\\\\-\\\\w+\\\\-\\\\d+$","regions":{"af-south-1":{"description":"Africa (Cape Town)"},"ap-east-1":{"description":"Asia Pacific (Hong Kong)"},"ap-east-2":{"description":"Asia Pacific (Taipei)"},"ap-northeast-1":{"description":"Asia Pacific (Tokyo)"},"ap-northeast-2":{"description":"Asia Pacific (Seoul)"},"ap-northeast-3":{"description":"Asia Pacific (Osaka)"},"ap-south-1":{"description":"Asia Pacific (Mumbai)"},"ap-south-2":{"description":"Asia Pacific (Hyderabad)"},"ap-southeast-1":{"description":"Asia Pacific (Singapore)"},"ap-southeast-2":{"description":"Asia Pacific (Sydney)"},"ap-southeast-3":{"description":"Asia Pacific (Jakarta)"},"ap-southeast-4":{"description":"Asia Pacific (Melbourne)"},"ap-southeast-5":{"description":"Asia Pacific (Malaysia)"},"ap-southeast-6":{"description":"Asia Pacific (New Zealand)"},"ap-southeast-7":{"description":"Asia Pacific (Thailand)"},"aws-global":{"description":"aws global region"},"ca-central-1":{"description":"Canada (Central)"},"ca-west-1":{"description":"Canada West (Calgary)"},"eu-central-1":{"description":"Europe (Frankfurt)"},"eu-central-2":{"description":"Europe (Zurich)"},"eu-north-1":{"description":"Europe (Stockholm)"},"eu-south-1":{"description":"Europe (Milan)"},"eu-south-2":{"description":"Europe (Spain)"},"eu-west-1":{"description":"Europe (Ireland)"},"eu-west-2":{"description":"Europe (London)"},"eu-west-3":{"description":"Europe (Paris)"},"il-central-1":{"description":"Israel (Tel Aviv)"},"me-central-1":{"description":"Middle East (UAE)"},"me-south-1":{"description":"Middle East (Bahrain)"},"mx-central-1":{"description":"Mexico (Central)"},"sa-east-1":{"description":"South America (Sao Paulo)"},"us-east-1":{"description":"US East (N. Virginia)"},"us-east-2":{"description":"US East (Ohio)"},"us-west-1":{"description":"US West (N. California)"},"us-west-2":{"description":"US West (Oregon)"}}},{"id":"aws-cn","outputs":{"dnsSuffix":"amazonaws.com.cn","dualStackDnsSuffix":"api.amazonwebservices.com.cn","implicitGlobalRegion":"cn-northwest-1","name":"aws-cn","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^cn\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-cn-global":{"description":"aws-cn global region"},"cn-north-1":{"description":"China (Beijing)"},"cn-northwest-1":{"description":"China (Ningxia)"}}},{"id":"aws-eusc","outputs":{"dnsSuffix":"amazonaws.eu","dualStackDnsSuffix":"api.amazonwebservices.eu","implicitGlobalRegion":"eusc-de-east-1","name":"aws-eusc","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^eusc\\\\-(de)\\\\-\\\\w+\\\\-\\\\d+$","regions":{"eusc-de-east-1":{"description":"EU (Germany)"}}},{"id":"aws-iso","outputs":{"dnsSuffix":"c2s.ic.gov","dualStackDnsSuffix":"api.aws.ic.gov","implicitGlobalRegion":"us-iso-east-1","name":"aws-iso","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-iso\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-global":{"description":"aws-iso global region"},"us-iso-east-1":{"description":"US ISO East"},"us-iso-west-1":{"description":"US ISO WEST"}}},{"id":"aws-iso-b","outputs":{"dnsSuffix":"sc2s.sgov.gov","dualStackDnsSuffix":"api.aws.scloud","implicitGlobalRegion":"us-isob-east-1","name":"aws-iso-b","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-isob\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-b-global":{"description":"aws-iso-b global region"},"us-isob-east-1":{"description":"US ISOB East (Ohio)"},"us-isob-west-1":{"description":"US ISOB West"}}},{"id":"aws-iso-e","outputs":{"dnsSuffix":"cloud.adc-e.uk","dualStackDnsSuffix":"api.cloud-aws.adc-e.uk","implicitGlobalRegion":"eu-isoe-west-1","name":"aws-iso-e","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^eu\\\\-isoe\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-e-global":{"description":"aws-iso-e global region"},"eu-isoe-west-1":{"description":"EU ISOE West"}}},{"id":"aws-iso-f","outputs":{"dnsSuffix":"csp.hci.ic.gov","dualStackDnsSuffix":"api.aws.hci.ic.gov","implicitGlobalRegion":"us-isof-south-1","name":"aws-iso-f","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-isof\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-f-global":{"description":"aws-iso-f global region"},"us-isof-east-1":{"description":"US ISOF EAST"},"us-isof-south-1":{"description":"US ISOF SOUTH"}}},{"id":"aws-us-gov","outputs":{"dnsSuffix":"amazonaws.com","dualStackDnsSuffix":"api.aws","implicitGlobalRegion":"us-gov-west-1","name":"aws-us-gov","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-gov\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-us-gov-global":{"description":"aws-us-gov global region"},"us-gov-east-1":{"description":"AWS GovCloud (US-East)"},"us-gov-west-1":{"description":"AWS GovCloud (US-West)"}}}],"version":"1.1"}')
+var partitions_namespaceObject = JSON.parse('{"partitions":[{"id":"aws","outputs":{"dnsSuffix":"amazonaws.com","dualStackDnsSuffix":"api.aws","implicitGlobalRegion":"us-east-1","name":"aws","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^(us|eu|ap|sa|ca|me|af|il|mx)\\\\-\\\\w+\\\\-\\\\d+$","regions":{"af-south-1":{"description":"Africa (Cape Town)"},"ap-east-1":{"description":"Asia Pacific (Hong Kong)"},"ap-east-2":{"description":"Asia Pacific (Taipei)"},"ap-northeast-1":{"description":"Asia Pacific (Tokyo)"},"ap-northeast-2":{"description":"Asia Pacific (Seoul)"},"ap-northeast-3":{"description":"Asia Pacific (Osaka)"},"ap-south-1":{"description":"Asia Pacific (Mumbai)"},"ap-south-2":{"description":"Asia Pacific (Hyderabad)"},"ap-southeast-1":{"description":"Asia Pacific (Singapore)"},"ap-southeast-2":{"description":"Asia Pacific (Sydney)"},"ap-southeast-3":{"description":"Asia Pacific (Jakarta)"},"ap-southeast-4":{"description":"Asia Pacific (Melbourne)"},"ap-southeast-5":{"description":"Asia Pacific (Malaysia)"},"ap-southeast-6":{"description":"Asia Pacific (New Zealand)"},"ap-southeast-7":{"description":"Asia Pacific (Thailand)"},"aws-global":{"description":"aws global region"},"ca-central-1":{"description":"Canada (Central)"},"ca-west-1":{"description":"Canada West (Calgary)"},"eu-central-1":{"description":"Europe (Frankfurt)"},"eu-central-2":{"description":"Europe (Zurich)"},"eu-north-1":{"description":"Europe (Stockholm)"},"eu-south-1":{"description":"Europe (Milan)"},"eu-south-2":{"description":"Europe (Spain)"},"eu-west-1":{"description":"Europe (Ireland)"},"eu-west-2":{"description":"Europe (London)"},"eu-west-3":{"description":"Europe (Paris)"},"il-central-1":{"description":"Israel (Tel Aviv)"},"me-central-1":{"description":"Middle East (UAE)"},"me-south-1":{"description":"Middle East (Bahrain)"},"mx-central-1":{"description":"Mexico (Central)"},"sa-east-1":{"description":"South America (Sao Paulo)"},"us-east-1":{"description":"US East (N. Virginia)"},"us-east-2":{"description":"US East (Ohio)"},"us-west-1":{"description":"US West (N. California)"},"us-west-2":{"description":"US West (Oregon)"}}},{"id":"aws-cn","outputs":{"dnsSuffix":"amazonaws.com.cn","dualStackDnsSuffix":"api.amazonwebservices.com.cn","implicitGlobalRegion":"cn-northwest-1","name":"aws-cn","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^cn\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-cn-global":{"description":"aws-cn global region"},"cn-north-1":{"description":"China (Beijing)"},"cn-northwest-1":{"description":"China (Ningxia)"}}},{"id":"aws-eusc","outputs":{"dnsSuffix":"amazonaws.eu","dualStackDnsSuffix":"api.amazonwebservices.eu","implicitGlobalRegion":"eusc-de-east-1","name":"aws-eusc","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^eusc\\\\-(de)\\\\-\\\\w+\\\\-\\\\d+$","regions":{"eusc-de-east-1":{"description":"AWS European Sovereign Cloud (Germany)"}}},{"id":"aws-iso","outputs":{"dnsSuffix":"c2s.ic.gov","dualStackDnsSuffix":"api.aws.ic.gov","implicitGlobalRegion":"us-iso-east-1","name":"aws-iso","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-iso\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-global":{"description":"aws-iso global region"},"us-iso-east-1":{"description":"US ISO East"},"us-iso-west-1":{"description":"US ISO WEST"}}},{"id":"aws-iso-b","outputs":{"dnsSuffix":"sc2s.sgov.gov","dualStackDnsSuffix":"api.aws.scloud","implicitGlobalRegion":"us-isob-east-1","name":"aws-iso-b","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-isob\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-b-global":{"description":"aws-iso-b global region"},"us-isob-east-1":{"description":"US ISOB East (Ohio)"},"us-isob-west-1":{"description":"US ISOB West"}}},{"id":"aws-iso-e","outputs":{"dnsSuffix":"cloud.adc-e.uk","dualStackDnsSuffix":"api.cloud-aws.adc-e.uk","implicitGlobalRegion":"eu-isoe-west-1","name":"aws-iso-e","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^eu\\\\-isoe\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-e-global":{"description":"aws-iso-e global region"},"eu-isoe-west-1":{"description":"EU ISOE West"}}},{"id":"aws-iso-f","outputs":{"dnsSuffix":"csp.hci.ic.gov","dualStackDnsSuffix":"api.aws.hci.ic.gov","implicitGlobalRegion":"us-isof-south-1","name":"aws-iso-f","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-isof\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-f-global":{"description":"aws-iso-f global region"},"us-isof-east-1":{"description":"US ISOF EAST"},"us-isof-south-1":{"description":"US ISOF SOUTH"}}},{"id":"aws-us-gov","outputs":{"dnsSuffix":"amazonaws.com","dualStackDnsSuffix":"api.aws","implicitGlobalRegion":"us-gov-west-1","name":"aws-us-gov","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-gov\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-us-gov-global":{"description":"aws-us-gov global region"},"us-gov-east-1":{"description":"AWS GovCloud (US-East)"},"us-gov-west-1":{"description":"AWS GovCloud (US-West)"}}}],"version":"1.1"}')
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/partition.js
 
 let selectedPartitionsInfo = partitions_namespaceObject;
@@ -10426,6 +10502,11 @@ class EventStreamSerde {
                             [unionMember]: out,
                         };
                     }
+                    if (body.byteLength === 0) {
+                        return {
+                            [unionMember]: {},
+                        };
+                    }
                 }
                 return {
                     [unionMember]: await this.deserializer.read(eventStreamSchema, body),
@@ -10531,6 +10612,9 @@ class EventStreamSerde {
                     serializer.write(eventSchema, event[unionMember]);
                 }
             }
+            else if (eventSchema.isUnitSchema()) {
+                serializer.write(eventSchema, {});
+            }
             else {
                 throw new Error("@smithy/core/event-streams - non-struct member not supported in event stream union.");
             }
@@ -10557,25 +10641,31 @@ class EventStreamSerde {
 __webpack_require__.d(__webpack_exports__, {
   t: () => (HttpProtocol)
 });
-/* import */ var _smithy_core_schema__rspack_import_3 = __webpack_require__(8754);
-/* import */ var _smithy_core_schema__rspack_import_4 = __webpack_require__(6081);
-/* import */ var _smithy_protocol_http__rspack_import_1 = __webpack_require__(7324);
-/* import */ var _smithy_protocol_http__rspack_import_2 = __webpack_require__(4094);
+/* import */ var _smithy_core_schema__rspack_import_1 = __webpack_require__(7870);
+/* import */ var _smithy_core_schema__rspack_import_4 = __webpack_require__(8754);
+/* import */ var _smithy_core_schema__rspack_import_5 = __webpack_require__(6081);
+/* import */ var _smithy_protocol_http__rspack_import_2 = __webpack_require__(7324);
+/* import */ var _smithy_protocol_http__rspack_import_3 = __webpack_require__(4094);
 /* import */ var _SerdeContext__rspack_import_0 = __webpack_require__(3279);
 
 
 
 class HttpProtocol extends _SerdeContext__rspack_import_0/* .SerdeContext */.f {
     options;
+    compositeErrorRegistry;
     constructor(options) {
         super();
         this.options = options;
+        this.compositeErrorRegistry = _smithy_core_schema__rspack_import_1/* .TypeRegistry["for"] */.O["for"](options.defaultNamespace);
+        for (const etr of options.errorTypeRegistries ?? []) {
+            this.compositeErrorRegistry.copyFrom(etr);
+        }
     }
     getRequestType() {
-        return _smithy_protocol_http__rspack_import_1/* .HttpRequest */.K;
+        return _smithy_protocol_http__rspack_import_2/* .HttpRequest */.K;
     }
     getResponseType() {
-        return _smithy_protocol_http__rspack_import_2/* .HttpResponse */.c;
+        return _smithy_protocol_http__rspack_import_3/* .HttpResponse */.c;
     }
     setSerdeContext(serdeContext) {
         this.serdeContext = serdeContext;
@@ -10614,8 +10704,11 @@ class HttpProtocol extends _SerdeContext__rspack_import_0/* .SerdeContext */.f {
         }
     }
     setHostPrefix(request, operationSchema, input) {
-        const inputNs = _smithy_core_schema__rspack_import_3/* .NormalizedSchema.of */.l.of(operationSchema.input);
-        const opTraits = (0,_smithy_core_schema__rspack_import_4/* .translateTraits */.c)(operationSchema.traits ?? {});
+        if (this.serdeContext?.disableHostPrefix) {
+            return;
+        }
+        const inputNs = _smithy_core_schema__rspack_import_4/* .NormalizedSchema.of */.l.of(operationSchema.input);
+        const opTraits = (0,_smithy_core_schema__rspack_import_5/* .translateTraits */.c)(operationSchema.traits ?? {});
         if (opTraits.endpoint) {
             let hostPrefix = opTraits.endpoint?.[0];
             if (typeof hostPrefix === "string") {
@@ -11009,10 +11102,24 @@ class TypeRegistry {
         }
         return TypeRegistry.registries.get(namespace);
     }
+    copyFrom(other) {
+        const { schemas, exceptions } = this;
+        for (const [k, v] of other.schemas) {
+            if (!schemas.has(k)) {
+                schemas.set(k, v);
+            }
+        }
+        for (const [k, v] of other.exceptions) {
+            if (!exceptions.has(k)) {
+                exceptions.set(k, v);
+            }
+        }
+    }
     register(shapeId, schema) {
         const qualifiedName = this.normalizeShapeId(shapeId);
-        const registry = TypeRegistry.for(qualifiedName.split("#")[0]);
-        registry.schemas.set(qualifiedName, schema);
+        for (const r of [this, TypeRegistry.for(qualifiedName.split("#")[0])]) {
+            r.schemas.set(qualifiedName, schema);
+        }
     }
     getSchema(shapeId) {
         const id = this.normalizeShapeId(shapeId);
@@ -11023,12 +11130,17 @@ class TypeRegistry {
     }
     registerError(es, ctor) {
         const $error = es;
-        const registry = TypeRegistry.for($error[1]);
-        registry.schemas.set($error[1] + "#" + $error[2], $error);
-        registry.exceptions.set($error, ctor);
+        const ns = $error[1];
+        for (const r of [this, TypeRegistry.for(ns)]) {
+            r.schemas.set(ns + "#" + $error[2], $error);
+            r.exceptions.set($error, ctor);
+        }
     }
     getErrorCtor(es) {
         const $error = es;
+        if (this.exceptions.has($error)) {
+            return this.exceptions.get($error);
+        }
         const registry = TypeRegistry.for($error[1]);
         return registry.exceptions.get($error);
     }
@@ -11218,6 +11330,9 @@ __webpack_require__.d(__webpack_exports__, {
 /* import */ var _translateTraits__rspack_import_1 = __webpack_require__(6081);
 
 
+const anno = {
+    it: Symbol.for("@smithy/nor-struct-it"),
+};
 class NormalizedSchema {
     ref;
     memberName;
@@ -11298,7 +11413,7 @@ class NormalizedSchema {
     }
     getSchema() {
         const sc = this.schema;
-        if (sc[0] === 0) {
+        if (Array.isArray(sc) && sc[0] === 0) {
             return sc[4];
         }
         return sc;
@@ -11328,6 +11443,9 @@ class NormalizedSchema {
     }
     isStructSchema() {
         const sc = this.getSchema();
+        if (typeof sc !== "object") {
+            return false;
+        }
         const id = sc[0];
         return (id === 3 ||
             id === -3 ||
@@ -11335,6 +11453,9 @@ class NormalizedSchema {
     }
     isUnionSchema() {
         const sc = this.getSchema();
+        if (typeof sc !== "object") {
+            return false;
+        }
         return sc[0] === 4;
     }
     isBlobSchema() {
@@ -11373,10 +11494,7 @@ class NormalizedSchema {
         return !!streaming || this.getSchema() === 42;
     }
     isIdempotencyToken() {
-        const match = (traits) => (traits & 0b0100) === 0b0100 ||
-            !!traits?.idempotencyToken;
-        const { normalizedTraits, traits, memberTraits } = this;
-        return match(normalizedTraits) || match(traits) || match(memberTraits);
+        return !!this.getMergedTraits().idempotencyToken;
     }
     getMergedTraits() {
         return (this.normalizedTraits ??
@@ -11457,9 +11575,19 @@ class NormalizedSchema {
             throw new Error("@smithy/core/schema - cannot iterate non-struct schema.");
         }
         const struct = this.getSchema();
-        for (let i = 0; i < struct[4].length; ++i) {
-            yield [struct[4][i], member([struct[5][i], 0], struct[4][i])];
+        const z = struct[4].length;
+        let it = struct[anno.it];
+        if (it && z === it.length) {
+            yield* it;
+            return;
         }
+        it = Array(z);
+        for (let i = 0; i < z; ++i) {
+            const k = struct[4][i];
+            const v = member([struct[5][i], 0], k);
+            yield (it[i] = [k, v]);
+        }
+        struct[anno.it] = it;
     }
 }
 function member(memberSchema, memberName) {
@@ -14049,8 +14177,15 @@ function writeBody(httpRequest, body) {
         return;
     }
     if (body) {
-        if (Buffer.isBuffer(body) || typeof body === "string") {
-            httpRequest.end(body);
+        const isBuffer = Buffer.isBuffer(body);
+        const isString = typeof body === "string";
+        if (isBuffer || isString) {
+            if (isBuffer && body.byteLength === 0) {
+                httpRequest.end();
+            }
+            else {
+                httpRequest.end(body);
+            }
             return;
         }
         const uint8 = body;
@@ -14131,7 +14266,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
         });
     }
     resolveDefaultConfig(options) {
-        const { requestTimeout, connectionTimeout, socketTimeout, socketAcquisitionWarningTimeout, httpAgent, httpsAgent, throwOnRequestTimeout, } = options || {};
+        const { requestTimeout, connectionTimeout, socketTimeout, socketAcquisitionWarningTimeout, httpAgent, httpsAgent, throwOnRequestTimeout, logger, } = options || {};
         const keepAlive = true;
         const maxSockets = 50;
         return {
@@ -14154,7 +14289,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
                 }
                 return new external_https_namespaceObject.Agent({ keepAlive, maxSockets, ...httpsAgent });
             })(),
-            logger: console,
+            logger,
         };
     }
     destroy() {
@@ -16798,7 +16933,7 @@ module.exports = __rspack_createRequire_require("stream");
 
 },
 9955(module) {
-module.exports = {"rE":"3.958.0"}
+module.exports = {"rE":"3.990.0"}
 
 },
 
@@ -17018,7 +17153,7 @@ const commonParams = {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/package.json
-var package_namespaceObject = {"rE":"3.958.0"}
+var package_namespaceObject = {"rE":"3.992.0"}
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
@@ -17073,15 +17208,21 @@ function memoizeChain(providers, treatAsExpired) {
         else if (!credentials || treatAsExpired?.(credentials)) {
             if (credentials) {
                 if (!passiveLock) {
-                    passiveLock = chain(options).then((c) => {
+                    passiveLock = chain(options)
+                        .then((c) => {
                         credentials = c;
+                    })
+                        .finally(() => {
                         passiveLock = undefined;
                     });
                 }
             }
             else {
-                activeLock = chain(options).then((c) => {
+                activeLock = chain(options)
+                    .then((c) => {
                     credentials = c;
+                })
+                    .finally(() => {
                     activeLock = undefined;
                 });
                 return provider(options);
@@ -17227,14 +17368,183 @@ var toBase64 = __webpack_require__(9718);
 var fromUtf8 = __webpack_require__(7459);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-utf8/dist-es/toUtf8.js
 var toUtf8 = __webpack_require__(7638);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var util_endpoints_dist_es = __webpack_require__(3886);
+// EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
+var customEndpointFunctions = __webpack_require__(468);
+// EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/lib/isValidHostLabel.js
+var isValidHostLabel = __webpack_require__(8883);
+// EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/lib/isIpAddress.js
+var isIpAddress = __webpack_require__(1466);
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/lib/isIpAddress.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/isVirtualHostableS3Bucket.js
+
+
+const isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
+    if (allowSubDomains) {
+        for (const label of value.split(".")) {
+            if (!isVirtualHostableS3Bucket(label)) {
+                return false;
+            }
+        }
+        return true;
+    }
+    if (!(0,isValidHostLabel/* .isValidHostLabel */.X)(value)) {
+        return false;
+    }
+    if (value.length < 3 || value.length > 63) {
+        return false;
+    }
+    if (value !== value.toLowerCase()) {
+        return false;
+    }
+    if ((0,isIpAddress/* .isIpAddress */.o)(value)) {
+        return false;
+    }
+    return true;
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/parseArn.js
+const ARN_DELIMITER = ":";
+const RESOURCE_DELIMITER = "/";
+const parseArn = (value) => {
+    const segments = value.split(ARN_DELIMITER);
+    if (segments.length < 6)
+        return null;
+    const [arn, partition, service, region, accountId, ...resourcePath] = segments;
+    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER) === "")
+        return null;
+    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER)).flat();
+    return {
+        partition,
+        service,
+        region,
+        accountId,
+        resourceId,
+    };
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/partitions.json
+var partitions_namespaceObject = JSON.parse('{"partitions":[{"id":"aws","outputs":{"dnsSuffix":"amazonaws.com","dualStackDnsSuffix":"api.aws","implicitGlobalRegion":"us-east-1","name":"aws","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^(us|eu|ap|sa|ca|me|af|il|mx)\\\\-\\\\w+\\\\-\\\\d+$","regions":{"af-south-1":{"description":"Africa (Cape Town)"},"ap-east-1":{"description":"Asia Pacific (Hong Kong)"},"ap-east-2":{"description":"Asia Pacific (Taipei)"},"ap-northeast-1":{"description":"Asia Pacific (Tokyo)"},"ap-northeast-2":{"description":"Asia Pacific (Seoul)"},"ap-northeast-3":{"description":"Asia Pacific (Osaka)"},"ap-south-1":{"description":"Asia Pacific (Mumbai)"},"ap-south-2":{"description":"Asia Pacific (Hyderabad)"},"ap-southeast-1":{"description":"Asia Pacific (Singapore)"},"ap-southeast-2":{"description":"Asia Pacific (Sydney)"},"ap-southeast-3":{"description":"Asia Pacific (Jakarta)"},"ap-southeast-4":{"description":"Asia Pacific (Melbourne)"},"ap-southeast-5":{"description":"Asia Pacific (Malaysia)"},"ap-southeast-6":{"description":"Asia Pacific (New Zealand)"},"ap-southeast-7":{"description":"Asia Pacific (Thailand)"},"aws-global":{"description":"aws global region"},"ca-central-1":{"description":"Canada (Central)"},"ca-west-1":{"description":"Canada West (Calgary)"},"eu-central-1":{"description":"Europe (Frankfurt)"},"eu-central-2":{"description":"Europe (Zurich)"},"eu-north-1":{"description":"Europe (Stockholm)"},"eu-south-1":{"description":"Europe (Milan)"},"eu-south-2":{"description":"Europe (Spain)"},"eu-west-1":{"description":"Europe (Ireland)"},"eu-west-2":{"description":"Europe (London)"},"eu-west-3":{"description":"Europe (Paris)"},"il-central-1":{"description":"Israel (Tel Aviv)"},"me-central-1":{"description":"Middle East (UAE)"},"me-south-1":{"description":"Middle East (Bahrain)"},"mx-central-1":{"description":"Mexico (Central)"},"sa-east-1":{"description":"South America (Sao Paulo)"},"us-east-1":{"description":"US East (N. Virginia)"},"us-east-2":{"description":"US East (Ohio)"},"us-west-1":{"description":"US West (N. California)"},"us-west-2":{"description":"US West (Oregon)"}}},{"id":"aws-cn","outputs":{"dnsSuffix":"amazonaws.com.cn","dualStackDnsSuffix":"api.amazonwebservices.com.cn","implicitGlobalRegion":"cn-northwest-1","name":"aws-cn","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^cn\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-cn-global":{"description":"aws-cn global region"},"cn-north-1":{"description":"China (Beijing)"},"cn-northwest-1":{"description":"China (Ningxia)"}}},{"id":"aws-eusc","outputs":{"dnsSuffix":"amazonaws.eu","dualStackDnsSuffix":"api.amazonwebservices.eu","implicitGlobalRegion":"eusc-de-east-1","name":"aws-eusc","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^eusc\\\\-(de)\\\\-\\\\w+\\\\-\\\\d+$","regions":{"eusc-de-east-1":{"description":"AWS European Sovereign Cloud (Germany)"}}},{"id":"aws-iso","outputs":{"dnsSuffix":"c2s.ic.gov","dualStackDnsSuffix":"api.aws.ic.gov","implicitGlobalRegion":"us-iso-east-1","name":"aws-iso","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-iso\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-global":{"description":"aws-iso global region"},"us-iso-east-1":{"description":"US ISO East"},"us-iso-west-1":{"description":"US ISO WEST"}}},{"id":"aws-iso-b","outputs":{"dnsSuffix":"sc2s.sgov.gov","dualStackDnsSuffix":"api.aws.scloud","implicitGlobalRegion":"us-isob-east-1","name":"aws-iso-b","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-isob\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-b-global":{"description":"aws-iso-b global region"},"us-isob-east-1":{"description":"US ISOB East (Ohio)"},"us-isob-west-1":{"description":"US ISOB West"}}},{"id":"aws-iso-e","outputs":{"dnsSuffix":"cloud.adc-e.uk","dualStackDnsSuffix":"api.cloud-aws.adc-e.uk","implicitGlobalRegion":"eu-isoe-west-1","name":"aws-iso-e","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^eu\\\\-isoe\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-e-global":{"description":"aws-iso-e global region"},"eu-isoe-west-1":{"description":"EU ISOE West"}}},{"id":"aws-iso-f","outputs":{"dnsSuffix":"csp.hci.ic.gov","dualStackDnsSuffix":"api.aws.hci.ic.gov","implicitGlobalRegion":"us-isof-south-1","name":"aws-iso-f","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-isof\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-iso-f-global":{"description":"aws-iso-f global region"},"us-isof-east-1":{"description":"US ISOF EAST"},"us-isof-south-1":{"description":"US ISOF SOUTH"}}},{"id":"aws-us-gov","outputs":{"dnsSuffix":"amazonaws.com","dualStackDnsSuffix":"api.aws","implicitGlobalRegion":"us-gov-west-1","name":"aws-us-gov","supportsDualStack":true,"supportsFIPS":true},"regionRegex":"^us\\\\-gov\\\\-\\\\w+\\\\-\\\\d+$","regions":{"aws-us-gov-global":{"description":"aws-us-gov global region"},"us-gov-east-1":{"description":"AWS GovCloud (US-East)"},"us-gov-west-1":{"description":"AWS GovCloud (US-West)"}}}],"version":"1.1"}')
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/lib/aws/partition.js
+
+let selectedPartitionsInfo = partitions_namespaceObject;
+let selectedUserAgentPrefix = "";
+const partition_partition = (value) => {
+    const { partitions } = selectedPartitionsInfo;
+    for (const partition of partitions) {
+        const { regions, outputs } = partition;
+        for (const [region, regionData] of Object.entries(regions)) {
+            if (region === value) {
+                return {
+                    ...outputs,
+                    ...regionData,
+                };
+            }
+        }
+    }
+    for (const partition of partitions) {
+        const { regionRegex, outputs } = partition;
+        if (new RegExp(regionRegex).test(value)) {
+            return {
+                ...outputs,
+            };
+        }
+    }
+    const DEFAULT_PARTITION = partitions.find((partition) => partition.id === "aws");
+    if (!DEFAULT_PARTITION) {
+        throw new Error("Provided region was not found in the partition array or regex," +
+            " and default partition with id 'aws' doesn't exist.");
+    }
+    return {
+        ...DEFAULT_PARTITION.outputs,
+    };
+};
+const setPartitionInfo = (partitionsInfo, userAgentPrefix = "") => {
+    selectedPartitionsInfo = partitionsInfo;
+    selectedUserAgentPrefix = userAgentPrefix;
+};
+const useDefaultPartitionInfo = () => {
+    setPartitionInfo(partitionsInfo, "");
+};
+const getUserAgentPrefix = () => selectedUserAgentPrefix;
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/aws.js
+
+
+
+
+const awsEndpointFunctions = {
+    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket,
+    parseArn: parseArn,
+    partition: partition_partition,
+};
+customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = awsEndpointFunctions;
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/resolveDefaultAwsRegionalEndpointsConfig.js
+
+const resolveDefaultAwsRegionalEndpointsConfig = (input) => {
+    if (typeof input.endpointProvider !== "function") {
+        throw new Error("@aws-sdk/util-endpoint - endpointProvider and endpoint missing in config for this client.");
+    }
+    const { endpoint } = input;
+    if (endpoint === undefined) {
+        input.endpoint = async () => {
+            return toEndpointV1(input.endpointProvider({
+                Region: typeof input.region === "function" ? await input.region() : input.region,
+                UseDualStack: typeof input.useDualstackEndpoint === "function"
+                    ? await input.useDualstackEndpoint()
+                    : input.useDualstackEndpoint,
+                UseFIPS: typeof input.useFipsEndpoint === "function" ? await input.useFipsEndpoint() : input.useFipsEndpoint,
+                Endpoint: undefined,
+            }, { logger: input.logger }));
+        };
+    }
+    return input;
+};
+const toEndpointV1 = (endpoint) => parseUrl(endpoint.url);
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/resolveEndpoint.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/EndpointError.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/EndpointRuleObject.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/ErrorRuleObject.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/RuleSetObject.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/TreeRuleObject.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/shared.js
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/types/index.js
+
+
+
+
+
+
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/node_modules/@aws-sdk/util-endpoints/dist-es/index.js
+
+
+
+
+
+
+
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
 var EndpointCache = __webpack_require__(7461);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/resolveEndpoint.js + 25 modules
 var resolveEndpoint = __webpack_require__(6308);
-// EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
-var customEndpointFunctions = __webpack_require__(468);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/endpoint/ruleset.js
 const F = "required", G = "type", H = "fn", I = "argv", J = "ref";
 const a = false, b = true, ruleset_c = "booleanEquals", d = "stringEquals", e = "sigv4", f = "sts", g = "us-east-1", h = "endpoint", i = "https://sts.{Region}.{PartitionResult#dnsSuffix}", j = "tree", k = "error", l = "getAttr", m = { [F]: false, [G]: "string" }, n = { [F]: true, "default": false, [G]: "boolean" }, ruleset_o = { [J]: "Endpoint" }, p = { [H]: "isSet", [I]: [{ [J]: "Region" }] }, q = { [J]: "Region" }, r = { [H]: "aws.partition", [I]: [q], "assign": "PartitionResult" }, s = { [J]: "UseFIPS" }, t = { [J]: "UseDualStack" }, u = { "url": "https://sts.amazonaws.com", "properties": { "authSchemes": [{ "name": e, "signingName": f, "signingRegion": g }] }, "headers": {} }, v = {}, w = { "conditions": [{ [H]: d, [I]: [q, "aws-global"] }], [h]: u, [G]: h }, x = { [H]: ruleset_c, [I]: [s, true] }, y = { [H]: ruleset_c, [I]: [t, true] }, z = { [H]: l, [I]: [{ [J]: "PartitionResult" }, "supportsFIPS"] }, A = { [J]: "PartitionResult" }, B = { [H]: ruleset_c, [I]: [true, { [H]: l, [I]: [A, "supportsDualStack"] }] }, C = [{ [H]: "isSet", [I]: [ruleset_o] }], D = [x], E = [y];
@@ -17255,230 +17565,8 @@ const defaultEndpointResolver = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = util_endpoints_dist_es/* .awsEndpointFunctions */.UF;
+customEndpointFunctions/* .customEndpointFunctions.aws */.m.aws = awsEndpointFunctions;
 
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeConfig.shared.js
-
-
-
-
-
-
-
-
-
-const getRuntimeConfig = (config) => {
-    return {
-        apiVersion: "2011-06-15",
-        base64Decoder: config?.base64Decoder ?? fromBase64/* .fromBase64 */.E,
-        base64Encoder: config?.base64Encoder ?? toBase64/* .toBase64 */.n,
-        disableHostPrefix: config?.disableHostPrefix ?? false,
-        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver,
-        extensions: config?.extensions ?? [],
-        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSTSHttpAuthSchemeProvider,
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
-                signer: new AwsSdkSigV4Signer/* .AwsSdkSigV4Signer */.f2(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new noAuth/* .NoAuthSigner */.m(),
-            },
-        ],
-        logger: config?.logger ?? new NoOpLogger/* .NoOpLogger */.N(),
-        protocol: config?.protocol ?? AwsQueryProtocol/* .AwsQueryProtocol */.k,
-        protocolSettings: config?.protocolSettings ?? {
-            defaultNamespace: "com.amazonaws.sts",
-            xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
-            version: "2011-06-15",
-            serviceTarget: "AWSSecurityTokenServiceV20110615",
-        },
-        serviceId: config?.serviceId ?? "STS",
-        urlParser: config?.urlParser ?? url_parser_dist_es/* .parseUrl */.D,
-        utf8Decoder: config?.utf8Decoder ?? fromUtf8/* .fromUtf8 */.a,
-        utf8Encoder: config?.utf8Encoder ?? toUtf8/* .toUtf8 */.P,
-    };
-};
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeConfig.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-const runtimeConfig_getRuntimeConfig = (config) => {
-    (0,dist_es_emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
-    const defaultsMode = (0,resolveDefaultsModeConfig/* .resolveDefaultsModeConfig */.I)(config);
-    const defaultConfigProvider = () => defaultsMode().then(defaults_mode/* .loadConfigsForDefaultMode */.l);
-    const clientSharedValues = getRuntimeConfig(config);
-    (0,emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
-    const loaderConfig = {
-        profile: config?.profile,
-        logger: clientSharedValues.logger,
-    };
-    return {
-        ...clientSharedValues,
-        ...config,
-        runtime: "node",
-        defaultsMode,
-        authSchemePreference: config?.authSchemePreference ?? (0,configLoader/* .loadConfig */.Z)(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS/* .NODE_AUTH_SCHEME_PREFERENCE_OPTIONS */.$, loaderConfig),
-        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength/* .calculateBodyLength */.n,
-        credentialDefaultProvider: config?.credentialDefaultProvider ?? defaultProvider,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? (0,defaultUserAgent/* .createDefaultUserAgentProvider */.pf)({ serviceId: clientSharedValues.serviceId, clientVersion: package_namespaceObject.rE }),
-        httpAuthSchemes: config?.httpAuthSchemes ?? [
-            {
-                schemeId: "aws.auth#sigv4",
-                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4") || (async (idProps) => await defaultProvider(idProps?.__config || {})()),
-                signer: new AwsSdkSigV4Signer/* .AwsSdkSigV4Signer */.f2(),
-            },
-            {
-                schemeId: "smithy.api#noAuth",
-                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
-                signer: new noAuth/* .NoAuthSigner */.m(),
-            },
-        ],
-        maxAttempts: config?.maxAttempts ?? (0,configLoader/* .loadConfig */.Z)(dist_es_configurations/* .NODE_MAX_ATTEMPT_CONFIG_OPTIONS */.qs, config),
-        region: config?.region ?? (0,configLoader/* .loadConfig */.Z)(regionConfig_config/* .NODE_REGION_CONFIG_OPTIONS */.GG, { ...regionConfig_config/* .NODE_REGION_CONFIG_FILE_OPTIONS */.zH, ...loaderConfig }),
-        requestHandler: node_http_handler/* .NodeHttpHandler.create */.$.create(config?.requestHandler ?? defaultConfigProvider),
-        retryMode: config?.retryMode ??
-            (0,configLoader/* .loadConfig */.Z)({
-                ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
-                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
-            }, config),
-        sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
-        streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
-        useDualstackEndpoint: config?.useDualstackEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseDualstackEndpointConfigOptions/* .NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS */.e$, loaderConfig),
-        useFipsEndpoint: config?.useFipsEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseFipsEndpointConfigOptions/* .NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS */.Ko, loaderConfig),
-        userAgentAppId: config?.userAgentAppId ?? (0,configLoader/* .loadConfig */.Z)(nodeAppIdConfigOptions/* .NODE_APP_ID_CONFIG_OPTIONS */.hV, loaderConfig),
-    };
-};
-
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/region-config-resolver/dist-es/extensions/index.js
-var dist_es_extensions = __webpack_require__(4163);
-// EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
-var httpExtensionConfiguration = __webpack_require__(2927);
-// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/auth/httpAuthExtensionConfiguration.js
-const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
-    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
-    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
-    let _credentials = runtimeConfig.credentials;
-    return {
-        setHttpAuthScheme(httpAuthScheme) {
-            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
-            if (index === -1) {
-                _httpAuthSchemes.push(httpAuthScheme);
-            }
-            else {
-                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
-            }
-        },
-        httpAuthSchemes() {
-            return _httpAuthSchemes;
-        },
-        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
-            _httpAuthSchemeProvider = httpAuthSchemeProvider;
-        },
-        httpAuthSchemeProvider() {
-            return _httpAuthSchemeProvider;
-        },
-        setCredentials(credentials) {
-            _credentials = credentials;
-        },
-        credentials() {
-            return _credentials;
-        },
-    };
-};
-const resolveHttpAuthRuntimeConfig = (config) => {
-    return {
-        httpAuthSchemes: config.httpAuthSchemes(),
-        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
-        credentials: config.credentials(),
-    };
-};
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeExtensions.js
-
-
-
-
-const resolveRuntimeExtensions = (runtimeConfig, extensions) => {
-    const extensionConfiguration = Object.assign((0,dist_es_extensions/* .getAwsRegionExtensionConfiguration */.R)(runtimeConfig), (0,defaultExtensionConfiguration/* .getDefaultExtensionConfiguration */.xA)(runtimeConfig), (0,httpExtensionConfiguration/* .getHttpHandlerExtensionConfiguration */.e)(runtimeConfig), getHttpAuthExtensionConfiguration(runtimeConfig));
-    extensions.forEach((extension) => extension.configure(extensionConfiguration));
-    return Object.assign(runtimeConfig, (0,dist_es_extensions/* .resolveAwsRegionExtensionConfiguration */.$)(extensionConfiguration), (0,defaultExtensionConfiguration/* .resolveDefaultRuntimeConfig */.uv)(extensionConfiguration), (0,httpExtensionConfiguration/* .resolveHttpHandlerRuntimeConfig */.j)(extensionConfiguration), resolveHttpAuthRuntimeConfig(extensionConfiguration));
-};
-
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/STSClient.js
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-class STSClient extends client/* .Client */.K {
-    config;
-    constructor(...[configuration]) {
-        const _config_0 = runtimeConfig_getRuntimeConfig(configuration || {});
-        super(_config_0);
-        this.initConfig = _config_0;
-        const _config_1 = resolveClientEndpointParameters(_config_0);
-        const _config_2 = (0,configurations/* .resolveUserAgentConfig */.D)(_config_1);
-        const _config_3 = (0,dist_es_configurations/* .resolveRetryConfig */.$z)(_config_2);
-        const _config_4 = (0,resolveRegionConfig/* .resolveRegionConfig */.T)(_config_3);
-        const _config_5 = (0,dist_es/* .resolveHostHeaderConfig */.OV)(_config_4);
-        const _config_6 = (0,resolveEndpointConfig/* .resolveEndpointConfig */.C)(_config_5);
-        const _config_7 = resolveHttpAuthSchemeConfig(_config_6);
-        const _config_8 = resolveRuntimeExtensions(_config_7, configuration?.extensions || []);
-        this.config = _config_8;
-        this.middlewareStack.use((0,getSchemaSerdePlugin/* .getSchemaSerdePlugin */.wq)(this.config));
-        this.middlewareStack.use((0,user_agent_middleware/* .getUserAgentPlugin */.sM)(this.config));
-        this.middlewareStack.use((0,retryMiddleware/* .getRetryPlugin */.ey)(this.config));
-        this.middlewareStack.use((0,middleware_content_length_dist_es/* .getContentLengthPlugin */.vK)(this.config));
-        this.middlewareStack.use((0,dist_es/* .getHostHeaderPlugin */.TC)(this.config));
-        this.middlewareStack.use((0,loggerMiddleware/* .getLoggerPlugin */.Y7)(this.config));
-        this.middlewareStack.use((0,getRecursionDetectionPlugin/* .getRecursionDetectionPlugin */.n)(this.config));
-        this.middlewareStack.use((0,getHttpAuthSchemeEndpointRuleSetPlugin/* .getHttpAuthSchemeEndpointRuleSetPlugin */.w)(this.config, {
-            httpAuthSchemeParametersProvider: defaultSTSHttpAuthSchemeParametersProvider,
-            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig/* .DefaultIdentityProviderConfig */.h({
-                "aws.auth#sigv4": config.credentials,
-            }),
-        }));
-        this.middlewareStack.use((0,getHttpSigningMiddleware/* .getHttpSigningPlugin */.l)(this.config));
-    }
-    destroy() {
-        super.destroy();
-    }
-}
-
-// EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 6 modules
-var getEndpointPlugin = __webpack_require__(113);
-// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
 var TypeRegistry = __webpack_require__(7870);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/exceptions.js
@@ -17756,6 +17844,86 @@ const n0 = "com.amazonaws.sts";
 
 
 
+const _s_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s);
+var STSServiceException$ = [-3, _s, "STSServiceException", 0, [], []];
+_s_registry.registerError(STSServiceException$, STSServiceException);
+const n0_registry = TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0);
+var ExpiredTokenException$ = [-3, n0, _ETE,
+    { [_aQE]: [`ExpiredTokenException`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(ExpiredTokenException$, ExpiredTokenException);
+var ExpiredTradeInTokenException$ = [-3, n0, _ETITE,
+    { [_aQE]: [`ExpiredTradeInTokenException`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(ExpiredTradeInTokenException$, ExpiredTradeInTokenException);
+var IDPCommunicationErrorException$ = [-3, n0, _IDPCEE,
+    { [_aQE]: [`IDPCommunicationError`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(IDPCommunicationErrorException$, IDPCommunicationErrorException);
+var IDPRejectedClaimException$ = [-3, n0, _IDPRCE,
+    { [_aQE]: [`IDPRejectedClaim`, 403], [_e]: _c, [_hE]: 403 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(IDPRejectedClaimException$, IDPRejectedClaimException);
+var InvalidAuthorizationMessageException$ = [-3, n0, _IAME,
+    { [_aQE]: [`InvalidAuthorizationMessageException`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(InvalidAuthorizationMessageException$, InvalidAuthorizationMessageException);
+var InvalidIdentityTokenException$ = [-3, n0, _IITE,
+    { [_aQE]: [`InvalidIdentityToken`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(InvalidIdentityTokenException$, InvalidIdentityTokenException);
+var JWTPayloadSizeExceededException$ = [-3, n0, _JWTPSEE,
+    { [_aQE]: [`JWTPayloadSizeExceededException`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(JWTPayloadSizeExceededException$, JWTPayloadSizeExceededException);
+var MalformedPolicyDocumentException$ = [-3, n0, _MPDE,
+    { [_aQE]: [`MalformedPolicyDocument`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(MalformedPolicyDocumentException$, MalformedPolicyDocumentException);
+var OutboundWebIdentityFederationDisabledException$ = [-3, n0, _OWIFDE,
+    { [_aQE]: [`OutboundWebIdentityFederationDisabledException`, 403], [_e]: _c, [_hE]: 403 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(OutboundWebIdentityFederationDisabledException$, OutboundWebIdentityFederationDisabledException);
+var PackedPolicyTooLargeException$ = [-3, n0, _PPTLE,
+    { [_aQE]: [`PackedPolicyTooLarge`, 400], [_e]: _c, [_hE]: 400 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(PackedPolicyTooLargeException$, PackedPolicyTooLargeException);
+var RegionDisabledException$ = [-3, n0, _RDE,
+    { [_aQE]: [`RegionDisabledException`, 403], [_e]: _c, [_hE]: 403 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(RegionDisabledException$, RegionDisabledException);
+var SessionDurationEscalationException$ = [-3, n0, _SDEE,
+    { [_aQE]: [`SessionDurationEscalationException`, 403], [_e]: _c, [_hE]: 403 },
+    [_m],
+    [0]
+];
+n0_registry.registerError(SessionDurationEscalationException$, SessionDurationEscalationException);
+const errorTypeRegistries = [
+    _s_registry,
+    n0_registry,
+];
 var accessKeySecretType = (/* unused pure expression or super */ null && ([0, n0, _aKST, 8, 0]));
 var clientTokenType = (/* unused pure expression or super */ null && ([0, n0, _cTT, 8, 0]));
 var SAMLAssertionType = (/* unused pure expression or super */ null && ([0, n0, _SAMLAT, 8, 0]));
@@ -17764,12 +17932,12 @@ var webIdentityTokenType = (/* unused pure expression or super */ null && ([0, n
 var AssumedRoleUser$ = (/* unused pure expression or super */ null && ([3, n0, _ARU,
     0,
     [_ARI, _A],
-    [0, 0]
+    [0, 0], 2
 ]));
 var AssumeRoleRequest$ = (/* unused pure expression or super */ null && ([3, n0, _ARR,
     0,
     [_RA, _RSN, _PA, _P, _DS, _T, _TTK, _EI, _SN, _TC, _SI, _PC],
-    [0, 0, () => policyDescriptorListType, 0, 1, () => tagListType, 64 | 0, 0, 0, 0, 0, () => ProvidedContextsListType]
+    [0, 0, () => policyDescriptorListType, 0, 1, () => tagListType, 64 | 0, 0, 0, 0, 0, () => ProvidedContextsListType], 2
 ]));
 var AssumeRoleResponse$ = (/* unused pure expression or super */ null && ([3, n0, _ARRs,
     0,
@@ -17779,7 +17947,7 @@ var AssumeRoleResponse$ = (/* unused pure expression or super */ null && ([3, n0
 var AssumeRoleWithSAMLRequest$ = (/* unused pure expression or super */ null && ([3, n0, _ARWSAMLR,
     0,
     [_RA, _PAr, _SAMLA, _PA, _P, _DS],
-    [0, 0, [() => SAMLAssertionType, 0], () => policyDescriptorListType, 0, 1]
+    [0, 0, [() => SAMLAssertionType, 0], () => policyDescriptorListType, 0, 1], 3
 ]));
 var AssumeRoleWithSAMLResponse$ = (/* unused pure expression or super */ null && ([3, n0, _ARWSAMLRs,
     0,
@@ -17789,7 +17957,7 @@ var AssumeRoleWithSAMLResponse$ = (/* unused pure expression or super */ null &&
 var AssumeRoleWithWebIdentityRequest$ = (/* unused pure expression or super */ null && ([3, n0, _ARWWIR,
     0,
     [_RA, _RSN, _WIT, _PI, _PA, _P, _DS],
-    [0, 0, [() => clientTokenType, 0], 0, () => policyDescriptorListType, 0, 1]
+    [0, 0, [() => clientTokenType, 0], 0, () => policyDescriptorListType, 0, 1], 3
 ]));
 var AssumeRoleWithWebIdentityResponse$ = (/* unused pure expression or super */ null && ([3, n0, _ARWWIRs,
     0,
@@ -17799,7 +17967,7 @@ var AssumeRoleWithWebIdentityResponse$ = (/* unused pure expression or super */ 
 var AssumeRootRequest$ = (/* unused pure expression or super */ null && ([3, n0, _ARRss,
     0,
     [_TP, _TPA, _DS],
-    [0, () => PolicyDescriptorType$, 1]
+    [0, () => PolicyDescriptorType$, 1], 2
 ]));
 var AssumeRootResponse$ = (/* unused pure expression or super */ null && ([3, n0, _ARRssu,
     0,
@@ -17809,39 +17977,27 @@ var AssumeRootResponse$ = (/* unused pure expression or super */ null && ([3, n0
 var Credentials$ = (/* unused pure expression or super */ null && ([3, n0, _C,
     0,
     [_AKI, _SAK, _STe, _E],
-    [0, [() => accessKeySecretType, 0], 0, 4]
+    [0, [() => accessKeySecretType, 0], 0, 4], 4
 ]));
 var DecodeAuthorizationMessageRequest$ = (/* unused pure expression or super */ null && ([3, n0, _DAMR,
     0,
     [_EM],
-    [0]
+    [0], 1
 ]));
 var DecodeAuthorizationMessageResponse$ = (/* unused pure expression or super */ null && ([3, n0, _DAMRe,
     0,
     [_DM],
     [0]
 ]));
-var ExpiredTokenException$ = [-3, n0, _ETE,
-    { [_aQE]: [`ExpiredTokenException`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(ExpiredTokenException$, ExpiredTokenException);
-var ExpiredTradeInTokenException$ = [-3, n0, _ETITE,
-    { [_aQE]: [`ExpiredTradeInTokenException`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(ExpiredTradeInTokenException$, ExpiredTradeInTokenException);
 var FederatedUser$ = (/* unused pure expression or super */ null && ([3, n0, _FU,
     0,
     [_FUI, _A],
-    [0, 0]
+    [0, 0], 2
 ]));
 var GetAccessKeyInfoRequest$ = (/* unused pure expression or super */ null && ([3, n0, _GAKIR,
     0,
     [_AKI],
-    [0]
+    [0], 1
 ]));
 var GetAccessKeyInfoResponse$ = (/* unused pure expression or super */ null && ([3, n0, _GAKIRe,
     0,
@@ -17861,7 +18017,7 @@ var GetCallerIdentityResponse$ = [3, n0, _GCIRe,
 var GetDelegatedAccessTokenRequest$ = (/* unused pure expression or super */ null && ([3, n0, _GDATR,
     0,
     [_TIT],
-    [[() => tradeInTokenType, 0]]
+    [[() => tradeInTokenType, 0]], 1
 ]));
 var GetDelegatedAccessTokenResponse$ = (/* unused pure expression or super */ null && ([3, n0, _GDATRe,
     0,
@@ -17871,7 +18027,7 @@ var GetDelegatedAccessTokenResponse$ = (/* unused pure expression or super */ nu
 var GetFederationTokenRequest$ = (/* unused pure expression or super */ null && ([3, n0, _GFTR,
     0,
     [_N, _P, _PA, _DS, _T],
-    [0, 0, () => policyDescriptorListType, 1, () => tagListType]
+    [0, 0, () => policyDescriptorListType, 1, () => tagListType], 1
 ]));
 var GetFederationTokenResponse$ = (/* unused pure expression or super */ null && ([3, n0, _GFTRe,
     0,
@@ -17890,62 +18046,14 @@ var GetSessionTokenResponse$ = (/* unused pure expression or super */ null && ([
 ]));
 var GetWebIdentityTokenRequest$ = (/* unused pure expression or super */ null && ([3, n0, _GWITR,
     0,
-    [_Au, _DS, _SA, _T],
-    [64 | 0, 1, 0, () => tagListType]
+    [_Au, _SA, _DS, _T],
+    [64 | 0, 0, 1, () => tagListType], 2
 ]));
 var GetWebIdentityTokenResponse$ = (/* unused pure expression or super */ null && ([3, n0, _GWITRe,
     0,
     [_WIT, _E],
     [[() => webIdentityTokenType, 0], 4]
 ]));
-var IDPCommunicationErrorException$ = [-3, n0, _IDPCEE,
-    { [_aQE]: [`IDPCommunicationError`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(IDPCommunicationErrorException$, IDPCommunicationErrorException);
-var IDPRejectedClaimException$ = [-3, n0, _IDPRCE,
-    { [_aQE]: [`IDPRejectedClaim`, 403], [_e]: _c, [_hE]: 403 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(IDPRejectedClaimException$, IDPRejectedClaimException);
-var InvalidAuthorizationMessageException$ = [-3, n0, _IAME,
-    { [_aQE]: [`InvalidAuthorizationMessageException`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidAuthorizationMessageException$, InvalidAuthorizationMessageException);
-var InvalidIdentityTokenException$ = [-3, n0, _IITE,
-    { [_aQE]: [`InvalidIdentityToken`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(InvalidIdentityTokenException$, InvalidIdentityTokenException);
-var JWTPayloadSizeExceededException$ = [-3, n0, _JWTPSEE,
-    { [_aQE]: [`JWTPayloadSizeExceededException`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(JWTPayloadSizeExceededException$, JWTPayloadSizeExceededException);
-var MalformedPolicyDocumentException$ = [-3, n0, _MPDE,
-    { [_aQE]: [`MalformedPolicyDocument`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(MalformedPolicyDocumentException$, MalformedPolicyDocumentException);
-var OutboundWebIdentityFederationDisabledException$ = [-3, n0, _OWIFDE,
-    { [_aQE]: [`OutboundWebIdentityFederationDisabledException`, 403], [_e]: _c, [_hE]: 403 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(OutboundWebIdentityFederationDisabledException$, OutboundWebIdentityFederationDisabledException);
-var PackedPolicyTooLargeException$ = [-3, n0, _PPTLE,
-    { [_aQE]: [`PackedPolicyTooLarge`, 400], [_e]: _c, [_hE]: 400 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(PackedPolicyTooLargeException$, PackedPolicyTooLargeException);
 var PolicyDescriptorType$ = (/* unused pure expression or super */ null && ([3, n0, _PDT,
     0,
     [_a],
@@ -17956,25 +18064,11 @@ var ProvidedContext$ = (/* unused pure expression or super */ null && ([3, n0, _
     [_PAro, _CA],
     [0, 0]
 ]));
-var RegionDisabledException$ = [-3, n0, _RDE,
-    { [_aQE]: [`RegionDisabledException`, 403], [_e]: _c, [_hE]: 403 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(RegionDisabledException$, RegionDisabledException);
-var SessionDurationEscalationException$ = [-3, n0, _SDEE,
-    { [_aQE]: [`SessionDurationEscalationException`, 403], [_e]: _c, [_hE]: 403 },
-    [_m],
-    [0]
-];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](n0).registerError(SessionDurationEscalationException$, SessionDurationEscalationException);
 var Tag$ = (/* unused pure expression or super */ null && ([3, n0, _Ta,
     0,
     [_K, _V],
-    [0, 0]
+    [0, 0], 2
 ]));
-var STSServiceException$ = [-3, _s, "STSServiceException", 0, [], []];
-TypeRegistry/* .TypeRegistry["for"] */.O["for"](_s).registerError(STSServiceException$, STSServiceException);
 var policyDescriptorListType = (/* unused pure expression or super */ null && ([1, n0, _pDLT,
     0, () => PolicyDescriptorType$
 ]));
@@ -18020,6 +18114,230 @@ var GetWebIdentityToken$ = (/* unused pure expression or super */ null && ([9, n
     0, () => GetWebIdentityTokenRequest$, () => GetWebIdentityTokenResponse$
 ]));
 
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeConfig.shared.js
+
+
+
+
+
+
+
+
+
+
+const getRuntimeConfig = (config) => {
+    return {
+        apiVersion: "2011-06-15",
+        base64Decoder: config?.base64Decoder ?? fromBase64/* .fromBase64 */.E,
+        base64Encoder: config?.base64Encoder ?? toBase64/* .toBase64 */.n,
+        disableHostPrefix: config?.disableHostPrefix ?? false,
+        endpointProvider: config?.endpointProvider ?? defaultEndpointResolver,
+        extensions: config?.extensions ?? [],
+        httpAuthSchemeProvider: config?.httpAuthSchemeProvider ?? defaultSTSHttpAuthSchemeProvider,
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4"),
+                signer: new AwsSdkSigV4Signer/* .AwsSdkSigV4Signer */.f2(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new noAuth/* .NoAuthSigner */.m(),
+            },
+        ],
+        logger: config?.logger ?? new NoOpLogger/* .NoOpLogger */.N(),
+        protocol: config?.protocol ?? AwsQueryProtocol/* .AwsQueryProtocol */.k,
+        protocolSettings: config?.protocolSettings ?? {
+            defaultNamespace: "com.amazonaws.sts",
+            errorTypeRegistries: errorTypeRegistries,
+            xmlNamespace: "https://sts.amazonaws.com/doc/2011-06-15/",
+            version: "2011-06-15",
+            serviceTarget: "AWSSecurityTokenServiceV20110615",
+        },
+        serviceId: config?.serviceId ?? "STS",
+        urlParser: config?.urlParser ?? url_parser_dist_es/* .parseUrl */.D,
+        utf8Decoder: config?.utf8Decoder ?? fromUtf8/* .fromUtf8 */.a,
+        utf8Encoder: config?.utf8Encoder ?? toUtf8/* .toUtf8 */.P,
+    };
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeConfig.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+const runtimeConfig_getRuntimeConfig = (config) => {
+    (0,dist_es_emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
+    const defaultsMode = (0,resolveDefaultsModeConfig/* .resolveDefaultsModeConfig */.I)(config);
+    const defaultConfigProvider = () => defaultsMode().then(defaults_mode/* .loadConfigsForDefaultMode */.l);
+    const clientSharedValues = getRuntimeConfig(config);
+    (0,emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
+    const loaderConfig = {
+        profile: config?.profile,
+        logger: clientSharedValues.logger,
+    };
+    return {
+        ...clientSharedValues,
+        ...config,
+        runtime: "node",
+        defaultsMode,
+        authSchemePreference: config?.authSchemePreference ?? (0,configLoader/* .loadConfig */.Z)(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS/* .NODE_AUTH_SCHEME_PREFERENCE_OPTIONS */.$, loaderConfig),
+        bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength/* .calculateBodyLength */.n,
+        credentialDefaultProvider: config?.credentialDefaultProvider ?? defaultProvider,
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? (0,defaultUserAgent/* .createDefaultUserAgentProvider */.pf)({ serviceId: clientSharedValues.serviceId, clientVersion: package_namespaceObject.rE }),
+        httpAuthSchemes: config?.httpAuthSchemes ?? [
+            {
+                schemeId: "aws.auth#sigv4",
+                identityProvider: (ipc) => ipc.getIdentityProvider("aws.auth#sigv4") || (async (idProps) => await defaultProvider(idProps?.__config || {})()),
+                signer: new AwsSdkSigV4Signer/* .AwsSdkSigV4Signer */.f2(),
+            },
+            {
+                schemeId: "smithy.api#noAuth",
+                identityProvider: (ipc) => ipc.getIdentityProvider("smithy.api#noAuth") || (async () => ({})),
+                signer: new noAuth/* .NoAuthSigner */.m(),
+            },
+        ],
+        maxAttempts: config?.maxAttempts ?? (0,configLoader/* .loadConfig */.Z)(dist_es_configurations/* .NODE_MAX_ATTEMPT_CONFIG_OPTIONS */.qs, config),
+        region: config?.region ?? (0,configLoader/* .loadConfig */.Z)(regionConfig_config/* .NODE_REGION_CONFIG_OPTIONS */.GG, { ...regionConfig_config/* .NODE_REGION_CONFIG_FILE_OPTIONS */.zH, ...loaderConfig }),
+        requestHandler: node_http_handler/* .NodeHttpHandler.create */.$.create(config?.requestHandler ?? defaultConfigProvider),
+        retryMode: config?.retryMode ??
+            (0,configLoader/* .loadConfig */.Z)({
+                ...dist_es_configurations/* .NODE_RETRY_MODE_CONFIG_OPTIONS */.kN,
+                default: async () => (await defaultConfigProvider()).retryMode || dist_es_config/* .DEFAULT_RETRY_MODE */.L,
+            }, config),
+        sha256: config?.sha256 ?? hash_node_dist_es/* .Hash.bind */.V.bind(null, "sha256"),
+        streamCollector: config?.streamCollector ?? stream_collector/* .streamCollector */.k,
+        useDualstackEndpoint: config?.useDualstackEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseDualstackEndpointConfigOptions/* .NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS */.e$, loaderConfig),
+        useFipsEndpoint: config?.useFipsEndpoint ?? (0,configLoader/* .loadConfig */.Z)(NodeUseFipsEndpointConfigOptions/* .NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS */.Ko, loaderConfig),
+        userAgentAppId: config?.userAgentAppId ?? (0,configLoader/* .loadConfig */.Z)(nodeAppIdConfigOptions/* .NODE_APP_ID_CONFIG_OPTIONS */.hV, loaderConfig),
+    };
+};
+
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/region-config-resolver/dist-es/extensions/index.js
+var dist_es_extensions = __webpack_require__(4163);
+// EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
+var httpExtensionConfiguration = __webpack_require__(2927);
+// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
+var defaultExtensionConfiguration = __webpack_require__(5724);
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/auth/httpAuthExtensionConfiguration.js
+const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
+    const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
+    let _httpAuthSchemeProvider = runtimeConfig.httpAuthSchemeProvider;
+    let _credentials = runtimeConfig.credentials;
+    return {
+        setHttpAuthScheme(httpAuthScheme) {
+            const index = _httpAuthSchemes.findIndex((scheme) => scheme.schemeId === httpAuthScheme.schemeId);
+            if (index === -1) {
+                _httpAuthSchemes.push(httpAuthScheme);
+            }
+            else {
+                _httpAuthSchemes.splice(index, 1, httpAuthScheme);
+            }
+        },
+        httpAuthSchemes() {
+            return _httpAuthSchemes;
+        },
+        setHttpAuthSchemeProvider(httpAuthSchemeProvider) {
+            _httpAuthSchemeProvider = httpAuthSchemeProvider;
+        },
+        httpAuthSchemeProvider() {
+            return _httpAuthSchemeProvider;
+        },
+        setCredentials(credentials) {
+            _credentials = credentials;
+        },
+        credentials() {
+            return _credentials;
+        },
+    };
+};
+const resolveHttpAuthRuntimeConfig = (config) => {
+    return {
+        httpAuthSchemes: config.httpAuthSchemes(),
+        httpAuthSchemeProvider: config.httpAuthSchemeProvider(),
+        credentials: config.credentials(),
+    };
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeExtensions.js
+
+
+
+
+const resolveRuntimeExtensions = (runtimeConfig, extensions) => {
+    const extensionConfiguration = Object.assign((0,dist_es_extensions/* .getAwsRegionExtensionConfiguration */.R)(runtimeConfig), (0,defaultExtensionConfiguration/* .getDefaultExtensionConfiguration */.xA)(runtimeConfig), (0,httpExtensionConfiguration/* .getHttpHandlerExtensionConfiguration */.e)(runtimeConfig), getHttpAuthExtensionConfiguration(runtimeConfig));
+    extensions.forEach((extension) => extension.configure(extensionConfiguration));
+    return Object.assign(runtimeConfig, (0,dist_es_extensions/* .resolveAwsRegionExtensionConfiguration */.$)(extensionConfiguration), (0,defaultExtensionConfiguration/* .resolveDefaultRuntimeConfig */.uv)(extensionConfiguration), (0,httpExtensionConfiguration/* .resolveHttpHandlerRuntimeConfig */.j)(extensionConfiguration), resolveHttpAuthRuntimeConfig(extensionConfiguration));
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/STSClient.js
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+class STSClient extends client/* .Client */.K {
+    config;
+    constructor(...[configuration]) {
+        const _config_0 = runtimeConfig_getRuntimeConfig(configuration || {});
+        super(_config_0);
+        this.initConfig = _config_0;
+        const _config_1 = resolveClientEndpointParameters(_config_0);
+        const _config_2 = (0,configurations/* .resolveUserAgentConfig */.D)(_config_1);
+        const _config_3 = (0,dist_es_configurations/* .resolveRetryConfig */.$z)(_config_2);
+        const _config_4 = (0,resolveRegionConfig/* .resolveRegionConfig */.T)(_config_3);
+        const _config_5 = (0,dist_es/* .resolveHostHeaderConfig */.OV)(_config_4);
+        const _config_6 = (0,resolveEndpointConfig/* .resolveEndpointConfig */.C)(_config_5);
+        const _config_7 = resolveHttpAuthSchemeConfig(_config_6);
+        const _config_8 = resolveRuntimeExtensions(_config_7, configuration?.extensions || []);
+        this.config = _config_8;
+        this.middlewareStack.use((0,getSchemaSerdePlugin/* .getSchemaSerdePlugin */.wq)(this.config));
+        this.middlewareStack.use((0,user_agent_middleware/* .getUserAgentPlugin */.sM)(this.config));
+        this.middlewareStack.use((0,retryMiddleware/* .getRetryPlugin */.ey)(this.config));
+        this.middlewareStack.use((0,middleware_content_length_dist_es/* .getContentLengthPlugin */.vK)(this.config));
+        this.middlewareStack.use((0,dist_es/* .getHostHeaderPlugin */.TC)(this.config));
+        this.middlewareStack.use((0,loggerMiddleware/* .getLoggerPlugin */.Y7)(this.config));
+        this.middlewareStack.use((0,getRecursionDetectionPlugin/* .getRecursionDetectionPlugin */.n)(this.config));
+        this.middlewareStack.use((0,getHttpAuthSchemeEndpointRuleSetPlugin/* .getHttpAuthSchemeEndpointRuleSetPlugin */.w)(this.config, {
+            httpAuthSchemeParametersProvider: defaultSTSHttpAuthSchemeParametersProvider,
+            identityProviderConfigProvider: async (config) => new DefaultIdentityProviderConfig/* .DefaultIdentityProviderConfig */.h({
+                "aws.auth#sigv4": config.credentials,
+            }),
+        }));
+        this.middlewareStack.use((0,getHttpSigningMiddleware/* .getHttpSigningPlugin */.l)(this.config));
+    }
+    destroy() {
+        super.destroy();
+    }
+}
+
+// EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 6 modules
+var getEndpointPlugin = __webpack_require__(113);
+// EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
+var command = __webpack_require__(4388);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/commands/GetCallerIdentityCommand.js
 
 
