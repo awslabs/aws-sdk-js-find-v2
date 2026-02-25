@@ -1,22 +1,6 @@
-import { createHash as __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_createHash__, createPrivateKey as __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_createPrivateKey__, createPublicKey as __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_createPublicKey__, sign as __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_sign__ } from "node:crypto";
-import { homedir as __WEBPACK_EXTERNAL_MODULE_node_os_e12349cb_homedir__ } from "node:os";
-import { dirname as __WEBPACK_EXTERNAL_MODULE_node_path_02319fef_dirname__, join as __WEBPACK_EXTERNAL_MODULE_node_path_02319fef_join__ } from "node:path";
-import { exec as __WEBPACK_EXTERNAL_MODULE_child_process_exec__ } from "child_process";
-import { promisify as __WEBPACK_EXTERNAL_MODULE_util_promisify__ } from "util";
-import { env as __WEBPACK_EXTERNAL_MODULE_process_env__, versions as __WEBPACK_EXTERNAL_MODULE_process_versions__ } from "process";
-import { parse as __WEBPACK_EXTERNAL_MODULE_url_parse__ } from "url";
-import { Agent as __WEBPACK_EXTERNAL_MODULE_https_Agent__, request as __WEBPACK_EXTERNAL_MODULE_https_request__ } from "https";
-import { readFile as __WEBPACK_EXTERNAL_MODULE_node_fs_promises_4a3ebc43_readFile__ } from "node:fs/promises";
-import * as __WEBPACK_EXTERNAL_MODULE_buffer__ from "buffer";
-import * as __WEBPACK_EXTERNAL_MODULE_crypto__ from "crypto";
-import * as __WEBPACK_EXTERNAL_MODULE_fs__ from "fs";
-import * as __WEBPACK_EXTERNAL_MODULE_fs_promises_f8dae9d1__ from "fs/promises";
-import * as __WEBPACK_EXTERNAL_MODULE_http__ from "http";
-import * as __WEBPACK_EXTERNAL_MODULE_node_fs_75ed2103__ from "node:fs";
-import * as __WEBPACK_EXTERNAL_MODULE_os__ from "os";
-import * as __WEBPACK_EXTERNAL_MODULE_path__ from "path";
-import * as __WEBPACK_EXTERNAL_MODULE_stream__ from "stream";
-/******/ var __webpack_modules__ = ({
+/******/ (() => { // webpackBootstrap
+/******/ 	"use strict";
+/******/ 	var __webpack_modules__ = ({
 
 /***/ 5122
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
@@ -4998,11 +4982,12 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(4314);
+var node_http_handler = __webpack_require__(9637);
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
 var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: external "fs/promises"
-var promises_ = __webpack_require__(7932);
+var promises_ = __webpack_require__(1943);
+var promises_default = /*#__PURE__*/__webpack_require__.n(promises_);
 ;// ./node_modules/@aws-sdk/credential-provider-http/dist-es/fromHttp/checkUrl.js
 
 const LOOPBACK_CIDR_IPv4 = "127.0.0.0/8";
@@ -5174,7 +5159,7 @@ Set AWS_CONTAINER_CREDENTIALS_FULL_URI or AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
             request.headers.Authorization = token;
         }
         else if (tokenFile) {
-            request.headers.Authorization = (await promises_["default"].readFile(tokenFile)).toString();
+            request.headers.Authorization = (await promises_default().readFile(tokenFile)).toString();
         }
         try {
             const result = await requestHandler.handle(request);
@@ -5192,7 +5177,7 @@ Set AWS_CONTAINER_CREDENTIALS_FULL_URI or AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
 
 /***/ },
 
-/***/ 542
+/***/ 8481
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -5218,13 +5203,13 @@ const resolveCredentialSource = (credentialSource, profileName, logger) => {
     const sourceProvidersMap = {
         EcsContainer: async (options) => {
             const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 3610));
-            const { fromContainerMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6807));
+            const { fromContainerMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 2321));
             logger?.debug("@aws-sdk/credential-provider-ini - credential_source is EcsContainer");
             return async () => (0,chain/* chain */.c)(fromHttp(options ?? {}), fromContainerMetadata(options))().then(setNamedProvider);
         },
         Ec2InstanceMetadata: async (options) => {
             logger?.debug("@aws-sdk/credential-provider-ini - credential_source is Ec2InstanceMetadata");
-            const { fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6807));
+            const { fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 2321));
             return async () => fromInstanceMetadata(options)().then(setNamedProvider);
         },
         Environment: async (options) => {
@@ -5328,15 +5313,15 @@ const isCredentialSourceWithoutRoleArn = (section) => {
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpRequest.js
 var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/readFile.js + 1 modules
-var readFile = __webpack_require__(6143);
+var readFile = __webpack_require__(8845);
 ;// external "node:crypto"
-
+const external_node_crypto_namespaceObject = require("node:crypto");
 // EXTERNAL MODULE: external "node:fs"
-var external_node_fs_ = __webpack_require__(9627);
+var external_node_fs_ = __webpack_require__(3024);
 ;// external "node:os"
-
+const external_node_os_namespaceObject = require("node:os");
 ;// external "node:path"
-
+const external_node_path_namespaceObject = require("node:path");
 ;// ./node_modules/@aws-sdk/credential-provider-login/dist-es/LoginCredentialsFetcher.js
 
 
@@ -5499,7 +5484,7 @@ class LoginCredentialsFetcher {
     }
     async saveToken(token) {
         const tokenFilePath = this.getTokenFilePath();
-        const directory = __WEBPACK_EXTERNAL_MODULE_node_path_02319fef_dirname__(tokenFilePath);
+        const directory = (0,external_node_path_namespaceObject.dirname)(tokenFilePath);
         try {
             await external_node_fs_.promises.mkdir(directory, { recursive: true });
         }
@@ -5508,10 +5493,10 @@ class LoginCredentialsFetcher {
         await external_node_fs_.promises.writeFile(tokenFilePath, JSON.stringify(token, null, 2), "utf8");
     }
     getTokenFilePath() {
-        const directory = process.env.AWS_LOGIN_CACHE_DIRECTORY ?? __WEBPACK_EXTERNAL_MODULE_node_path_02319fef_join__(__WEBPACK_EXTERNAL_MODULE_node_os_e12349cb_homedir__(), ".aws", "login", "cache");
+        const directory = process.env.AWS_LOGIN_CACHE_DIRECTORY ?? (0,external_node_path_namespaceObject.join)((0,external_node_os_namespaceObject.homedir)(), ".aws", "login", "cache");
         const loginSessionBytes = Buffer.from(this.loginSession, "utf8");
-        const loginSessionSha256 = __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_createHash__("sha256").update(loginSessionBytes).digest("hex");
-        return __WEBPACK_EXTERNAL_MODULE_node_path_02319fef_join__(directory, `${loginSessionSha256}.json`);
+        const loginSessionSha256 = (0,external_node_crypto_namespaceObject.createHash)("sha256").update(loginSessionBytes).digest("hex");
+        return (0,external_node_path_namespaceObject.join)(directory, `${loginSessionSha256}.json`);
     }
     derToRawSignature(derSignature) {
         let offset = 2;
@@ -5555,12 +5540,12 @@ class LoginCredentialsFetcher {
     async generateDpop(method = "POST", endpoint) {
         const token = await this.loadToken();
         try {
-            const privateKey = __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_createPrivateKey__({
+            const privateKey = (0,external_node_crypto_namespaceObject.createPrivateKey)({
                 key: token.dpopKey,
                 format: "pem",
                 type: "sec1",
             });
-            const publicKey = __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_createPublicKey__(privateKey);
+            const publicKey = (0,external_node_crypto_namespaceObject.createPublicKey)(privateKey);
             const publicDer = publicKey.export({ format: "der", type: "spki" });
             let pointStart = -1;
             for (let i = 0; i < publicDer.length; i++) {
@@ -5590,7 +5575,7 @@ class LoginCredentialsFetcher {
             const headerB64 = Buffer.from(JSON.stringify(header)).toString("base64url");
             const payloadB64 = Buffer.from(JSON.stringify(payload)).toString("base64url");
             const message = `${headerB64}.${payloadB64}`;
-            const asn1Signature = __WEBPACK_EXTERNAL_MODULE_node_crypto_803ecaf5_sign__("sha256", Buffer.from(message), privateKey);
+            const asn1Signature = (0,external_node_crypto_namespaceObject.sign)("sha256", Buffer.from(message), privateKey);
             const rawSignature = this.derToRawSignature(asn1Signature);
             const signatureB64 = rawSignature.toString("base64url");
             return `${message}.${signatureB64}`;
@@ -5641,7 +5626,7 @@ const resolveLoginCredentials = async (profileName, options, callerClientConfig)
 ;// ./node_modules/@aws-sdk/credential-provider-ini/dist-es/resolveProcessCredentials.js
 
 const isProcessProfile = (arg) => Boolean(arg) && typeof arg === "object" && typeof arg.credential_process === "string";
-const resolveProcessCredentials = async (options, profile) => Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1873)).then(({ fromProcess }) => fromProcess({
+const resolveProcessCredentials = async (options, profile) => Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5777)).then(({ fromProcess }) => fromProcess({
     ...options,
     profile,
 })().then((creds) => (0,setCredentialFeature/* setCredentialFeature */.g)(creds, "CREDENTIALS_PROFILE_PROCESS", "v")));
@@ -5762,7 +5747,7 @@ const fromIni = (init = {}) => async ({ callerClientConfig } = {}) => {
 
 /***/ },
 
-/***/ 1873
+/***/ 5777
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -5780,9 +5765,9 @@ var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/externalDataInterceptor.js
 var externalDataInterceptor = __webpack_require__(3297);
 ;// external "child_process"
-
+const external_child_process_namespaceObject = require("child_process");
 ;// external "util"
-
+const external_util_namespaceObject = require("util");
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
 ;// ./node_modules/@aws-sdk/credential-provider-process/dist-es/getValidatedProcessCredentials.js
@@ -5828,7 +5813,7 @@ const resolveProcessCredentials = async (profileName, profiles, logger) => {
     if (profiles[profileName]) {
         const credentialProcess = profile["credential_process"];
         if (credentialProcess !== undefined) {
-            const execPromise = __WEBPACK_EXTERNAL_MODULE_util_promisify__(externalDataInterceptor/* externalDataInterceptor */.Z?.getTokenRecord?.().exec ?? __WEBPACK_EXTERNAL_MODULE_child_process_exec__);
+            const execPromise = (0,external_util_namespaceObject.promisify)(externalDataInterceptor/* externalDataInterceptor */.Z?.getTokenRecord?.().exec ?? external_child_process_namespaceObject.exec);
             try {
                 const { stdout } = await execPromise(credentialProcess);
                 let data;
@@ -5905,7 +5890,7 @@ const getSsoSessionData = (data) => Object.entries(data)
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseIni.js
 var parseIni = __webpack_require__(1476);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/readFile.js + 1 modules
-var readFile = __webpack_require__(6143);
+var readFile = __webpack_require__(8845);
 ;// ./node_modules/@smithy/shared-ini-file-loader/dist-es/loadSsoSessionData.js
 
 
@@ -5991,7 +5976,7 @@ const validateTokenKey = (key, value, forRefresh = false) => {
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getSSOTokenFilepath.js
 var getSSOTokenFilepath = __webpack_require__(2594);
 // EXTERNAL MODULE: external "fs"
-var external_fs_ = __webpack_require__(4421);
+var external_fs_ = __webpack_require__(9896);
 ;// ./node_modules/@aws-sdk/token-providers/dist-es/writeSSOTokenToFile.js
 
 
@@ -6668,7 +6653,7 @@ var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(4472);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 3 modules
-var defaultUserAgent = __webpack_require__(3371);
+var defaultUserAgent = __webpack_require__(8246);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -6682,7 +6667,7 @@ var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(4013);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(4314);
+var node_http_handler = __webpack_require__(9637);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(5178);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -6972,7 +6957,7 @@ var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/externalDataInterceptor.js
 var externalDataInterceptor = __webpack_require__(3297);
 // EXTERNAL MODULE: external "fs"
-var external_fs_ = __webpack_require__(4421);
+var external_fs_ = __webpack_require__(9896);
 ;// ./node_modules/@aws-sdk/credential-provider-web-identity/dist-es/fromWebToken.js
 const fromWebToken = (init) => async (awsIdentityProperties) => {
     init.logger?.debug("@aws-sdk/credential-provider-web-identity - fromWebToken");
@@ -7208,7 +7193,7 @@ class InvokeStoreMulti extends InvokeStoreBase {
     als;
     static async create() {
         const instance = new InvokeStoreMulti();
-        const asyncHooks = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6386));
+        const asyncHooks = await Promise.resolve(/* import() */).then(__webpack_require__.t.bind(__webpack_require__, 6698, 23));
         instance.als = new asyncHooks.AsyncLocalStorage();
         return instance;
     }
@@ -7677,7 +7662,7 @@ var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(4472);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 3 modules
-var defaultUserAgent = __webpack_require__(3371);
+var defaultUserAgent = __webpack_require__(8246);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -7691,7 +7676,7 @@ var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(4013);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(4314);
+var node_http_handler = __webpack_require__(9637);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(5178);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -8315,7 +8300,7 @@ var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(4472);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 3 modules
-var defaultUserAgent = __webpack_require__(3371);
+var defaultUserAgent = __webpack_require__(8246);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -8329,7 +8314,7 @@ var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(4013);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(4314);
+var node_http_handler = __webpack_require__(9637);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(5178);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -9569,7 +9554,7 @@ var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(4472);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 4 modules
 var AwsSdkSigV4Signer = __webpack_require__(6228);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 3 modules
-var defaultUserAgent = __webpack_require__(3371);
+var defaultUserAgent = __webpack_require__(8246);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/endpointsConfig/NodeUseDualstackEndpointConfigOptions.js
@@ -9581,7 +9566,7 @@ var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(4314);
+var node_http_handler = __webpack_require__(9637);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(5178);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -10112,7 +10097,7 @@ const toEndpointV1 = (endpoint) => parseUrl(endpoint.url);
 
 /***/ },
 
-/***/ 3371
+/***/ 8246
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -10124,9 +10109,9 @@ __webpack_require__.d(__webpack_exports__, {
 // UNUSED EXPORTS: crtAvailability, defaultUserAgent
 
 // EXTERNAL MODULE: external "os"
-var external_os_ = __webpack_require__(8116);
+var external_os_ = __webpack_require__(857);
 ;// external "process"
-
+const external_process_namespaceObject = require("process");
 ;// ./node_modules/@aws-sdk/util-user-agent-node/dist-es/crt-availability.js
 const crtAvailability = {
     isCrtAvailable: false,
@@ -10153,7 +10138,7 @@ const createDefaultUserAgentProvider = ({ serviceId, clientVersion }) => {
             ["ua", "2.1"],
             [`os/${(0,external_os_.platform)()}`, (0,external_os_.release)()],
             ["lang/js"],
-            ["md/nodejs", `${__WEBPACK_EXTERNAL_MODULE_process_versions__.node}`],
+            ["md/nodejs", `${external_process_namespaceObject.versions.node}`],
         ];
         const crtAvailable = isCrtAvailable();
         if (crtAvailable) {
@@ -10162,8 +10147,8 @@ const createDefaultUserAgentProvider = ({ serviceId, clientVersion }) => {
         if (serviceId) {
             sections.push([`api/${serviceId}`, clientVersion]);
         }
-        if (__WEBPACK_EXTERNAL_MODULE_process_env__.AWS_EXECUTION_ENV) {
-            sections.push([`exec-env/${__WEBPACK_EXTERNAL_MODULE_process_env__.AWS_EXECUTION_ENV}`]);
+        if (external_process_namespaceObject.env.AWS_EXECUTION_ENV) {
+            sections.push([`exec-env/${external_process_namespaceObject.env.AWS_EXECUTION_ENV}`]);
         }
         const appId = await config?.userAgentAppId?.();
         const resolvedUserAgent = appId ? [...sections, [`app/${appId}`]] : [...sections];
@@ -12410,7 +12395,7 @@ class NoAuthSigner {
 
 /***/ },
 
-/***/ 6807
+/***/ 2321
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -12429,13 +12414,13 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
 var CredentialsProviderError = __webpack_require__(3052);
 ;// external "url"
-
+const external_url_namespaceObject = require("url");
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/ProviderError.js
 var ProviderError = __webpack_require__(6014);
 // EXTERNAL MODULE: external "buffer"
-var external_buffer_ = __webpack_require__(604);
+var external_buffer_ = __webpack_require__(181);
 // EXTERNAL MODULE: external "http"
-var external_http_ = __webpack_require__(3782);
+var external_http_ = __webpack_require__(8611);
 ;// ./node_modules/@smithy/credential-provider-imds/dist-es/remoteProvider/httpRequest.js
 
 
@@ -12556,7 +12541,7 @@ const getCmdsUri = async ({ logger }) => {
         };
     }
     if (process.env[ENV_CMDS_FULL_URI]) {
-        const parsed = __WEBPACK_EXTERNAL_MODULE_url_parse__(process.env[ENV_CMDS_FULL_URI]);
+        const parsed = (0,external_url_namespaceObject.parse)(process.env[ENV_CMDS_FULL_URI]);
         if (!parsed.hostname || !(parsed.hostname in GREENGRASS_HOSTS)) {
             throw new CredentialsProviderError/* CredentialsProviderError */.C(`${parsed.hostname} is not a valid container metadata service hostname`, {
                 tryNextLink: false,
@@ -12854,8 +12839,10 @@ const getCredentialsFromProfile = async (profile, options, init) => {
 /* harmony export */ });
 /* harmony import */ var _smithy_util_buffer_from__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9290);
 /* harmony import */ var _smithy_util_utf8__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(4424);
-/* harmony import */ var buffer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(604);
-/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(7823);
+/* harmony import */ var buffer__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(181);
+/* harmony import */ var buffer__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(buffer__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(6982);
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_3___default = /*#__PURE__*/__webpack_require__.n(crypto__WEBPACK_IMPORTED_MODULE_3__);
 
 
 
@@ -13676,7 +13663,7 @@ var constants = __webpack_require__(7072);
 // EXTERNAL MODULE: ./node_modules/@smithy/uuid/dist-es/v4.js + 1 modules
 var v4 = __webpack_require__(6851);
 // EXTERNAL MODULE: external "stream"
-var external_stream_ = __webpack_require__(702);
+var external_stream_ = __webpack_require__(2203);
 ;// ./node_modules/@smithy/middleware-retry/dist-es/isStreamingPayload/isStreamingPayload.js
 
 const isStreamingPayload = (request) => request?.body instanceof external_stream_.Readable ||
@@ -14197,7 +14184,7 @@ const loadConfig = ({ environmentVariableSelector, configFileSelector, default: 
 
 /***/ },
 
-/***/ 4314
+/***/ 9637
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -14236,9 +14223,9 @@ function buildQueryString(query) {
 }
 
 // EXTERNAL MODULE: external "http"
-var external_http_ = __webpack_require__(3782);
+var external_http_ = __webpack_require__(8611);
 ;// external "https"
-
+const external_https_namespaceObject = require("https");
 ;// ./node_modules/@smithy/node-http-handler/dist-es/constants.js
 const NODEJS_TIMEOUT_ERROR_CODES = ["ECONNRESET", "EPIPE", "ETIMEDOUT"];
 
@@ -14370,7 +14357,7 @@ const setSocketTimeout = (request, reject, timeoutInMs = 0) => {
 };
 
 // EXTERNAL MODULE: external "stream"
-var external_stream_ = __webpack_require__(702);
+var external_stream_ = __webpack_require__(2203);
 ;// ./node_modules/@smithy/node-http-handler/dist-es/write-request-body.js
 
 
@@ -14517,11 +14504,11 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
                 return new external_http_.Agent({ keepAlive, maxSockets, ...httpAgent });
             })(),
             httpsAgent: (() => {
-                if (httpsAgent instanceof __WEBPACK_EXTERNAL_MODULE_https_Agent__ || typeof httpsAgent?.destroy === "function") {
+                if (httpsAgent instanceof external_https_namespaceObject.Agent || typeof httpsAgent?.destroy === "function") {
                     this.externalAgent = true;
                     return httpsAgent;
                 }
-                return new __WEBPACK_EXTERNAL_MODULE_https_Agent__({ keepAlive, maxSockets, ...httpsAgent });
+                return new external_https_namespaceObject.Agent({ keepAlive, maxSockets, ...httpsAgent });
             })(),
             logger,
         };
@@ -14559,7 +14546,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
             const expectContinue = (headers.Expect ?? headers.expect) === "100-continue";
             let agent = isSSL ? config.httpsAgent : config.httpAgent;
             if (expectContinue && !this.externalAgent) {
-                agent = new (isSSL ? __WEBPACK_EXTERNAL_MODULE_https_Agent__ : external_http_.Agent)({
+                agent = new (isSSL ? external_https_namespaceObject.Agent : external_http_.Agent)({
                     keepAlive: false,
                     maxSockets: Infinity,
                 });
@@ -14597,7 +14584,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
                 agent,
                 auth,
             };
-            const requestFunc = isSSL ? __WEBPACK_EXTERNAL_MODULE_https_request__ : external_http_.request;
+            const requestFunc = isSSL ? external_https_namespaceObject.request : external_http_.request;
             const req = requestFunc(nodeHttpsOptions, (res) => {
                 const httpResponse = new dist_es_httpResponse/* HttpResponse */.c({
                     statusCode: res.statusCode || -1,
@@ -14675,7 +14662,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: external "stream"
-var external_stream_ = __webpack_require__(702);
+var external_stream_ = __webpack_require__(2203);
 ;// ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/collector.js
 
 class Collector extends external_stream_.Writable {
@@ -15111,7 +15098,7 @@ const CONFIG_PREFIX_SEPARATOR = ".";
 /* harmony export */   Z: () => (/* binding */ externalDataInterceptor)
 /* harmony export */ });
 /* harmony import */ var _getSSOTokenFromFile__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(4757);
-/* harmony import */ var _readFile__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6143);
+/* harmony import */ var _readFile__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(8845);
 
 
 const externalDataInterceptor = {
@@ -15139,7 +15126,8 @@ const externalDataInterceptor = {
 /* harmony export */   g: () => (/* binding */ getConfigFilepath)
 /* harmony export */ });
 /* unused harmony export ENV_CONFIG_PATH */
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2521);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6928);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _getHomeDir__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(7029);
 
 
@@ -15155,8 +15143,10 @@ const getConfigFilepath = () => process.env[ENV_CONFIG_PATH] || (0,path__WEBPACK
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   R: () => (/* binding */ getHomeDir)
 /* harmony export */ });
-/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(8116);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2521);
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(857);
+/* harmony import */ var os__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(os__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6928);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
 
 
 const homeDirCache = {};
@@ -15204,8 +15194,10 @@ const getProfileName = (init) => init.profile || process.env[ENV_PROFILE] || DEF
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   C: () => (/* binding */ getSSOTokenFilepath)
 /* harmony export */ });
-/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7823);
-/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2521);
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(6982);
+/* harmony import */ var crypto__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(crypto__WEBPACK_IMPORTED_MODULE_0__);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(6928);
+/* harmony import */ var path__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(path__WEBPACK_IMPORTED_MODULE_1__);
 /* harmony import */ var _getHomeDir__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(7029);
 
 
@@ -15226,7 +15218,8 @@ const getSSOTokenFilepath = (id) => {
 /* harmony export */   a: () => (/* binding */ tokenIntercept),
 /* harmony export */   v: () => (/* binding */ getSSOTokenFromFile)
 /* harmony export */ });
-/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(7932);
+/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(1943);
+/* harmony import */ var fs_promises__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(fs_promises__WEBPACK_IMPORTED_MODULE_0__);
 /* harmony import */ var _getSSOTokenFilepath__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(2594);
 
 
@@ -15255,7 +15248,7 @@ __webpack_require__.d(__webpack_exports__, {
 // UNUSED EXPORTS: CONFIG_PREFIX_SEPARATOR
 
 // EXTERNAL MODULE: external "path"
-var external_path_ = __webpack_require__(2521);
+var external_path_ = __webpack_require__(6928);
 // EXTERNAL MODULE: ./node_modules/@smithy/types/dist-es/profile.js
 var profile = __webpack_require__(5578);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/constants.js
@@ -15293,7 +15286,7 @@ const getCredentialsFilepath = () => process.env[ENV_CREDENTIALS_PATH] || (0,ext
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseIni.js
 var parseIni = __webpack_require__(1476);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/readFile.js + 1 modules
-var readFile = __webpack_require__(6143);
+var readFile = __webpack_require__(8845);
 ;// ./node_modules/@smithy/shared-ini-file-loader/dist-es/loadSharedConfigFiles.js
 
 
@@ -15440,7 +15433,7 @@ const parseKnownFiles = async (init) => {
 
 /***/ },
 
-/***/ 6143
+/***/ 8845
 (__unused_webpack_module, __webpack_exports__, __webpack_require__) {
 
 
@@ -15453,7 +15446,7 @@ __webpack_require__.d(__webpack_exports__, {
 // UNUSED EXPORTS: filePromises
 
 ;// external "node:fs/promises"
-
+const promises_namespaceObject = require("node:fs/promises");
 ;// ./node_modules/@smithy/shared-ini-file-loader/dist-es/readFile.js
 
 const filePromises = {};
@@ -15463,7 +15456,7 @@ const readFile = (path, options) => {
         return fileIntercept[path];
     }
     if (!filePromises[path] || options?.ignoreCache) {
-        filePromises[path] = __WEBPACK_EXTERNAL_MODULE_node_fs_promises_4a3ebc43_readFile__(path, "utf8");
+        filePromises[path] = (0,promises_namespaceObject.readFile)(path, "utf8");
     }
     return filePromises[path];
 };
@@ -16098,7 +16091,8 @@ const toBase64 = (_input) => {
 /* harmony export */ __webpack_require__.d(__webpack_exports__, {
 /* harmony export */   n: () => (/* binding */ calculateBodyLength)
 /* harmony export */ });
-/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(9627);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3024);
+/* harmony import */ var node_fs__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(node_fs__WEBPACK_IMPORTED_MODULE_0__);
 
 const calculateBodyLength = (body) => {
     if (!body) {
@@ -16138,7 +16132,8 @@ const calculateBodyLength = (body) => {
 /* harmony export */   s: () => (/* binding */ fromString)
 /* harmony export */ });
 /* harmony import */ var _smithy_is_array_buffer__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(3695);
-/* harmony import */ var buffer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(604);
+/* harmony import */ var buffer__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(181);
+/* harmony import */ var buffer__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(buffer__WEBPACK_IMPORTED_MODULE_1__);
 
 
 const fromArrayBuffer = (input, offset = 0, length = input.byteLength - offset) => {
@@ -16272,7 +16267,7 @@ const inferPhysicalRegion = async () => {
     }
     if (!process.env[ENV_IMDS_DISABLED]) {
         try {
-            const { getInstanceMetadataEndpoint, httpRequest } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6807));
+            const { getInstanceMetadataEndpoint, httpRequest } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 2321));
             const endpoint = await getInstanceMetadataEndpoint();
             return (await httpRequest({ ...endpoint, path: IMDS_REGION_PATH })).toString();
         }
@@ -17003,7 +16998,7 @@ var stream_collector = __webpack_require__(5178);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-buffer-from/dist-es/index.js
 var dist_es = __webpack_require__(9290);
 // EXTERNAL MODULE: external "stream"
-var external_stream_ = __webpack_require__(702);
+var external_stream_ = __webpack_require__(2203);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
 ;// ./node_modules/@smithy/fetch-http-handler/dist-es/stream-collector.js
@@ -17275,10 +17270,11 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: external "crypto"
-var external_crypto_ = __webpack_require__(7823);
+var external_crypto_ = __webpack_require__(6982);
+var external_crypto_default = /*#__PURE__*/__webpack_require__.n(external_crypto_);
 ;// ./node_modules/@smithy/uuid/dist-es/randomUUID.js
 
-const randomUUID = external_crypto_["default"].randomUUID.bind(external_crypto_["default"]);
+const randomUUID = external_crypto_default().randomUUID.bind((external_crypto_default()));
 
 ;// ./node_modules/@smithy/uuid/dist-es/v4.js
 
@@ -17316,109 +17312,73 @@ const v4 = () => {
 
 /***/ },
 
-/***/ 6386
+/***/ 181
 (module) {
 
-module.exports = import("node:async_hooks");;
+module.exports = require("buffer");
 
 /***/ },
 
-/***/ 604
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 6982
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["Buffer"]: () => (__WEBPACK_EXTERNAL_MODULE_buffer__.Buffer) });
+module.exports = require("crypto");
 
 /***/ },
 
-/***/ 7823
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 9896
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["createHash"]: () => (__WEBPACK_EXTERNAL_MODULE_crypto__.createHash), ["createHmac"]: () => (__WEBPACK_EXTERNAL_MODULE_crypto__.createHmac), ["default"]: () => (__WEBPACK_EXTERNAL_MODULE_crypto__["default"]) });
+module.exports = require("fs");
 
 /***/ },
 
-/***/ 4421
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 1943
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["promises"]: () => (__WEBPACK_EXTERNAL_MODULE_fs__.promises), ["readFileSync"]: () => (__WEBPACK_EXTERNAL_MODULE_fs__.readFileSync) });
+module.exports = require("fs/promises");
 
 /***/ },
 
-/***/ 7932
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 8611
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["default"]: () => (__WEBPACK_EXTERNAL_MODULE_fs_promises_f8dae9d1__["default"]), ["readFile"]: () => (__WEBPACK_EXTERNAL_MODULE_fs_promises_f8dae9d1__.readFile) });
+module.exports = require("http");
 
 /***/ },
 
-/***/ 3782
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 6698
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["Agent"]: () => (__WEBPACK_EXTERNAL_MODULE_http__.Agent), ["request"]: () => (__WEBPACK_EXTERNAL_MODULE_http__.request) });
+module.exports = require("node:async_hooks");
 
 /***/ },
 
-/***/ 9627
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 3024
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["ReadStream"]: () => (__WEBPACK_EXTERNAL_MODULE_node_fs_75ed2103__.ReadStream), ["fstatSync"]: () => (__WEBPACK_EXTERNAL_MODULE_node_fs_75ed2103__.fstatSync), ["lstatSync"]: () => (__WEBPACK_EXTERNAL_MODULE_node_fs_75ed2103__.lstatSync), ["promises"]: () => (__WEBPACK_EXTERNAL_MODULE_node_fs_75ed2103__.promises) });
+module.exports = require("node:fs");
 
 /***/ },
 
-/***/ 8116
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 857
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["homedir"]: () => (__WEBPACK_EXTERNAL_MODULE_os__.homedir), ["platform"]: () => (__WEBPACK_EXTERNAL_MODULE_os__.platform), ["release"]: () => (__WEBPACK_EXTERNAL_MODULE_os__.release) });
+module.exports = require("os");
 
 /***/ },
 
-/***/ 2521
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 6928
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["join"]: () => (__WEBPACK_EXTERNAL_MODULE_path__.join), ["sep"]: () => (__WEBPACK_EXTERNAL_MODULE_path__.sep) });
+module.exports = require("path");
 
 /***/ },
 
-/***/ 702
-(module, __unused_webpack_exports, __webpack_require__) {
+/***/ 2203
+(module) {
 
-var x = (y) => {
-	var x = {}; __webpack_require__.d(x, y); return x
-} 
-var y = (x) => (() => (x))
-module.exports = x({ ["Readable"]: () => (__WEBPACK_EXTERNAL_MODULE_stream__.Readable), ["Writable"]: () => (__WEBPACK_EXTERNAL_MODULE_stream__.Writable) });
+module.exports = require("stream");
 
 /***/ },
 
@@ -17429,61 +17389,103 @@ module.exports = {"rE":"3.990.0"};
 
 /***/ }
 
-/******/ });
+/******/ 	});
 /************************************************************************/
-/******/ // The module cache
-/******/ var __webpack_module_cache__ = {};
-/******/ 
-/******/ // The require function
-/******/ function __webpack_require__(moduleId) {
-/******/ 	// Check if module is in cache
-/******/ 	var cachedModule = __webpack_module_cache__[moduleId];
-/******/ 	if (cachedModule !== undefined) {
-/******/ 		return cachedModule.exports;
+/******/ 	// The module cache
+/******/ 	var __webpack_module_cache__ = {};
+/******/ 	
+/******/ 	// The require function
+/******/ 	function __webpack_require__(moduleId) {
+/******/ 		// Check if module is in cache
+/******/ 		var cachedModule = __webpack_module_cache__[moduleId];
+/******/ 		if (cachedModule !== undefined) {
+/******/ 			return cachedModule.exports;
+/******/ 		}
+/******/ 		// Create a new module (and put it into the cache)
+/******/ 		var module = __webpack_module_cache__[moduleId] = {
+/******/ 			// no module.id needed
+/******/ 			// no module.loaded needed
+/******/ 			exports: {}
+/******/ 		};
+/******/ 	
+/******/ 		// Execute the module function
+/******/ 		__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
+/******/ 	
+/******/ 		// Return the exports of the module
+/******/ 		return module.exports;
 /******/ 	}
-/******/ 	// Create a new module (and put it into the cache)
-/******/ 	var module = __webpack_module_cache__[moduleId] = {
-/******/ 		// no module.id needed
-/******/ 		// no module.loaded needed
-/******/ 		exports: {}
-/******/ 	};
-/******/ 
-/******/ 	// Execute the module function
-/******/ 	__webpack_modules__[moduleId](module, module.exports, __webpack_require__);
-/******/ 
-/******/ 	// Return the exports of the module
-/******/ 	return module.exports;
-/******/ }
-/******/ 
+/******/ 	
 /************************************************************************/
-/******/ /* webpack/runtime/define property getters */
-/******/ (() => {
-/******/ 	// define getter functions for harmony exports
-/******/ 	__webpack_require__.d = (exports, definition) => {
-/******/ 		for(var key in definition) {
-/******/ 			if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
-/******/ 				Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__webpack_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__webpack_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/create fake namespace object */
+/******/ 	(() => {
+/******/ 		var getProto = Object.getPrototypeOf ? (obj) => (Object.getPrototypeOf(obj)) : (obj) => (obj.__proto__);
+/******/ 		var leafPrototypes;
+/******/ 		// create a fake namespace object
+/******/ 		// mode & 1: value is a module id, require it
+/******/ 		// mode & 2: merge all properties of value into the ns
+/******/ 		// mode & 4: return value when already ns object
+/******/ 		// mode & 16: return value when it's Promise-like
+/******/ 		// mode & 8|1: behave like require
+/******/ 		__webpack_require__.t = function(value, mode) {
+/******/ 			if(mode & 1) value = this(value);
+/******/ 			if(mode & 8) return value;
+/******/ 			if(typeof value === 'object' && value) {
+/******/ 				if((mode & 4) && value.__esModule) return value;
+/******/ 				if((mode & 16) && typeof value.then === 'function') return value;
 /******/ 			}
-/******/ 		}
-/******/ 	};
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/hasOwnProperty shorthand */
-/******/ (() => {
-/******/ 	__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
-/******/ })();
-/******/ 
-/******/ /* webpack/runtime/make namespace object */
-/******/ (() => {
-/******/ 	// define __esModule on exports
-/******/ 	__webpack_require__.r = (exports) => {
-/******/ 		if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
-/******/ 			Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
-/******/ 		}
-/******/ 		Object.defineProperty(exports, '__esModule', { value: true });
-/******/ 	};
-/******/ })();
-/******/ 
+/******/ 			var ns = Object.create(null);
+/******/ 			__webpack_require__.r(ns);
+/******/ 			var def = {};
+/******/ 			leafPrototypes = leafPrototypes || [null, getProto({}), getProto([]), getProto(getProto)];
+/******/ 			for(var current = mode & 2 && value; (typeof current == 'object' || typeof current == 'function') && !~leafPrototypes.indexOf(current); current = getProto(current)) {
+/******/ 				Object.getOwnPropertyNames(current).forEach((key) => (def[key] = () => (value[key])));
+/******/ 			}
+/******/ 			def['default'] = () => (value);
+/******/ 			__webpack_require__.d(ns, def);
+/******/ 			return ns;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__webpack_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__webpack_require__.o(definition, key) && !__webpack_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__webpack_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/make namespace object */
+/******/ 	(() => {
+/******/ 		// define __esModule on exports
+/******/ 		__webpack_require__.r = (exports) => {
+/******/ 			if(typeof Symbol !== 'undefined' && Symbol.toStringTag) {
+/******/ 				Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+/******/ 			}
+/******/ 			Object.defineProperty(exports, '__esModule', { value: true });
+/******/ 		};
+/******/ 	})();
+/******/ 	
 /************************************************************************/
 var __webpack_exports__ = {};
 // ESM COMPAT FLAG
@@ -17631,7 +17633,7 @@ var chain = __webpack_require__(8062);
 
 const ENV_IMDS_DISABLED = "AWS_EC2_METADATA_DISABLED";
 const remoteProvider = async (init) => {
-    const { ENV_CMDS_FULL_URI, ENV_CMDS_RELATIVE_URI, fromContainerMetadata, fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6807));
+    const { ENV_CMDS_FULL_URI, ENV_CMDS_RELATIVE_URI, fromContainerMetadata, fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 2321));
     if (process.env[ENV_CMDS_RELATIVE_URI] || process.env[ENV_CMDS_FULL_URI]) {
         init.logger?.debug("@aws-sdk/credential-provider-node - remoteProvider::fromHttp/fromContainerMetadata");
         const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 3610));
@@ -17756,12 +17758,12 @@ const defaultProvider = (init = {}) => memoizeChain([
     },
     async (awsIdentityProperties) => {
         init.logger?.debug("@aws-sdk/credential-provider-node - defaultProvider::fromIni");
-        const { fromIni } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 542));
+        const { fromIni } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8481));
         return fromIni(init)(awsIdentityProperties);
     },
     async (awsIdentityProperties) => {
         init.logger?.debug("@aws-sdk/credential-provider-node - defaultProvider::fromProcess");
-        const { fromProcess } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1873));
+        const { fromProcess } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5777));
         return fromProcess(init)(awsIdentityProperties);
     },
     async (awsIdentityProperties) => {
@@ -17784,7 +17786,7 @@ const credentialsWillNeedRefresh = (credentials) => credentials?.expiration !== 
 const credentialsTreatedAsExpired = (credentials) => credentials?.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000;
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 3 modules
-var defaultUserAgent = __webpack_require__(3371);
+var defaultUserAgent = __webpack_require__(8246);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -17800,7 +17802,7 @@ var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(4013);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(4314);
+var node_http_handler = __webpack_require__(9637);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(5178);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -18825,3 +18827,5 @@ const v3_client = new STSClient();
 const handler = async () => v3_client.send(new GetCallerIdentityCommand());
 
 module.exports = __webpack_exports__;
+/******/ })()
+;
