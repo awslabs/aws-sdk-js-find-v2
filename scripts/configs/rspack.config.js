@@ -19,7 +19,9 @@ const createConfig = (version, minify, moduleSystem) => ({
     minimizer: [new rspack.SwcJsMinimizerRspackPlugin({ extractComments: false })],
   },
   plugins: [new rspack.optimize.LimitChunkCountPlugin({ maxChunks: 1 })],
-  experiments: { outputModule: true },
+  experiments: {
+    outputModule: moduleSystem === ModuleSystem.esm ? true : false,
+  },
   entry: getInputPath(version),
   output: {
     path: getOutputDir(version),
