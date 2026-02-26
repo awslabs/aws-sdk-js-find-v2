@@ -1,5 +1,5 @@
-import { createRequire as __rspack_createRequire } from "node:module";
-const __rspack_createRequire_require = __rspack_createRequire(import.meta.url);
+(() => {
+"use strict";
 var __webpack_modules__ = ({
 5122(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 __webpack_require__.d(__webpack_exports__, {
@@ -5271,13 +5271,13 @@ var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/readFile.js + 1 modules
 var readFile = __webpack_require__(1919);
 ;// CONCATENATED MODULE: external "node:crypto"
-const external_node_crypto_namespaceObject = __rspack_createRequire_require("node:crypto");
+const external_node_crypto_namespaceObject = require("node:crypto");
 // EXTERNAL MODULE: external "node:fs"
 var external_node_fs_ = __webpack_require__(3024);
 ;// CONCATENATED MODULE: external "node:os"
-const external_node_os_namespaceObject = __rspack_createRequire_require("node:os");
+const external_node_os_namespaceObject = require("node:os");
 ;// CONCATENATED MODULE: external "node:path"
-const external_node_path_namespaceObject = __rspack_createRequire_require("node:path");
+const external_node_path_namespaceObject = require("node:path");
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/credential-provider-login/dist-es/LoginCredentialsFetcher.js
 
 
@@ -5718,9 +5718,9 @@ var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/externalDataInterceptor.js
 var externalDataInterceptor = __webpack_require__(3297);
 ;// CONCATENATED MODULE: external "child_process"
-const external_child_process_namespaceObject = __rspack_createRequire_require("child_process");
+const external_child_process_namespaceObject = require("child_process");
 ;// CONCATENATED MODULE: external "util"
-const external_util_namespaceObject = __rspack_createRequire_require("util");
+const external_util_namespaceObject = require("util");
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/credential-provider-process/dist-es/getValidatedProcessCredentials.js
@@ -10011,7 +10011,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: external "os"
 var external_os_ = __webpack_require__(857);
 ;// CONCATENATED MODULE: external "process"
-const external_process_namespaceObject = __rspack_createRequire_require("process");
+const external_process_namespaceObject = require("process");
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/crt-availability.js
 const crtAvailability = {
     isCrtAvailable: false,
@@ -12227,7 +12227,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
 var CredentialsProviderError = __webpack_require__(3052);
 ;// CONCATENATED MODULE: external "url"
-const external_url_namespaceObject = __rspack_createRequire_require("url");
+const external_url_namespaceObject = require("url");
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/ProviderError.js
 var ProviderError = __webpack_require__(6014);
 // EXTERNAL MODULE: external "buffer"
@@ -14004,7 +14004,7 @@ function buildQueryString(query) {
 // EXTERNAL MODULE: external "http"
 var external_http_ = __webpack_require__(8611);
 ;// CONCATENATED MODULE: external "https"
-const external_https_namespaceObject = __rspack_createRequire_require("https");
+const external_https_namespaceObject = require("https");
 ;// CONCATENATED MODULE: ./node_modules/@smithy/node-http-handler/dist-es/constants.js
 const NODEJS_TIMEOUT_ERROR_CODES = ["ECONNRESET", "EPIPE", "ETIMEDOUT"];
 
@@ -15151,7 +15151,7 @@ __webpack_require__.d(__webpack_exports__, {
 // UNUSED EXPORTS: filePromises
 
 ;// CONCATENATED MODULE: external "node:fs/promises"
-const promises_namespaceObject = __rspack_createRequire_require("node:fs/promises");
+const promises_namespaceObject = require("node:fs/promises");
 ;// CONCATENATED MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/readFile.js
 
 const filePromises = {};
@@ -16893,43 +16893,43 @@ const v4 = () => {
 
 },
 181(module) {
-module.exports = __rspack_createRequire_require("buffer");
+module.exports = require("buffer");
 
 },
 6982(module) {
-module.exports = __rspack_createRequire_require("crypto");
+module.exports = require("crypto");
 
 },
 9896(module) {
-module.exports = __rspack_createRequire_require("fs");
+module.exports = require("fs");
 
 },
 1943(module) {
-module.exports = __rspack_createRequire_require("fs/promises");
+module.exports = require("fs/promises");
 
 },
 8611(module) {
-module.exports = __rspack_createRequire_require("http");
+module.exports = require("http");
 
 },
 6698(module) {
-module.exports = __rspack_createRequire_require("node:async_hooks");
+module.exports = require("node:async_hooks");
 
 },
 3024(module) {
-module.exports = __rspack_createRequire_require("node:fs");
+module.exports = require("node:fs");
 
 },
 857(module) {
-module.exports = __rspack_createRequire_require("os");
+module.exports = require("os");
 
 },
 6928(module) {
-module.exports = __rspack_createRequire_require("path");
+module.exports = require("path");
 
 },
 2203(module) {
-module.exports = __rspack_createRequire_require("stream");
+module.exports = require("stream");
 
 },
 9955(module) {
@@ -18367,3 +18367,5 @@ const handler = async () => v3_client.send(new GetCallerIdentityCommand());
 })();
 
 module.exports = __webpack_exports__;
+})()
+;
