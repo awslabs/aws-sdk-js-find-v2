@@ -3,21 +3,20 @@
 var url = require('url');
 var buffer = require('buffer');
 var http = require('http');
-var fs = require('fs/promises');
-var fs$1 = require('fs');
-var node_crypto = require('node:crypto');
+var fs = require('node:fs/promises');
 var node_fs = require('node:fs');
+var node_crypto = require('node:crypto');
 var node_os = require('node:os');
 var node_path = require('node:path');
-var child_process = require('child_process');
-var util = require('util');
+var node_child_process = require('node:child_process');
+var node_util = require('node:util');
+var promises = require('fs/promises');
 var crypto$1 = require('crypto');
 var path = require('path');
 var stream = require('stream');
 var os = require('os');
-var promises = require('node:fs/promises');
 var https = require('https');
-var process$1 = require('process');
+var node_process = require('node:process');
 
 const getHttpHandlerExtensionConfiguration = (runtimeConfig) => {
     return {
@@ -2465,7 +2464,8 @@ class HttpBindingProtocol extends HttpProtocol {
         const headers = {};
         const endpoint = await context.endpoint();
         const ns = NormalizedSchema.of(operationSchema?.input);
-        const schema = ns.getSchema();
+        const payloadMemberNames = [];
+        const payloadMemberSchemas = [];
         let hasNonHttpBindingMember = false;
         let payload;
         const request = new HttpRequest({
@@ -2558,10 +2558,29 @@ class HttpBindingProtocol extends HttpProtocol {
             }
             else {
                 hasNonHttpBindingMember = true;
+                payloadMemberNames.push(memberName);
+                payloadMemberSchemas.push(memberNs);
             }
         }
         if (hasNonHttpBindingMember && input) {
-            serializer.write(schema, input);
+            const [namespace, name] = (ns.getName(true) ?? "#Unknown").split("#");
+            const requiredMembers = ns.getSchema()[6];
+            const payloadSchema = [
+                3,
+                namespace,
+                name,
+                ns.getMergedTraits(),
+                payloadMemberNames,
+                payloadMemberSchemas,
+                undefined,
+            ];
+            if (requiredMembers) {
+                payloadSchema[6] = requiredMembers;
+            }
+            else {
+                payloadSchema.pop();
+            }
+            serializer.write(payloadSchema, input);
             payload = serializer.flush();
         }
         request.headers = headers;
@@ -3354,7 +3373,7 @@ const parseURL = (value) => {
 const stringEquals = (value1, value2) => value1 === value2;
 
 const substring = (input, start, stop, reverse) => {
-    if (start >= stop || input.length < stop) {
+    if (start >= stop || input.length < stop || /[^\u0000-\u007f]/.test(input)) {
         return null;
     }
     if (!reverse) {
@@ -3630,10 +3649,10 @@ const resolveEndpoint = (ruleSetObject, options) => {
     return endpoint;
 };
 
-const isVirtualHostableS3Bucket$1 = (value, allowSubDomains = false) => {
+const isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
     if (allowSubDomains) {
         for (const label of value.split(".")) {
-            if (!isVirtualHostableS3Bucket$1(label)) {
+            if (!isVirtualHostableS3Bucket(label)) {
                 return false;
             }
         }
@@ -3654,16 +3673,16 @@ const isVirtualHostableS3Bucket$1 = (value, allowSubDomains = false) => {
     return true;
 };
 
-const ARN_DELIMITER$1 = ":";
-const RESOURCE_DELIMITER$1 = "/";
-const parseArn$1 = (value) => {
-    const segments = value.split(ARN_DELIMITER$1);
+const ARN_DELIMITER = ":";
+const RESOURCE_DELIMITER = "/";
+const parseArn = (value) => {
+    const segments = value.split(ARN_DELIMITER);
     if (segments.length < 6)
         return null;
     const [arn, partition, service, region, accountId, ...resourcePath] = segments;
-    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER$1) === "")
+    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER) === "")
         return null;
-    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER$1)).flat();
+    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER)).flat();
     return {
         partition,
         service,
@@ -3673,7 +3692,7 @@ const parseArn$1 = (value) => {
     };
 };
 
-var partitions$1 = [
+var partitions = [
 	{
 		id: "aws",
 		outputs: {
@@ -3946,12 +3965,12 @@ var partitions$1 = [
 		}
 	}
 ];
-var partitionsInfo$1 = {
-	partitions: partitions$1};
+var partitionsInfo = {
+	partitions: partitions};
 
-let selectedPartitionsInfo$1 = partitionsInfo$1;
-const partition$1 = (value) => {
-    const { partitions } = selectedPartitionsInfo$1;
+let selectedPartitionsInfo = partitionsInfo;
+const partition = (value) => {
+    const { partitions } = selectedPartitionsInfo;
     for (const partition of partitions) {
         const { regions, outputs } = partition;
         for (const [region, regionData] of Object.entries(regions)) {
@@ -3981,12 +4000,12 @@ const partition$1 = (value) => {
     };
 };
 
-const awsEndpointFunctions$1 = {
-    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket$1,
-    parseArn: parseArn$1,
-    partition: partition$1,
+const awsEndpointFunctions = {
+    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket,
+    parseArn: parseArn,
+    partition: partition,
 };
-customEndpointFunctions.aws = awsEndpointFunctions$1;
+customEndpointFunctions.aws = awsEndpointFunctions;
 
 function parseQueryString(querystring) {
     const query = {};
@@ -5484,6 +5503,7 @@ const emitWarningIfUnsupportedVersion = (version) => {
     }
 };
 
+const knownAlgorithms = Object.values(AlgorithmId);
 const getChecksumConfiguration = (runtimeConfig) => {
     const checksumAlgorithms = [];
     for (const id in AlgorithmId) {
@@ -5496,8 +5516,23 @@ const getChecksumConfiguration = (runtimeConfig) => {
             checksumConstructor: () => runtimeConfig[algorithmId],
         });
     }
+    for (const [id, ChecksumCtor] of Object.entries(runtimeConfig.checksumAlgorithms ?? {})) {
+        checksumAlgorithms.push({
+            algorithmId: () => id,
+            checksumConstructor: () => ChecksumCtor,
+        });
+    }
     return {
         addChecksumAlgorithm(algo) {
+            runtimeConfig.checksumAlgorithms = runtimeConfig.checksumAlgorithms ?? {};
+            const id = algo.algorithmId();
+            const ctor = algo.checksumConstructor();
+            if (knownAlgorithms.includes(id)) {
+                runtimeConfig.checksumAlgorithms[id.toUpperCase()] = ctor;
+            }
+            else {
+                runtimeConfig.checksumAlgorithms[id] = ctor;
+            }
             checksumAlgorithms.push(algo);
         },
         checksumAlgorithms() {
@@ -5508,7 +5543,10 @@ const getChecksumConfiguration = (runtimeConfig) => {
 const resolveChecksumRuntimeConfig = (clientConfig) => {
     const runtimeConfig = {};
     clientConfig.checksumAlgorithms().forEach((checksumAlgorithm) => {
-        runtimeConfig[checksumAlgorithm.algorithmId()] = checksumAlgorithm.checksumConstructor();
+        const id = checksumAlgorithm.algorithmId();
+        if (knownAlgorithms.includes(id)) {
+            runtimeConfig[id] = checksumAlgorithm.checksumConstructor();
+        }
     });
     return runtimeConfig;
 };
@@ -5628,9 +5666,9 @@ class ProtocolLib {
             }
             error.Error = {
                 ...error.Error,
-                Type: error.Error.Type,
-                Code: error.Error.Code,
-                Message: error.Error.message ?? error.Error.Message ?? msg,
+                Type: error.Error?.Type,
+                Code: error.Error?.Code,
+                Message: error.Error?.message ?? error.Error?.Message ?? msg,
             };
             const reqId = error.$metadata.requestId;
             if (reqId) {
@@ -6690,49 +6728,90 @@ function getPositionFromMatch(match) {
 }
 
 const defaultOptions = {
-    preserveOrder: false,
-    attributeNamePrefix: '@_',
-    attributesGroupName: false,
-    textNodeName: '#text',
-    ignoreAttributes: true,
-    removeNSPrefix: false, // remove NS from tag name or attribute name if true
-    allowBooleanAttributes: false, //a tag can have attributes without any value
-    //ignoreRootElement : false,
-    parseTagValue: true,
-    parseAttributeValue: false,
-    trimValues: true, //Trim string values of tag and attributes
-    cdataPropName: false,
-    numberParseOptions: {
-      hex: true,
-      leadingZeros: true,
-      eNotation: true
-    },
-    tagValueProcessor: function(tagName, val) {
-      return val;
-    },
-    attributeValueProcessor: function(attrName, val) {
-      return val;
-    },
-    stopNodes: [], //nested tags will not be parsed even for errors
-    alwaysCreateTextNode: false,
-    isArray: () => false,
-    commentPropName: false,
-    unpairedTags: [],
-    processEntities: true,
-    htmlEntities: false,
-    ignoreDeclaration: false,
-    ignorePiTags: false,
-    transformTagName: false,
-    transformAttributeName: false,
-    updateTag: function(tagName, jPath, attrs){
-      return tagName
-    },
-    // skipEmptyListItem: false
-    captureMetaData: false,
+  preserveOrder: false,
+  attributeNamePrefix: '@_',
+  attributesGroupName: false,
+  textNodeName: '#text',
+  ignoreAttributes: true,
+  removeNSPrefix: false, // remove NS from tag name or attribute name if true
+  allowBooleanAttributes: false, //a tag can have attributes without any value
+  //ignoreRootElement : false,
+  parseTagValue: true,
+  parseAttributeValue: false,
+  trimValues: true, //Trim string values of tag and attributes
+  cdataPropName: false,
+  numberParseOptions: {
+    hex: true,
+    leadingZeros: true,
+    eNotation: true
+  },
+  tagValueProcessor: function (tagName, val) {
+    return val;
+  },
+  attributeValueProcessor: function (attrName, val) {
+    return val;
+  },
+  stopNodes: [], //nested tags will not be parsed even for errors
+  alwaysCreateTextNode: false,
+  isArray: () => false,
+  commentPropName: false,
+  unpairedTags: [],
+  processEntities: true,
+  htmlEntities: false,
+  ignoreDeclaration: false,
+  ignorePiTags: false,
+  transformTagName: false,
+  transformAttributeName: false,
+  updateTag: function (tagName, jPath, attrs) {
+    return tagName
+  },
+  // skipEmptyListItem: false
+  captureMetaData: false,
 };
-   
-const buildOptions = function(options) {
-    return Object.assign({}, defaultOptions, options);
+
+/**
+ * Normalizes processEntities option for backward compatibility
+ * @param {boolean|object} value 
+ * @returns {object} Always returns normalized object
+ */
+function normalizeProcessEntities(value) {
+  // Boolean backward compatibility
+  if (typeof value === 'boolean') {
+    return {
+      enabled: value, // true or false
+      maxEntitySize: 10000,
+      maxExpansionDepth: 10,
+      maxTotalExpansions: 1000,
+      maxExpandedLength: 100000,
+      allowedTags: null,
+      tagFilter: null
+    };
+  }
+
+  // Object config - merge with defaults
+  if (typeof value === 'object' && value !== null) {
+    return {
+      enabled: value.enabled !== false, // default true if not specified
+      maxEntitySize: value.maxEntitySize ?? 10000,
+      maxExpansionDepth: value.maxExpansionDepth ?? 10,
+      maxTotalExpansions: value.maxTotalExpansions ?? 1000,
+      maxExpandedLength: value.maxExpandedLength ?? 100000,
+      allowedTags: value.allowedTags ?? null,
+      tagFilter: value.tagFilter ?? null
+    };
+  }
+
+  // Default to enabled with limits
+  return normalizeProcessEntities(true);
+}
+
+const buildOptions = function (options) {
+  const built = Object.assign({}, defaultOptions, options);
+
+  // Always normalize processEntities for backward compatibility and validation
+  built.processEntities = normalizeProcessEntities(built.processEntities);
+  //console.debug(built.processEntities)
+  return built;
 };
 
 let METADATA_SYMBOL$1;
@@ -6774,81 +6853,83 @@ class XmlNode{
   }
 }
 
-class DocTypeReader{
-    constructor(processEntities){
-        this.suppressValidationErr = !processEntities;
+class DocTypeReader {
+    constructor(options) {
+        this.suppressValidationErr = !options;
+        this.options = options;
     }
-    
-    readDocType(xmlData, i){
-    
+
+    readDocType(xmlData, i) {
+
         const entities = {};
-        if( xmlData[i + 3] === 'O' &&
+        if (xmlData[i + 3] === 'O' &&
             xmlData[i + 4] === 'C' &&
             xmlData[i + 5] === 'T' &&
             xmlData[i + 6] === 'Y' &&
             xmlData[i + 7] === 'P' &&
-            xmlData[i + 8] === 'E')
-        {    
-            i = i+9;
+            xmlData[i + 8] === 'E') {
+            i = i + 9;
             let angleBracketsCount = 1;
             let hasBody = false, comment = false;
             let exp = "";
-            for(;i<xmlData.length;i++){
+            for (; i < xmlData.length; i++) {
                 if (xmlData[i] === '<' && !comment) { //Determine the tag type
-                    if( hasBody && hasSeq(xmlData, "!ENTITY",i)){
-                        i += 7; 
+                    if (hasBody && hasSeq(xmlData, "!ENTITY", i)) {
+                        i += 7;
                         let entityName, val;
-                        [entityName, val,i] = this.readEntityExp(xmlData,i+1,this.suppressValidationErr);
-                        if(val.indexOf("&") === -1) //Parameter entities are not supported
-                            entities[ entityName ] = {
-                                regx : RegExp( `&${entityName};`,"g"),
+                        [entityName, val, i] = this.readEntityExp(xmlData, i + 1, this.suppressValidationErr);
+                        if (val.indexOf("&") === -1) { //Parameter entities are not supported
+                            const escaped = entityName.replace(/[.\-+*:]/g, '\\.');
+                            entities[entityName] = {
+                                regx: RegExp(`&${escaped};`, "g"),
                                 val: val
                             };
+                        }
                     }
-                    else if( hasBody && hasSeq(xmlData, "!ELEMENT",i))  {
+                    else if (hasBody && hasSeq(xmlData, "!ELEMENT", i)) {
                         i += 8;//Not supported
-                        const {index} = this.readElementExp(xmlData,i+1);
+                        const { index } = this.readElementExp(xmlData, i + 1);
                         i = index;
-                    }else if( hasBody && hasSeq(xmlData, "!ATTLIST",i)){
+                    } else if (hasBody && hasSeq(xmlData, "!ATTLIST", i)) {
                         i += 8;//Not supported
                         // const {index} = this.readAttlistExp(xmlData,i+1);
                         // i = index;
-                    }else if( hasBody && hasSeq(xmlData, "!NOTATION",i)) {
+                    } else if (hasBody && hasSeq(xmlData, "!NOTATION", i)) {
                         i += 9;//Not supported
-                        const {index} = this.readNotationExp(xmlData,i+1,this.suppressValidationErr);
+                        const { index } = this.readNotationExp(xmlData, i + 1, this.suppressValidationErr);
                         i = index;
-                    }else if( hasSeq(xmlData, "!--",i) ) comment = true;
+                    } else if (hasSeq(xmlData, "!--", i)) comment = true;
                     else throw new Error(`Invalid DOCTYPE`);
 
                     angleBracketsCount++;
                     exp = "";
                 } else if (xmlData[i] === '>') { //Read tag content
-                    if(comment){
-                        if( xmlData[i - 1] === "-" && xmlData[i - 2] === "-"){
+                    if (comment) {
+                        if (xmlData[i - 1] === "-" && xmlData[i - 2] === "-") {
                             comment = false;
                             angleBracketsCount--;
                         }
-                    }else {
+                    } else {
                         angleBracketsCount--;
                     }
                     if (angleBracketsCount === 0) {
-                    break;
+                        break;
                     }
-                }else if( xmlData[i] === '['){
+                } else if (xmlData[i] === '[') {
                     hasBody = true;
-                }else {
+                } else {
                     exp += xmlData[i];
                 }
             }
-            if(angleBracketsCount !== 0){
+            if (angleBracketsCount !== 0) {
                 throw new Error(`Unclosed DOCTYPE`);
             }
-        }else {
+        } else {
             throw new Error(`Invalid Tag instead of DOCTYPE`);
         }
-        return {entities, i};
+        return { entities, i };
     }
-    readEntityExp(xmlData, i) {    
+    readEntityExp(xmlData, i) {
         //External entities are not supported
         //    <!ENTITY ext SYSTEM "http://normal-website.com" >
 
@@ -6873,10 +6954,10 @@ class DocTypeReader{
         i = skipWhitespace(xmlData, i);
 
         // Check for unsupported constructs (external entities or parameter entities)
-        if(!this.suppressValidationErr){
+        if (!this.suppressValidationErr) {
             if (xmlData.substring(i, i + 6).toUpperCase() === "SYSTEM") {
                 throw new Error("External entities are not supported");
-            }else if (xmlData[i] === "%") {
+            } else if (xmlData[i] === "%") {
                 throw new Error("Parameter entities are not supported");
             }
         }
@@ -6884,8 +6965,18 @@ class DocTypeReader{
         // Read entity value (internal entity)
         let entityValue = "";
         [i, entityValue] = this.readIdentifierVal(xmlData, i, "entity");
+
+        // Validate entity size
+        if (this.options.enabled !== false &&
+            this.options.maxEntitySize &&
+            entityValue.length > this.options.maxEntitySize) {
+            throw new Error(
+                `Entity "${entityName}" size (${entityValue.length}) exceeds maximum allowed size (${this.options.maxEntitySize})`
+            );
+        }
+
         i--;
-        return [entityName, entityValue, i ];
+        return [entityName, entityValue, i];
     }
 
     readNotationExp(xmlData, i) {
@@ -6918,25 +7009,25 @@ class DocTypeReader{
         let systemIdentifier = null;
 
         if (identifierType === "PUBLIC") {
-            [i, publicIdentifier ] = this.readIdentifierVal(xmlData, i, "publicIdentifier");
+            [i, publicIdentifier] = this.readIdentifierVal(xmlData, i, "publicIdentifier");
 
             // Skip whitespace after public identifier
             i = skipWhitespace(xmlData, i);
 
             // Optionally read system identifier
             if (xmlData[i] === '"' || xmlData[i] === "'") {
-                [i, systemIdentifier ] = this.readIdentifierVal(xmlData, i,"systemIdentifier");
+                [i, systemIdentifier] = this.readIdentifierVal(xmlData, i, "systemIdentifier");
             }
         } else if (identifierType === "SYSTEM") {
             // Read system identifier (mandatory for SYSTEM)
-            [i, systemIdentifier ] = this.readIdentifierVal(xmlData, i, "systemIdentifier");
+            [i, systemIdentifier] = this.readIdentifierVal(xmlData, i, "systemIdentifier");
 
             if (!this.suppressValidationErr && !systemIdentifier) {
                 throw new Error("Missing mandatory system identifier for SYSTEM notation");
             }
         }
-        
-        return {notationName, publicIdentifier, systemIdentifier, index: --i};
+
+        return { notationName, publicIdentifier, systemIdentifier, index: --i };
     }
 
     readIdentifierVal(xmlData, i, type) {
@@ -6965,7 +7056,7 @@ class DocTypeReader{
         // <!ELEMENT title (#PCDATA)>
         // <!ELEMENT book (title, author+)>
         // <!ELEMENT name (content-model)>
-        
+
         // Skip leading whitespace after <!ELEMENT
         i = skipWhitespace(xmlData, i);
 
@@ -6985,8 +7076,8 @@ class DocTypeReader{
         i = skipWhitespace(xmlData, i);
         let contentModel = "";
         // Expect '(' to start content model
-        if(xmlData[i] === "E" && hasSeq(xmlData, "MPTY",i)) i+=4;
-        else if(xmlData[i] === "A" && hasSeq(xmlData, "NY",i)) i+=2;
+        if (xmlData[i] === "E" && hasSeq(xmlData, "MPTY", i)) i += 4;
+        else if (xmlData[i] === "A" && hasSeq(xmlData, "NY", i)) i += 2;
         else if (xmlData[i] === "(") {
             i++; // Move past '('
 
@@ -6999,10 +7090,10 @@ class DocTypeReader{
                 throw new Error("Unterminated content model");
             }
 
-        }else if(!this.suppressValidationErr){
+        } else if (!this.suppressValidationErr) {
             throw new Error(`Invalid Element Expression, found "${xmlData[i]}"`);
         }
-        
+
         return {
             elementName,
             contentModel: contentModel.trim(),
@@ -7138,16 +7229,16 @@ const skipWhitespace = (data, index) => {
 
 
 
-function hasSeq(data, seq,i){
-    for(let j=0;j<seq.length;j++){
-        if(seq[j]!==data[i+j+1]) return false;
+function hasSeq(data, seq, i) {
+    for (let j = 0; j < seq.length; j++) {
+        if (seq[j] !== data[i + j + 1]) return false;
     }
     return true;
 }
 
-function validateEntityName(name){
+function validateEntityName(name) {
     if (isName(name))
-	    return name;
+        return name;
     else
         throw new Error(`Invalid entity name ${name}`);
 }
@@ -7157,48 +7248,51 @@ const numRegex = /^([\-\+])?(0*)([0-9]*(\.[0-9]*)?)$/;
 // const octRegex = /^0x[a-z0-9]+/;
 // const binRegex = /0x[a-z0-9]+/;
 
- 
+
 const consider = {
-    hex :  true,
+    hex: true,
     // oct: false,
     leadingZeros: true,
     decimalPoint: "\.",
     eNotation: true,
-    //skipLike: /regex/
+    //skipLike: /regex/,
+    infinity: "original", // "null", "infinity" (Infinity type), "string" ("Infinity" (the string literal))
 };
 
-function toNumber(str, options = {}){
-    options = Object.assign({}, consider, options );
-    if(!str || typeof str !== "string" ) return str;
-    
-    let trimmedStr  = str.trim();
-    
-    if(options.skipLike !== undefined && options.skipLike.test(trimmedStr)) return str;
-    else if(str==="0") return 0;
+function toNumber(str, options = {}) {
+    options = Object.assign({}, consider, options);
+    if (!str || typeof str !== "string") return str;
+
+    let trimmedStr = str.trim();
+
+    if (options.skipLike !== undefined && options.skipLike.test(trimmedStr)) return str;
+    else if (str === "0") return 0;
     else if (options.hex && hexRegex.test(trimmedStr)) {
         return parse_int(trimmedStr, 16);
-    // }else if (options.oct && octRegex.test(str)) {
-    //     return Number.parseInt(val, 8);
-    }else if (trimmedStr.includes('e') || trimmedStr.includes('E')) { //eNotation
-        return resolveEnotation(str,trimmedStr,options);
-    // }else if (options.parseBin && binRegex.test(str)) {
-    //     return Number.parseInt(val, 2);
-    }else {
+        // }else if (options.oct && octRegex.test(str)) {
+        //     return Number.parseInt(val, 8);
+    } else if (!isFinite(trimmedStr)) { //Infinity
+        return handleInfinity(str, Number(trimmedStr), options);
+    } else if (trimmedStr.includes('e') || trimmedStr.includes('E')) { //eNotation
+        return resolveEnotation(str, trimmedStr, options);
+        // }else if (options.parseBin && binRegex.test(str)) {
+        //     return Number.parseInt(val, 2);
+    } else {
         //separate negative sign, leading zeros, and rest number
         const match = numRegex.exec(trimmedStr);
         // +00.123 => [ , '+', '00', '.123', ..
-        if(match){
+        if (match) {
             const sign = match[1] || "";
             const leadingZeros = match[2];
             let numTrimmedByZeros = trimZeros(match[3]); //complete num without leading zeros
             const decimalAdjacentToLeadingZeros = sign ? // 0., -00., 000.
-                str[leadingZeros.length+1] === "." 
+                str[leadingZeros.length + 1] === "."
                 : str[leadingZeros.length] === ".";
 
             //trim ending zeros for floating number
-            if(!options.leadingZeros //leading zeros are not allowed
-                && (leadingZeros.length > 1 
-                    || (leadingZeros.length === 1 && !decimalAdjacentToLeadingZeros))){
+            if (!options.leadingZeros //leading zeros are not allowed
+                && (leadingZeros.length > 1
+                    || (leadingZeros.length === 1 && !decimalAdjacentToLeadingZeros))) {
                 // 00, 00.3, +03.24, 03, 03.24
                 return str;
             }
@@ -7206,54 +7300,54 @@ function toNumber(str, options = {}){
                 const num = Number(trimmedStr);
                 const parsedStr = String(num);
 
-                if( num === 0) return num;
-                if(parsedStr.search(/[eE]/) !== -1){ //given number is long and parsed to eNotation
-                    if(options.eNotation) return num;
+                if (num === 0) return num;
+                if (parsedStr.search(/[eE]/) !== -1) { //given number is long and parsed to eNotation
+                    if (options.eNotation) return num;
                     else return str;
-                }else if(trimmedStr.indexOf(".") !== -1){ //floating number
-                    if(parsedStr === "0") return num; //0.0
-                    else if(parsedStr === numTrimmedByZeros) return num; //0.456. 0.79000
-                    else if( parsedStr === `${sign}${numTrimmedByZeros}`) return num;
+                } else if (trimmedStr.indexOf(".") !== -1) { //floating number
+                    if (parsedStr === "0") return num; //0.0
+                    else if (parsedStr === numTrimmedByZeros) return num; //0.456. 0.79000
+                    else if (parsedStr === `${sign}${numTrimmedByZeros}`) return num;
                     else return str;
                 }
-                
-                let n = leadingZeros? numTrimmedByZeros : trimmedStr;
-                if(leadingZeros){
+
+                let n = leadingZeros ? numTrimmedByZeros : trimmedStr;
+                if (leadingZeros) {
                     // -009 => -9
-                    return (n === parsedStr) || (sign+n === parsedStr) ? num : str
-                }else  {
+                    return (n === parsedStr) || (sign + n === parsedStr) ? num : str
+                } else {
                     // +9
-                    return (n === parsedStr) || (n === sign+parsedStr) ? num : str
+                    return (n === parsedStr) || (n === sign + parsedStr) ? num : str
                 }
             }
-        }else { //non-numeric string
+        } else { //non-numeric string
             return str;
         }
     }
 }
 
 const eNotationRegx = /^([-+])?(0*)(\d*(\.\d*)?[eE][-\+]?\d+)$/;
-function resolveEnotation(str,trimmedStr,options){
-    if(!options.eNotation) return str;
-    const notation = trimmedStr.match(eNotationRegx); 
-    if(notation){
+function resolveEnotation(str, trimmedStr, options) {
+    if (!options.eNotation) return str;
+    const notation = trimmedStr.match(eNotationRegx);
+    if (notation) {
         let sign = notation[1] || "";
         const eChar = notation[3].indexOf("e") === -1 ? "E" : "e";
         const leadingZeros = notation[2];
         const eAdjacentToLeadingZeros = sign ? // 0E.
-            str[leadingZeros.length+1] === eChar 
+            str[leadingZeros.length + 1] === eChar
             : str[leadingZeros.length] === eChar;
 
-        if(leadingZeros.length > 1 && eAdjacentToLeadingZeros) return str;
-        else if(leadingZeros.length === 1 
-            && (notation[3].startsWith(`.${eChar}`) || notation[3][0] === eChar)){
-                return Number(trimmedStr);
-        }else if(options.leadingZeros && !eAdjacentToLeadingZeros){ //accept with leading zeros
+        if (leadingZeros.length > 1 && eAdjacentToLeadingZeros) return str;
+        else if (leadingZeros.length === 1
+            && (notation[3].startsWith(`.${eChar}`) || notation[3][0] === eChar)) {
+            return Number(trimmedStr);
+        } else if (options.leadingZeros && !eAdjacentToLeadingZeros) { //accept with leading zeros
             //remove leading 0s
             trimmedStr = (notation[1] || "") + notation[3];
             return Number(trimmedStr);
-        }else return str;
-    }else {
+        } else return str;
+    } else {
         return str;
     }
 }
@@ -7263,23 +7357,46 @@ function resolveEnotation(str,trimmedStr,options){
  * @param {string} numStr without leading zeros
  * @returns 
  */
-function trimZeros(numStr){
-    if(numStr && numStr.indexOf(".") !== -1){//float
+function trimZeros(numStr) {
+    if (numStr && numStr.indexOf(".") !== -1) {//float
         numStr = numStr.replace(/0+$/, ""); //remove ending zeros
-        if(numStr === ".")  numStr = "0";
-        else if(numStr[0] === ".")  numStr = "0"+numStr;
-        else if(numStr[numStr.length-1] === ".")  numStr = numStr.substring(0,numStr.length-1);
+        if (numStr === ".") numStr = "0";
+        else if (numStr[0] === ".") numStr = "0" + numStr;
+        else if (numStr[numStr.length - 1] === ".") numStr = numStr.substring(0, numStr.length - 1);
         return numStr;
     }
     return numStr;
 }
 
-function parse_int(numStr, base){
+function parse_int(numStr, base) {
     //polyfill
-    if(parseInt) return parseInt(numStr, base);
-    else if(Number.parseInt) return Number.parseInt(numStr, base);
-    else if(window && window.parseInt) return window.parseInt(numStr, base);
+    if (parseInt) return parseInt(numStr, base);
+    else if (Number.parseInt) return Number.parseInt(numStr, base);
+    else if (window && window.parseInt) return window.parseInt(numStr, base);
     else throw new Error("parseInt, Number.parseInt, window.parseInt are not supported")
+}
+
+/**
+ * Handle infinite values based on user option
+ * @param {string} str - original input string
+ * @param {number} num - parsed number (Infinity or -Infinity)
+ * @param {object} options - user options
+ * @returns {string|number|null} based on infinity option
+ */
+function handleInfinity(str, num, options) {
+    const isPositive = num === Infinity;
+
+    switch (options.infinity.toLowerCase()) {
+        case "null":
+            return null;
+        case "infinity":
+            return num; // Return Infinity or -Infinity
+        case "string":
+            return isPositive ? "Infinity" : "-Infinity";
+        case "original":
+        default:
+            return str; // Return original string like "1e1000"
+    }
 }
 
 function getIgnoreAttributesFn(ignoreAttributes) {
@@ -7308,19 +7425,19 @@ function getIgnoreAttributesFn(ignoreAttributes) {
 //const tagsRegx = new RegExp("<(\\/?[\\w:\\-\._]+)([^>]*)>(\\s*"+cdataRegx+")*([^<]+)?","g");
 //const tagsRegx = new RegExp("<(\\/?)((\\w*:)?([\\w:\\-\._]+))([^>]*)>([^<]*)("+cdataRegx+"([^<]*))*([^<]+)?","g");
 
-class OrderedObjParser{
-  constructor(options){
+class OrderedObjParser {
+  constructor(options) {
     this.options = options;
     this.currentNode = null;
     this.tagsNodeStack = [];
     this.docTypeEntities = {};
     this.lastEntities = {
-      "apos" : { regex: /&(apos|#39|#x27);/g, val : "'"},
-      "gt" : { regex: /&(gt|#62|#x3E);/g, val : ">"},
-      "lt" : { regex: /&(lt|#60|#x3C);/g, val : "<"},
-      "quot" : { regex: /&(quot|#34|#x22);/g, val : "\""},
+      "apos": { regex: /&(apos|#39|#x27);/g, val: "'" },
+      "gt": { regex: /&(gt|#62|#x3E);/g, val: ">" },
+      "lt": { regex: /&(lt|#60|#x3C);/g, val: "<" },
+      "quot": { regex: /&(quot|#34|#x22);/g, val: "\"" },
     };
-    this.ampEntity = { regex: /&(amp|#38|#x26);/g, val : "&"};
+    this.ampEntity = { regex: /&(amp|#38|#x26);/g, val: "&" };
     this.htmlEntities = {
       "space": { regex: /&(nbsp|#160);/g, val: " " },
       // "lt" : { regex: /&(lt|#60);/g, val: "<" },
@@ -7328,15 +7445,15 @@ class OrderedObjParser{
       // "amp" : { regex: /&(amp|#38);/g, val: "&" },
       // "quot" : { regex: /&(quot|#34);/g, val: "\"" },
       // "apos" : { regex: /&(apos|#39);/g, val: "'" },
-      "cent" : { regex: /&(cent|#162);/g, val: "¢" },
-      "pound" : { regex: /&(pound|#163);/g, val: "£" },
-      "yen" : { regex: /&(yen|#165);/g, val: "¥" },
-      "euro" : { regex: /&(euro|#8364);/g, val: "€" },
-      "copyright" : { regex: /&(copy|#169);/g, val: "©" },
-      "reg" : { regex: /&(reg|#174);/g, val: "®" },
-      "inr" : { regex: /&(inr|#8377);/g, val: "₹" },
-      "num_dec": { regex: /&#([0-9]{1,7});/g, val : (_, str) => fromCodePoint(str, 10, "&#") },
-      "num_hex": { regex: /&#x([0-9a-fA-F]{1,6});/g, val : (_, str) => fromCodePoint(str, 16, "&#x") },
+      "cent": { regex: /&(cent|#162);/g, val: "¢" },
+      "pound": { regex: /&(pound|#163);/g, val: "£" },
+      "yen": { regex: /&(yen|#165);/g, val: "¥" },
+      "euro": { regex: /&(euro|#8364);/g, val: "€" },
+      "copyright": { regex: /&(copy|#169);/g, val: "©" },
+      "reg": { regex: /&(reg|#174);/g, val: "®" },
+      "inr": { regex: /&(inr|#8377);/g, val: "₹" },
+      "num_dec": { regex: /&#([0-9]{1,7});/g, val: (_, str) => fromCodePoint(str, 10, "&#") },
+      "num_hex": { regex: /&#x([0-9a-fA-F]{1,6});/g, val: (_, str) => fromCodePoint(str, 16, "&#x") },
     };
     this.addExternalEntities = addExternalEntities;
     this.parseXml = parseXml;
@@ -7349,16 +7466,18 @@ class OrderedObjParser{
     this.saveTextToParentTag = saveTextToParentTag;
     this.addChild = addChild;
     this.ignoreAttributesFn = getIgnoreAttributesFn(this.options.ignoreAttributes);
+    this.entityExpansionCount = 0;
+    this.currentExpandedLength = 0;
 
-    if(this.options.stopNodes && this.options.stopNodes.length > 0){
+    if (this.options.stopNodes && this.options.stopNodes.length > 0) {
       this.stopNodesExact = new Set();
       this.stopNodesWildcard = new Set();
-      for(let i = 0; i < this.options.stopNodes.length; i++){
+      for (let i = 0; i < this.options.stopNodes.length; i++) {
         const stopNodeExp = this.options.stopNodes[i];
-        if(typeof stopNodeExp !== 'string') continue;
-        if(stopNodeExp.startsWith("*.")){
+        if (typeof stopNodeExp !== 'string') continue;
+        if (stopNodeExp.startsWith("*.")) {
           this.stopNodesWildcard.add(stopNodeExp.substring(2));
-        }else {
+        } else {
           this.stopNodesExact.add(stopNodeExp);
         }
       }
@@ -7367,13 +7486,14 @@ class OrderedObjParser{
 
 }
 
-function addExternalEntities(externalEntities){
+function addExternalEntities(externalEntities) {
   const entKeys = Object.keys(externalEntities);
   for (let i = 0; i < entKeys.length; i++) {
     const ent = entKeys[i];
+    const escaped = ent.replace(/[.\-+*:]/g, '\\.');
     this.lastEntities[ent] = {
-       regex: new RegExp("&"+ent+";","g"),
-       val : externalEntities[ent]
+      regex: new RegExp("&" + escaped + ";", "g"),
+      val: externalEntities[ent]
     };
   }
 }
@@ -7392,23 +7512,23 @@ function parseTextData(val, tagName, jPath, dontTrim, hasAttributes, isLeafNode,
     if (this.options.trimValues && !dontTrim) {
       val = val.trim();
     }
-    if(val.length > 0){
-      if(!escapeEntities) val = this.replaceEntitiesValue(val);
-      
+    if (val.length > 0) {
+      if (!escapeEntities) val = this.replaceEntitiesValue(val, tagName, jPath);
+
       const newval = this.options.tagValueProcessor(tagName, val, jPath, hasAttributes, isLeafNode);
-      if(newval === null || newval === undefined){
+      if (newval === null || newval === undefined) {
         //don't parse
         return val;
-      }else if(typeof newval !== typeof val || newval !== val){
+      } else if (typeof newval !== typeof val || newval !== val) {
         //overwrite
         return newval;
-      }else if(this.options.trimValues){
+      } else if (this.options.trimValues) {
         return parseValue(val, this.options.parseTagValue, this.options.numberParseOptions);
-      }else {
+      } else {
         const trimmedVal = val.trim();
-        if(trimmedVal === val){
+        if (trimmedVal === val) {
           return parseValue(val, this.options.parseTagValue, this.options.numberParseOptions);
-        }else {
+        } else {
           return val;
         }
       }
@@ -7434,7 +7554,7 @@ function resolveNameSpace(tagname) {
 //const attrsRegx = new RegExp("([\\w\\-\\.\\:]+)\\s*=\\s*(['\"])((.|\n)*?)\\2","gm");
 const attrsRegx = new RegExp('([^\\s=]+)\\s*(=\\s*([\'"])([\\s\\S]*?)\\3)?', 'gm');
 
-function buildAttributesMap(attrStr, jPath) {
+function buildAttributesMap(attrStr, jPath, tagName) {
   if (this.options.ignoreAttributes !== true && typeof attrStr === 'string') {
     // attrStr = attrStr.replace(/\r?\n/g, ' ');
     //attrStr = attrStr || attrStr.trim();
@@ -7453,20 +7573,20 @@ function buildAttributesMap(attrStr, jPath) {
         if (this.options.transformAttributeName) {
           aName = this.options.transformAttributeName(aName);
         }
-        if(aName === "__proto__") aName  = "#__proto__";
+        if (aName === "__proto__") aName = "#__proto__";
         if (oldVal !== undefined) {
           if (this.options.trimValues) {
             oldVal = oldVal.trim();
           }
-          oldVal = this.replaceEntitiesValue(oldVal);
+          oldVal = this.replaceEntitiesValue(oldVal, tagName, jPath);
           const newVal = this.options.attributeValueProcessor(attrName, oldVal, jPath);
-          if(newVal === null || newVal === undefined){
+          if (newVal === null || newVal === undefined) {
             //don't parse
             attrs[aName] = oldVal;
-          }else if(typeof newVal !== typeof oldVal || newVal !== oldVal){
+          } else if (typeof newVal !== typeof oldVal || newVal !== oldVal) {
             //overwrite
             attrs[aName] = newVal;
-          }else {
+          } else {
             //parse
             attrs[aName] = parseValue(
               oldVal,
@@ -7491,47 +7611,52 @@ function buildAttributesMap(attrStr, jPath) {
   }
 }
 
-const parseXml = function(xmlData) {
+const parseXml = function (xmlData) {
   xmlData = xmlData.replace(/\r\n?/g, "\n"); //TODO: remove this line
   const xmlObj = new XmlNode('!xml');
   let currentNode = xmlObj;
   let textData = "";
   let jPath = "";
+
+  // Reset entity expansion counters for this document
+  this.entityExpansionCount = 0;
+  this.currentExpandedLength = 0;
+
   const docTypeReader = new DocTypeReader(this.options.processEntities);
-  for(let i=0; i< xmlData.length; i++){//for each char in XML data
+  for (let i = 0; i < xmlData.length; i++) {//for each char in XML data
     const ch = xmlData[i];
-    if(ch === '<'){
+    if (ch === '<') {
       // const nextIndex = i+1;
       // const _2ndChar = xmlData[nextIndex];
-      if( xmlData[i+1] === '/') {//Closing Tag
+      if (xmlData[i + 1] === '/') {//Closing Tag
         const closeIndex = findClosingIndex(xmlData, ">", i, "Closing Tag is not closed.");
-        let tagName = xmlData.substring(i+2,closeIndex).trim();
+        let tagName = xmlData.substring(i + 2, closeIndex).trim();
 
-        if(this.options.removeNSPrefix){
+        if (this.options.removeNSPrefix) {
           const colonIndex = tagName.indexOf(":");
-          if(colonIndex !== -1){
-            tagName = tagName.substr(colonIndex+1);
+          if (colonIndex !== -1) {
+            tagName = tagName.substr(colonIndex + 1);
           }
         }
 
-        if(this.options.transformTagName) {
+        if (this.options.transformTagName) {
           tagName = this.options.transformTagName(tagName);
         }
 
-        if(currentNode){
+        if (currentNode) {
           textData = this.saveTextToParentTag(textData, currentNode, jPath);
         }
 
         //check if last tag of nested tag was unpaired tag
-        const lastTagName = jPath.substring(jPath.lastIndexOf(".")+1);
-        if(tagName && this.options.unpairedTags.indexOf(tagName) !== -1 ){
+        const lastTagName = jPath.substring(jPath.lastIndexOf(".") + 1);
+        if (tagName && this.options.unpairedTags.indexOf(tagName) !== -1) {
           throw new Error(`Unpaired tag can not be used as closing tag: </${tagName}>`);
         }
         let propIndex = 0;
-        if(lastTagName && this.options.unpairedTags.indexOf(lastTagName) !== -1 ){
-          propIndex = jPath.lastIndexOf('.', jPath.lastIndexOf('.')-1);
+        if (lastTagName && this.options.unpairedTags.indexOf(lastTagName) !== -1) {
+          propIndex = jPath.lastIndexOf('.', jPath.lastIndexOf('.') - 1);
           this.tagsNodeStack.pop();
-        }else {
+        } else {
           propIndex = jPath.lastIndexOf(".");
         }
         jPath = jPath.substring(0, propIndex);
@@ -7539,59 +7664,59 @@ const parseXml = function(xmlData) {
         currentNode = this.tagsNodeStack.pop();//avoid recursion, set the parent tag scope
         textData = "";
         i = closeIndex;
-      } else if( xmlData[i+1] === '?') {
+      } else if (xmlData[i + 1] === '?') {
 
-        let tagData = readTagExp(xmlData,i, false, "?>");
-        if(!tagData) throw new Error("Pi Tag is not closed.");
+        let tagData = readTagExp(xmlData, i, false, "?>");
+        if (!tagData) throw new Error("Pi Tag is not closed.");
 
         textData = this.saveTextToParentTag(textData, currentNode, jPath);
-        if( (this.options.ignoreDeclaration && tagData.tagName === "?xml") || this.options.ignorePiTags);else {
-  
+        if ((this.options.ignoreDeclaration && tagData.tagName === "?xml") || this.options.ignorePiTags) ; else {
+
           const childNode = new XmlNode(tagData.tagName);
           childNode.add(this.options.textNodeName, "");
-          
-          if(tagData.tagName !== tagData.tagExp && tagData.attrExpPresent){
-            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath);
+
+          if (tagData.tagName !== tagData.tagExp && tagData.attrExpPresent) {
+            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath, tagData.tagName);
           }
           this.addChild(currentNode, childNode, jPath, i);
         }
 
 
         i = tagData.closeIndex + 1;
-      } else if(xmlData.substr(i + 1, 3) === '!--') {
-        const endIndex = findClosingIndex(xmlData, "-->", i+4, "Comment is not closed.");
-        if(this.options.commentPropName){
+      } else if (xmlData.substr(i + 1, 3) === '!--') {
+        const endIndex = findClosingIndex(xmlData, "-->", i + 4, "Comment is not closed.");
+        if (this.options.commentPropName) {
           const comment = xmlData.substring(i + 4, endIndex - 2);
 
           textData = this.saveTextToParentTag(textData, currentNode, jPath);
 
-          currentNode.add(this.options.commentPropName, [ { [this.options.textNodeName] : comment } ]);
+          currentNode.add(this.options.commentPropName, [{ [this.options.textNodeName]: comment }]);
         }
         i = endIndex;
-      } else if( xmlData.substr(i + 1, 2) === '!D') {
+      } else if (xmlData.substr(i + 1, 2) === '!D') {
         const result = docTypeReader.readDocType(xmlData, i);
         this.docTypeEntities = result.entities;
         i = result.i;
-      }else if(xmlData.substr(i + 1, 2) === '![') {
+      } else if (xmlData.substr(i + 1, 2) === '![') {
         const closeIndex = findClosingIndex(xmlData, "]]>", i, "CDATA is not closed.") - 2;
-        const tagExp = xmlData.substring(i + 9,closeIndex);
+        const tagExp = xmlData.substring(i + 9, closeIndex);
 
         textData = this.saveTextToParentTag(textData, currentNode, jPath);
 
         let val = this.parseTextData(tagExp, currentNode.tagname, jPath, true, false, true, true);
-        if(val == undefined) val = "";
+        if (val == undefined) val = "";
 
         //cdata should be set even if it is 0 length string
-        if(this.options.cdataPropName){
-          currentNode.add(this.options.cdataPropName, [ { [this.options.textNodeName] : tagExp } ]);
-        }else {
+        if (this.options.cdataPropName) {
+          currentNode.add(this.options.cdataPropName, [{ [this.options.textNodeName]: tagExp }]);
+        } else {
           currentNode.add(this.options.textNodeName, val);
         }
-        
+
         i = closeIndex + 2;
-      }else {//Opening tag
-        let result = readTagExp(xmlData,i, this.options.removeNSPrefix);
-        let tagName= result.tagName;
+      } else {//Opening tag
+        let result = readTagExp(xmlData, i, this.options.removeNSPrefix);
+        let tagName = result.tagName;
         const rawTagName = result.rawTagName;
         let tagExp = result.tagExp;
         let attrExpPresent = result.attrExpPresent;
@@ -7600,15 +7725,15 @@ const parseXml = function(xmlData) {
         if (this.options.transformTagName) {
           //console.log(tagExp, tagName)
           const newTagName = this.options.transformTagName(tagName);
-          if(tagExp === tagName) {
+          if (tagExp === tagName) {
             tagExp = newTagName;
           }
           tagName = newTagName;
         }
-        
+
         //save text as child node
         if (currentNode && textData) {
-          if(currentNode.tagname !== '!xml'){
+          if (currentNode.tagname !== '!xml') {
             //when nested tag is found
             textData = this.saveTextToParentTag(textData, currentNode, jPath, false);
           }
@@ -7616,88 +7741,87 @@ const parseXml = function(xmlData) {
 
         //check if last tag was unpaired tag
         const lastTag = currentNode;
-        if(lastTag && this.options.unpairedTags.indexOf(lastTag.tagname) !== -1 ){
+        if (lastTag && this.options.unpairedTags.indexOf(lastTag.tagname) !== -1) {
           currentNode = this.tagsNodeStack.pop();
           jPath = jPath.substring(0, jPath.lastIndexOf("."));
         }
-        if(tagName !== xmlObj.tagname){
+        if (tagName !== xmlObj.tagname) {
           jPath += jPath ? "." + tagName : tagName;
         }
         const startIndex = i;
         if (this.isItStopNode(this.stopNodesExact, this.stopNodesWildcard, jPath, tagName)) {
           let tagContent = "";
           //self-closing tag
-          if(tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1){
-            if(tagName[tagName.length - 1] === "/"){ //remove trailing '/'
+          if (tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1) {
+            if (tagName[tagName.length - 1] === "/") { //remove trailing '/'
               tagName = tagName.substr(0, tagName.length - 1);
               jPath = jPath.substr(0, jPath.length - 1);
               tagExp = tagName;
-            }else {
+            } else {
               tagExp = tagExp.substr(0, tagExp.length - 1);
             }
             i = result.closeIndex;
           }
           //unpaired tag
-          else if(this.options.unpairedTags.indexOf(tagName) !== -1){
-            
+          else if (this.options.unpairedTags.indexOf(tagName) !== -1) {
+
             i = result.closeIndex;
           }
           //normal tag
           else {
             //read until closing tag is found
             const result = this.readStopNodeData(xmlData, rawTagName, closeIndex + 1);
-            if(!result) throw new Error(`Unexpected end of ${rawTagName}`);
+            if (!result) throw new Error(`Unexpected end of ${rawTagName}`);
             i = result.i;
             tagContent = result.tagContent;
           }
 
           const childNode = new XmlNode(tagName);
 
-          if(tagName !== tagExp && attrExpPresent){
-            childNode[":@"] = this.buildAttributesMap(tagExp, jPath
-            );
+          if (tagName !== tagExp && attrExpPresent) {
+            childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
           }
-          if(tagContent) {
+          if (tagContent) {
             tagContent = this.parseTextData(tagContent, tagName, jPath, true, attrExpPresent, true, true);
           }
-          
+
           jPath = jPath.substr(0, jPath.lastIndexOf("."));
           childNode.add(this.options.textNodeName, tagContent);
-          
+
           this.addChild(currentNode, childNode, jPath, startIndex);
-        }else {
-  //selfClosing tag
-          if(tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1){
-            if(tagName[tagName.length - 1] === "/"){ //remove trailing '/'
+        } else {
+          //selfClosing tag
+          if (tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1) {
+            if (tagName[tagName.length - 1] === "/") { //remove trailing '/'
               tagName = tagName.substr(0, tagName.length - 1);
               jPath = jPath.substr(0, jPath.length - 1);
               tagExp = tagName;
-            }else {
+            } else {
               tagExp = tagExp.substr(0, tagExp.length - 1);
             }
-            
-            if(this.options.transformTagName) {
+
+            if (this.options.transformTagName) {
               const newTagName = this.options.transformTagName(tagName);
-              if(tagExp === tagName) {
+              if (tagExp === tagName) {
                 tagExp = newTagName;
               }
               tagName = newTagName;
             }
 
             const childNode = new XmlNode(tagName);
-            if(tagName !== tagExp && attrExpPresent){
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath);
+            if (tagName !== tagExp && attrExpPresent) {
+              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
             }
             this.addChild(currentNode, childNode, jPath, startIndex);
             jPath = jPath.substr(0, jPath.lastIndexOf("."));
           }
-    //opening tag
+          //opening tag
           else {
-            const childNode = new XmlNode( tagName);
+            const childNode = new XmlNode(tagName);
             this.tagsNodeStack.push(currentNode);
-            
-            if(tagName !== tagExp && attrExpPresent){
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath);
+
+            if (tagName !== tagExp && attrExpPresent) {
+              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
             }
             this.addChild(currentNode, childNode, jPath, startIndex);
             currentNode = childNode;
@@ -7706,50 +7830,111 @@ const parseXml = function(xmlData) {
           i = closeIndex;
         }
       }
-    }else {
+    } else {
       textData += xmlData[i];
     }
   }
   return xmlObj.child;
 };
 
-function addChild(currentNode, childNode, jPath, startIndex){
+function addChild(currentNode, childNode, jPath, startIndex) {
   // unset startIndex if not requested
   if (!this.options.captureMetaData) startIndex = undefined;
   const result = this.options.updateTag(childNode.tagname, jPath, childNode[":@"]);
-  if(result === false); else if(typeof result === "string"){
+  if (result === false) ; else if (typeof result === "string") {
     childNode.tagname = result;
     currentNode.addChild(childNode, startIndex);
-  }else {
+  } else {
     currentNode.addChild(childNode, startIndex);
   }
 }
 
-const replaceEntitiesValue = function(val){
+const replaceEntitiesValue = function (val, tagName, jPath) {
+  // Performance optimization: Early return if no entities to replace
+  if (val.indexOf('&') === -1) {
+    return val;
+  }
 
-  if(this.options.processEntities){
-    for(let entityName in this.docTypeEntities){
-      const entity = this.docTypeEntities[entityName];
-      val = val.replace( entity.regx, entity.val);
+  const entityConfig = this.options.processEntities;
+
+  if (!entityConfig.enabled) {
+    return val;
+  }
+
+  // Check tag-specific filtering
+  if (entityConfig.allowedTags) {
+    if (!entityConfig.allowedTags.includes(tagName)) {
+      return val; // Skip entity replacement for current tag as not set
     }
-    for(let entityName in this.lastEntities){
-      const entity = this.lastEntities[entityName];
-      val = val.replace( entity.regex, entity.val);
+  }
+
+  if (entityConfig.tagFilter) {
+    if (!entityConfig.tagFilter(tagName, jPath)) {
+      return val; // Skip based on custom filter
     }
-    if(this.options.htmlEntities){
-      for(let entityName in this.htmlEntities){
-        const entity = this.htmlEntities[entityName];
-        val = val.replace( entity.regex, entity.val);
+  }
+
+  // Replace DOCTYPE entities
+  for (let entityName in this.docTypeEntities) {
+    const entity = this.docTypeEntities[entityName];
+    const matches = val.match(entity.regx);
+
+    if (matches) {
+      // Track expansions
+      this.entityExpansionCount += matches.length;
+
+      // Check expansion limit
+      if (entityConfig.maxTotalExpansions &&
+        this.entityExpansionCount > entityConfig.maxTotalExpansions) {
+        throw new Error(
+          `Entity expansion limit exceeded: ${this.entityExpansionCount} > ${entityConfig.maxTotalExpansions}`
+        );
+      }
+
+      // Store length before replacement
+      const lengthBefore = val.length;
+      val = val.replace(entity.regx, entity.val);
+
+      // Check expanded length immediately after replacement
+      if (entityConfig.maxExpandedLength) {
+        this.currentExpandedLength += (val.length - lengthBefore);
+
+        if (this.currentExpandedLength > entityConfig.maxExpandedLength) {
+          throw new Error(
+            `Total expanded content size exceeded: ${this.currentExpandedLength} > ${entityConfig.maxExpandedLength}`
+          );
+        }
       }
     }
-    val = val.replace( this.ampEntity.regex, this.ampEntity.val);
   }
+  if (val.indexOf('&') === -1) return val;  // Early exit
+
+  // Replace standard entities
+  for (let entityName in this.lastEntities) {
+    const entity = this.lastEntities[entityName];
+    val = val.replace(entity.regex, entity.val);
+  }
+  if (val.indexOf('&') === -1) return val;  // Early exit
+
+  // Replace HTML entities if enabled
+  if (this.options.htmlEntities) {
+    for (let entityName in this.htmlEntities) {
+      const entity = this.htmlEntities[entityName];
+      val = val.replace(entity.regex, entity.val);
+    }
+  }
+
+  // Replace ampersand entity last
+  val = val.replace(this.ampEntity.regex, this.ampEntity.val);
+
   return val;
 };
+
+
 function saveTextToParentTag(textData, currentNode, jPath, isLeafNode) {
   if (textData) { //store previously collected data as textNode
-    if(isLeafNode === undefined) isLeafNode = currentNode.child.length === 0;
-    
+    if (isLeafNode === undefined) isLeafNode = currentNode.child.length === 0;
+
     textData = this.parseTextData(textData,
       currentNode.tagname,
       jPath,
@@ -7771,9 +7956,9 @@ function saveTextToParentTag(textData, currentNode, jPath, isLeafNode) {
  * @param {string} jPath
  * @param {string} currentTagName
  */
-function isItStopNode(stopNodesExact, stopNodesWildcard, jPath, currentTagName){
-  if(stopNodesWildcard && stopNodesWildcard.has(currentTagName)) return true;
-  if(stopNodesExact && stopNodesExact.has(jPath)) return true;
+function isItStopNode(stopNodesExact, stopNodesWildcard, jPath, currentTagName) {
+  if (stopNodesWildcard && stopNodesWildcard.has(currentTagName)) return true;
+  if (stopNodesExact && stopNodesExact.has(jPath)) return true;
   return false;
 }
 
@@ -7783,24 +7968,24 @@ function isItStopNode(stopNodesExact, stopNodesWildcard, jPath, currentTagName){
  * @param {number} i starting index
  * @returns 
  */
-function tagExpWithClosingIndex(xmlData, i, closingChar = ">"){
+function tagExpWithClosingIndex(xmlData, i, closingChar = ">") {
   let attrBoundary;
   let tagExp = "";
   for (let index = i; index < xmlData.length; index++) {
     let ch = xmlData[index];
     if (attrBoundary) {
-        if (ch === attrBoundary) attrBoundary = "";//reset
+      if (ch === attrBoundary) attrBoundary = "";//reset
     } else if (ch === '"' || ch === "'") {
-        attrBoundary = ch;
+      attrBoundary = ch;
     } else if (ch === closingChar[0]) {
-      if(closingChar[1]){
-        if(xmlData[index + 1] === closingChar[1]){
+      if (closingChar[1]) {
+        if (xmlData[index + 1] === closingChar[1]) {
           return {
             data: tagExp,
             index: index
           }
         }
-      }else {
+      } else {
         return {
           data: tagExp,
           index: index
@@ -7813,33 +7998,33 @@ function tagExpWithClosingIndex(xmlData, i, closingChar = ">"){
   }
 }
 
-function findClosingIndex(xmlData, str, i, errMsg){
+function findClosingIndex(xmlData, str, i, errMsg) {
   const closingIndex = xmlData.indexOf(str, i);
-  if(closingIndex === -1){
+  if (closingIndex === -1) {
     throw new Error(errMsg)
-  }else {
+  } else {
     return closingIndex + str.length - 1;
   }
 }
 
-function readTagExp(xmlData,i, removeNSPrefix, closingChar = ">"){
-  const result = tagExpWithClosingIndex(xmlData, i+1, closingChar);
-  if(!result) return;
+function readTagExp(xmlData, i, removeNSPrefix, closingChar = ">") {
+  const result = tagExpWithClosingIndex(xmlData, i + 1, closingChar);
+  if (!result) return;
   let tagExp = result.data;
   const closeIndex = result.index;
   const separatorIndex = tagExp.search(/\s/);
   let tagName = tagExp;
   let attrExpPresent = true;
-  if(separatorIndex !== -1){//separate tag name and attributes expression
+  if (separatorIndex !== -1) {//separate tag name and attributes expression
     tagName = tagExp.substring(0, separatorIndex);
     tagExp = tagExp.substring(separatorIndex + 1).trimStart();
   }
 
   const rawTagName = tagName;
-  if(removeNSPrefix){
+  if (removeNSPrefix) {
     const colonIndex = tagName.indexOf(":");
-    if(colonIndex !== -1){
-      tagName = tagName.substr(colonIndex+1);
+    if (colonIndex !== -1) {
+      tagName = tagName.substr(colonIndex + 1);
       attrExpPresent = tagName !== result.data.substr(colonIndex + 1);
     }
   }
@@ -7858,47 +8043,47 @@ function readTagExp(xmlData,i, removeNSPrefix, closingChar = ">"){
  * @param {string} tagName 
  * @param {number} i 
  */
-function readStopNodeData(xmlData, tagName, i){
+function readStopNodeData(xmlData, tagName, i) {
   const startIndex = i;
   // Starting at 1 since we already have an open tag
   let openTagCount = 1;
 
   for (; i < xmlData.length; i++) {
-    if( xmlData[i] === "<"){ 
-      if (xmlData[i+1] === "/") {//close tag
-          const closeIndex = findClosingIndex(xmlData, ">", i, `${tagName} is not closed`);
-          let closeTagName = xmlData.substring(i+2,closeIndex).trim();
-          if(closeTagName === tagName){
-            openTagCount--;
-            if (openTagCount === 0) {
-              return {
-                tagContent: xmlData.substring(startIndex, i),
-                i : closeIndex
-              }
+    if (xmlData[i] === "<") {
+      if (xmlData[i + 1] === "/") {//close tag
+        const closeIndex = findClosingIndex(xmlData, ">", i, `${tagName} is not closed`);
+        let closeTagName = xmlData.substring(i + 2, closeIndex).trim();
+        if (closeTagName === tagName) {
+          openTagCount--;
+          if (openTagCount === 0) {
+            return {
+              tagContent: xmlData.substring(startIndex, i),
+              i: closeIndex
             }
-          }
-          i=closeIndex;
-        } else if(xmlData[i+1] === '?') { 
-          const closeIndex = findClosingIndex(xmlData, "?>", i+1, "StopNode is not closed.");
-          i=closeIndex;
-        } else if(xmlData.substr(i + 1, 3) === '!--') { 
-          const closeIndex = findClosingIndex(xmlData, "-->", i+3, "StopNode is not closed.");
-          i=closeIndex;
-        } else if(xmlData.substr(i + 1, 2) === '![') { 
-          const closeIndex = findClosingIndex(xmlData, "]]>", i, "StopNode is not closed.") - 2;
-          i=closeIndex;
-        } else {
-          const tagData = readTagExp(xmlData, i, '>');
-
-          if (tagData) {
-            const openTagName = tagData && tagData.tagName;
-            if (openTagName === tagName && tagData.tagExp[tagData.tagExp.length-1] !== "/") {
-              openTagCount++;
-            }
-            i=tagData.closeIndex;
           }
         }
+        i = closeIndex;
+      } else if (xmlData[i + 1] === '?') {
+        const closeIndex = findClosingIndex(xmlData, "?>", i + 1, "StopNode is not closed.");
+        i = closeIndex;
+      } else if (xmlData.substr(i + 1, 3) === '!--') {
+        const closeIndex = findClosingIndex(xmlData, "-->", i + 3, "StopNode is not closed.");
+        i = closeIndex;
+      } else if (xmlData.substr(i + 1, 2) === '![') {
+        const closeIndex = findClosingIndex(xmlData, "]]>", i, "StopNode is not closed.") - 2;
+        i = closeIndex;
+      } else {
+        const tagData = readTagExp(xmlData, i, '>');
+
+        if (tagData) {
+          const openTagName = tagData && tagData.tagName;
+          if (openTagName === tagName && tagData.tagExp[tagData.tagExp.length - 1] !== "/") {
+            openTagCount++;
+          }
+          i = tagData.closeIndex;
+        }
       }
+    }
   }//end for loop
 }
 
@@ -7906,8 +8091,8 @@ function parseValue(val, shouldParse, options) {
   if (shouldParse && typeof val === 'string') {
     //console.log(options)
     const newval = val.trim();
-    if(newval === 'true' ) return true;
-    else if(newval === 'false' ) return false;
+    if (newval === 'true') return true;
+    else if (newval === 'false') return false;
     else return toNumber(val, options);
   } else {
     if (isExist(val)) {
@@ -7918,13 +8103,13 @@ function parseValue(val, shouldParse, options) {
   }
 }
 
-function fromCodePoint(str, base, prefix){
+function fromCodePoint(str, base, prefix) {
   const codePoint = Number.parseInt(str, base);
 
   if (codePoint >= 0 && codePoint <= 0x10FFFF) {
-      return String.fromCodePoint(codePoint);
+    return String.fromCodePoint(codePoint);
   } else {
-      return prefix +str + ";";
+    return prefix + str + ";";
   }
 }
 
@@ -8541,7 +8726,7 @@ class AwsQueryProtocol extends RpcProtocol {
     }
     async handleError(operationSchema, context, response, dataObject, metadata) {
         const errorIdentifier = this.loadQueryErrorCode(response, dataObject) ?? "Unknown";
-        const errorData = this.loadQueryError(dataObject);
+        const errorData = this.loadQueryError(dataObject) ?? {};
         const message = this.loadQueryErrorMessage(dataObject);
         errorData.message = message;
         errorData.Error = {
@@ -9021,7 +9206,7 @@ const getSSOTokenFromFile = async (id) => {
         return tokenIntercept[id];
     }
     const ssoTokenFilepath = getSSOTokenFilepath(id);
-    const ssoTokenText = await fs.readFile(ssoTokenFilepath, "utf8");
+    const ssoTokenText = await promises.readFile(ssoTokenFilepath, "utf8");
     return JSON.parse(ssoTokenText);
 };
 
@@ -9108,7 +9293,7 @@ const readFile = (path, options) => {
         return fileIntercept[path];
     }
     if (!filePromises[path] || options?.ignoreCache) {
-        filePromises[path] = promises.readFile(path, "utf8");
+        filePromises[path] = fs.readFile(path, "utf8");
     }
     return filePromises[path];
 };
@@ -9931,9 +10116,9 @@ const commonParams$4 = {
     UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" },
 };
 
-var version$2 = "3.992.0";
-var packageInfo$2 = {
-	version: version$2};
+var version$1 = "3.1000.0";
+var packageInfo$1 = {
+	version: version$1};
 
 const ENV_KEY = "AWS_ACCESS_KEY_ID";
 const ENV_SECRET = "AWS_SECRET_ACCESS_KEY";
@@ -10121,19 +10306,71 @@ const defaultProvider = (init = {}) => memoizeChain([
 ], credentialsTreatedAsExpired);
 const credentialsTreatedAsExpired = (credentials) => credentials?.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000;
 
+const getRuntimeUserAgentPair = () => {
+    const runtimesToCheck = ["deno", "bun", "llrt"];
+    for (const runtime of runtimesToCheck) {
+        if (node_process.versions[runtime]) {
+            return [`md/${runtime}`, node_process.versions[runtime]];
+        }
+    }
+    return ["md/nodejs", node_process.versions.node];
+};
+
+const getTypeScriptPackageJsonPath = (dirname = "") => {
+    let nodeModulesPath;
+    const normalizedPath = node_path.normalize(dirname);
+    const parts = normalizedPath.split(node_path.sep);
+    const nodeModulesIndex = parts.indexOf("node_modules");
+    if (nodeModulesIndex !== -1) {
+        nodeModulesPath = parts.slice(0, nodeModulesIndex).join(node_path.sep);
+    }
+    else {
+        nodeModulesPath = dirname;
+    }
+    return node_path.join(nodeModulesPath, "node_modules", "typescript", "package.json");
+};
+
+let tscVersion;
+const getTypeScriptUserAgentPair = async () => {
+    if (tscVersion === null) {
+        return undefined;
+    }
+    else if (typeof tscVersion === "string") {
+        return ["md/tsc", tscVersion];
+    }
+    try {
+        const packageJson = await fs.readFile(getTypeScriptPackageJsonPath(__dirname), "utf-8");
+        const { version } = JSON.parse(packageJson);
+        if (typeof version !== "string") {
+            tscVersion = null;
+            return undefined;
+        }
+        tscVersion = version;
+        return ["md/tsc", tscVersion];
+    }
+    catch {
+        tscVersion = null;
+    }
+};
+
 const isCrtAvailable = () => {
     return null;
 };
 
 const createDefaultUserAgentProvider = ({ serviceId, clientVersion }) => {
+    const runtimeUserAgentPair = getRuntimeUserAgentPair();
     return async (config) => {
         const sections = [
             ["aws-sdk-js", clientVersion],
             ["ua", "2.1"],
-            [`os/${os.platform()}`, os.release()],
+            [`os/${node_os.platform()}`, node_os.release()],
             ["lang/js"],
-            ["md/nodejs", `${process$1.versions.node}`],
+            runtimeUserAgentPair,
         ];
+        const typescriptUserAgentPair = await getTypeScriptUserAgentPair();
+        if (typescriptUserAgentPair) {
+            sections.push(typescriptUserAgentPair);
+        }
         const crtAvailable = isCrtAvailable();
         if (crtAvailable) {
             sections.push(crtAvailable);
@@ -10141,8 +10378,8 @@ const createDefaultUserAgentProvider = ({ serviceId, clientVersion }) => {
         if (serviceId) {
             sections.push([`api/${serviceId}`, clientVersion]);
         }
-        if (process$1.env.AWS_EXECUTION_ENV) {
-            sections.push([`exec-env/${process$1.env.AWS_EXECUTION_ENV}`]);
+        if (node_process.env.AWS_EXECUTION_ENV) {
+            sections.push([`exec-env/${node_process.env.AWS_EXECUTION_ENV}`]);
         }
         const appId = await config?.userAgentAppId?.();
         const resolvedUserAgent = appId ? [...sections, [`app/${appId}`]] : [...sections];
@@ -10286,364 +10523,6 @@ const inferPhysicalRegion = async () => {
         }
     }
 };
-
-const isVirtualHostableS3Bucket = (value, allowSubDomains = false) => {
-    if (allowSubDomains) {
-        for (const label of value.split(".")) {
-            if (!isVirtualHostableS3Bucket(label)) {
-                return false;
-            }
-        }
-        return true;
-    }
-    if (!isValidHostLabel(value)) {
-        return false;
-    }
-    if (value.length < 3 || value.length > 63) {
-        return false;
-    }
-    if (value !== value.toLowerCase()) {
-        return false;
-    }
-    if (isIpAddress(value)) {
-        return false;
-    }
-    return true;
-};
-
-const ARN_DELIMITER = ":";
-const RESOURCE_DELIMITER = "/";
-const parseArn = (value) => {
-    const segments = value.split(ARN_DELIMITER);
-    if (segments.length < 6)
-        return null;
-    const [arn, partition, service, region, accountId, ...resourcePath] = segments;
-    if (arn !== "arn" || partition === "" || service === "" || resourcePath.join(ARN_DELIMITER) === "")
-        return null;
-    const resourceId = resourcePath.map((resource) => resource.split(RESOURCE_DELIMITER)).flat();
-    return {
-        partition,
-        service,
-        region,
-        accountId,
-        resourceId,
-    };
-};
-
-var partitions = [
-	{
-		id: "aws",
-		outputs: {
-			dnsSuffix: "amazonaws.com",
-			dualStackDnsSuffix: "api.aws",
-			implicitGlobalRegion: "us-east-1",
-			name: "aws",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^(us|eu|ap|sa|ca|me|af|il|mx)\\-\\w+\\-\\d+$",
-		regions: {
-			"af-south-1": {
-				description: "Africa (Cape Town)"
-			},
-			"ap-east-1": {
-				description: "Asia Pacific (Hong Kong)"
-			},
-			"ap-east-2": {
-				description: "Asia Pacific (Taipei)"
-			},
-			"ap-northeast-1": {
-				description: "Asia Pacific (Tokyo)"
-			},
-			"ap-northeast-2": {
-				description: "Asia Pacific (Seoul)"
-			},
-			"ap-northeast-3": {
-				description: "Asia Pacific (Osaka)"
-			},
-			"ap-south-1": {
-				description: "Asia Pacific (Mumbai)"
-			},
-			"ap-south-2": {
-				description: "Asia Pacific (Hyderabad)"
-			},
-			"ap-southeast-1": {
-				description: "Asia Pacific (Singapore)"
-			},
-			"ap-southeast-2": {
-				description: "Asia Pacific (Sydney)"
-			},
-			"ap-southeast-3": {
-				description: "Asia Pacific (Jakarta)"
-			},
-			"ap-southeast-4": {
-				description: "Asia Pacific (Melbourne)"
-			},
-			"ap-southeast-5": {
-				description: "Asia Pacific (Malaysia)"
-			},
-			"ap-southeast-6": {
-				description: "Asia Pacific (New Zealand)"
-			},
-			"ap-southeast-7": {
-				description: "Asia Pacific (Thailand)"
-			},
-			"aws-global": {
-				description: "aws global region"
-			},
-			"ca-central-1": {
-				description: "Canada (Central)"
-			},
-			"ca-west-1": {
-				description: "Canada West (Calgary)"
-			},
-			"eu-central-1": {
-				description: "Europe (Frankfurt)"
-			},
-			"eu-central-2": {
-				description: "Europe (Zurich)"
-			},
-			"eu-north-1": {
-				description: "Europe (Stockholm)"
-			},
-			"eu-south-1": {
-				description: "Europe (Milan)"
-			},
-			"eu-south-2": {
-				description: "Europe (Spain)"
-			},
-			"eu-west-1": {
-				description: "Europe (Ireland)"
-			},
-			"eu-west-2": {
-				description: "Europe (London)"
-			},
-			"eu-west-3": {
-				description: "Europe (Paris)"
-			},
-			"il-central-1": {
-				description: "Israel (Tel Aviv)"
-			},
-			"me-central-1": {
-				description: "Middle East (UAE)"
-			},
-			"me-south-1": {
-				description: "Middle East (Bahrain)"
-			},
-			"mx-central-1": {
-				description: "Mexico (Central)"
-			},
-			"sa-east-1": {
-				description: "South America (Sao Paulo)"
-			},
-			"us-east-1": {
-				description: "US East (N. Virginia)"
-			},
-			"us-east-2": {
-				description: "US East (Ohio)"
-			},
-			"us-west-1": {
-				description: "US West (N. California)"
-			},
-			"us-west-2": {
-				description: "US West (Oregon)"
-			}
-		}
-	},
-	{
-		id: "aws-cn",
-		outputs: {
-			dnsSuffix: "amazonaws.com.cn",
-			dualStackDnsSuffix: "api.amazonwebservices.com.cn",
-			implicitGlobalRegion: "cn-northwest-1",
-			name: "aws-cn",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^cn\\-\\w+\\-\\d+$",
-		regions: {
-			"aws-cn-global": {
-				description: "aws-cn global region"
-			},
-			"cn-north-1": {
-				description: "China (Beijing)"
-			},
-			"cn-northwest-1": {
-				description: "China (Ningxia)"
-			}
-		}
-	},
-	{
-		id: "aws-eusc",
-		outputs: {
-			dnsSuffix: "amazonaws.eu",
-			dualStackDnsSuffix: "api.amazonwebservices.eu",
-			implicitGlobalRegion: "eusc-de-east-1",
-			name: "aws-eusc",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^eusc\\-(de)\\-\\w+\\-\\d+$",
-		regions: {
-			"eusc-de-east-1": {
-				description: "AWS European Sovereign Cloud (Germany)"
-			}
-		}
-	},
-	{
-		id: "aws-iso",
-		outputs: {
-			dnsSuffix: "c2s.ic.gov",
-			dualStackDnsSuffix: "api.aws.ic.gov",
-			implicitGlobalRegion: "us-iso-east-1",
-			name: "aws-iso",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^us\\-iso\\-\\w+\\-\\d+$",
-		regions: {
-			"aws-iso-global": {
-				description: "aws-iso global region"
-			},
-			"us-iso-east-1": {
-				description: "US ISO East"
-			},
-			"us-iso-west-1": {
-				description: "US ISO WEST"
-			}
-		}
-	},
-	{
-		id: "aws-iso-b",
-		outputs: {
-			dnsSuffix: "sc2s.sgov.gov",
-			dualStackDnsSuffix: "api.aws.scloud",
-			implicitGlobalRegion: "us-isob-east-1",
-			name: "aws-iso-b",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^us\\-isob\\-\\w+\\-\\d+$",
-		regions: {
-			"aws-iso-b-global": {
-				description: "aws-iso-b global region"
-			},
-			"us-isob-east-1": {
-				description: "US ISOB East (Ohio)"
-			},
-			"us-isob-west-1": {
-				description: "US ISOB West"
-			}
-		}
-	},
-	{
-		id: "aws-iso-e",
-		outputs: {
-			dnsSuffix: "cloud.adc-e.uk",
-			dualStackDnsSuffix: "api.cloud-aws.adc-e.uk",
-			implicitGlobalRegion: "eu-isoe-west-1",
-			name: "aws-iso-e",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^eu\\-isoe\\-\\w+\\-\\d+$",
-		regions: {
-			"aws-iso-e-global": {
-				description: "aws-iso-e global region"
-			},
-			"eu-isoe-west-1": {
-				description: "EU ISOE West"
-			}
-		}
-	},
-	{
-		id: "aws-iso-f",
-		outputs: {
-			dnsSuffix: "csp.hci.ic.gov",
-			dualStackDnsSuffix: "api.aws.hci.ic.gov",
-			implicitGlobalRegion: "us-isof-south-1",
-			name: "aws-iso-f",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^us\\-isof\\-\\w+\\-\\d+$",
-		regions: {
-			"aws-iso-f-global": {
-				description: "aws-iso-f global region"
-			},
-			"us-isof-east-1": {
-				description: "US ISOF EAST"
-			},
-			"us-isof-south-1": {
-				description: "US ISOF SOUTH"
-			}
-		}
-	},
-	{
-		id: "aws-us-gov",
-		outputs: {
-			dnsSuffix: "amazonaws.com",
-			dualStackDnsSuffix: "api.aws",
-			implicitGlobalRegion: "us-gov-west-1",
-			name: "aws-us-gov",
-			supportsDualStack: true,
-			supportsFIPS: true
-		},
-		regionRegex: "^us\\-gov\\-\\w+\\-\\d+$",
-		regions: {
-			"aws-us-gov-global": {
-				description: "aws-us-gov global region"
-			},
-			"us-gov-east-1": {
-				description: "AWS GovCloud (US-East)"
-			},
-			"us-gov-west-1": {
-				description: "AWS GovCloud (US-West)"
-			}
-		}
-	}
-];
-var partitionsInfo = {
-	partitions: partitions};
-
-let selectedPartitionsInfo = partitionsInfo;
-const partition = (value) => {
-    const { partitions } = selectedPartitionsInfo;
-    for (const partition of partitions) {
-        const { regions, outputs } = partition;
-        for (const [region, regionData] of Object.entries(regions)) {
-            if (region === value) {
-                return {
-                    ...outputs,
-                    ...regionData,
-                };
-            }
-        }
-    }
-    for (const partition of partitions) {
-        const { regionRegex, outputs } = partition;
-        if (new RegExp(regionRegex).test(value)) {
-            return {
-                ...outputs,
-            };
-        }
-    }
-    const DEFAULT_PARTITION = partitions.find((partition) => partition.id === "aws");
-    if (!DEFAULT_PARTITION) {
-        throw new Error("Provided region was not found in the partition array or regex," +
-            " and default partition with id 'aws' doesn't exist.");
-    }
-    return {
-        ...DEFAULT_PARTITION.outputs,
-    };
-};
-
-const awsEndpointFunctions = {
-    isVirtualHostableS3Bucket: isVirtualHostableS3Bucket,
-    parseArn: parseArn,
-    partition: partition,
-};
-customEndpointFunctions.aws = awsEndpointFunctions;
 
 const F$1 = "required", G$1 = "type", H$1 = "fn", I$1 = "argv", J$1 = "ref";
 const a$4 = false, b$4 = true, c$4 = "booleanEquals", d$4 = "stringEquals", e$4 = "sigv4", f$4 = "sts", g$4 = "us-east-1", h$4 = "endpoint", i$4 = "https://sts.{Region}.{PartitionResult#dnsSuffix}", j$4 = "tree", k$4 = "error", l$4 = "getAttr", m$4 = { [F$1]: false, [G$1]: "string" }, n$4 = { [F$1]: true, "default": false, [G$1]: "boolean" }, o$4 = { [J$1]: "Endpoint" }, p$4 = { [H$1]: "isSet", [I$1]: [{ [J$1]: "Region" }] }, q$4 = { [J$1]: "Region" }, r$4 = { [H$1]: "aws.partition", [I$1]: [q$4], "assign": "PartitionResult" }, s$4 = { [J$1]: "UseFIPS" }, t$4 = { [J$1]: "UseDualStack" }, u$4 = { "url": "https://sts.amazonaws.com", "properties": { "authSchemes": [{ "name": e$4, "signingName": f$4, "signingRegion": g$4 }] }, "headers": {} }, v$4 = {}, w$4 = { "conditions": [{ [H$1]: d$4, [I$1]: [q$4, "aws-global"] }], [h$4]: u$4, [G$1]: h$4 }, x$4 = { [H$1]: c$4, [I$1]: [s$4, true] }, y$1 = { [H$1]: c$4, [I$1]: [t$4, true] }, z$1 = { [H$1]: l$4, [I$1]: [{ [J$1]: "PartitionResult" }, "supportsFIPS"] }, A$1 = { [J$1]: "PartitionResult" }, B$1 = { [H$1]: c$4, [I$1]: [true, { [H$1]: l$4, [I$1]: [A$1, "supportsDualStack"] }] }, C$1 = [{ [H$1]: "isSet", [I$1]: [o$4] }], D$1 = [x$4], E$1 = [y$1];
@@ -10988,7 +10867,7 @@ const getRuntimeConfig$8 = (config) => {
         authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
         bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
         credentialDefaultProvider: config?.credentialDefaultProvider ?? defaultProvider,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$2.version }),
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
         httpAuthSchemes: config?.httpAuthSchemes ?? [
             {
                 schemeId: "aws.auth#sigv4",
@@ -11976,7 +11855,7 @@ const validateTokenKey = (key, value, forRefresh = false) => {
     }
 };
 
-const { writeFile } = fs$1.promises;
+const { writeFile } = node_fs.promises;
 const writeSSOTokenToFile = (id, ssoToken) => {
     const tokenFilepath = getSSOTokenFilepath(id);
     const tokenString = JSON.stringify(ssoToken, null, 2);
@@ -12770,7 +12649,7 @@ const resolveProcessCredentials = async (profileName, profiles, logger) => {
     if (profiles[profileName]) {
         const credentialProcess = profile["credential_process"];
         if (credentialProcess !== undefined) {
-            const execPromise = util.promisify(externalDataInterceptor?.getTokenRecord?.().exec ?? child_process.exec);
+            const execPromise = node_util.promisify(externalDataInterceptor?.getTokenRecord?.().exec ?? node_child_process.exec);
             try {
                 const { stdout } = await execPromise(credentialProcess);
                 let data;
@@ -12852,7 +12731,7 @@ const fromTokenFile = (init = {}) => async (awsIdentityProperties) => {
     const credentials = await fromWebToken({
         ...init,
         webIdentityToken: externalDataInterceptor?.getTokenRecord?.()[webIdentityTokenFile] ??
-            fs$1.readFileSync(webIdentityTokenFile, { encoding: "ascii" }),
+            node_fs.readFileSync(webIdentityTokenFile, { encoding: "ascii" }),
         roleArn,
         roleSessionName,
     })(awsIdentityProperties);
@@ -12931,13 +12810,111 @@ const commonParams$3 = {
     UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" },
 };
 
-var version$1 = "3.990.0";
-var packageInfo$1 = {
-	version: version$1};
+var version = "3.996.3";
+var packageInfo = {
+	version: version};
 
 const u$3 = "required", v$3 = "fn", w$3 = "argv", x$3 = "ref";
-const a$3 = true, b$3 = "isSet", c$3 = "booleanEquals", d$3 = "error", e$3 = "endpoint", f$3 = "tree", g$3 = "PartitionResult", h$3 = "getAttr", i$3 = { [u$3]: false, "type": "string" }, j$3 = { [u$3]: true, "default": false, "type": "boolean" }, k$3 = { [x$3]: "Endpoint" }, l$3 = { [v$3]: c$3, [w$3]: [{ [x$3]: "UseFIPS" }, true] }, m$3 = { [v$3]: c$3, [w$3]: [{ [x$3]: "UseDualStack" }, true] }, n$3 = {}, o$3 = { [v$3]: h$3, [w$3]: [{ [x$3]: g$3 }, "supportsFIPS"] }, p$3 = { [x$3]: g$3 }, q$3 = { [v$3]: c$3, [w$3]: [true, { [v$3]: h$3, [w$3]: [p$3, "supportsDualStack"] }] }, r$3 = [l$3], s$3 = [m$3], t$3 = [{ [x$3]: "Region" }];
-const _data$3 = { parameters: { Region: i$3, UseDualStack: j$3, UseFIPS: j$3, Endpoint: i$3 }, rules: [{ conditions: [{ [v$3]: b$3, [w$3]: [k$3] }], rules: [{ conditions: r$3, error: "Invalid Configuration: FIPS and custom endpoint are not supported", type: d$3 }, { conditions: s$3, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", type: d$3 }, { endpoint: { url: k$3, properties: n$3, headers: n$3 }, type: e$3 }], type: f$3 }, { conditions: [{ [v$3]: b$3, [w$3]: t$3 }], rules: [{ conditions: [{ [v$3]: "aws.partition", [w$3]: t$3, assign: g$3 }], rules: [{ conditions: [l$3, m$3], rules: [{ conditions: [{ [v$3]: c$3, [w$3]: [a$3, o$3] }, q$3], rules: [{ endpoint: { url: "https://oidc-fips.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: n$3, headers: n$3 }, type: e$3 }], type: f$3 }, { error: "FIPS and DualStack are enabled, but this partition does not support one or both", type: d$3 }], type: f$3 }, { conditions: r$3, rules: [{ conditions: [{ [v$3]: c$3, [w$3]: [o$3, a$3] }], rules: [{ conditions: [{ [v$3]: "stringEquals", [w$3]: [{ [v$3]: h$3, [w$3]: [p$3, "name"] }, "aws-us-gov"] }], endpoint: { url: "https://oidc.{Region}.amazonaws.com", properties: n$3, headers: n$3 }, type: e$3 }, { endpoint: { url: "https://oidc-fips.{Region}.{PartitionResult#dnsSuffix}", properties: n$3, headers: n$3 }, type: e$3 }], type: f$3 }, { error: "FIPS is enabled but this partition does not support FIPS", type: d$3 }], type: f$3 }, { conditions: s$3, rules: [{ conditions: [q$3], rules: [{ endpoint: { url: "https://oidc.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: n$3, headers: n$3 }, type: e$3 }], type: f$3 }, { error: "DualStack is enabled but this partition does not support DualStack", type: d$3 }], type: f$3 }, { endpoint: { url: "https://oidc.{Region}.{PartitionResult#dnsSuffix}", properties: n$3, headers: n$3 }, type: e$3 }], type: f$3 }], type: f$3 }, { error: "Invalid Configuration: Missing Region", type: d$3 }] };
+const a$3 = true, b$3 = "isSet", c$3 = "booleanEquals", d$3 = "error", e$3 = "endpoint", f$3 = "tree", g$3 = "PartitionResult", h$3 = "getAttr", i$3 = { [u$3]: false, type: "string" }, j$3 = { [u$3]: true, default: false, type: "boolean" }, k$3 = { [x$3]: "Endpoint" }, l$3 = { [v$3]: c$3, [w$3]: [{ [x$3]: "UseFIPS" }, true] }, m$3 = { [v$3]: c$3, [w$3]: [{ [x$3]: "UseDualStack" }, true] }, n$3 = {}, o$3 = { [v$3]: h$3, [w$3]: [{ [x$3]: g$3 }, "supportsFIPS"] }, p$3 = { [x$3]: g$3 }, q$3 = { [v$3]: c$3, [w$3]: [true, { [v$3]: h$3, [w$3]: [p$3, "supportsDualStack"] }] }, r$3 = [l$3], s$3 = [m$3], t$3 = [{ [x$3]: "Region" }];
+const _data$3 = {
+    parameters: { Region: i$3, UseDualStack: j$3, UseFIPS: j$3, Endpoint: i$3 },
+    rules: [
+        {
+            conditions: [{ [v$3]: b$3, [w$3]: [k$3] }],
+            rules: [
+                { conditions: r$3, error: "Invalid Configuration: FIPS and custom endpoint are not supported", type: d$3 },
+                { conditions: s$3, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", type: d$3 },
+                { endpoint: { url: k$3, properties: n$3, headers: n$3 }, type: e$3 },
+            ],
+            type: f$3,
+        },
+        {
+            conditions: [{ [v$3]: b$3, [w$3]: t$3 }],
+            rules: [
+                {
+                    conditions: [{ [v$3]: "aws.partition", [w$3]: t$3, assign: g$3 }],
+                    rules: [
+                        {
+                            conditions: [l$3, m$3],
+                            rules: [
+                                {
+                                    conditions: [{ [v$3]: c$3, [w$3]: [a$3, o$3] }, q$3],
+                                    rules: [
+                                        {
+                                            endpoint: {
+                                                url: "https://oidc-fips.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                properties: n$3,
+                                                headers: n$3,
+                                            },
+                                            type: e$3,
+                                        },
+                                    ],
+                                    type: f$3,
+                                },
+                                { error: "FIPS and DualStack are enabled, but this partition does not support one or both", type: d$3 },
+                            ],
+                            type: f$3,
+                        },
+                        {
+                            conditions: r$3,
+                            rules: [
+                                {
+                                    conditions: [{ [v$3]: c$3, [w$3]: [o$3, a$3] }],
+                                    rules: [
+                                        {
+                                            conditions: [{ [v$3]: "stringEquals", [w$3]: [{ [v$3]: h$3, [w$3]: [p$3, "name"] }, "aws-us-gov"] }],
+                                            endpoint: { url: "https://oidc.{Region}.amazonaws.com", properties: n$3, headers: n$3 },
+                                            type: e$3,
+                                        },
+                                        {
+                                            endpoint: {
+                                                url: "https://oidc-fips.{Region}.{PartitionResult#dnsSuffix}",
+                                                properties: n$3,
+                                                headers: n$3,
+                                            },
+                                            type: e$3,
+                                        },
+                                    ],
+                                    type: f$3,
+                                },
+                                { error: "FIPS is enabled but this partition does not support FIPS", type: d$3 },
+                            ],
+                            type: f$3,
+                        },
+                        {
+                            conditions: s$3,
+                            rules: [
+                                {
+                                    conditions: [q$3],
+                                    rules: [
+                                        {
+                                            endpoint: {
+                                                url: "https://oidc.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                properties: n$3,
+                                                headers: n$3,
+                                            },
+                                            type: e$3,
+                                        },
+                                    ],
+                                    type: f$3,
+                                },
+                                { error: "DualStack is enabled but this partition does not support DualStack", type: d$3 },
+                            ],
+                            type: f$3,
+                        },
+                        {
+                            endpoint: { url: "https://oidc.{Region}.{PartitionResult#dnsSuffix}", properties: n$3, headers: n$3 },
+                            type: e$3,
+                        },
+                    ],
+                    type: f$3,
+                },
+            ],
+            type: f$3,
+        },
+        { error: "Invalid Configuration: Missing Region", type: d$3 },
+    ],
+};
 const ruleSet$3 = _data$3;
 
 const cache$3 = new EndpointCache({
@@ -12950,7 +12927,7 @@ const defaultEndpointResolver$3 = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions$1;
+customEndpointFunctions.aws = awsEndpointFunctions;
 
 class SSOOIDCServiceException extends ServiceException {
     constructor(options) {
@@ -13328,7 +13305,7 @@ const getRuntimeConfig$6 = (config) => {
         authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
         bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
         defaultUserAgentProvider: config?.defaultUserAgentProvider ??
-            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
+            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo.version }),
         maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
         region: config?.region ??
             loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
@@ -13477,9 +13454,10 @@ var index$2 = /*#__PURE__*/Object.freeze({
 const defaultSSOHttpAuthSchemeParametersProvider = async (config, context, input) => {
     return {
         operation: getSmithyContext(context).operation,
-        region: await normalizeProvider$1(config.region)() || (() => {
-            throw new Error("expected `region` to be configured for `aws.auth#sigv4`");
-        })(),
+        region: (await normalizeProvider$1(config.region)()) ||
+            (() => {
+                throw new Error("expected `region` to be configured for `aws.auth#sigv4`");
+            })(),
     };
 };
 function createAwsAuthSigv4HttpAuthOption$2(authParameters) {
@@ -13505,26 +13483,10 @@ function createSmithyApiNoAuthHttpAuthOption$2(authParameters) {
 const defaultSSOHttpAuthSchemeProvider = (authParameters) => {
     const options = [];
     switch (authParameters.operation) {
-        case "GetRoleCredentials":
-            {
-                options.push(createSmithyApiNoAuthHttpAuthOption$2());
-                break;
-            }
-        case "ListAccountRoles":
-            {
-                options.push(createSmithyApiNoAuthHttpAuthOption$2());
-                break;
-            }
-        case "ListAccounts":
-            {
-                options.push(createSmithyApiNoAuthHttpAuthOption$2());
-                break;
-            }
-        case "Logout":
-            {
-                options.push(createSmithyApiNoAuthHttpAuthOption$2());
-                break;
-            }
+        case "GetRoleCredentials": {
+            options.push(createSmithyApiNoAuthHttpAuthOption$2());
+            break;
+        }
         default: {
             options.push(createAwsAuthSigv4HttpAuthOption$2(authParameters));
         }
@@ -13552,13 +13514,107 @@ const commonParams$2 = {
     UseDualStack: { type: "builtInParams", name: "useDualstackEndpoint" },
 };
 
-var version = "3.990.0";
-var packageInfo = {
-	version: version};
-
 const u$2 = "required", v$2 = "fn", w$2 = "argv", x$2 = "ref";
-const a$2 = true, b$2 = "isSet", c$2 = "booleanEquals", d$2 = "error", e$2 = "endpoint", f$2 = "tree", g$2 = "PartitionResult", h$2 = "getAttr", i$2 = { [u$2]: false, "type": "string" }, j$2 = { [u$2]: true, "default": false, "type": "boolean" }, k$2 = { [x$2]: "Endpoint" }, l$2 = { [v$2]: c$2, [w$2]: [{ [x$2]: "UseFIPS" }, true] }, m$2 = { [v$2]: c$2, [w$2]: [{ [x$2]: "UseDualStack" }, true] }, n$2 = {}, o$2 = { [v$2]: h$2, [w$2]: [{ [x$2]: g$2 }, "supportsFIPS"] }, p$2 = { [x$2]: g$2 }, q$2 = { [v$2]: c$2, [w$2]: [true, { [v$2]: h$2, [w$2]: [p$2, "supportsDualStack"] }] }, r$2 = [l$2], s$2 = [m$2], t$2 = [{ [x$2]: "Region" }];
-const _data$2 = { parameters: { Region: i$2, UseDualStack: j$2, UseFIPS: j$2, Endpoint: i$2 }, rules: [{ conditions: [{ [v$2]: b$2, [w$2]: [k$2] }], rules: [{ conditions: r$2, error: "Invalid Configuration: FIPS and custom endpoint are not supported", type: d$2 }, { conditions: s$2, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", type: d$2 }, { endpoint: { url: k$2, properties: n$2, headers: n$2 }, type: e$2 }], type: f$2 }, { conditions: [{ [v$2]: b$2, [w$2]: t$2 }], rules: [{ conditions: [{ [v$2]: "aws.partition", [w$2]: t$2, assign: g$2 }], rules: [{ conditions: [l$2, m$2], rules: [{ conditions: [{ [v$2]: c$2, [w$2]: [a$2, o$2] }, q$2], rules: [{ endpoint: { url: "https://portal.sso-fips.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: n$2, headers: n$2 }, type: e$2 }], type: f$2 }, { error: "FIPS and DualStack are enabled, but this partition does not support one or both", type: d$2 }], type: f$2 }, { conditions: r$2, rules: [{ conditions: [{ [v$2]: c$2, [w$2]: [o$2, a$2] }], rules: [{ conditions: [{ [v$2]: "stringEquals", [w$2]: [{ [v$2]: h$2, [w$2]: [p$2, "name"] }, "aws-us-gov"] }], endpoint: { url: "https://portal.sso.{Region}.amazonaws.com", properties: n$2, headers: n$2 }, type: e$2 }, { endpoint: { url: "https://portal.sso-fips.{Region}.{PartitionResult#dnsSuffix}", properties: n$2, headers: n$2 }, type: e$2 }], type: f$2 }, { error: "FIPS is enabled but this partition does not support FIPS", type: d$2 }], type: f$2 }, { conditions: s$2, rules: [{ conditions: [q$2], rules: [{ endpoint: { url: "https://portal.sso.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: n$2, headers: n$2 }, type: e$2 }], type: f$2 }, { error: "DualStack is enabled but this partition does not support DualStack", type: d$2 }], type: f$2 }, { endpoint: { url: "https://portal.sso.{Region}.{PartitionResult#dnsSuffix}", properties: n$2, headers: n$2 }, type: e$2 }], type: f$2 }], type: f$2 }, { error: "Invalid Configuration: Missing Region", type: d$2 }] };
+const a$2 = true, b$2 = "isSet", c$2 = "booleanEquals", d$2 = "error", e$2 = "endpoint", f$2 = "tree", g$2 = "PartitionResult", h$2 = "getAttr", i$2 = { [u$2]: false, type: "string" }, j$2 = { [u$2]: true, default: false, type: "boolean" }, k$2 = { [x$2]: "Endpoint" }, l$2 = { [v$2]: c$2, [w$2]: [{ [x$2]: "UseFIPS" }, true] }, m$2 = { [v$2]: c$2, [w$2]: [{ [x$2]: "UseDualStack" }, true] }, n$2 = {}, o$2 = { [v$2]: h$2, [w$2]: [{ [x$2]: g$2 }, "supportsFIPS"] }, p$2 = { [x$2]: g$2 }, q$2 = { [v$2]: c$2, [w$2]: [true, { [v$2]: h$2, [w$2]: [p$2, "supportsDualStack"] }] }, r$2 = [l$2], s$2 = [m$2], t$2 = [{ [x$2]: "Region" }];
+const _data$2 = {
+    parameters: { Region: i$2, UseDualStack: j$2, UseFIPS: j$2, Endpoint: i$2 },
+    rules: [
+        {
+            conditions: [{ [v$2]: b$2, [w$2]: [k$2] }],
+            rules: [
+                { conditions: r$2, error: "Invalid Configuration: FIPS and custom endpoint are not supported", type: d$2 },
+                { conditions: s$2, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", type: d$2 },
+                { endpoint: { url: k$2, properties: n$2, headers: n$2 }, type: e$2 },
+            ],
+            type: f$2,
+        },
+        {
+            conditions: [{ [v$2]: b$2, [w$2]: t$2 }],
+            rules: [
+                {
+                    conditions: [{ [v$2]: "aws.partition", [w$2]: t$2, assign: g$2 }],
+                    rules: [
+                        {
+                            conditions: [l$2, m$2],
+                            rules: [
+                                {
+                                    conditions: [{ [v$2]: c$2, [w$2]: [a$2, o$2] }, q$2],
+                                    rules: [
+                                        {
+                                            endpoint: {
+                                                url: "https://portal.sso-fips.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                properties: n$2,
+                                                headers: n$2,
+                                            },
+                                            type: e$2,
+                                        },
+                                    ],
+                                    type: f$2,
+                                },
+                                { error: "FIPS and DualStack are enabled, but this partition does not support one or both", type: d$2 },
+                            ],
+                            type: f$2,
+                        },
+                        {
+                            conditions: r$2,
+                            rules: [
+                                {
+                                    conditions: [{ [v$2]: c$2, [w$2]: [o$2, a$2] }],
+                                    rules: [
+                                        {
+                                            conditions: [{ [v$2]: "stringEquals", [w$2]: [{ [v$2]: h$2, [w$2]: [p$2, "name"] }, "aws-us-gov"] }],
+                                            endpoint: { url: "https://portal.sso.{Region}.amazonaws.com", properties: n$2, headers: n$2 },
+                                            type: e$2,
+                                        },
+                                        {
+                                            endpoint: {
+                                                url: "https://portal.sso-fips.{Region}.{PartitionResult#dnsSuffix}",
+                                                properties: n$2,
+                                                headers: n$2,
+                                            },
+                                            type: e$2,
+                                        },
+                                    ],
+                                    type: f$2,
+                                },
+                                { error: "FIPS is enabled but this partition does not support FIPS", type: d$2 },
+                            ],
+                            type: f$2,
+                        },
+                        {
+                            conditions: s$2,
+                            rules: [
+                                {
+                                    conditions: [q$2],
+                                    rules: [
+                                        {
+                                            endpoint: {
+                                                url: "https://portal.sso.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                properties: n$2,
+                                                headers: n$2,
+                                            },
+                                            type: e$2,
+                                        },
+                                    ],
+                                    type: f$2,
+                                },
+                                { error: "DualStack is enabled but this partition does not support DualStack", type: d$2 },
+                            ],
+                            type: f$2,
+                        },
+                        {
+                            endpoint: { url: "https://portal.sso.{Region}.{PartitionResult#dnsSuffix}", properties: n$2, headers: n$2 },
+                            type: e$2,
+                        },
+                    ],
+                    type: f$2,
+                },
+            ],
+            type: f$2,
+        },
+        { error: "Invalid Configuration: Missing Region", type: d$2 },
+    ],
+};
 const ruleSet$2 = _data$2;
 
 const cache$2 = new EndpointCache({
@@ -13571,7 +13627,7 @@ const defaultEndpointResolver$2 = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions$1;
+customEndpointFunctions.aws = awsEndpointFunctions;
 
 class SSOServiceException extends ServiceException {
     constructor(options) {
@@ -13664,54 +13720,54 @@ const _s_registry$2 = TypeRegistry.for(_s$2);
 var SSOServiceException$ = [-3, _s$2, "SSOServiceException", 0, [], []];
 _s_registry$2.registerError(SSOServiceException$, SSOServiceException);
 const n0_registry$2 = TypeRegistry.for(n0$2);
-var InvalidRequestException$ = [-3, n0$2, _IRE,
-    { [_e$2]: _c$2, [_hE$2]: 400 },
-    [_m$2],
-    [0]
-];
+var InvalidRequestException$ = [-3, n0$2, _IRE, { [_e$2]: _c$2, [_hE$2]: 400 }, [_m$2], [0]];
 n0_registry$2.registerError(InvalidRequestException$, InvalidRequestException);
-var ResourceNotFoundException$ = [-3, n0$2, _RNFE,
-    { [_e$2]: _c$2, [_hE$2]: 404 },
-    [_m$2],
-    [0]
-];
+var ResourceNotFoundException$ = [-3, n0$2, _RNFE, { [_e$2]: _c$2, [_hE$2]: 404 }, [_m$2], [0]];
 n0_registry$2.registerError(ResourceNotFoundException$, ResourceNotFoundException);
-var TooManyRequestsException$ = [-3, n0$2, _TMRE$1,
-    { [_e$2]: _c$2, [_hE$2]: 429 },
-    [_m$2],
-    [0]
-];
+var TooManyRequestsException$ = [-3, n0$2, _TMRE$1, { [_e$2]: _c$2, [_hE$2]: 429 }, [_m$2], [0]];
 n0_registry$2.registerError(TooManyRequestsException$, TooManyRequestsException);
-var UnauthorizedException$ = [-3, n0$2, _UE,
-    { [_e$2]: _c$2, [_hE$2]: 401 },
-    [_m$2],
-    [0]
-];
+var UnauthorizedException$ = [-3, n0$2, _UE, { [_e$2]: _c$2, [_hE$2]: 401 }, [_m$2], [0]];
 n0_registry$2.registerError(UnauthorizedException$, UnauthorizedException);
-const errorTypeRegistries$2 = [
-    _s_registry$2,
-    n0_registry$2,
-];
+const errorTypeRegistries$2 = [_s_registry$2, n0_registry$2];
 var AccessTokenType = [0, n0$2, _ATT, 8, 0];
 var SecretAccessKeyType = [0, n0$2, _SAKT, 8, 0];
 var SessionTokenType = [0, n0$2, _STT, 8, 0];
-var GetRoleCredentialsRequest$ = [3, n0$2, _GRCR,
+var GetRoleCredentialsRequest$ = [
+    3,
+    n0$2,
+    _GRCR,
     0,
     [_rN, _aI, _aT$1],
-    [[0, { [_hQ]: _rn }], [0, { [_hQ]: _ai }], [() => AccessTokenType, { [_hH]: _xasbt }]], 3
+    [
+        [0, { [_hQ]: _rn }],
+        [0, { [_hQ]: _ai }],
+        [() => AccessTokenType, { [_hH]: _xasbt }],
+    ],
+    3,
 ];
-var GetRoleCredentialsResponse$ = [3, n0$2, _GRCRe,
+var GetRoleCredentialsResponse$ = [
+    3,
+    n0$2,
+    _GRCRe,
     0,
     [_rC],
-    [[() => RoleCredentials$, 0]]
+    [[() => RoleCredentials$, 0]],
 ];
-var RoleCredentials$ = [3, n0$2, _RC,
+var RoleCredentials$ = [
+    3,
+    n0$2,
+    _RC,
     0,
     [_aKI$1, _sAK$1, _sT$1, _ex],
-    [0, [() => SecretAccessKeyType, 0], [() => SessionTokenType, 0], 1]
+    [0, [() => SecretAccessKeyType, 0], [() => SessionTokenType, 0], 1],
 ];
-var GetRoleCredentials$ = [9, n0$2, _GRC,
-    { [_h$1]: ["GET", "/federation/credentials", 200] }, () => GetRoleCredentialsRequest$, () => GetRoleCredentialsResponse$
+var GetRoleCredentials$ = [
+    9,
+    n0$2,
+    _GRC,
+    { [_h$1]: ["GET", "/federation/credentials", 200] },
+    () => GetRoleCredentialsRequest$,
+    () => GetRoleCredentialsResponse$,
 ];
 
 const getRuntimeConfig$5 = (config) => {
@@ -13767,9 +13823,11 @@ const getRuntimeConfig$4 = (config) => {
         defaultsMode,
         authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
         bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
-        defaultUserAgentProvider: config?.defaultUserAgentProvider ?? createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo.version }),
+        defaultUserAgentProvider: config?.defaultUserAgentProvider ??
+            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo.version }),
         maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
-        region: config?.region ?? loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
+        region: config?.region ??
+            loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
         requestHandler: NodeHttpHandler.create(config?.requestHandler ?? defaultConfigProvider),
         retryMode: config?.retryMode ??
             loadConfig({
@@ -13952,8 +14010,145 @@ const commonParams$1 = {
 };
 
 const F = "required", G = "type", H = "fn", I = "argv", J = "ref";
-const a$1 = false, b$1 = true, c$1 = "booleanEquals", d$1 = "stringEquals", e$1 = "sigv4", f$1 = "sts", g$1 = "us-east-1", h$1 = "endpoint", i$1 = "https://sts.{Region}.{PartitionResult#dnsSuffix}", j$1 = "tree", k$1 = "error", l$1 = "getAttr", m$1 = { [F]: false, [G]: "string" }, n$1 = { [F]: true, "default": false, [G]: "boolean" }, o$1 = { [J]: "Endpoint" }, p$1 = { [H]: "isSet", [I]: [{ [J]: "Region" }] }, q$1 = { [J]: "Region" }, r$1 = { [H]: "aws.partition", [I]: [q$1], "assign": "PartitionResult" }, s$1 = { [J]: "UseFIPS" }, t$1 = { [J]: "UseDualStack" }, u$1 = { "url": "https://sts.amazonaws.com", "properties": { "authSchemes": [{ "name": e$1, "signingName": f$1, "signingRegion": g$1 }] }, "headers": {} }, v$1 = {}, w$1 = { "conditions": [{ [H]: d$1, [I]: [q$1, "aws-global"] }], [h$1]: u$1, [G]: h$1 }, x$1 = { [H]: c$1, [I]: [s$1, true] }, y = { [H]: c$1, [I]: [t$1, true] }, z = { [H]: l$1, [I]: [{ [J]: "PartitionResult" }, "supportsFIPS"] }, A = { [J]: "PartitionResult" }, B = { [H]: c$1, [I]: [true, { [H]: l$1, [I]: [A, "supportsDualStack"] }] }, C = [{ [H]: "isSet", [I]: [o$1] }], D = [x$1], E = [y];
-const _data$1 = { parameters: { Region: m$1, UseDualStack: n$1, UseFIPS: n$1, Endpoint: m$1, UseGlobalEndpoint: n$1 }, rules: [{ conditions: [{ [H]: c$1, [I]: [{ [J]: "UseGlobalEndpoint" }, b$1] }, { [H]: "not", [I]: C }, p$1, r$1, { [H]: c$1, [I]: [s$1, a$1] }, { [H]: c$1, [I]: [t$1, a$1] }], rules: [{ conditions: [{ [H]: d$1, [I]: [q$1, "ap-northeast-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "ap-south-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "ap-southeast-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "ap-southeast-2"] }], endpoint: u$1, [G]: h$1 }, w$1, { conditions: [{ [H]: d$1, [I]: [q$1, "ca-central-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "eu-central-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "eu-north-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "eu-west-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "eu-west-2"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "eu-west-3"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "sa-east-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, g$1] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "us-east-2"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "us-west-1"] }], endpoint: u$1, [G]: h$1 }, { conditions: [{ [H]: d$1, [I]: [q$1, "us-west-2"] }], endpoint: u$1, [G]: h$1 }, { endpoint: { url: i$1, properties: { authSchemes: [{ name: e$1, signingName: f$1, signingRegion: "{Region}" }] }, headers: v$1 }, [G]: h$1 }], [G]: j$1 }, { conditions: C, rules: [{ conditions: D, error: "Invalid Configuration: FIPS and custom endpoint are not supported", [G]: k$1 }, { conditions: E, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", [G]: k$1 }, { endpoint: { url: o$1, properties: v$1, headers: v$1 }, [G]: h$1 }], [G]: j$1 }, { conditions: [p$1], rules: [{ conditions: [r$1], rules: [{ conditions: [x$1, y], rules: [{ conditions: [{ [H]: c$1, [I]: [b$1, z] }, B], rules: [{ endpoint: { url: "https://sts-fips.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: v$1, headers: v$1 }, [G]: h$1 }], [G]: j$1 }, { error: "FIPS and DualStack are enabled, but this partition does not support one or both", [G]: k$1 }], [G]: j$1 }, { conditions: D, rules: [{ conditions: [{ [H]: c$1, [I]: [z, b$1] }], rules: [{ conditions: [{ [H]: d$1, [I]: [{ [H]: l$1, [I]: [A, "name"] }, "aws-us-gov"] }], endpoint: { url: "https://sts.{Region}.amazonaws.com", properties: v$1, headers: v$1 }, [G]: h$1 }, { endpoint: { url: "https://sts-fips.{Region}.{PartitionResult#dnsSuffix}", properties: v$1, headers: v$1 }, [G]: h$1 }], [G]: j$1 }, { error: "FIPS is enabled but this partition does not support FIPS", [G]: k$1 }], [G]: j$1 }, { conditions: E, rules: [{ conditions: [B], rules: [{ endpoint: { url: "https://sts.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: v$1, headers: v$1 }, [G]: h$1 }], [G]: j$1 }, { error: "DualStack is enabled but this partition does not support DualStack", [G]: k$1 }], [G]: j$1 }, w$1, { endpoint: { url: i$1, properties: v$1, headers: v$1 }, [G]: h$1 }], [G]: j$1 }], [G]: j$1 }, { error: "Invalid Configuration: Missing Region", [G]: k$1 }] };
+const a$1 = false, b$1 = true, c$1 = "booleanEquals", d$1 = "stringEquals", e$1 = "sigv4", f$1 = "sts", g$1 = "us-east-1", h$1 = "endpoint", i$1 = "https://sts.{Region}.{PartitionResult#dnsSuffix}", j$1 = "tree", k$1 = "error", l$1 = "getAttr", m$1 = { [F]: false, [G]: "string" }, n$1 = { [F]: true, default: false, [G]: "boolean" }, o$1 = { [J]: "Endpoint" }, p$1 = { [H]: "isSet", [I]: [{ [J]: "Region" }] }, q$1 = { [J]: "Region" }, r$1 = { [H]: "aws.partition", [I]: [q$1], assign: "PartitionResult" }, s$1 = { [J]: "UseFIPS" }, t$1 = { [J]: "UseDualStack" }, u$1 = {
+    url: "https://sts.amazonaws.com",
+    properties: { authSchemes: [{ name: e$1, signingName: f$1, signingRegion: g$1 }] },
+    headers: {},
+}, v$1 = {}, w$1 = { conditions: [{ [H]: d$1, [I]: [q$1, "aws-global"] }], [h$1]: u$1, [G]: h$1 }, x$1 = { [H]: c$1, [I]: [s$1, true] }, y = { [H]: c$1, [I]: [t$1, true] }, z = { [H]: l$1, [I]: [{ [J]: "PartitionResult" }, "supportsFIPS"] }, A = { [J]: "PartitionResult" }, B = { [H]: c$1, [I]: [true, { [H]: l$1, [I]: [A, "supportsDualStack"] }] }, C = [{ [H]: "isSet", [I]: [o$1] }], D = [x$1], E = [y];
+const _data$1 = {
+    parameters: { Region: m$1, UseDualStack: n$1, UseFIPS: n$1, Endpoint: m$1, UseGlobalEndpoint: n$1 },
+    rules: [
+        {
+            conditions: [
+                { [H]: c$1, [I]: [{ [J]: "UseGlobalEndpoint" }, b$1] },
+                { [H]: "not", [I]: C },
+                p$1,
+                r$1,
+                { [H]: c$1, [I]: [s$1, a$1] },
+                { [H]: c$1, [I]: [t$1, a$1] },
+            ],
+            rules: [
+                { conditions: [{ [H]: d$1, [I]: [q$1, "ap-northeast-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "ap-south-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "ap-southeast-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "ap-southeast-2"] }], endpoint: u$1, [G]: h$1 },
+                w$1,
+                { conditions: [{ [H]: d$1, [I]: [q$1, "ca-central-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "eu-central-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "eu-north-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "eu-west-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "eu-west-2"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "eu-west-3"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "sa-east-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, g$1] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "us-east-2"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "us-west-1"] }], endpoint: u$1, [G]: h$1 },
+                { conditions: [{ [H]: d$1, [I]: [q$1, "us-west-2"] }], endpoint: u$1, [G]: h$1 },
+                {
+                    endpoint: {
+                        url: i$1,
+                        properties: { authSchemes: [{ name: e$1, signingName: f$1, signingRegion: "{Region}" }] },
+                        headers: v$1,
+                    },
+                    [G]: h$1,
+                },
+            ],
+            [G]: j$1,
+        },
+        {
+            conditions: C,
+            rules: [
+                { conditions: D, error: "Invalid Configuration: FIPS and custom endpoint are not supported", [G]: k$1 },
+                { conditions: E, error: "Invalid Configuration: Dualstack and custom endpoint are not supported", [G]: k$1 },
+                { endpoint: { url: o$1, properties: v$1, headers: v$1 }, [G]: h$1 },
+            ],
+            [G]: j$1,
+        },
+        {
+            conditions: [p$1],
+            rules: [
+                {
+                    conditions: [r$1],
+                    rules: [
+                        {
+                            conditions: [x$1, y],
+                            rules: [
+                                {
+                                    conditions: [{ [H]: c$1, [I]: [b$1, z] }, B],
+                                    rules: [
+                                        {
+                                            endpoint: {
+                                                url: "https://sts-fips.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                properties: v$1,
+                                                headers: v$1,
+                                            },
+                                            [G]: h$1,
+                                        },
+                                    ],
+                                    [G]: j$1,
+                                },
+                                { error: "FIPS and DualStack are enabled, but this partition does not support one or both", [G]: k$1 },
+                            ],
+                            [G]: j$1,
+                        },
+                        {
+                            conditions: D,
+                            rules: [
+                                {
+                                    conditions: [{ [H]: c$1, [I]: [z, b$1] }],
+                                    rules: [
+                                        {
+                                            conditions: [{ [H]: d$1, [I]: [{ [H]: l$1, [I]: [A, "name"] }, "aws-us-gov"] }],
+                                            endpoint: { url: "https://sts.{Region}.amazonaws.com", properties: v$1, headers: v$1 },
+                                            [G]: h$1,
+                                        },
+                                        {
+                                            endpoint: {
+                                                url: "https://sts-fips.{Region}.{PartitionResult#dnsSuffix}",
+                                                properties: v$1,
+                                                headers: v$1,
+                                            },
+                                            [G]: h$1,
+                                        },
+                                    ],
+                                    [G]: j$1,
+                                },
+                                { error: "FIPS is enabled but this partition does not support FIPS", [G]: k$1 },
+                            ],
+                            [G]: j$1,
+                        },
+                        {
+                            conditions: E,
+                            rules: [
+                                {
+                                    conditions: [B],
+                                    rules: [
+                                        {
+                                            endpoint: {
+                                                url: "https://sts.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                properties: v$1,
+                                                headers: v$1,
+                                            },
+                                            [G]: h$1,
+                                        },
+                                    ],
+                                    [G]: j$1,
+                                },
+                                { error: "DualStack is enabled but this partition does not support DualStack", [G]: k$1 },
+                            ],
+                            [G]: j$1,
+                        },
+                        w$1,
+                        { endpoint: { url: i$1, properties: v$1, headers: v$1 }, [G]: h$1 },
+                    ],
+                    [G]: j$1,
+                },
+            ],
+            [G]: j$1,
+        },
+        { error: "Invalid Configuration: Missing Region", [G]: k$1 },
+    ],
+};
 const ruleSet$1 = _data$1;
 
 const cache$1 = new EndpointCache({
@@ -13966,7 +14161,7 @@ const defaultEndpointResolver$1 = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions$1;
+customEndpointFunctions.aws = awsEndpointFunctions;
 
 class STSServiceException extends ServiceException {
     constructor(options) {
@@ -14304,7 +14499,7 @@ const getRuntimeConfig$2 = (config) => {
         authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
         bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
         defaultUserAgentProvider: config?.defaultUserAgentProvider ??
-            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
+            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo.version }),
         httpAuthSchemes: config?.httpAuthSchemes ?? [
             {
                 schemeId: "aws.auth#sigv4",
@@ -14657,8 +14852,133 @@ const commonParams = {
 };
 
 const u = "required", v = "fn", w = "argv", x = "ref";
-const a = true, b = "isSet", c = "booleanEquals", d = "error", e = "endpoint", f = "tree", g = "PartitionResult", h = "stringEquals", i = { [u]: true, "default": false, "type": "boolean" }, j = { [u]: false, "type": "string" }, k = { [x]: "Endpoint" }, l = { [v]: c, [w]: [{ [x]: "UseFIPS" }, true] }, m = { [v]: c, [w]: [{ [x]: "UseDualStack" }, true] }, n = {}, o = { [v]: "getAttr", [w]: [{ [x]: g }, "name"] }, p = { [v]: c, [w]: [{ [x]: "UseFIPS" }, false] }, q = { [v]: c, [w]: [{ [x]: "UseDualStack" }, false] }, r = { [v]: "getAttr", [w]: [{ [x]: g }, "supportsFIPS"] }, s = { [v]: c, [w]: [true, { [v]: "getAttr", [w]: [{ [x]: g }, "supportsDualStack"] }] }, t = [{ [x]: "Region" }];
-const _data = { parameters: { UseDualStack: i, UseFIPS: i, Endpoint: j, Region: j }, rules: [{ conditions: [{ [v]: b, [w]: [k] }], rules: [{ conditions: [l], error: "Invalid Configuration: FIPS and custom endpoint are not supported", type: d }, { rules: [{ conditions: [m], error: "Invalid Configuration: Dualstack and custom endpoint are not supported", type: d }, { endpoint: { url: k, properties: n, headers: n }, type: e }], type: f }], type: f }, { rules: [{ conditions: [{ [v]: b, [w]: t }], rules: [{ conditions: [{ [v]: "aws.partition", [w]: t, assign: g }], rules: [{ conditions: [{ [v]: h, [w]: [o, "aws"] }, p, q], endpoint: { url: "https://{Region}.signin.aws.amazon.com", properties: n, headers: n }, type: e }, { conditions: [{ [v]: h, [w]: [o, "aws-cn"] }, p, q], endpoint: { url: "https://{Region}.signin.amazonaws.cn", properties: n, headers: n }, type: e }, { conditions: [{ [v]: h, [w]: [o, "aws-us-gov"] }, p, q], endpoint: { url: "https://{Region}.signin.amazonaws-us-gov.com", properties: n, headers: n }, type: e }, { conditions: [l, m], rules: [{ conditions: [{ [v]: c, [w]: [a, r] }, s], rules: [{ endpoint: { url: "https://signin-fips.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: n, headers: n }, type: e }], type: f }, { error: "FIPS and DualStack are enabled, but this partition does not support one or both", type: d }], type: f }, { conditions: [l, q], rules: [{ conditions: [{ [v]: c, [w]: [r, a] }], rules: [{ endpoint: { url: "https://signin-fips.{Region}.{PartitionResult#dnsSuffix}", properties: n, headers: n }, type: e }], type: f }, { error: "FIPS is enabled but this partition does not support FIPS", type: d }], type: f }, { conditions: [p, m], rules: [{ conditions: [s], rules: [{ endpoint: { url: "https://signin.{Region}.{PartitionResult#dualStackDnsSuffix}", properties: n, headers: n }, type: e }], type: f }, { error: "DualStack is enabled but this partition does not support DualStack", type: d }], type: f }, { endpoint: { url: "https://signin.{Region}.{PartitionResult#dnsSuffix}", properties: n, headers: n }, type: e }], type: f }], type: f }, { error: "Invalid Configuration: Missing Region", type: d }], type: f }] };
+const a = true, b = "isSet", c = "booleanEquals", d = "error", e = "endpoint", f = "tree", g = "PartitionResult", h = "stringEquals", i = { [u]: true, default: false, type: "boolean" }, j = { [u]: false, type: "string" }, k = { [x]: "Endpoint" }, l = { [v]: c, [w]: [{ [x]: "UseFIPS" }, true] }, m = { [v]: c, [w]: [{ [x]: "UseDualStack" }, true] }, n = {}, o = { [v]: "getAttr", [w]: [{ [x]: g }, "name"] }, p = { [v]: c, [w]: [{ [x]: "UseFIPS" }, false] }, q = { [v]: c, [w]: [{ [x]: "UseDualStack" }, false] }, r = { [v]: "getAttr", [w]: [{ [x]: g }, "supportsFIPS"] }, s = { [v]: c, [w]: [true, { [v]: "getAttr", [w]: [{ [x]: g }, "supportsDualStack"] }] }, t = [{ [x]: "Region" }];
+const _data = {
+    parameters: { UseDualStack: i, UseFIPS: i, Endpoint: j, Region: j },
+    rules: [
+        {
+            conditions: [{ [v]: b, [w]: [k] }],
+            rules: [
+                { conditions: [l], error: "Invalid Configuration: FIPS and custom endpoint are not supported", type: d },
+                {
+                    rules: [
+                        {
+                            conditions: [m],
+                            error: "Invalid Configuration: Dualstack and custom endpoint are not supported",
+                            type: d,
+                        },
+                        { endpoint: { url: k, properties: n, headers: n }, type: e },
+                    ],
+                    type: f,
+                },
+            ],
+            type: f,
+        },
+        {
+            rules: [
+                {
+                    conditions: [{ [v]: b, [w]: t }],
+                    rules: [
+                        {
+                            conditions: [{ [v]: "aws.partition", [w]: t, assign: g }],
+                            rules: [
+                                {
+                                    conditions: [{ [v]: h, [w]: [o, "aws"] }, p, q],
+                                    endpoint: { url: "https://{Region}.signin.aws.amazon.com", properties: n, headers: n },
+                                    type: e,
+                                },
+                                {
+                                    conditions: [{ [v]: h, [w]: [o, "aws-cn"] }, p, q],
+                                    endpoint: { url: "https://{Region}.signin.amazonaws.cn", properties: n, headers: n },
+                                    type: e,
+                                },
+                                {
+                                    conditions: [{ [v]: h, [w]: [o, "aws-us-gov"] }, p, q],
+                                    endpoint: { url: "https://{Region}.signin.amazonaws-us-gov.com", properties: n, headers: n },
+                                    type: e,
+                                },
+                                {
+                                    conditions: [l, m],
+                                    rules: [
+                                        {
+                                            conditions: [{ [v]: c, [w]: [a, r] }, s],
+                                            rules: [
+                                                {
+                                                    endpoint: {
+                                                        url: "https://signin-fips.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                        properties: n,
+                                                        headers: n,
+                                                    },
+                                                    type: e,
+                                                },
+                                            ],
+                                            type: f,
+                                        },
+                                        {
+                                            error: "FIPS and DualStack are enabled, but this partition does not support one or both",
+                                            type: d,
+                                        },
+                                    ],
+                                    type: f,
+                                },
+                                {
+                                    conditions: [l, q],
+                                    rules: [
+                                        {
+                                            conditions: [{ [v]: c, [w]: [r, a] }],
+                                            rules: [
+                                                {
+                                                    endpoint: {
+                                                        url: "https://signin-fips.{Region}.{PartitionResult#dnsSuffix}",
+                                                        properties: n,
+                                                        headers: n,
+                                                    },
+                                                    type: e,
+                                                },
+                                            ],
+                                            type: f,
+                                        },
+                                        { error: "FIPS is enabled but this partition does not support FIPS", type: d },
+                                    ],
+                                    type: f,
+                                },
+                                {
+                                    conditions: [p, m],
+                                    rules: [
+                                        {
+                                            conditions: [s],
+                                            rules: [
+                                                {
+                                                    endpoint: {
+                                                        url: "https://signin.{Region}.{PartitionResult#dualStackDnsSuffix}",
+                                                        properties: n,
+                                                        headers: n,
+                                                    },
+                                                    type: e,
+                                                },
+                                            ],
+                                            type: f,
+                                        },
+                                        { error: "DualStack is enabled but this partition does not support DualStack", type: d },
+                                    ],
+                                    type: f,
+                                },
+                                {
+                                    endpoint: { url: "https://signin.{Region}.{PartitionResult#dnsSuffix}", properties: n, headers: n },
+                                    type: e,
+                                },
+                            ],
+                            type: f,
+                        },
+                    ],
+                    type: f,
+                },
+                { error: "Invalid Configuration: Missing Region", type: d },
+            ],
+            type: f,
+        },
+    ],
+};
 const ruleSet = _data;
 
 const cache = new EndpointCache({
@@ -14671,7 +14991,7 @@ const defaultEndpointResolver = (endpointParams, context = {}) => {
         logger: context.logger,
     }));
 };
-customEndpointFunctions.aws = awsEndpointFunctions$1;
+customEndpointFunctions.aws = awsEndpointFunctions;
 
 class SigninServiceException extends ServiceException {
     constructor(options) {
@@ -14911,7 +15231,7 @@ const getRuntimeConfig = (config) => {
         authSchemePreference: config?.authSchemePreference ?? loadConfig(NODE_AUTH_SCHEME_PREFERENCE_OPTIONS, loaderConfig),
         bodyLengthChecker: config?.bodyLengthChecker ?? calculateBodyLength,
         defaultUserAgentProvider: config?.defaultUserAgentProvider ??
-            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo$1.version }),
+            createDefaultUserAgentProvider({ serviceId: clientSharedValues.serviceId, clientVersion: packageInfo.version }),
         maxAttempts: config?.maxAttempts ?? loadConfig(NODE_MAX_ATTEMPT_CONFIG_OPTIONS, config),
         region: config?.region ??
             loadConfig(NODE_REGION_CONFIG_OPTIONS, { ...NODE_REGION_CONFIG_FILE_OPTIONS, ...loaderConfig }),
