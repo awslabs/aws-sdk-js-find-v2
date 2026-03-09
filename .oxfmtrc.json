@@ -1,4 +1,7 @@
 {
   "$schema": "./node_modules/oxfmt/configuration_schema.json",
-  "ignorePatterns": [".github/*", "CHANGELOG.md", "package.json", "**/__fixtures__/**"]
+  "ignorePatterns": [".github/*", "CHANGELOG.md", "package.json", "**/__fixtures__/**"],
+  "sortImports": {
+    "enabled": true
+  }
 }
