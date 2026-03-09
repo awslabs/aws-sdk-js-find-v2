@@ -1,10 +1,10 @@
 import type { Lambda } from "@aws-sdk/client-lambda";
 import { beforeEach, describe, expect, it, vi } from "vitest";
 
-import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { getLambdaFunctionContents } from "./getLambdaFunctionContents.ts";
-import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
+import { getLambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import { hasSdkV2InBundle } from "./hasSdkV2InBundle.ts";
+import { hasSdkV2InFile } from "./hasSdkV2InFile.ts";
 
 vi.mock("./getLambdaFunctionContents.ts");
 vi.mock("./hasSdkV2InFile.ts");

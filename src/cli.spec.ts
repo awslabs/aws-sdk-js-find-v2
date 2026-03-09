@@ -1,9 +1,11 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { cpus } from "node:os";
+
+import { describe, it, expect, vi, beforeEach } from "vitest";
+
+import packageJson from "../package.json" with { type: "json" };
 import { createProgram } from "./cli.ts";
 import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import { LambdaCommandOutputType } from "./utils/printLambdaCommandOutput.ts";
-import packageJson from "../package.json" with { type: "json" };
 
 describe("CLI", () => {
   const mockOptions = {

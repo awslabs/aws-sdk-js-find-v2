@@ -1,12 +1,13 @@
 import { describe, it, expect, vi } from "vitest";
+
 import { getLambdaFunctions } from "./getLambdaFunctions.ts";
 
 vi.mock("@aws-sdk/client-lambda", () => ({
   paginateListFunctions: vi.fn(),
 }));
 
-import type { Paginator } from "@smithy/types";
 import { type ListFunctionsCommandOutput, paginateListFunctions } from "@aws-sdk/client-lambda";
+import type { Paginator } from "@smithy/types";
 
 describe("getLambdaFunctions", () => {
   const mockClient = {} as any;

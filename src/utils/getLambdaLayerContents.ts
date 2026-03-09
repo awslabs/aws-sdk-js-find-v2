@@ -1,6 +1,6 @@
 import { AWS_SDK_PACKAGE_JSON } from "./constants.ts";
-import { processZipEntries } from "./processZipEntries.ts";
 import { processRemoteZip } from "./processRemoteZip.ts";
+import { processZipEntries } from "./processZipEntries.ts";
 
 /**
  * Map containing aws-sdk package.json files found in Lambda layer contents.

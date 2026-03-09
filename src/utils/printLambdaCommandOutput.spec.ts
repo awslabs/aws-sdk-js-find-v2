@@ -1,4 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from "vitest";
+
 import type { LambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 
 const mockPush = vi.fn();

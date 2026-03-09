@@ -1,9 +1,10 @@
-import { describe, it, expect } from "vitest";
 import { readdirSync, readFileSync, statSync } from "fs";
 import { join } from "path";
 
-import { hasSdkV2InBundle } from "./hasSdkV2InBundle";
+import { describe, it, expect } from "vitest";
+
 import { devDependencies } from "../../package.json";
+import { hasSdkV2InBundle } from "./hasSdkV2InBundle";
 
 describe("hasSdkV2InBundle", () => {
   const sdkVersionRange = devDependencies["aws-sdk"];

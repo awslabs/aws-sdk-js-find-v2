@@ -1,8 +1,8 @@
 import rspack from "@rspack/core";
 
 import { ModuleSystem, Version } from "./utils/constants.js";
-import { getOutputDir } from "./utils/getOutputDir.js";
 import { getInputPath } from "./utils/getInputPath.js";
+import { getOutputDir } from "./utils/getOutputDir.js";
 import { getOutputFilename } from "./utils/getOutputFilename.js";
 
 const LibraryType = {

@@ -1,5 +1,6 @@
 import type { FunctionConfiguration } from "@aws-sdk/client-lambda";
 import { describe, expect, it } from "vitest";
+
 import { getCodeSizeToSaveOnDisk } from "./getCodeSizeToSaveOnDisk.ts";
 
 describe("getCodeSizeToSaveOnDisk", () => {

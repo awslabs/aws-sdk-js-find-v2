@@ -1,5 +1,6 @@
-import type { LambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 import Table from "cli-table3";
+
+import type { LambdaFunctionScanOutput } from "./getLambdaFunctionScanOutput.ts";
 
 export const LambdaCommandOutputType = {
   // prints output as JSON

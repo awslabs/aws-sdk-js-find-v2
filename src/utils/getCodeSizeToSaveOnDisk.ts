@@ -1,4 +1,5 @@
 import type { FunctionConfiguration } from "@aws-sdk/client-lambda";
+
 import { getLambdaLayerToCodeSizeMap } from "./getLambdaLayerToCodeSizeMap.ts";
 
 const getFunctionTotalSize = (fn: FunctionConfiguration) =>

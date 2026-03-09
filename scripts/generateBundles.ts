@@ -3,8 +3,8 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
-import { getFixturesDir } from "./configs/utils/getFixturesDir.js";
 import { Version } from "./configs/utils/constants.js";
+import { getFixturesDir } from "./configs/utils/getFixturesDir.js";
 
 const execAsync = promisify(exec);
 
