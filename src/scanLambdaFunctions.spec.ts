@@ -1,7 +1,8 @@
-import { describe, it, expect, vi, beforeEach } from "vitest";
 import { type FunctionConfiguration, Lambda } from "@aws-sdk/client-lambda";
 import pLimit from "p-limit";
+import { describe, it, expect, vi, beforeEach } from "vitest";
 
+import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 import { getCodeSizeToDownload } from "./utils/getCodeSizeToDownload.ts";
 import { getCodeSizeToSaveOnDisk } from "./utils/getCodeSizeToSaveOnDisk.ts";
 import { getDownloadConfirmation } from "./utils/getDownloadConfirmation.ts";
@@ -12,7 +13,6 @@ import {
   LambdaCommandOutputType,
   printLambdaCommandOutput,
 } from "./utils/printLambdaCommandOutput.ts";
-import { scanLambdaFunctions } from "./scanLambdaFunctions.ts";
 
 vi.mock("@aws-sdk/client-lambda");
 vi.mock("./utils/getCodeSizeToDownload.ts");

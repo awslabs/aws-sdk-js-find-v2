@@ -1,4 +1,5 @@
 import type { Runtime } from "@aws-sdk/client-lambda";
+
 import { AWS_SDK_PACKAGE_JSON } from "./constants.ts";
 import type { LambdaLayerContents } from "./getLambdaLayerContents.ts";
 

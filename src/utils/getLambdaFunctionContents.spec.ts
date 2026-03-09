@@ -1,9 +1,10 @@
-import { beforeEach, describe, it, expect, vi } from "vitest";
 import type { Lambda } from "@aws-sdk/client-lambda";
-import { processRemoteZip } from "./processRemoteZip.ts";
-import { processZipEntries } from "./processZipEntries.ts";
+import { beforeEach, describe, it, expect, vi } from "vitest";
+
 import { getLambdaLayerContents } from "./getLambdaLayerContents.ts";
 import { getSdkVersionFromLambdaLayerContents } from "./getSdkVersionFromLambdaLayerContents.ts";
+import { processRemoteZip } from "./processRemoteZip.ts";
+import { processZipEntries } from "./processZipEntries.ts";
 
 vi.mock("./processRemoteZip.ts");
 vi.mock("./processZipEntries.ts");

@@ -1,6 +1,7 @@
 import { describe, it, expect } from "vitest";
-import { getSdkVersionFromLambdaLayerContents } from "./getSdkVersionFromLambdaLayerContents";
+
 import { AWS_SDK_PACKAGE_JSON } from "./constants";
+import { getSdkVersionFromLambdaLayerContents } from "./getSdkVersionFromLambdaLayerContents";
 
 describe("getSdkVersionFromLambdaLayerContents", () => {
   const runtime = "nodejs20.x";

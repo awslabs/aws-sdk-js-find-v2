@@ -1,6 +1,7 @@
+import { cpus } from "node:os";
+
 import { Command, Option } from "commander";
 import { satisfies } from "compare-versions";
-import { cpus } from "node:os";
 
 import packageJson from "../package.json" with { type: "json" };
 import { scanLambdaFunctions, type ScanLambdaFunctionsOptions } from "./scanLambdaFunctions.ts";
