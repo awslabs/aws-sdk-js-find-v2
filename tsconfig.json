@@ -2,7 +2,8 @@
   "extends": ["@tsconfig/node20/tsconfig.json", "@tsconfig/node-ts/tsconfig.json"],
   "compilerOptions": {
     "rootDir": "src",
-    "outDir": "dist"
+    "outDir": "dist",
+    "types": ["node"]
   },
   "exclude": ["vitest.config.ts", "**/*.spec.ts", "**/__fixtures__/**", "scripts"]
 }
