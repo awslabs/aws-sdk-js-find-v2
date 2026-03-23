@@ -8,6 +8,9 @@ on:
       - yarn.lock
       - .github/workflows/test-generate-bundles.yml
 
+env:
+  DOCKER_API_VERSION: "1.42"
+
 jobs:
   test-generate-bundles:
     permissions:
