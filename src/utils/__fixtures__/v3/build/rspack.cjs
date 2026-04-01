@@ -1015,6 +1015,7 @@ __webpack_require__.d(__webpack_exports__, {
 
 class ProtocolLib {
     queryCompat;
+    errorRegistry;
     constructor(queryCompat = false) {
         this.queryCompat = queryCompat;
     }
@@ -1050,30 +1051,47 @@ class ProtocolLib {
         }
     }
     async getErrorSchemaOrThrowBaseException(errorIdentifier, defaultNamespace, response, dataObject, metadata, getErrorSchema) {
-        let namespace = defaultNamespace;
         let errorName = errorIdentifier;
         if (errorIdentifier.includes("#")) {
-            [namespace, errorName] = errorIdentifier.split("#");
+            [, errorName] = errorIdentifier.split("#");
         }
         const errorMetadata = {
             $metadata: metadata,
             $fault: response.statusCode < 500 ? "client" : "server",
         };
-        const registry = _smithy_core_schema__rspack_import_0/* .TypeRegistry["for"] */.O["for"](namespace);
+        if (!this.errorRegistry) {
+            throw new Error("@aws-sdk/core/protocols - error handler not initialized.");
+        }
         try {
-            const errorSchema = getErrorSchema?.(registry, errorName) ?? registry.getSchema(errorIdentifier);
+            const errorSchema = getErrorSchema?.(this.errorRegistry, errorName) ??
+                this.errorRegistry.getSchema(errorIdentifier);
             return { errorSchema, errorMetadata };
         }
         catch (e) {
             dataObject.message = dataObject.message ?? dataObject.Message ?? "UnknownError";
-            const synthetic = _smithy_core_schema__rspack_import_0/* .TypeRegistry["for"] */.O["for"]("smithy.ts.sdk.synthetic." + namespace);
+            const synthetic = this.errorRegistry;
             const baseExceptionSchema = synthetic.getBaseException();
             if (baseExceptionSchema) {
                 const ErrorCtor = synthetic.getErrorCtor(baseExceptionSchema) ?? Error;
                 throw this.decorateServiceException(Object.assign(new ErrorCtor({ name: errorName }), errorMetadata), dataObject);
             }
-            throw this.decorateServiceException(Object.assign(new Error(errorName), errorMetadata), dataObject);
+            const d = dataObject;
+            const message = d?.message ?? d?.Message ?? d?.Error?.Message ?? d?.Error?.message;
+            throw this.decorateServiceException(Object.assign(new Error(message), {
+                name: errorName,
+            }, errorMetadata), dataObject);
         }
+    }
+    compose(composite, errorIdentifier, defaultNamespace) {
+        let namespace = defaultNamespace;
+        if (errorIdentifier.includes("#")) {
+            [namespace] = errorIdentifier.split("#");
+        }
+        const staticRegistry = _smithy_core_schema__rspack_import_0/* .TypeRegistry["for"] */.O["for"](namespace);
+        const defaultSyntheticRegistry = _smithy_core_schema__rspack_import_0/* .TypeRegistry["for"] */.O["for"]("smithy.ts.sdk.synthetic." + defaultNamespace);
+        composite.copyFrom(staticRegistry);
+        composite.copyFrom(defaultSyntheticRegistry);
+        this.errorRegistry = composite;
     }
     decorateServiceException(exception, additions = {}) {
         if (this.queryCompat) {
@@ -1129,7 +1147,7 @@ class ProtocolLib {
             return registry.getSchema(errorName);
         }
         catch (e) {
-            return registry.find((schema) => _smithy_core_schema__rspack_import_2/* .NormalizedSchema.of */.l.of(schema).getMergedTraits().awsQueryError?.[0] === errorName);
+            return registry.find((schema) => _smithy_core_schema__rspack_import_2/* .NormalizedSchema.of */.l1.of(schema).getMergedTraits().awsQueryError?.[0] === errorName);
         }
     }
 }
@@ -1228,14 +1246,12 @@ var HttpProtocol = __webpack_require__(6935);
 
 class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
     async serializeRequest(operationSchema, _input, context) {
-        const input = {
-            ...(_input ?? {}),
-        };
+        const input = _input && typeof _input === "object" ? _input : {};
         const serializer = this.serializer;
         const query = {};
         const headers = {};
         const endpoint = await context.endpoint();
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema?.input);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema?.input);
         const payloadMemberNames = [];
         const payloadMemberSchemas = [];
         let hasNonHttpBindingMember = false;
@@ -1298,7 +1314,6 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
                     serializer.write(memberNs, inputMemberValue);
                     payload = serializer.flush();
                 }
-                delete input[memberName];
             }
             else if (memberTraits.httpLabel) {
                 serializer.write(memberNs, inputMemberValue);
@@ -1309,12 +1324,10 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
                 else if (request.path.includes(`{${memberName}}`)) {
                     request.path = request.path.replace(`{${memberName}}`, (0,extended_encode_uri_component/* .extendedEncodeURIComponent */.$)(replacement));
                 }
-                delete input[memberName];
             }
             else if (memberTraits.httpHeader) {
                 serializer.write(memberNs, inputMemberValue);
                 headers[memberTraits.httpHeader.toLowerCase()] = String(serializer.flush());
-                delete input[memberName];
             }
             else if (typeof memberTraits.httpPrefixHeaders === "string") {
                 for (const [key, val] of Object.entries(inputMemberValue)) {
@@ -1322,11 +1335,9 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
                     serializer.write([memberNs.getValueSchema(), { httpHeader: amalgam }], val);
                     headers[amalgam.toLowerCase()] = serializer.flush();
                 }
-                delete input[memberName];
             }
             else if (memberTraits.httpQuery || memberTraits.httpQueryParams) {
                 this.serializeQuery(memberNs, inputMemberValue, query);
-                delete input[memberName];
             }
             else {
                 hasNonHttpBindingMember = true;
@@ -1396,7 +1407,7 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
     }
     async deserializeResponse(operationSchema, context, response) {
         const deserializer = this.deserializer;
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema.output);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema.output);
         const dataObject = {};
         if (response.statusCode >= 300) {
             const bytes = await (0,collect_stream_body/* .collectBody */.P)(response.body, context);
@@ -1439,7 +1450,7 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
         }
         let discardResponseBody = true;
         const deserializer = this.deserializer;
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         const nonHttpBindingMembers = [];
         for (const [memberName, memberSchema] of ns.structIterator()) {
             const memberTraits = memberSchema.getMemberTraits();
@@ -1547,7 +1558,7 @@ class ToStringShapeSerializer extends SerdeContext/* .SerdeContext */.f {
         this.settings = settings;
     }
     write(schema, value) {
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         switch (typeof value) {
             case "object":
                 if (value === null) {
@@ -1642,7 +1653,7 @@ class HttpInterceptingShapeSerializer {
         this.stringSerializer.setSerdeContext(serdeContext);
     }
     write(schema, value) {
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         const traits = ns.getMergedTraits();
         if (traits.httpHeader || traits.httpLabel || traits.httpQuery) {
             this.stringSerializer.write(ns, value);
@@ -1686,7 +1697,7 @@ class HttpInterceptingShapeDeserializer extends SerdeContext/* .SerdeContext */.
         this.serdeContext = serdeContext;
     }
     read(schema, data) {
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         const traits = ns.getMergedTraits();
         const toString = this.serdeContext?.utf8Encoder ?? toUtf8/* .toUtf8 */.P;
         if (traits.httpHeader || traits.httpResponseCode) {
@@ -1711,8 +1722,6 @@ class HttpInterceptingShapeDeserializer extends SerdeContext/* .SerdeContext */.
     }
 }
 
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
-var TypeRegistry = __webpack_require__(7870);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/ProtocolLib.js
 var ProtocolLib = __webpack_require__(4208);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/ConfigurableSerdeContext.js
@@ -1827,7 +1836,7 @@ class JsonShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConf
     }
     _read(schema, value) {
         const isObject = value !== null && typeof value === "object";
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         if (isObject) {
             if (ns.isStructSchema()) {
                 const record = value;
@@ -1871,22 +1880,16 @@ class JsonShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConf
             if (Array.isArray(value) && ns.isListSchema()) {
                 const listMember = ns.getValueSchema();
                 const out = [];
-                const sparse = !!ns.getMergedTraits().sparse;
                 for (const item of value) {
-                    if (sparse || item != null) {
-                        out.push(this._read(listMember, item));
-                    }
+                    out.push(this._read(listMember, item));
                 }
                 return out;
             }
             if (ns.isMapSchema()) {
                 const mapMember = ns.getValueSchema();
                 const out = {};
-                const sparse = !!ns.getMergedTraits().sparse;
                 for (const [_k, _v] of Object.entries(value)) {
-                    if (sparse || _v != null) {
-                        out[_k] = this._read(mapMember, _v);
-                    }
+                    out[_k] = this._read(mapMember, _v);
                 }
                 return out;
             }
@@ -2026,13 +2029,13 @@ class JsonShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfig
         this.settings = settings;
     }
     write(schema, value) {
-        this.rootSchema = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        this.rootSchema = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         this.buffer = this._write(this.rootSchema, value);
     }
     writeDiscriminatedDocument(schema, value) {
         this.write(schema, value);
         if (typeof this.buffer === "object") {
-            this.buffer.__type = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema).getName(true);
+            this.buffer.__type = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema).getName(true);
         }
     }
     flush() {
@@ -2050,7 +2053,7 @@ class JsonShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfig
     }
     _write(schema, value, container) {
         const isObject = value !== null && typeof value === "object";
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         if (isObject) {
             if (ns.isStructSchema()) {
                 const record = value;
@@ -2220,9 +2223,10 @@ class AwsRestJsonProtocol extends HttpBindingProtocol {
     deserializer;
     codec;
     mixin = new ProtocolLib/* .ProtocolLib */.U();
-    constructor({ defaultNamespace }) {
+    constructor({ defaultNamespace, errorTypeRegistries, }) {
         super({
             defaultNamespace,
+            errorTypeRegistries,
         });
         const settings = {
             timestampFormat: {
@@ -2248,7 +2252,7 @@ class AwsRestJsonProtocol extends HttpBindingProtocol {
     }
     async serializeRequest(operationSchema, input, context) {
         const request = await super.serializeRequest(operationSchema, input, context);
-        const inputSchema = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema.input);
+        const inputSchema = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema.input);
         if (!request.headers["content-type"]) {
             const contentType = this.mixin.resolveRestContentType(this.getDefaultContentType(), inputSchema);
             if (contentType) {
@@ -2262,7 +2266,7 @@ class AwsRestJsonProtocol extends HttpBindingProtocol {
     }
     async deserializeResponse(operationSchema, context, response) {
         const output = await super.deserializeResponse(operationSchema, context, response);
-        const outputSchema = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema.output);
+        const outputSchema = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema.output);
         for (const [name, member] of outputSchema.structIterator()) {
             if (member.getMemberTraits().httpPayload && !(name in output)) {
                 output[name] = null;
@@ -2272,10 +2276,11 @@ class AwsRestJsonProtocol extends HttpBindingProtocol {
     }
     async handleError(operationSchema, context, response, dataObject, metadata) {
         const errorIdentifier = loadRestJsonErrorCode(response, dataObject) ?? "Unknown";
+        this.mixin.compose(this.compositeErrorRegistry, errorIdentifier, this.options.defaultNamespace);
         const { errorSchema, errorMetadata } = await this.mixin.getErrorSchemaOrThrowBaseException(errorIdentifier, this.options.defaultNamespace, response, dataObject, metadata);
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(errorSchema);
-        const message = dataObject.message ?? dataObject.Message ?? "Unknown";
-        const ErrorCtor = TypeRegistry/* .TypeRegistry["for"] */.O["for"](errorSchema[1]).getErrorCtor(errorSchema) ?? Error;
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(errorSchema);
+        const message = dataObject.message ?? dataObject.Message ?? "UnknownError";
+        const ErrorCtor = this.compositeErrorRegistry.getErrorCtor(errorSchema) ?? Error;
         const exception = new ErrorCtor(message);
         await this.deserializeHttpMessage(errorSchema, context, response, dataObject);
         const output = {};
@@ -2295,7 +2300,7 @@ class AwsRestJsonProtocol extends HttpBindingProtocol {
 
 
 },
-6616(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+9768(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -2316,14 +2321,15 @@ var HttpProtocol = __webpack_require__(6935);
 
 
 class RpcProtocol extends HttpProtocol/* .HttpProtocol */.t {
-    async serializeRequest(operationSchema, input, context) {
+    async serializeRequest(operationSchema, _input, context) {
         const serializer = this.serializer;
         const query = {};
         const headers = {};
         const endpoint = await context.endpoint();
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema?.input);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema?.input);
         const schema = ns.getSchema();
         let payload;
+        const input = _input && typeof _input === "object" ? _input : {};
         const request = new httpRequest/* .HttpRequest */.K({
             protocol: "",
             hostname: "",
@@ -2338,33 +2344,30 @@ class RpcProtocol extends HttpProtocol/* .HttpProtocol */.t {
             this.updateServiceEndpoint(request, endpoint);
             this.setHostPrefix(request, operationSchema, input);
         }
-        const _input = {
-            ...input,
-        };
         if (input) {
             const eventStreamMember = ns.getEventStreamMember();
             if (eventStreamMember) {
-                if (_input[eventStreamMember]) {
+                if (input[eventStreamMember]) {
                     const initialRequest = {};
                     for (const [memberName, memberSchema] of ns.structIterator()) {
-                        if (memberName !== eventStreamMember && _input[memberName]) {
-                            serializer.write(memberSchema, _input[memberName]);
+                        if (memberName !== eventStreamMember && input[memberName]) {
+                            serializer.write(memberSchema, input[memberName]);
                             initialRequest[memberName] = serializer.flush();
                         }
                     }
                     payload = await this.serializeEventStream({
-                        eventStream: _input[eventStreamMember],
+                        eventStream: input[eventStreamMember],
                         requestSchema: ns,
                         initialRequest,
                     });
                 }
             }
             else {
-                serializer.write(schema, _input);
+                serializer.write(schema, input);
                 payload = serializer.flush();
             }
         }
-        request.headers = headers;
+        request.headers = Object.assign(request.headers, headers);
         request.query = query;
         request.body = payload;
         request.method = "POST";
@@ -2372,7 +2375,7 @@ class RpcProtocol extends HttpProtocol/* .HttpProtocol */.t {
     }
     async deserializeResponse(operationSchema, context, response) {
         const deserializer = this.deserializer;
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema.output);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema.output);
         const dataObject = {};
         if (response.statusCode >= 300) {
             const bytes = await (0,collect_stream_body/* .collectBody */.P)(response.body, context);
@@ -2408,11 +2411,81 @@ class RpcProtocol extends HttpProtocol/* .HttpProtocol */.t {
 
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/deref.js
 var deref = __webpack_require__(6625);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/TypeRegistry.js
-var TypeRegistry = __webpack_require__(7870);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/ProtocolLib.js
 var ProtocolLib = __webpack_require__(4208);
+;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/util.js
+
+
+const nameStartChar = ':A-Za-z_\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD';
+const nameChar = nameStartChar + '\\-.\\d\\u00B7\\u0300-\\u036F\\u203F-\\u2040';
+const nameRegexp = '[' + nameStartChar + '][' + nameChar + ']*';
+const regexName = new RegExp('^' + nameRegexp + '$');
+
+function getAllMatches(string, regex) {
+  const matches = [];
+  let match = regex.exec(string);
+  while (match) {
+    const allmatches = [];
+    allmatches.startIndex = regex.lastIndex - match[0].length;
+    const len = match.length;
+    for (let index = 0; index < len; index++) {
+      allmatches.push(match[index]);
+    }
+    matches.push(allmatches);
+    match = regex.exec(string);
+  }
+  return matches;
+}
+
+const isName = function (string) {
+  const match = regexName.exec(string);
+  return !(match === null || typeof match === 'undefined');
+}
+
+function isExist(v) {
+  return typeof v !== 'undefined';
+}
+
+function isEmptyObject(obj) {
+  return Object.keys(obj).length === 0;
+}
+
+function getValue(v) {
+  if (exports.isExist(v)) {
+    return v;
+  } else {
+    return '';
+  }
+}
+
+/**
+ * Dangerous property names that could lead to prototype pollution or security issues
+ */
+const DANGEROUS_PROPERTY_NAMES = [
+  // '__proto__',
+  // 'constructor',
+  // 'prototype',
+  'hasOwnProperty',
+  'toString',
+  'valueOf',
+  '__defineGetter__',
+  '__defineSetter__',
+  '__lookupGetter__',
+  '__lookupSetter__'
+];
+
+const criticalProperties = ["__proto__", "constructor", "prototype"];
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/xmlparser/OptionsBuilder.js
+
+
+const defaultOnDangerousProperty = (name) => {
+  if (DANGEROUS_PROPERTY_NAMES.includes(name)) {
+    return "__" + name;
+  }
+  return name;
+};
+
+
 const defaultOptions = {
   preserveOrder: false,
   attributeNamePrefix: '@_',
@@ -2453,7 +2526,37 @@ const defaultOptions = {
   },
   // skipEmptyListItem: false
   captureMetaData: false,
+  maxNestedTags: 100,
+  strictReservedNames: true,
+  jPath: true, // if true, pass jPath string to callbacks; if false, pass matcher instance
+  onDangerousProperty: defaultOnDangerousProperty
 };
+
+
+/**
+ * Validates that a property name is safe to use
+ * @param {string} propertyName - The property name to validate
+ * @param {string} optionName - The option field name (for error message)
+ * @throws {Error} If property name is dangerous
+ */
+function validatePropertyName(propertyName, optionName) {
+  if (typeof propertyName !== 'string') {
+    return; // Only validate string property names
+  }
+
+  const normalized = propertyName.toLowerCase();
+  if (DANGEROUS_PROPERTY_NAMES.some(dangerous => normalized === dangerous.toLowerCase())) {
+    throw new Error(
+      `[SECURITY] Invalid ${optionName}: "${propertyName}" is a reserved JavaScript keyword that could cause prototype pollution`
+    );
+  }
+
+  if (criticalProperties.some(dangerous => normalized === dangerous.toLowerCase())) {
+    throw new Error(
+      `[SECURITY] Invalid ${optionName}: "${propertyName}" is a reserved JavaScript keyword that could cause prototype pollution`
+    );
+  }
+}
 
 /**
  * Normalizes processEntities option for backward compatibility
@@ -2469,6 +2572,7 @@ function normalizeProcessEntities(value) {
       maxExpansionDepth: 10,
       maxTotalExpansions: 1000,
       maxExpandedLength: 100000,
+      maxEntityCount: 100,
       allowedTags: null,
       tagFilter: null
     };
@@ -2477,11 +2581,12 @@ function normalizeProcessEntities(value) {
   // Object config - merge with defaults
   if (typeof value === 'object' && value !== null) {
     return {
-      enabled: value.enabled !== false, // default true if not specified
-      maxEntitySize: value.maxEntitySize ?? 10000,
-      maxExpansionDepth: value.maxExpansionDepth ?? 10,
-      maxTotalExpansions: value.maxTotalExpansions ?? 1000,
-      maxExpandedLength: value.maxExpandedLength ?? 100000,
+      enabled: value.enabled !== false,
+      maxEntitySize: Math.max(1, value.maxEntitySize ?? 10000),
+      maxExpansionDepth: Math.max(1, value.maxExpansionDepth ?? 10),
+      maxTotalExpansions: Math.max(1, value.maxTotalExpansions ?? 1000),
+      maxExpandedLength: Math.max(1, value.maxExpandedLength ?? 100000),
+      maxEntityCount: Math.max(1, value.maxEntityCount ?? 100),
       allowedTags: value.allowedTags ?? null,
       tagFilter: value.tagFilter ?? null
     };
@@ -2494,80 +2599,42 @@ function normalizeProcessEntities(value) {
 const buildOptions = function (options) {
   const built = Object.assign({}, defaultOptions, options);
 
+  // Validate property names to prevent prototype pollution
+  const propertyNameOptions = [
+    { value: built.attributeNamePrefix, name: 'attributeNamePrefix' },
+    { value: built.attributesGroupName, name: 'attributesGroupName' },
+    { value: built.textNodeName, name: 'textNodeName' },
+    { value: built.cdataPropName, name: 'cdataPropName' },
+    { value: built.commentPropName, name: 'commentPropName' }
+  ];
+
+  for (const { value, name } of propertyNameOptions) {
+    if (value) {
+      validatePropertyName(value, name);
+    }
+  }
+
+  if (built.onDangerousProperty === null) {
+    built.onDangerousProperty = defaultOnDangerousProperty;
+  }
+
   // Always normalize processEntities for backward compatibility and validation
   built.processEntities = normalizeProcessEntities(built.processEntities);
+
+  // Convert old-style stopNodes for backward compatibility
+  if (built.stopNodes && Array.isArray(built.stopNodes)) {
+    built.stopNodes = built.stopNodes.map(node => {
+      if (typeof node === 'string' && node.startsWith('*.')) {
+        // Old syntax: *.tagname meant "tagname anywhere"
+        // Convert to new syntax: ..tagname
+        return '..' + node.substring(2);
+      }
+      return node;
+    });
+  }
   //console.debug(built.processEntities)
   return built;
 };
-;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/util.js
-
-
-const nameStartChar = ':A-Za-z_\\u00C0-\\u00D6\\u00D8-\\u00F6\\u00F8-\\u02FF\\u0370-\\u037D\\u037F-\\u1FFF\\u200C-\\u200D\\u2070-\\u218F\\u2C00-\\u2FEF\\u3001-\\uD7FF\\uF900-\\uFDCF\\uFDF0-\\uFFFD';
-const nameChar = nameStartChar + '\\-.\\d\\u00B7\\u0300-\\u036F\\u203F-\\u2040';
-const nameRegexp = '[' + nameStartChar + '][' + nameChar + ']*';
-const regexName = new RegExp('^' + nameRegexp + '$');
-
-function getAllMatches(string, regex) {
-  const matches = [];
-  let match = regex.exec(string);
-  while (match) {
-    const allmatches = [];
-    allmatches.startIndex = regex.lastIndex - match[0].length;
-    const len = match.length;
-    for (let index = 0; index < len; index++) {
-      allmatches.push(match[index]);
-    }
-    matches.push(allmatches);
-    match = regex.exec(string);
-  }
-  return matches;
-}
-
-const isName = function(string) {
-  const match = regexName.exec(string);
-  return !(match === null || typeof match === 'undefined');
-}
-
-function isExist(v) {
-  return typeof v !== 'undefined';
-}
-
-function isEmptyObject(obj) {
-  return Object.keys(obj).length === 0;
-}
-
-/**
- * Copy all the properties of a into b.
- * @param {*} target
- * @param {*} a
- */
-function merge(target, a, arrayMode) {
-  if (a) {
-    const keys = Object.keys(a); // will return an array of own properties
-    const len = keys.length; //don't make it inline
-    for (let i = 0; i < len; i++) {
-      if (arrayMode === 'strict') {
-        target[keys[i]] = [ a[keys[i]] ];
-      } else {
-        target[keys[i]] = a[keys[i]];
-      }
-    }
-  }
-}
-/* exports.merge =function (b,a){
-  return Object.assign(b,a);
-} */
-
-function getValue(v) {
-  if (exports.isExist(v)) {
-    return v;
-  } else {
-    return '';
-  }
-}
-
-// const fakeCall = function(a) {return a;};
-// const fakeCallNoReturn = function() {};
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/xmlparser/xmlNode.js
 
 
@@ -2579,23 +2646,23 @@ if (typeof Symbol !== "function") {
   METADATA_SYMBOL = Symbol("XML Node Metadata");
 }
 
-class XmlNode{
+class XmlNode {
   constructor(tagname) {
     this.tagname = tagname;
     this.child = []; //nested tags, text, cdata, comments in order
-    this[":@"] = {}; //attributes map
+    this[":@"] = Object.create(null); //attributes map
   }
-  add(key,val){
+  add(key, val) {
     // this.child.push( {name : key, val: val, isCdata: isCdata });
-    if(key === "__proto__") key = "#__proto__";
-    this.child.push( {[key]: val });
+    if (key === "__proto__") key = "#__proto__";
+    this.child.push({ [key]: val });
   }
   addChild(node, startIndex) {
-    if(node.tagname === "__proto__") node.tagname = "#__proto__";
-    if(node[":@"] && Object.keys(node[":@"]).length > 0){
-      this.child.push( { [node.tagname]: node.child, [":@"]: node[":@"] });
-    }else{
-      this.child.push( { [node.tagname]: node.child });
+    if (node.tagname === "__proto__") node.tagname = "#__proto__";
+    if (node[":@"] && Object.keys(node[":@"]).length > 0) {
+      this.child.push({ [node.tagname]: node.child, [":@"]: node[":@"] });
+    } else {
+      this.child.push({ [node.tagname]: node.child });
     }
     // if requested, add the startIndex
     if (startIndex !== undefined) {
@@ -2620,8 +2687,9 @@ class DocTypeReader {
     }
 
     readDocType(xmlData, i) {
+        const entities = Object.create(null);
+        let entityCount = 0;
 
-        const entities = {};
         if (xmlData[i + 3] === 'O' &&
             xmlData[i + 4] === 'C' &&
             xmlData[i + 5] === 'T' &&
@@ -2639,11 +2707,20 @@ class DocTypeReader {
                         let entityName, val;
                         [entityName, val, i] = this.readEntityExp(xmlData, i + 1, this.suppressValidationErr);
                         if (val.indexOf("&") === -1) { //Parameter entities are not supported
-                            const escaped = entityName.replace(/[.\-+*:]/g, '\\.');
+                            if (this.options.enabled !== false &&
+                                this.options.maxEntityCount != null &&
+                                entityCount >= this.options.maxEntityCount) {
+                                throw new Error(
+                                    `Entity count (${entityCount + 1}) exceeds maximum allowed (${this.options.maxEntityCount})`
+                                );
+                            }
+                            //const escaped = entityName.replace(/[.\-+*:]/g, '\\.');
+                            const escaped = entityName.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
                             entities[entityName] = {
                                 regx: RegExp(`&${escaped};`, "g"),
                                 val: val
                             };
+                            entityCount++;
                         }
                     }
                     else if (hasBody && hasSeq(xmlData, "!ELEMENT", i)) {
@@ -2703,11 +2780,12 @@ class DocTypeReader {
         i = skipWhitespace(xmlData, i);
 
         // Read entity name
-        let entityName = "";
+        const startIndex = i;
         while (i < xmlData.length && !/\s/.test(xmlData[i]) && xmlData[i] !== '"' && xmlData[i] !== "'") {
-            entityName += xmlData[i];
             i++;
         }
+        let entityName = xmlData.substring(startIndex, i);
+
         validateEntityName(entityName);
 
         // Skip whitespace after entity name
@@ -2728,7 +2806,7 @@ class DocTypeReader {
 
         // Validate entity size
         if (this.options.enabled !== false &&
-            this.options.maxEntitySize &&
+            this.options.maxEntitySize != null &&
             entityValue.length > this.options.maxEntitySize) {
             throw new Error(
                 `Entity "${entityName}" size (${entityValue.length}) exceeds maximum allowed size (${this.options.maxEntitySize})`
@@ -2744,11 +2822,13 @@ class DocTypeReader {
         i = skipWhitespace(xmlData, i);
 
         // Read notation name
-        let notationName = "";
+
+        const startIndex = i;
         while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-            notationName += xmlData[i];
             i++;
         }
+        let notationName = xmlData.substring(startIndex, i);
+
         !this.suppressValidationErr && validateEntityName(notationName);
 
         // Skip whitespace after notation name
@@ -2798,10 +2878,11 @@ class DocTypeReader {
         }
         i++;
 
+        const startIndex = i;
         while (i < xmlData.length && xmlData[i] !== startChar) {
-            identifierVal += xmlData[i];
             i++;
         }
+        identifierVal = xmlData.substring(startIndex, i);
 
         if (xmlData[i] !== startChar) {
             throw new Error(`Unterminated ${type} value`);
@@ -2821,11 +2902,11 @@ class DocTypeReader {
         i = skipWhitespace(xmlData, i);
 
         // Read element name
-        let elementName = "";
+        const startIndex = i;
         while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-            elementName += xmlData[i];
             i++;
         }
+        let elementName = xmlData.substring(startIndex, i);
 
         // Validate element name
         if (!this.suppressValidationErr && !isName(elementName)) {
@@ -2842,10 +2923,12 @@ class DocTypeReader {
             i++; // Move past '('
 
             // Read content model
+            const startIndex = i;
             while (i < xmlData.length && xmlData[i] !== ")") {
-                contentModel += xmlData[i];
                 i++;
             }
+            contentModel = xmlData.substring(startIndex, i);
+
             if (xmlData[i] !== ")") {
                 throw new Error("Unterminated content model");
             }
@@ -2866,11 +2949,11 @@ class DocTypeReader {
         i = skipWhitespace(xmlData, i);
 
         // Read element name
-        let elementName = "";
+        let startIndex = i;
         while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-            elementName += xmlData[i];
             i++;
         }
+        let elementName = xmlData.substring(startIndex, i);
 
         // Validate element name
         validateEntityName(elementName)
@@ -2879,11 +2962,11 @@ class DocTypeReader {
         i = skipWhitespace(xmlData, i);
 
         // Read attribute name
-        let attributeName = "";
+        startIndex = i;
         while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-            attributeName += xmlData[i];
             i++;
         }
+        let attributeName = xmlData.substring(startIndex, i);
 
         // Validate attribute name
         if (!validateEntityName(attributeName)) {
@@ -2911,11 +2994,13 @@ class DocTypeReader {
             // Read the list of allowed notations
             let allowedNotations = [];
             while (i < xmlData.length && xmlData[i] !== ")") {
-                let notation = "";
+
+
+                const startIndex = i;
                 while (i < xmlData.length && xmlData[i] !== "|" && xmlData[i] !== ")") {
-                    notation += xmlData[i];
                     i++;
                 }
+                let notation = xmlData.substring(startIndex, i);
 
                 // Validate notation name
                 notation = notation.trim();
@@ -2941,10 +3026,11 @@ class DocTypeReader {
             attributeType += " (" + allowedNotations.join("|") + ")";
         } else {
             // Handle simple types (e.g., CDATA, ID, IDREF, etc.)
+            const startIndex = i;
             while (i < xmlData.length && !/\s/.test(xmlData[i])) {
-                attributeType += xmlData[i];
                 i++;
             }
+            attributeType += xmlData.substring(startIndex, i);
 
             // Validate simple attribute type
             const validTypes = ["CDATA", "ID", "IDREF", "IDREFS", "ENTITY", "ENTITIES", "NMTOKEN", "NMTOKENS"];
@@ -3025,8 +3111,9 @@ function toNumber(str, options = {}) {
 
     let trimmedStr = str.trim();
 
-    if (options.skipLike !== undefined && options.skipLike.test(trimmedStr)) return str;
-    else if (str === "0") return 0;
+    if (trimmedStr.length === 0) return str;
+    else if (options.skipLike !== undefined && options.skipLike.test(trimmedStr)) return str;
+    else if (trimmedStr === "0") return 0;
     else if (options.hex && hexRegex.test(trimmedStr)) {
         return parse_int(trimmedStr, 16);
         // }else if (options.oct && octRegex.test(str)) {
@@ -3102,11 +3189,16 @@ function resolveEnotation(str, trimmedStr, options) {
         else if (leadingZeros.length === 1
             && (notation[3].startsWith(`.${eChar}`) || notation[3][0] === eChar)) {
             return Number(trimmedStr);
-        } else if (options.leadingZeros && !eAdjacentToLeadingZeros) { //accept with leading zeros
-            //remove leading 0s
-            trimmedStr = (notation[1] || "") + notation[3];
+        } else if (leadingZeros.length > 0) {
+            // Has leading zeros — only accept if leadingZeros option allows it
+            if (options.leadingZeros && !eAdjacentToLeadingZeros) {
+                trimmedStr = (notation[1] || "") + notation[3];
+                return Number(trimmedStr);
+            } else return str;
+        } else {
+            // No leading zeros — always valid e-notation, parse it
             return Number(trimmedStr);
-        } else return str;
+        }
     } else {
         return str;
     }
@@ -3177,9 +3269,742 @@ function getIgnoreAttributesFn(ignoreAttributes) {
     }
     return () => false
 }
+;// CONCATENATED MODULE: ./node_modules/path-expression-matcher/src/Matcher.js
+/**
+ * Matcher - Tracks current path in XML/JSON tree and matches against Expressions
+ * 
+ * The matcher maintains a stack of nodes representing the current path from root to
+ * current tag. It only stores attribute values for the current (top) node to minimize
+ * memory usage. Sibling tracking is used to auto-calculate position and counter.
+ * 
+ * @example
+ * const matcher = new Matcher();
+ * matcher.push("root", {});
+ * matcher.push("users", {});
+ * matcher.push("user", { id: "123", type: "admin" });
+ * 
+ * const expr = new Expression("root.users.user");
+ * matcher.matches(expr); // true
+ */
+
+/**
+ * Names of methods that mutate Matcher state.
+ * Any attempt to call these on a read-only view throws a TypeError.
+ * @type {Set<string>}
+ */
+const MUTATING_METHODS = new Set(['push', 'pop', 'reset', 'updateCurrent', 'restore']);
+
+class Matcher {
+  /**
+   * Create a new Matcher
+   * @param {Object} options - Configuration options
+   * @param {string} options.separator - Default path separator (default: '.')
+   */
+  constructor(options = {}) {
+    this.separator = options.separator || '.';
+    this.path = [];
+    this.siblingStacks = [];
+    // Each path node: { tag: string, values: object, position: number, counter: number }
+    // values only present for current (last) node
+    // Each siblingStacks entry: Map<tagName, count> tracking occurrences at each level
+  }
+
+  /**
+   * Push a new tag onto the path
+   * @param {string} tagName - Name of the tag
+   * @param {Object} attrValues - Attribute key-value pairs for current node (optional)
+   * @param {string} namespace - Namespace for the tag (optional)
+   */
+  push(tagName, attrValues = null, namespace = null) {
+    // Remove values from previous current node (now becoming ancestor)
+    if (this.path.length > 0) {
+      const prev = this.path[this.path.length - 1];
+      prev.values = undefined;
+    }
+
+    // Get or create sibling tracking for current level
+    const currentLevel = this.path.length;
+    if (!this.siblingStacks[currentLevel]) {
+      this.siblingStacks[currentLevel] = new Map();
+    }
+
+    const siblings = this.siblingStacks[currentLevel];
+
+    // Create a unique key for sibling tracking that includes namespace
+    const siblingKey = namespace ? `${namespace}:${tagName}` : tagName;
+
+    // Calculate counter (how many times this tag appeared at this level)
+    const counter = siblings.get(siblingKey) || 0;
+
+    // Calculate position (total children at this level so far)
+    let position = 0;
+    for (const count of siblings.values()) {
+      position += count;
+    }
+
+    // Update sibling count for this tag
+    siblings.set(siblingKey, counter + 1);
+
+    // Create new node
+    const node = {
+      tag: tagName,
+      position: position,
+      counter: counter
+    };
+
+    // Store namespace if provided
+    if (namespace !== null && namespace !== undefined) {
+      node.namespace = namespace;
+    }
+
+    // Store values only for current node
+    if (attrValues !== null && attrValues !== undefined) {
+      node.values = attrValues;
+    }
+
+    this.path.push(node);
+  }
+
+  /**
+   * Pop the last tag from the path
+   * @returns {Object|undefined} The popped node
+   */
+  pop() {
+    if (this.path.length === 0) {
+      return undefined;
+    }
+
+    const node = this.path.pop();
+
+    // Clean up sibling tracking for levels deeper than current
+    // After pop, path.length is the new depth
+    // We need to clean up siblingStacks[path.length + 1] and beyond
+    if (this.siblingStacks.length > this.path.length + 1) {
+      this.siblingStacks.length = this.path.length + 1;
+    }
+
+    return node;
+  }
+
+  /**
+   * Update current node's attribute values
+   * Useful when attributes are parsed after push
+   * @param {Object} attrValues - Attribute values
+   */
+  updateCurrent(attrValues) {
+    if (this.path.length > 0) {
+      const current = this.path[this.path.length - 1];
+      if (attrValues !== null && attrValues !== undefined) {
+        current.values = attrValues;
+      }
+    }
+  }
+
+  /**
+   * Get current tag name
+   * @returns {string|undefined}
+   */
+  getCurrentTag() {
+    return this.path.length > 0 ? this.path[this.path.length - 1].tag : undefined;
+  }
+
+  /**
+   * Get current namespace
+   * @returns {string|undefined}
+   */
+  getCurrentNamespace() {
+    return this.path.length > 0 ? this.path[this.path.length - 1].namespace : undefined;
+  }
+
+  /**
+   * Get current node's attribute value
+   * @param {string} attrName - Attribute name
+   * @returns {*} Attribute value or undefined
+   */
+  getAttrValue(attrName) {
+    if (this.path.length === 0) return undefined;
+    const current = this.path[this.path.length - 1];
+    return current.values?.[attrName];
+  }
+
+  /**
+   * Check if current node has an attribute
+   * @param {string} attrName - Attribute name
+   * @returns {boolean}
+   */
+  hasAttr(attrName) {
+    if (this.path.length === 0) return false;
+    const current = this.path[this.path.length - 1];
+    return current.values !== undefined && attrName in current.values;
+  }
+
+  /**
+   * Get current node's sibling position (child index in parent)
+   * @returns {number}
+   */
+  getPosition() {
+    if (this.path.length === 0) return -1;
+    return this.path[this.path.length - 1].position ?? 0;
+  }
+
+  /**
+   * Get current node's repeat counter (occurrence count of this tag name)
+   * @returns {number}
+   */
+  getCounter() {
+    if (this.path.length === 0) return -1;
+    return this.path[this.path.length - 1].counter ?? 0;
+  }
+
+  /**
+   * Get current node's sibling index (alias for getPosition for backward compatibility)
+   * @returns {number}
+   * @deprecated Use getPosition() or getCounter() instead
+   */
+  getIndex() {
+    return this.getPosition();
+  }
+
+  /**
+   * Get current path depth
+   * @returns {number}
+   */
+  getDepth() {
+    return this.path.length;
+  }
+
+  /**
+   * Get path as string
+   * @param {string} separator - Optional separator (uses default if not provided)
+   * @param {boolean} includeNamespace - Whether to include namespace in output (default: true)
+   * @returns {string}
+   */
+  toString(separator, includeNamespace = true) {
+    const sep = separator || this.separator;
+    return this.path.map(n => {
+      if (includeNamespace && n.namespace) {
+        return `${n.namespace}:${n.tag}`;
+      }
+      return n.tag;
+    }).join(sep);
+  }
+
+  /**
+   * Get path as array of tag names
+   * @returns {string[]}
+   */
+  toArray() {
+    return this.path.map(n => n.tag);
+  }
+
+  /**
+   * Reset the path to empty
+   */
+  reset() {
+    this.path = [];
+    this.siblingStacks = [];
+  }
+
+  /**
+   * Match current path against an Expression
+   * @param {Expression} expression - The expression to match against
+   * @returns {boolean} True if current path matches the expression
+   */
+  matches(expression) {
+    const segments = expression.segments;
+
+    if (segments.length === 0) {
+      return false;
+    }
+
+    // Handle deep wildcard patterns
+    if (expression.hasDeepWildcard()) {
+      return this._matchWithDeepWildcard(segments);
+    }
+
+    // Simple path matching (no deep wildcards)
+    return this._matchSimple(segments);
+  }
+
+  /**
+   * Match simple path (no deep wildcards)
+   * @private
+   */
+  _matchSimple(segments) {
+    // Path must be same length as segments
+    if (this.path.length !== segments.length) {
+      return false;
+    }
+
+    // Match each segment bottom-to-top
+    for (let i = 0; i < segments.length; i++) {
+      const segment = segments[i];
+      const node = this.path[i];
+      const isCurrentNode = (i === this.path.length - 1);
+
+      if (!this._matchSegment(segment, node, isCurrentNode)) {
+        return false;
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Match path with deep wildcards
+   * @private
+   */
+  _matchWithDeepWildcard(segments) {
+    let pathIdx = this.path.length - 1;  // Start from current node (bottom)
+    let segIdx = segments.length - 1;     // Start from last segment
+
+    while (segIdx >= 0 && pathIdx >= 0) {
+      const segment = segments[segIdx];
+
+      if (segment.type === 'deep-wildcard') {
+        // ".." matches zero or more levels
+        segIdx--;
+
+        if (segIdx < 0) {
+          // Pattern ends with "..", always matches
+          return true;
+        }
+
+        // Find where next segment matches in the path
+        const nextSeg = segments[segIdx];
+        let found = false;
+
+        for (let i = pathIdx; i >= 0; i--) {
+          const isCurrentNode = (i === this.path.length - 1);
+          if (this._matchSegment(nextSeg, this.path[i], isCurrentNode)) {
+            pathIdx = i - 1;
+            segIdx--;
+            found = true;
+            break;
+          }
+        }
+
+        if (!found) {
+          return false;
+        }
+      } else {
+        // Regular segment
+        const isCurrentNode = (pathIdx === this.path.length - 1);
+        if (!this._matchSegment(segment, this.path[pathIdx], isCurrentNode)) {
+          return false;
+        }
+        pathIdx--;
+        segIdx--;
+      }
+    }
+
+    // All segments must be consumed
+    return segIdx < 0;
+  }
+
+  /**
+   * Match a single segment against a node
+   * @private
+   * @param {Object} segment - Segment from Expression
+   * @param {Object} node - Node from path
+   * @param {boolean} isCurrentNode - Whether this is the current (last) node
+   * @returns {boolean}
+   */
+  _matchSegment(segment, node, isCurrentNode) {
+    // Match tag name (* is wildcard)
+    if (segment.tag !== '*' && segment.tag !== node.tag) {
+      return false;
+    }
+
+    // Match namespace if specified in segment
+    if (segment.namespace !== undefined) {
+      // Segment has namespace - node must match it
+      if (segment.namespace !== '*' && segment.namespace !== node.namespace) {
+        return false;
+      }
+    }
+    // If segment has no namespace, it matches nodes with or without namespace
+
+    // Match attribute name (check if node has this attribute)
+    // Can only check for current node since ancestors don't have values
+    if (segment.attrName !== undefined) {
+      if (!isCurrentNode) {
+        // Can't check attributes for ancestor nodes (values not stored)
+        return false;
+      }
+
+      if (!node.values || !(segment.attrName in node.values)) {
+        return false;
+      }
+
+      // Match attribute value (only possible for current node)
+      if (segment.attrValue !== undefined) {
+        const actualValue = node.values[segment.attrName];
+        // Both should be strings
+        if (String(actualValue) !== String(segment.attrValue)) {
+          return false;
+        }
+      }
+    }
+
+    // Match position (only for current node)
+    if (segment.position !== undefined) {
+      if (!isCurrentNode) {
+        // Can't check position for ancestor nodes
+        return false;
+      }
+
+      const counter = node.counter ?? 0;
+
+      if (segment.position === 'first' && counter !== 0) {
+        return false;
+      } else if (segment.position === 'odd' && counter % 2 !== 1) {
+        return false;
+      } else if (segment.position === 'even' && counter % 2 !== 0) {
+        return false;
+      } else if (segment.position === 'nth') {
+        if (counter !== segment.positionValue) {
+          return false;
+        }
+      }
+    }
+
+    return true;
+  }
+
+  /**
+   * Create a snapshot of current state
+   * @returns {Object} State snapshot
+   */
+  snapshot() {
+    return {
+      path: this.path.map(node => ({ ...node })),
+      siblingStacks: this.siblingStacks.map(map => new Map(map))
+    };
+  }
+
+  /**
+   * Restore state from snapshot
+   * @param {Object} snapshot - State snapshot
+   */
+  restore(snapshot) {
+    this.path = snapshot.path.map(node => ({ ...node }));
+    this.siblingStacks = snapshot.siblingStacks.map(map => new Map(map));
+  }
+
+  /**
+   * Return a read-only view of this matcher.
+   *
+   * The returned object exposes all query/inspection methods but throws a
+   * TypeError if any state-mutating method is called (`push`, `pop`, `reset`,
+   * `updateCurrent`, `restore`).  Property reads (e.g. `.path`, `.separator`)
+   * are allowed but the returned arrays/objects are frozen so callers cannot
+   * mutate internal state through them either.
+   *
+   * @returns {ReadOnlyMatcher} A proxy that forwards read operations and blocks writes.
+   *
+   * @example
+   * const matcher = new Matcher();
+   * matcher.push("root", {});
+   *
+   * const ro = matcher.readOnly();
+   * ro.matches(expr);      // ✓ works
+   * ro.getCurrentTag();    // ✓ works
+   * ro.push("child", {}); // ✗ throws TypeError
+   * ro.reset();            // ✗ throws TypeError
+   */
+  readOnly() {
+    const self = this;
+
+    return new Proxy(self, {
+      get(target, prop, receiver) {
+        // Block mutating methods
+        if (MUTATING_METHODS.has(prop)) {
+          return () => {
+            throw new TypeError(
+              `Cannot call '${prop}' on a read-only Matcher. ` +
+              `Obtain a writable instance to mutate state.`
+            );
+          };
+        }
+
+        const value = Reflect.get(target, prop, receiver);
+
+        // Freeze array/object properties so callers can't mutate internal
+        // state through direct property access (e.g. matcher.path.push(...))
+        if (prop === 'path' || prop === 'siblingStacks') {
+          return Object.freeze(
+            Array.isArray(value)
+              ? value.map(item =>
+                item instanceof Map
+                  ? Object.freeze(new Map(item))   // freeze a copy of each Map
+                  : Object.freeze({ ...item })      // freeze a copy of each node
+              )
+              : value
+          );
+        }
+
+        // Bind methods so `this` inside them still refers to the real Matcher
+        if (typeof value === 'function') {
+          return value.bind(target);
+        }
+
+        return value;
+      },
+
+      // Prevent any property assignment on the read-only view
+      set(_target, prop) {
+        throw new TypeError(
+          `Cannot set property '${String(prop)}' on a read-only Matcher.`
+        );
+      },
+
+      // Prevent property deletion
+      deleteProperty(_target, prop) {
+        throw new TypeError(
+          `Cannot delete property '${String(prop)}' from a read-only Matcher.`
+        );
+      }
+    });
+  }
+}
+;// CONCATENATED MODULE: ./node_modules/path-expression-matcher/src/Expression.js
+/**
+ * Expression - Parses and stores a tag pattern expression
+ * 
+ * Patterns are parsed once and stored in an optimized structure for fast matching.
+ * 
+ * @example
+ * const expr = new Expression("root.users.user");
+ * const expr2 = new Expression("..user[id]:first");
+ * const expr3 = new Expression("root/users/user", { separator: '/' });
+ */
+class Expression {
+  /**
+   * Create a new Expression
+   * @param {string} pattern - Pattern string (e.g., "root.users.user", "..user[id]")
+   * @param {Object} options - Configuration options
+   * @param {string} options.separator - Path separator (default: '.')
+   */
+  constructor(pattern, options = {}) {
+    this.pattern = pattern;
+    this.separator = options.separator || '.';
+    this.segments = this._parse(pattern);
+
+    // Cache expensive checks for performance (O(1) instead of O(n))
+    this._hasDeepWildcard = this.segments.some(seg => seg.type === 'deep-wildcard');
+    this._hasAttributeCondition = this.segments.some(seg => seg.attrName !== undefined);
+    this._hasPositionSelector = this.segments.some(seg => seg.position !== undefined);
+  }
+
+  /**
+   * Parse pattern string into segments
+   * @private
+   * @param {string} pattern - Pattern to parse
+   * @returns {Array} Array of segment objects
+   */
+  _parse(pattern) {
+    const segments = [];
+
+    // Split by separator but handle ".." specially
+    let i = 0;
+    let currentPart = '';
+
+    while (i < pattern.length) {
+      if (pattern[i] === this.separator) {
+        // Check if next char is also separator (deep wildcard)
+        if (i + 1 < pattern.length && pattern[i + 1] === this.separator) {
+          // Flush current part if any
+          if (currentPart.trim()) {
+            segments.push(this._parseSegment(currentPart.trim()));
+            currentPart = '';
+          }
+          // Add deep wildcard
+          segments.push({ type: 'deep-wildcard' });
+          i += 2; // Skip both separators
+        } else {
+          // Regular separator
+          if (currentPart.trim()) {
+            segments.push(this._parseSegment(currentPart.trim()));
+          }
+          currentPart = '';
+          i++;
+        }
+      } else {
+        currentPart += pattern[i];
+        i++;
+      }
+    }
+
+    // Flush remaining part
+    if (currentPart.trim()) {
+      segments.push(this._parseSegment(currentPart.trim()));
+    }
+
+    return segments;
+  }
+
+  /**
+   * Parse a single segment
+   * @private
+   * @param {string} part - Segment string (e.g., "user", "ns::user", "user[id]", "ns::user:first")
+   * @returns {Object} Segment object
+   */
+  _parseSegment(part) {
+    const segment = { type: 'tag' };
+
+    // NEW NAMESPACE SYNTAX (v2.0):
+    // ============================
+    // Namespace uses DOUBLE colon (::)
+    // Position uses SINGLE colon (:)
+    // 
+    // Examples:
+    //   "user"              → tag
+    //   "user:first"        → tag + position
+    //   "user[id]"          → tag + attribute
+    //   "user[id]:first"    → tag + attribute + position
+    //   "ns::user"          → namespace + tag
+    //   "ns::user:first"    → namespace + tag + position
+    //   "ns::user[id]"      → namespace + tag + attribute
+    //   "ns::user[id]:first" → namespace + tag + attribute + position
+    //   "ns::first"         → namespace + tag named "first" (NO ambiguity!)
+    //
+    // This eliminates all ambiguity:
+    //   :: = namespace separator
+    //   :  = position selector
+    //   [] = attributes
+
+    // Step 1: Extract brackets [attr] or [attr=value]
+    let bracketContent = null;
+    let withoutBrackets = part;
+
+    const bracketMatch = part.match(/^([^\[]+)(\[[^\]]*\])(.*)$/);
+    if (bracketMatch) {
+      withoutBrackets = bracketMatch[1] + bracketMatch[3];
+      if (bracketMatch[2]) {
+        const content = bracketMatch[2].slice(1, -1);
+        if (content) {
+          bracketContent = content;
+        }
+      }
+    }
+
+    // Step 2: Check for namespace (double colon ::)
+    let namespace = undefined;
+    let tagAndPosition = withoutBrackets;
+
+    if (withoutBrackets.includes('::')) {
+      const nsIndex = withoutBrackets.indexOf('::');
+      namespace = withoutBrackets.substring(0, nsIndex).trim();
+      tagAndPosition = withoutBrackets.substring(nsIndex + 2).trim(); // Skip ::
+
+      if (!namespace) {
+        throw new Error(`Invalid namespace in pattern: ${part}`);
+      }
+    }
+
+    // Step 3: Parse tag and position (single colon :)
+    let tag = undefined;
+    let positionMatch = null;
+
+    if (tagAndPosition.includes(':')) {
+      const colonIndex = tagAndPosition.lastIndexOf(':'); // Use last colon for position
+      const tagPart = tagAndPosition.substring(0, colonIndex).trim();
+      const posPart = tagAndPosition.substring(colonIndex + 1).trim();
+
+      // Verify position is a valid keyword
+      const isPositionKeyword = ['first', 'last', 'odd', 'even'].includes(posPart) ||
+        /^nth\(\d+\)$/.test(posPart);
+
+      if (isPositionKeyword) {
+        tag = tagPart;
+        positionMatch = posPart;
+      } else {
+        // Not a valid position keyword, treat whole thing as tag
+        tag = tagAndPosition;
+      }
+    } else {
+      tag = tagAndPosition;
+    }
+
+    if (!tag) {
+      throw new Error(`Invalid segment pattern: ${part}`);
+    }
+
+    segment.tag = tag;
+    if (namespace) {
+      segment.namespace = namespace;
+    }
+
+    // Step 4: Parse attributes
+    if (bracketContent) {
+      if (bracketContent.includes('=')) {
+        const eqIndex = bracketContent.indexOf('=');
+        segment.attrName = bracketContent.substring(0, eqIndex).trim();
+        segment.attrValue = bracketContent.substring(eqIndex + 1).trim();
+      } else {
+        segment.attrName = bracketContent.trim();
+      }
+    }
+
+    // Step 5: Parse position selector
+    if (positionMatch) {
+      const nthMatch = positionMatch.match(/^nth\((\d+)\)$/);
+      if (nthMatch) {
+        segment.position = 'nth';
+        segment.positionValue = parseInt(nthMatch[1], 10);
+      } else {
+        segment.position = positionMatch;
+      }
+    }
+
+    return segment;
+  }
+
+  /**
+   * Get the number of segments
+   * @returns {number}
+   */
+  get length() {
+    return this.segments.length;
+  }
+
+  /**
+   * Check if expression contains deep wildcard
+   * @returns {boolean}
+   */
+  hasDeepWildcard() {
+    return this._hasDeepWildcard;
+  }
+
+  /**
+   * Check if expression has attribute conditions
+   * @returns {boolean}
+   */
+  hasAttributeCondition() {
+    return this._hasAttributeCondition;
+  }
+
+  /**
+   * Check if expression has position selectors
+   * @returns {boolean}
+   */
+  hasPositionSelector() {
+    return this._hasPositionSelector;
+  }
+
+  /**
+   * Get string representation
+   * @returns {string}
+   */
+  toString() {
+    return this.pattern;
+  }
+}
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/xmlparser/OrderedObjParser.js
 
 ///@ts-check
+
 
 
 
@@ -3193,6 +4018,57 @@ function getIgnoreAttributesFn(ignoreAttributes) {
 
 //const tagsRegx = new RegExp("<(\\/?[\\w:\\-\._]+)([^>]*)>(\\s*"+cdataRegx+")*([^<]+)?","g");
 //const tagsRegx = new RegExp("<(\\/?)((\\w*:)?([\\w:\\-\._]+))([^>]*)>([^<]*)("+cdataRegx+"([^<]*))*([^<]+)?","g");
+
+// Helper functions for attribute and namespace handling
+
+/**
+ * Extract raw attributes (without prefix) from prefixed attribute map
+ * @param {object} prefixedAttrs - Attributes with prefix from buildAttributesMap
+ * @param {object} options - Parser options containing attributeNamePrefix
+ * @returns {object} Raw attributes for matcher
+ */
+function extractRawAttributes(prefixedAttrs, options) {
+  if (!prefixedAttrs) return {};
+
+  // Handle attributesGroupName option
+  const attrs = options.attributesGroupName
+    ? prefixedAttrs[options.attributesGroupName]
+    : prefixedAttrs;
+
+  if (!attrs) return {};
+
+  const rawAttrs = {};
+  for (const key in attrs) {
+    // Remove the attribute prefix to get raw name
+    if (key.startsWith(options.attributeNamePrefix)) {
+      const rawName = key.substring(options.attributeNamePrefix.length);
+      rawAttrs[rawName] = attrs[key];
+    } else {
+      // Attribute without prefix (shouldn't normally happen, but be safe)
+      rawAttrs[key] = attrs[key];
+    }
+  }
+  return rawAttrs;
+}
+
+/**
+ * Extract namespace from raw tag name
+ * @param {string} rawTagName - Tag name possibly with namespace (e.g., "soap:Envelope")
+ * @returns {string|undefined} Namespace or undefined
+ */
+function extractNamespace(rawTagName) {
+  if (!rawTagName || typeof rawTagName !== 'string') return undefined;
+
+  const colonIndex = rawTagName.indexOf(':');
+  if (colonIndex !== -1 && colonIndex > 0) {
+    const ns = rawTagName.substring(0, colonIndex);
+    // Don't treat xmlns as a namespace
+    if (ns !== 'xmlns') {
+      return ns;
+    }
+  }
+  return undefined;
+}
 
 class OrderedObjParser {
   constructor(options) {
@@ -3238,16 +4114,27 @@ class OrderedObjParser {
     this.entityExpansionCount = 0;
     this.currentExpandedLength = 0;
 
+    // Initialize path matcher for path-expression-matcher
+    this.matcher = new Matcher();
+
+    // Live read-only proxy of matcher — PEM creates and caches this internally.
+    // All user callbacks receive this instead of the mutable matcher.
+    this.readonlyMatcher = this.matcher.readOnly();
+
+    // Flag to track if current node is a stop node (optimization)
+    this.isCurrentNodeStopNode = false;
+
+    // Pre-compile stopNodes expressions
     if (this.options.stopNodes && this.options.stopNodes.length > 0) {
-      this.stopNodesExact = new Set();
-      this.stopNodesWildcard = new Set();
+      this.stopNodeExpressions = [];
       for (let i = 0; i < this.options.stopNodes.length; i++) {
         const stopNodeExp = this.options.stopNodes[i];
-        if (typeof stopNodeExp !== 'string') continue;
-        if (stopNodeExp.startsWith("*.")) {
-          this.stopNodesWildcard.add(stopNodeExp.substring(2));
-        } else {
-          this.stopNodesExact.add(stopNodeExp);
+        if (typeof stopNodeExp === 'string') {
+          // Convert string to Expression object
+          this.stopNodeExpressions.push(new Expression(stopNodeExp));
+        } else if (stopNodeExp instanceof Expression) {
+          // Already an Expression object
+          this.stopNodeExpressions.push(stopNodeExp);
         }
       }
     }
@@ -3270,7 +4157,7 @@ function addExternalEntities(externalEntities) {
 /**
  * @param {string} val
  * @param {string} tagName
- * @param {string} jPath
+ * @param {string|Matcher} jPath - jPath string or Matcher instance based on options.jPath
  * @param {boolean} dontTrim
  * @param {boolean} hasAttributes
  * @param {boolean} isLeafNode
@@ -3284,7 +4171,9 @@ function parseTextData(val, tagName, jPath, dontTrim, hasAttributes, isLeafNode,
     if (val.length > 0) {
       if (!escapeEntities) val = this.replaceEntitiesValue(val, tagName, jPath);
 
-      const newval = this.options.tagValueProcessor(tagName, val, jPath, hasAttributes, isLeafNode);
+      // Pass jPath string or matcher based on options.jPath setting
+      const jPathOrMatcher = this.options.jPath ? jPath.toString() : jPath;
+      const newval = this.options.tagValueProcessor(tagName, val, jPathOrMatcher, hasAttributes, isLeafNode);
       if (newval === null || newval === undefined) {
         //don't parse
         return val;
@@ -3331,24 +4220,58 @@ function buildAttributesMap(attrStr, jPath, tagName) {
     const matches = getAllMatches(attrStr, attrsRegx);
     const len = matches.length; //don't make it inline
     const attrs = {};
+
+    // First pass: parse all attributes and update matcher with raw values
+    // This ensures the matcher has all attribute values when processors run
+    const rawAttrsForMatcher = {};
     for (let i = 0; i < len; i++) {
       const attrName = this.resolveNameSpace(matches[i][1]);
-      if (this.ignoreAttributesFn(attrName, jPath)) {
+      const oldVal = matches[i][4];
+
+      if (attrName.length && oldVal !== undefined) {
+        let parsedVal = oldVal;
+        if (this.options.trimValues) {
+          parsedVal = parsedVal.trim();
+        }
+        parsedVal = this.replaceEntitiesValue(parsedVal, tagName, this.readonlyMatcher);
+        rawAttrsForMatcher[attrName] = parsedVal;
+      }
+    }
+
+    // Update matcher with raw attribute values BEFORE running processors
+    if (Object.keys(rawAttrsForMatcher).length > 0 && typeof jPath === 'object' && jPath.updateCurrent) {
+      jPath.updateCurrent(rawAttrsForMatcher);
+    }
+
+    // Second pass: now process attributes with matcher having full attribute context
+    for (let i = 0; i < len; i++) {
+      const attrName = this.resolveNameSpace(matches[i][1]);
+
+      // Convert jPath to string if needed for ignoreAttributesFn
+      const jPathStr = this.options.jPath ? jPath.toString() : this.readonlyMatcher;
+      if (this.ignoreAttributesFn(attrName, jPathStr)) {
         continue
       }
+
       let oldVal = matches[i][4];
       let aName = this.options.attributeNamePrefix + attrName;
+
       if (attrName.length) {
         if (this.options.transformAttributeName) {
           aName = this.options.transformAttributeName(aName);
         }
-        if (aName === "__proto__") aName = "#__proto__";
+        //if (aName === "__proto__") aName = "#__proto__";
+        aName = sanitizeName(aName, this.options);
+
         if (oldVal !== undefined) {
           if (this.options.trimValues) {
             oldVal = oldVal.trim();
           }
-          oldVal = this.replaceEntitiesValue(oldVal, tagName, jPath);
-          const newVal = this.options.attributeValueProcessor(attrName, oldVal, jPath);
+          oldVal = this.replaceEntitiesValue(oldVal, tagName, this.readonlyMatcher);
+
+          // Pass jPath string or readonlyMatcher based on options.jPath setting
+          const jPathOrMatcher = this.options.jPath ? jPath.toString() : this.readonlyMatcher;
+          const newVal = this.options.attributeValueProcessor(attrName, oldVal, jPathOrMatcher);
           if (newVal === null || newVal === undefined) {
             //don't parse
             attrs[aName] = oldVal;
@@ -3368,6 +4291,7 @@ function buildAttributesMap(attrStr, jPath, tagName) {
         }
       }
     }
+
     if (!Object.keys(attrs).length) {
       return;
     }
@@ -3385,7 +4309,9 @@ const parseXml = function (xmlData) {
   const xmlObj = new XmlNode('!xml');
   let currentNode = xmlObj;
   let textData = "";
-  let jPath = "";
+
+  // Reset matcher for new document
+  this.matcher.reset();
 
   // Reset entity expansion counters for this document
   this.entityExpansionCount = 0;
@@ -3408,27 +4334,25 @@ const parseXml = function (xmlData) {
           }
         }
 
-        if (this.options.transformTagName) {
-          tagName = this.options.transformTagName(tagName);
-        }
+        tagName = transformTagName(this.options.transformTagName, tagName, "", this.options).tagName;
 
         if (currentNode) {
-          textData = this.saveTextToParentTag(textData, currentNode, jPath);
+          textData = this.saveTextToParentTag(textData, currentNode, this.readonlyMatcher);
         }
 
         //check if last tag of nested tag was unpaired tag
-        const lastTagName = jPath.substring(jPath.lastIndexOf(".") + 1);
+        const lastTagName = this.matcher.getCurrentTag();
         if (tagName && this.options.unpairedTags.indexOf(tagName) !== -1) {
           throw new Error(`Unpaired tag can not be used as closing tag: </${tagName}>`);
         }
-        let propIndex = 0
         if (lastTagName && this.options.unpairedTags.indexOf(lastTagName) !== -1) {
-          propIndex = jPath.lastIndexOf('.', jPath.lastIndexOf('.') - 1)
+          // Pop the unpaired tag
+          this.matcher.pop();
           this.tagsNodeStack.pop();
-        } else {
-          propIndex = jPath.lastIndexOf(".");
         }
-        jPath = jPath.substring(0, propIndex);
+        // Pop the closing tag
+        this.matcher.pop();
+        this.isCurrentNodeStopNode = false; // Reset flag when closing tag
 
         currentNode = this.tagsNodeStack.pop();//avoid recursion, set the parent tag scope
         textData = "";
@@ -3438,7 +4362,7 @@ const parseXml = function (xmlData) {
         let tagData = readTagExp(xmlData, i, false, "?>");
         if (!tagData) throw new Error("Pi Tag is not closed.");
 
-        textData = this.saveTextToParentTag(textData, currentNode, jPath);
+        textData = this.saveTextToParentTag(textData, currentNode, this.readonlyMatcher);
         if ((this.options.ignoreDeclaration && tagData.tagName === "?xml") || this.options.ignorePiTags) {
           //do nothing
         } else {
@@ -3447,9 +4371,9 @@ const parseXml = function (xmlData) {
           childNode.add(this.options.textNodeName, "");
 
           if (tagData.tagName !== tagData.tagExp && tagData.attrExpPresent) {
-            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, jPath, tagData.tagName);
+            childNode[":@"] = this.buildAttributesMap(tagData.tagExp, this.matcher, tagData.tagName);
           }
-          this.addChild(currentNode, childNode, jPath, i);
+          this.addChild(currentNode, childNode, this.readonlyMatcher, i);
         }
 
 
@@ -3459,7 +4383,7 @@ const parseXml = function (xmlData) {
         if (this.options.commentPropName) {
           const comment = xmlData.substring(i + 4, endIndex - 2);
 
-          textData = this.saveTextToParentTag(textData, currentNode, jPath);
+          textData = this.saveTextToParentTag(textData, currentNode, this.readonlyMatcher);
 
           currentNode.add(this.options.commentPropName, [{ [this.options.textNodeName]: comment }]);
         }
@@ -3472,9 +4396,9 @@ const parseXml = function (xmlData) {
         const closeIndex = findClosingIndex(xmlData, "]]>", i, "CDATA is not closed.") - 2;
         const tagExp = xmlData.substring(i + 9, closeIndex);
 
-        textData = this.saveTextToParentTag(textData, currentNode, jPath);
+        textData = this.saveTextToParentTag(textData, currentNode, this.readonlyMatcher);
 
-        let val = this.parseTextData(tagExp, currentNode.tagname, jPath, true, false, true, true);
+        let val = this.parseTextData(tagExp, currentNode.tagname, this.readonlyMatcher, true, false, true, true);
         if (val == undefined) val = "";
 
         //cdata should be set even if it is 0 length string
@@ -3487,26 +4411,36 @@ const parseXml = function (xmlData) {
         i = closeIndex + 2;
       } else {//Opening tag
         let result = readTagExp(xmlData, i, this.options.removeNSPrefix);
+
+        // Safety check: readTagExp can return undefined
+        if (!result) {
+          // Log context for debugging
+          const context = xmlData.substring(Math.max(0, i - 50), Math.min(xmlData.length, i + 50));
+          throw new Error(`readTagExp returned undefined at position ${i}. Context: "${context}"`);
+        }
+
         let tagName = result.tagName;
         const rawTagName = result.rawTagName;
         let tagExp = result.tagExp;
         let attrExpPresent = result.attrExpPresent;
         let closeIndex = result.closeIndex;
 
-        if (this.options.transformTagName) {
-          //console.log(tagExp, tagName)
-          const newTagName = this.options.transformTagName(tagName);
-          if (tagExp === tagName) {
-            tagExp = newTagName
-          }
-          tagName = newTagName;
+        ({ tagName, tagExp } = transformTagName(this.options.transformTagName, tagName, tagExp, this.options));
+
+        if (this.options.strictReservedNames &&
+          (tagName === this.options.commentPropName
+            || tagName === this.options.cdataPropName
+            || tagName === this.options.textNodeName
+            || tagName === this.options.attributesGroupName
+          )) {
+          throw new Error(`Invalid tag name: ${tagName}`);
         }
 
         //save text as child node
         if (currentNode && textData) {
           if (currentNode.tagname !== '!xml') {
             //when nested tag is found
-            textData = this.saveTextToParentTag(textData, currentNode, jPath, false);
+            textData = this.saveTextToParentTag(textData, currentNode, this.readonlyMatcher, false);
           }
         }
 
@@ -3514,28 +4448,65 @@ const parseXml = function (xmlData) {
         const lastTag = currentNode;
         if (lastTag && this.options.unpairedTags.indexOf(lastTag.tagname) !== -1) {
           currentNode = this.tagsNodeStack.pop();
-          jPath = jPath.substring(0, jPath.lastIndexOf("."));
+          this.matcher.pop();
         }
+
+        // Clean up self-closing syntax BEFORE processing attributes
+        // This is where tagExp gets the trailing / removed
+        let isSelfClosing = false;
+        if (tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1) {
+          isSelfClosing = true;
+          if (tagName[tagName.length - 1] === "/") {
+            tagName = tagName.substr(0, tagName.length - 1);
+            tagExp = tagName;
+          } else {
+            tagExp = tagExp.substr(0, tagExp.length - 1);
+          }
+
+          // Re-check attrExpPresent after cleaning
+          attrExpPresent = (tagName !== tagExp);
+        }
+
+        // Now process attributes with CLEAN tagExp (no trailing /)
+        let prefixedAttrs = null;
+        let rawAttrs = {};
+        let namespace = undefined;
+
+        // Extract namespace from rawTagName
+        namespace = extractNamespace(rawTagName);
+
+        // Push tag to matcher FIRST (with empty attrs for now) so callbacks see correct path
         if (tagName !== xmlObj.tagname) {
-          jPath += jPath ? "." + tagName : tagName;
+          this.matcher.push(tagName, {}, namespace);
         }
+
+        // Now build attributes - callbacks will see correct matcher state
+        if (tagName !== tagExp && attrExpPresent) {
+          // Build attributes (returns prefixed attributes for the tree)
+          // Note: buildAttributesMap now internally updates the matcher with raw attributes
+          prefixedAttrs = this.buildAttributesMap(tagExp, this.matcher, tagName);
+
+          if (prefixedAttrs) {
+            // Extract raw attributes (without prefix) for our use
+            rawAttrs = extractRawAttributes(prefixedAttrs, this.options);
+          }
+        }
+
+        // Now check if this is a stop node (after attributes are set)
+        if (tagName !== xmlObj.tagname) {
+          this.isCurrentNodeStopNode = this.isItStopNode(this.stopNodeExpressions, this.matcher);
+        }
+
         const startIndex = i;
-        if (this.isItStopNode(this.stopNodesExact, this.stopNodesWildcard, jPath, tagName)) {
+        if (this.isCurrentNodeStopNode) {
           let tagContent = "";
-          //self-closing tag
-          if (tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1) {
-            if (tagName[tagName.length - 1] === "/") { //remove trailing '/'
-              tagName = tagName.substr(0, tagName.length - 1);
-              jPath = jPath.substr(0, jPath.length - 1);
-              tagExp = tagName;
-            } else {
-              tagExp = tagExp.substr(0, tagExp.length - 1);
-            }
+
+          // For self-closing tags, content is empty
+          if (isSelfClosing) {
             i = result.closeIndex;
           }
           //unpaired tag
           else if (this.options.unpairedTags.indexOf(tagName) !== -1) {
-
             i = result.closeIndex;
           }
           //normal tag
@@ -3549,52 +4520,54 @@ const parseXml = function (xmlData) {
 
           const childNode = new XmlNode(tagName);
 
-          if (tagName !== tagExp && attrExpPresent) {
-            childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
-          }
-          if (tagContent) {
-            tagContent = this.parseTextData(tagContent, tagName, jPath, true, attrExpPresent, true, true);
+          if (prefixedAttrs) {
+            childNode[":@"] = prefixedAttrs;
           }
 
-          jPath = jPath.substr(0, jPath.lastIndexOf("."));
+          // For stop nodes, store raw content as-is without any processing
           childNode.add(this.options.textNodeName, tagContent);
 
-          this.addChild(currentNode, childNode, jPath, startIndex);
+          this.matcher.pop(); // Pop the stop node tag
+          this.isCurrentNodeStopNode = false; // Reset flag
+
+          this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
         } else {
           //selfClosing tag
-          if (tagExp.length > 0 && tagExp.lastIndexOf("/") === tagExp.length - 1) {
-            if (tagName[tagName.length - 1] === "/") { //remove trailing '/'
-              tagName = tagName.substr(0, tagName.length - 1);
-              jPath = jPath.substr(0, jPath.length - 1);
-              tagExp = tagName;
-            } else {
-              tagExp = tagExp.substr(0, tagExp.length - 1);
-            }
-
-            if (this.options.transformTagName) {
-              const newTagName = this.options.transformTagName(tagName);
-              if (tagExp === tagName) {
-                tagExp = newTagName
-              }
-              tagName = newTagName;
-            }
+          if (isSelfClosing) {
+            ({ tagName, tagExp } = transformTagName(this.options.transformTagName, tagName, tagExp, this.options));
 
             const childNode = new XmlNode(tagName);
-            if (tagName !== tagExp && attrExpPresent) {
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+            if (prefixedAttrs) {
+              childNode[":@"] = prefixedAttrs;
             }
-            this.addChild(currentNode, childNode, jPath, startIndex);
-            jPath = jPath.substr(0, jPath.lastIndexOf("."));
+            this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
+            this.matcher.pop(); // Pop self-closing tag
+            this.isCurrentNodeStopNode = false; // Reset flag
+          }
+          else if (this.options.unpairedTags.indexOf(tagName) !== -1) {//unpaired tag
+            const childNode = new XmlNode(tagName);
+            if (prefixedAttrs) {
+              childNode[":@"] = prefixedAttrs;
+            }
+            this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
+            this.matcher.pop(); // Pop unpaired tag
+            this.isCurrentNodeStopNode = false; // Reset flag
+            i = result.closeIndex;
+            // Continue to next iteration without changing currentNode
+            continue;
           }
           //opening tag
           else {
             const childNode = new XmlNode(tagName);
+            if (this.tagsNodeStack.length > this.options.maxNestedTags) {
+              throw new Error("Maximum nested tags exceeded");
+            }
             this.tagsNodeStack.push(currentNode);
 
-            if (tagName !== tagExp && attrExpPresent) {
-              childNode[":@"] = this.buildAttributesMap(tagExp, jPath, tagName);
+            if (prefixedAttrs) {
+              childNode[":@"] = prefixedAttrs;
             }
-            this.addChild(currentNode, childNode, jPath, startIndex);
+            this.addChild(currentNode, childNode, this.readonlyMatcher, startIndex);
             currentNode = childNode;
           }
           textData = "";
@@ -3608,10 +4581,13 @@ const parseXml = function (xmlData) {
   return xmlObj.child;
 }
 
-function addChild(currentNode, childNode, jPath, startIndex) {
+function addChild(currentNode, childNode, matcher, startIndex) {
   // unset startIndex if not requested
   if (!this.options.captureMetaData) startIndex = undefined;
-  const result = this.options.updateTag(childNode.tagname, jPath, childNode[":@"])
+
+  // Pass jPath string or matcher based on options.jPath setting
+  const jPathOrMatcher = this.options.jPath ? matcher.toString() : matcher;
+  const result = this.options.updateTag(childNode.tagname, jPathOrMatcher, childNode[":@"])
   if (result === false) {
     //do nothing
   } else if (typeof result === "string") {
@@ -3622,33 +4598,40 @@ function addChild(currentNode, childNode, jPath, startIndex) {
   }
 }
 
-const replaceEntitiesValue = function (val, tagName, jPath) {
-  // Performance optimization: Early return if no entities to replace
-  if (val.indexOf('&') === -1) {
-    return val;
-  }
-
+/**
+ * @param {object} val - Entity object with regex and val properties
+ * @param {string} tagName - Tag name
+ * @param {string|Matcher} jPath - jPath string or Matcher instance based on options.jPath
+ */
+function replaceEntitiesValue(val, tagName, jPath) {
   const entityConfig = this.options.processEntities;
 
-  if (!entityConfig.enabled) {
+  if (!entityConfig || !entityConfig.enabled) {
     return val;
   }
 
-  // Check tag-specific filtering
+  // Check if tag is allowed to contain entities
   if (entityConfig.allowedTags) {
-    if (!entityConfig.allowedTags.includes(tagName)) {
-      return val; // Skip entity replacement for current tag as not set
+    const jPathOrMatcher = this.options.jPath ? jPath.toString() : jPath;
+    const allowed = Array.isArray(entityConfig.allowedTags)
+      ? entityConfig.allowedTags.includes(tagName)
+      : entityConfig.allowedTags(tagName, jPathOrMatcher);
+
+    if (!allowed) {
+      return val;
     }
   }
 
+  // Apply custom tag filter if provided
   if (entityConfig.tagFilter) {
-    if (!entityConfig.tagFilter(tagName, jPath)) {
+    const jPathOrMatcher = this.options.jPath ? jPath.toString() : jPath;
+    if (!entityConfig.tagFilter(tagName, jPathOrMatcher)) {
       return val; // Skip based on custom filter
     }
   }
 
   // Replace DOCTYPE entities
-  for (let entityName in this.docTypeEntities) {
+  for (const entityName of Object.keys(this.docTypeEntities)) {
     const entity = this.docTypeEntities[entityName];
     const matches = val.match(entity.regx);
 
@@ -3680,19 +4663,38 @@ const replaceEntitiesValue = function (val, tagName, jPath) {
       }
     }
   }
-  if (val.indexOf('&') === -1) return val;  // Early exit
-
   // Replace standard entities
-  for (let entityName in this.lastEntities) {
+  for (const entityName of Object.keys(this.lastEntities)) {
     const entity = this.lastEntities[entityName];
+    const matches = val.match(entity.regex);
+    if (matches) {
+      this.entityExpansionCount += matches.length;
+      if (entityConfig.maxTotalExpansions &&
+        this.entityExpansionCount > entityConfig.maxTotalExpansions) {
+        throw new Error(
+          `Entity expansion limit exceeded: ${this.entityExpansionCount} > ${entityConfig.maxTotalExpansions}`
+        );
+      }
+    }
     val = val.replace(entity.regex, entity.val);
   }
-  if (val.indexOf('&') === -1) return val;  // Early exit
+  if (val.indexOf('&') === -1) return val;
 
   // Replace HTML entities if enabled
   if (this.options.htmlEntities) {
-    for (let entityName in this.htmlEntities) {
+    for (const entityName of Object.keys(this.htmlEntities)) {
       const entity = this.htmlEntities[entityName];
+      const matches = val.match(entity.regex);
+      if (matches) {
+        //console.log(matches);
+        this.entityExpansionCount += matches.length;
+        if (entityConfig.maxTotalExpansions &&
+          this.entityExpansionCount > entityConfig.maxTotalExpansions) {
+          throw new Error(
+            `Entity expansion limit exceeded: ${this.entityExpansionCount} > ${entityConfig.maxTotalExpansions}`
+          );
+        }
+      }
       val = val.replace(entity.regex, entity.val);
     }
   }
@@ -3704,19 +4706,19 @@ const replaceEntitiesValue = function (val, tagName, jPath) {
 }
 
 
-function saveTextToParentTag(textData, currentNode, jPath, isLeafNode) {
+function saveTextToParentTag(textData, parentNode, matcher, isLeafNode) {
   if (textData) { //store previously collected data as textNode
-    if (isLeafNode === undefined) isLeafNode = currentNode.child.length === 0
+    if (isLeafNode === undefined) isLeafNode = parentNode.child.length === 0
 
     textData = this.parseTextData(textData,
-      currentNode.tagname,
-      jPath,
+      parentNode.tagname,
+      matcher,
       false,
-      currentNode[":@"] ? Object.keys(currentNode[":@"]).length !== 0 : false,
+      parentNode[":@"] ? Object.keys(parentNode[":@"]).length !== 0 : false,
       isLeafNode);
 
     if (textData !== undefined && textData !== "")
-      currentNode.add(this.options.textNodeName, textData);
+      parentNode.add(this.options.textNodeName, textData);
     textData = "";
   }
   return textData;
@@ -3724,14 +4726,17 @@ function saveTextToParentTag(textData, currentNode, jPath, isLeafNode) {
 
 //TODO: use jPath to simplify the logic
 /**
- * @param {Set} stopNodesExact
- * @param {Set} stopNodesWildcard
- * @param {string} jPath
- * @param {string} currentTagName
+ * @param {Array<Expression>} stopNodeExpressions - Array of compiled Expression objects
+ * @param {Matcher} matcher - Current path matcher
  */
-function isItStopNode(stopNodesExact, stopNodesWildcard, jPath, currentTagName) {
-  if (stopNodesWildcard && stopNodesWildcard.has(currentTagName)) return true;
-  if (stopNodesExact && stopNodesExact.has(jPath)) return true;
+function isItStopNode(stopNodeExpressions, matcher) {
+  if (!stopNodeExpressions || stopNodeExpressions.length === 0) return false;
+
+  for (let i = 0; i < stopNodeExpressions.length; i++) {
+    if (matcher.matches(stopNodeExpressions[i])) {
+      return true;
+    }
+  }
   return false;
 }
 
@@ -3885,7 +4890,31 @@ function fromCodePoint(str, base, prefix) {
     return prefix + str + ";";
   }
 }
+
+function transformTagName(fn, tagName, tagExp, options) {
+  if (fn) {
+    const newTagName = fn(tagName);
+    if (tagExp === tagName) {
+      tagExp = newTagName
+    }
+    tagName = newTagName;
+  }
+  tagName = sanitizeName(tagName, options);
+  return { tagName, tagExp };
+}
+
+
+
+function sanitizeName(name, options) {
+  if (criticalProperties.includes(name)) {
+    throw new Error(`[SECURITY] Invalid name: "${name}" is a reserved JavaScript keyword that could cause prototype pollution`);
+  } else if (DANGEROUS_PROPERTY_NAMES.includes(name)) {
+    return options.onDangerousProperty(name);
+  }
+  return name;
+}
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/xmlparser/node2json.js
+
 
 
 
@@ -3893,94 +4922,147 @@ function fromCodePoint(str, base, prefix) {
 const node2json_METADATA_SYMBOL = XmlNode.getMetaDataSymbol();
 
 /**
- * 
- * @param {array} node 
- * @param {any} options 
- * @returns 
+ * Helper function to strip attribute prefix from attribute map
+ * @param {object} attrs - Attributes with prefix (e.g., {"@_class": "code"})
+ * @param {string} prefix - Attribute prefix to remove (e.g., "@_")
+ * @returns {object} Attributes without prefix (e.g., {"class": "code"})
  */
-function prettify(node, options){
-  return compress( node, options);
+function stripAttributePrefix(attrs, prefix) {
+  if (!attrs || typeof attrs !== 'object') return {};
+  if (!prefix) return attrs;
+
+  const rawAttrs = {};
+  for (const key in attrs) {
+    if (key.startsWith(prefix)) {
+      const rawName = key.substring(prefix.length);
+      rawAttrs[rawName] = attrs[key];
+    } else {
+      // Attribute without prefix (shouldn't normally happen, but be safe)
+      rawAttrs[key] = attrs[key];
+    }
+  }
+  return rawAttrs;
 }
 
 /**
  * 
+ * @param {array} node 
+ * @param {any} options 
+ * @param {Matcher} matcher - Path matcher instance
+ * @returns 
+ */
+function prettify(node, options, matcher, readonlyMatcher) {
+  return compress(node, options, matcher, readonlyMatcher);
+}
+
+/**
  * @param {array} arr 
  * @param {object} options 
- * @param {string} jPath 
+ * @param {Matcher} matcher - Path matcher instance
  * @returns object
  */
-function compress(arr, options, jPath){
+function compress(arr, options, matcher, readonlyMatcher) {
   let text;
-  const compressedObj = {};
+  const compressedObj = {}; //This is intended to be a plain object
   for (let i = 0; i < arr.length; i++) {
     const tagObj = arr[i];
     const property = propName(tagObj);
-    let newJpath = "";
-    if(jPath === undefined) newJpath = property;
-    else newJpath = jPath + "." + property;
 
-    if(property === options.textNodeName){
-      if(text === undefined) text = tagObj[property];
+    // Push current property to matcher WITH RAW ATTRIBUTES (no prefix)
+    if (property !== undefined && property !== options.textNodeName) {
+      const rawAttrs = stripAttributePrefix(
+        tagObj[":@"] || {},
+        options.attributeNamePrefix
+      );
+      matcher.push(property, rawAttrs);
+    }
+
+    if (property === options.textNodeName) {
+      if (text === undefined) text = tagObj[property];
       else text += "" + tagObj[property];
-    }else if(property === undefined){
+    } else if (property === undefined) {
       continue;
-    }else if(tagObj[property]){
-      
-      let val = compress(tagObj[property], options, newJpath);
-      const isLeaf = isLeafTag(val, options);
-      if (tagObj[node2json_METADATA_SYMBOL] !== undefined) {
-        val[node2json_METADATA_SYMBOL] = tagObj[node2json_METADATA_SYMBOL]; // copy over metadata
-      }
+    } else if (tagObj[property]) {
 
-      if(tagObj[":@"]){
-        assignAttributes( val, tagObj[":@"], newJpath, options);
-      }else if(Object.keys(val).length === 1 && val[options.textNodeName] !== undefined && !options.alwaysCreateTextNode){
+      let val = compress(tagObj[property], options, matcher, readonlyMatcher);
+      const isLeaf = isLeafTag(val, options);
+
+      if (tagObj[":@"]) {
+        assignAttributes(val, tagObj[":@"], readonlyMatcher, options);
+      } else if (Object.keys(val).length === 1 && val[options.textNodeName] !== undefined && !options.alwaysCreateTextNode) {
         val = val[options.textNodeName];
-      }else if(Object.keys(val).length === 0){
-        if(options.alwaysCreateTextNode) val[options.textNodeName] = "";
+      } else if (Object.keys(val).length === 0) {
+        if (options.alwaysCreateTextNode) val[options.textNodeName] = "";
         else val = "";
       }
 
-      if(compressedObj[property] !== undefined && compressedObj.hasOwnProperty(property)) {
-        if(!Array.isArray(compressedObj[property])) {
-            compressedObj[property] = [ compressedObj[property] ];
+      if (tagObj[node2json_METADATA_SYMBOL] !== undefined && typeof val === "object" && val !== null) {
+        val[node2json_METADATA_SYMBOL] = tagObj[node2json_METADATA_SYMBOL]; // copy over metadata
+      }
+
+
+      if (compressedObj[property] !== undefined && Object.prototype.hasOwnProperty.call(compressedObj, property)) {
+        if (!Array.isArray(compressedObj[property])) {
+          compressedObj[property] = [compressedObj[property]];
         }
         compressedObj[property].push(val);
-      }else{
+      } else {
         //TODO: if a node is not an array, then check if it should be an array
         //also determine if it is a leaf node
-        if (options.isArray(property, newJpath, isLeaf )) {
+
+        // Pass jPath string or readonlyMatcher based on options.jPath setting
+        const jPathOrMatcher = options.jPath ? readonlyMatcher.toString() : readonlyMatcher;
+        if (options.isArray(property, jPathOrMatcher, isLeaf)) {
           compressedObj[property] = [val];
-        }else{
+        } else {
           compressedObj[property] = val;
         }
       }
+
+      // Pop property from matcher after processing
+      if (property !== undefined && property !== options.textNodeName) {
+        matcher.pop();
+      }
     }
-    
+
   }
   // if(text && text.length > 0) compressedObj[options.textNodeName] = text;
-  if(typeof text === "string"){
-    if(text.length > 0) compressedObj[options.textNodeName] = text;
-  }else if(text !== undefined) compressedObj[options.textNodeName] = text;
+  if (typeof text === "string") {
+    if (text.length > 0) compressedObj[options.textNodeName] = text;
+  } else if (text !== undefined) compressedObj[options.textNodeName] = text;
+
+
   return compressedObj;
 }
 
-function propName(obj){
+function propName(obj) {
   const keys = Object.keys(obj);
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
-    if(key !== ":@") return key;
+    if (key !== ":@") return key;
   }
 }
 
-function assignAttributes(obj, attrMap, jpath, options){
+function assignAttributes(obj, attrMap, readonlyMatcher, options) {
   if (attrMap) {
     const keys = Object.keys(attrMap);
     const len = keys.length; //don't make it inline
     for (let i = 0; i < len; i++) {
-      const atrrName = keys[i];
-      if (options.isArray(atrrName, jpath + "." + atrrName, true, true)) {
-        obj[atrrName] = [ attrMap[atrrName] ];
+      const atrrName = keys[i];  // This is the PREFIXED name (e.g., "@_class")
+
+      // Strip prefix for matcher path (for isArray callback)
+      const rawAttrName = atrrName.startsWith(options.attributeNamePrefix)
+        ? atrrName.substring(options.attributeNamePrefix.length)
+        : atrrName;
+
+      // For attributes, we need to create a temporary path
+      // Pass jPath string or matcher based on options.jPath setting
+      const jPathOrMatcher = options.jPath
+        ? readonlyMatcher.toString() + "." + rawAttrName
+        : readonlyMatcher;
+
+      if (options.isArray(atrrName, jPathOrMatcher, true, true)) {
+        obj[atrrName] = [attrMap[atrrName]];
       } else {
         obj[atrrName] = attrMap[atrrName];
       }
@@ -3988,10 +5070,10 @@ function assignAttributes(obj, attrMap, jpath, options){
   }
 }
 
-function isLeafTag(obj, options){
+function isLeafTag(obj, options) {
   const { textNodeName } = options;
   const propCount = Object.keys(obj).length;
-  
+
   if (propCount === 0) {
     return true;
   }
@@ -4005,7 +5087,6 @@ function isLeafTag(obj, options){
 
   return false;
 }
-
 ;// CONCATENATED MODULE: ./node_modules/fast-xml-parser/src/validator.js
 
 
@@ -4033,19 +5114,19 @@ function validate(xmlData, options) {
     // check for byte order mark (BOM)
     xmlData = xmlData.substr(1);
   }
-  
+
   for (let i = 0; i < xmlData.length; i++) {
 
-    if (xmlData[i] === '<' && xmlData[i+1] === '?') {
-      i+=2;
-      i = readPI(xmlData,i);
+    if (xmlData[i] === '<' && xmlData[i + 1] === '?') {
+      i += 2;
+      i = readPI(xmlData, i);
       if (i.err) return i;
-    }else if (xmlData[i] === '<') {
+    } else if (xmlData[i] === '<') {
       //starting of tag
       //read until you reach to '>' avoiding any '>' in attribute value
       let tagStartPos = i;
       i++;
-      
+
       if (xmlData[i] === '!') {
         i = readCommentAndCDATA(xmlData, i);
         continue;
@@ -4081,14 +5162,14 @@ function validate(xmlData, options) {
           if (tagName.trim().length === 0) {
             msg = "Invalid space after '<'.";
           } else {
-            msg = "Tag '"+tagName+"' is an invalid name.";
+            msg = "Tag '" + tagName + "' is an invalid name.";
           }
           return getErrorObject('InvalidTag', msg, getLineNumberForPosition(xmlData, i));
         }
 
         const result = readAttributeStr(xmlData, i);
         if (result === false) {
-          return getErrorObject('InvalidAttr', "Attributes for '"+tagName+"' have open quote.", getLineNumberForPosition(xmlData, i));
+          return getErrorObject('InvalidAttr', "Attributes for '" + tagName + "' have open quote.", getLineNumberForPosition(xmlData, i));
         }
         let attrStr = result.value;
         i = result.index;
@@ -4109,17 +5190,17 @@ function validate(xmlData, options) {
           }
         } else if (closingTag) {
           if (!result.tagClosed) {
-            return getErrorObject('InvalidTag', "Closing tag '"+tagName+"' doesn't have proper closing.", getLineNumberForPosition(xmlData, i));
+            return getErrorObject('InvalidTag', "Closing tag '" + tagName + "' doesn't have proper closing.", getLineNumberForPosition(xmlData, i));
           } else if (attrStr.trim().length > 0) {
-            return getErrorObject('InvalidTag', "Closing tag '"+tagName+"' can't have attributes or invalid starting.", getLineNumberForPosition(xmlData, tagStartPos));
+            return getErrorObject('InvalidTag', "Closing tag '" + tagName + "' can't have attributes or invalid starting.", getLineNumberForPosition(xmlData, tagStartPos));
           } else if (tags.length === 0) {
-            return getErrorObject('InvalidTag', "Closing tag '"+tagName+"' has not been opened.", getLineNumberForPosition(xmlData, tagStartPos));
+            return getErrorObject('InvalidTag', "Closing tag '" + tagName + "' has not been opened.", getLineNumberForPosition(xmlData, tagStartPos));
           } else {
             const otg = tags.pop();
             if (tagName !== otg.tagName) {
               let openPos = getLineNumberForPosition(xmlData, otg.tagStartPos);
               return getErrorObject('InvalidTag',
-                "Expected closing tag '"+otg.tagName+"' (opened in line "+openPos.line+", col "+openPos.col+") instead of closing tag '"+tagName+"'.",
+                "Expected closing tag '" + otg.tagName + "' (opened in line " + openPos.line + ", col " + openPos.col + ") instead of closing tag '" + tagName + "'.",
                 getLineNumberForPosition(xmlData, tagStartPos));
             }
 
@@ -4140,10 +5221,10 @@ function validate(xmlData, options) {
           //if the root level has been reached before ...
           if (reachedRoot === true) {
             return getErrorObject('InvalidXml', 'Multiple possible root nodes found.', getLineNumberForPosition(xmlData, i));
-          } else if(options.unpairedTags.indexOf(tagName) !== -1){
+          } else if (options.unpairedTags.indexOf(tagName) !== -1) {
             //don't push into stack
           } else {
-            tags.push({tagName, tagStartPos});
+            tags.push({ tagName, tagStartPos });
           }
           tagFound = true;
         }
@@ -4157,10 +5238,10 @@ function validate(xmlData, options) {
               i++;
               i = readCommentAndCDATA(xmlData, i);
               continue;
-            } else if (xmlData[i+1] === '?') {
+            } else if (xmlData[i + 1] === '?') {
               i = readPI(xmlData, ++i);
               if (i.err) return i;
-            } else{
+            } else {
               break;
             }
           } else if (xmlData[i] === '&') {
@@ -4168,7 +5249,7 @@ function validate(xmlData, options) {
             if (afterAmp == -1)
               return getErrorObject('InvalidChar', "char '&' is not expected.", getLineNumberForPosition(xmlData, i));
             i = afterAmp;
-          }else{
+          } else {
             if (reachedRoot === true && !isWhiteSpace(xmlData[i])) {
               return getErrorObject('InvalidXml', "Extra text at the end", getLineNumberForPosition(xmlData, i));
             }
@@ -4179,28 +5260,28 @@ function validate(xmlData, options) {
         }
       }
     } else {
-      if ( isWhiteSpace(xmlData[i])) {
+      if (isWhiteSpace(xmlData[i])) {
         continue;
       }
-      return getErrorObject('InvalidChar', "char '"+xmlData[i]+"' is not expected.", getLineNumberForPosition(xmlData, i));
+      return getErrorObject('InvalidChar', "char '" + xmlData[i] + "' is not expected.", getLineNumberForPosition(xmlData, i));
     }
   }
 
   if (!tagFound) {
     return getErrorObject('InvalidXml', 'Start tag expected.', 1);
-  }else if (tags.length == 1) {
-      return getErrorObject('InvalidTag', "Unclosed tag '"+tags[0].tagName+"'.", getLineNumberForPosition(xmlData, tags[0].tagStartPos));
-  }else if (tags.length > 0) {
-      return getErrorObject('InvalidXml', "Invalid '"+
-          JSON.stringify(tags.map(t => t.tagName), null, 4).replace(/\r?\n/g, '')+
-          "' found.", {line: 1, col: 1});
+  } else if (tags.length == 1) {
+    return getErrorObject('InvalidTag', "Unclosed tag '" + tags[0].tagName + "'.", getLineNumberForPosition(xmlData, tags[0].tagStartPos));
+  } else if (tags.length > 0) {
+    return getErrorObject('InvalidXml', "Invalid '" +
+      JSON.stringify(tags.map(t => t.tagName), null, 4).replace(/\r?\n/g, '') +
+      "' found.", { line: 1, col: 1 });
   }
 
   return true;
 };
 
-function isWhiteSpace(char){
-  return char === ' ' || char === '\t' || char === '\n'  || char === '\r';
+function isWhiteSpace(char) {
+  return char === ' ' || char === '\t' || char === '\n' || char === '\r';
 }
 /**
  * Read Processing insstructions and skip
@@ -4336,25 +5417,25 @@ function validateAttributeString(attrStr, options) {
   for (let i = 0; i < matches.length; i++) {
     if (matches[i][1].length === 0) {
       //nospace before attribute name: a="sd"b="saf"
-      return getErrorObject('InvalidAttr', "Attribute '"+matches[i][2]+"' has no space in starting.", getPositionFromMatch(matches[i]))
+      return getErrorObject('InvalidAttr', "Attribute '" + matches[i][2] + "' has no space in starting.", getPositionFromMatch(matches[i]))
     } else if (matches[i][3] !== undefined && matches[i][4] === undefined) {
-      return getErrorObject('InvalidAttr', "Attribute '"+matches[i][2]+"' is without value.", getPositionFromMatch(matches[i]));
+      return getErrorObject('InvalidAttr', "Attribute '" + matches[i][2] + "' is without value.", getPositionFromMatch(matches[i]));
     } else if (matches[i][3] === undefined && !options.allowBooleanAttributes) {
       //independent attribute: ab
-      return getErrorObject('InvalidAttr', "boolean attribute '"+matches[i][2]+"' is not allowed.", getPositionFromMatch(matches[i]));
+      return getErrorObject('InvalidAttr', "boolean attribute '" + matches[i][2] + "' is not allowed.", getPositionFromMatch(matches[i]));
     }
     /* else if(matches[i][6] === undefined){//attribute without value: ab=
                     return { err: { code:"InvalidAttr",msg:"attribute " + matches[i][2] + " has no value assigned."}};
                 } */
     const attrName = matches[i][2];
     if (!validateAttrName(attrName)) {
-      return getErrorObject('InvalidAttr', "Attribute '"+attrName+"' is an invalid name.", getPositionFromMatch(matches[i]));
+      return getErrorObject('InvalidAttr', "Attribute '" + attrName + "' is an invalid name.", getPositionFromMatch(matches[i]));
     }
-    if (!attrNames.hasOwnProperty(attrName)) {
+    if (!Object.prototype.hasOwnProperty.call(attrNames, attrName)) {
       //check for duplicate attribute.
       attrNames[attrName] = 1;
     } else {
-      return getErrorObject('InvalidAttr', "Attribute '"+attrName+"' is repeated.", getPositionFromMatch(matches[i]));
+      return getErrorObject('InvalidAttr', "Attribute '" + attrName + "' is repeated.", getPositionFromMatch(matches[i]));
     }
   }
 
@@ -4440,38 +5521,38 @@ function getPositionFromMatch(match) {
 
 
 
-class XMLParser{
-    
-    constructor(options){
+class XMLParser {
+
+    constructor(options) {
         this.externalEntities = {};
         this.options = buildOptions(options);
-        
+
     }
     /**
      * Parse XML dats to JS object 
      * @param {string|Uint8Array} xmlData 
      * @param {boolean|Object} validationOption 
      */
-    parse(xmlData,validationOption){
-        if(typeof xmlData !== "string" && xmlData.toString){
+    parse(xmlData, validationOption) {
+        if (typeof xmlData !== "string" && xmlData.toString) {
             xmlData = xmlData.toString();
-        }else if(typeof xmlData !== "string"){
+        } else if (typeof xmlData !== "string") {
             throw new Error("XML data is accepted in String or Bytes[] form.")
         }
-        
-        if( validationOption){
-            if(validationOption === true) validationOption = {}; //validate with default options
-            
+
+        if (validationOption) {
+            if (validationOption === true) validationOption = {}; //validate with default options
+
             const result = validate(xmlData, validationOption);
             if (result !== true) {
-              throw Error( `${result.err.msg}:${result.err.line}:${result.err.col}` )
+                throw Error(`${result.err.msg}:${result.err.line}:${result.err.col}`)
             }
-          }
+        }
         const orderedObjParser = new OrderedObjParser(this.options);
         orderedObjParser.addExternalEntities(this.externalEntities);
         const orderedResult = orderedObjParser.parseXml(xmlData);
-        if(this.options.preserveOrder || orderedResult === undefined) return orderedResult;
-        else return prettify(orderedResult, this.options);
+        if (this.options.preserveOrder || orderedResult === undefined) return orderedResult;
+        else return prettify(orderedResult, this.options, orderedObjParser.matcher, orderedObjParser.readonlyMatcher);
     }
 
     /**
@@ -4479,14 +5560,14 @@ class XMLParser{
      * @param {string} key 
      * @param {string} value 
      */
-    addEntity(key, value){
-        if(value.indexOf("&") !== -1){
+    addEntity(key, value) {
+        if (value.indexOf("&") !== -1) {
             throw new Error("Entity value can't have '&'")
-        }else if(key.indexOf("&") !== -1 || key.indexOf(";") !== -1){
+        } else if (key.indexOf("&") !== -1 || key.indexOf(";") !== -1) {
             throw new Error("An entity must be set without '&' and ';'. Eg. use '#xD' for '&#xD;'")
-        }else if(value === "&"){
+        } else if (value === "&") {
             throw new Error("An entity with value '&' is not permitted");
-        }else{
+        } else {
             this.externalEntities[key] = value;
         }
     }
@@ -4505,17 +5586,21 @@ class XMLParser{
         return XmlNode.getMetaDataSymbol();
     }
 }
-
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/xml-builder/dist-es/xml-parser.js
 
 const parser = new XMLParser({
     attributeNamePrefix: "",
+    processEntities: {
+        enabled: true,
+        maxTotalExpansions: Infinity,
+    },
     htmlEntities: true,
     ignoreAttributes: false,
     ignoreDeclaration: true,
     parseTagValue: false,
     trimValues: false,
     tagValueProcessor: (_, val) => (val.trim() === "" && val.includes("\n") ? "" : undefined),
+    maxNestedTags: Infinity,
 });
 parser.addEntity("#xD", "\r");
 parser.addEntity("#10", "\n");
@@ -4566,7 +5651,7 @@ class XmlShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConfi
         this.stringDeserializer.setSerdeContext(serdeContext);
     }
     read(schema, bytes, key) {
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         const memberSchemas = ns.getMemberSchemas();
         const isEventPayload = ns.isStructSchema() &&
             ns.isMemberSchema() &&
@@ -4590,7 +5675,7 @@ class XmlShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConfi
         return this.readSchema(schema, key ? parsedObject[key] : parsedObject);
     }
     readSchema(_schema, value) {
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(_schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(_schema);
         if (ns.isUnitSchema()) {
             return;
         }
@@ -4602,18 +5687,18 @@ class XmlShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConfi
             return value;
         }
         if (typeof value === "object") {
-            const sparse = !!traits.sparse;
             const flat = !!traits.xmlFlattened;
             if (ns.isListSchema()) {
                 const listValue = ns.getValueSchema();
                 const buffer = [];
                 const sourceKey = listValue.getMergedTraits().xmlName ?? "member";
                 const source = flat ? value : (value[0] ?? value)[sourceKey];
+                if (source == null) {
+                    return buffer;
+                }
                 const sourceArray = Array.isArray(source) ? source : [source];
                 for (const v of sourceArray) {
-                    if (v != null || sparse) {
-                        buffer.push(this.readSchema(listValue, v));
-                    }
+                    buffer.push(this.readSchema(listValue, v));
                 }
                 return buffer;
             }
@@ -4633,9 +5718,7 @@ class XmlShapeDeserializer extends ConfigurableSerdeContext/* .SerdeContextConfi
                 for (const entry of entries) {
                     const key = entry[keyProperty];
                     const value = entry[valueProperty];
-                    if (value != null || sparse) {
-                        buffer[key] = this.readSchema(memberNs, value);
-                    }
+                    buffer[key] = this.readSchema(memberNs, value);
                 }
                 return buffer;
             }
@@ -4732,7 +5815,7 @@ class QueryShapeSerializer extends ConfigurableSerdeContext/* .SerdeContextConfi
         if (this.buffer === undefined) {
             this.buffer = "";
         }
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
         if (prefix && !prefix.endsWith(".")) {
             prefix += ".";
         }
@@ -4919,6 +6002,7 @@ class AwsQueryProtocol extends RpcProtocol {
     constructor(options) {
         super({
             defaultNamespace: options.defaultNamespace,
+            errorTypeRegistries: options.errorTypeRegistries,
         });
         this.options = options;
         const settings = {
@@ -4964,7 +6048,7 @@ class AwsQueryProtocol extends RpcProtocol {
     }
     async deserializeResponse(operationSchema, context, response) {
         const deserializer = this.deserializer;
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(operationSchema.output);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(operationSchema.output);
         const dataObject = {};
         if (response.statusCode >= 300) {
             const bytes = await (0,collect_stream_body/* .collectBody */.P)(response.body, context);
@@ -4995,6 +6079,7 @@ class AwsQueryProtocol extends RpcProtocol {
     }
     async handleError(operationSchema, context, response, dataObject, metadata) {
         const errorIdentifier = this.loadQueryErrorCode(response, dataObject) ?? "Unknown";
+        this.mixin.compose(this.compositeErrorRegistry, errorIdentifier, this.options.defaultNamespace);
         const errorData = this.loadQueryError(dataObject) ?? {};
         const message = this.loadQueryErrorMessage(dataObject);
         errorData.message = message;
@@ -5004,8 +6089,8 @@ class AwsQueryProtocol extends RpcProtocol {
             Message: message,
         };
         const { errorSchema, errorMetadata } = await this.mixin.getErrorSchemaOrThrowBaseException(errorIdentifier, this.options.defaultNamespace, response, errorData, metadata, this.mixin.findQueryCompatibleError);
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(errorSchema);
-        const ErrorCtor = TypeRegistry/* .TypeRegistry["for"] */.O["for"](errorSchema[1]).getErrorCtor(errorSchema) ?? Error;
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(errorSchema);
+        const ErrorCtor = this.compositeErrorRegistry.getErrorCtor(errorSchema) ?? Error;
         const exception = new ErrorCtor(message);
         const output = {
             Type: errorData.Error.Type,
@@ -5104,8 +6189,8 @@ __webpack_require__.d(__webpack_exports__, {
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
-// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(2060);
+// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
+var node_http_handler = __webpack_require__(3437);
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
 var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: external "node:fs/promises"
@@ -5323,13 +6408,13 @@ const resolveCredentialSource = (credentialSource, profileName, logger) => {
     const sourceProvidersMap = {
         EcsContainer: async (options) => {
             const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 4161));
-            const { fromContainerMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5301));
+            const { fromContainerMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
             logger?.debug("@aws-sdk/credential-provider-ini - credential_source is EcsContainer");
             return async () => (0,chain/* .chain */.c)(fromHttp(options ?? {}), fromContainerMetadata(options))().then(setNamedProvider);
         },
         Ec2InstanceMetadata: async (options) => {
             logger?.debug("@aws-sdk/credential-provider-ini - credential_source is Ec2InstanceMetadata");
-            const { fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5301));
+            const { fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
             return async () => fromInstanceMetadata(options)().then(setNamedProvider);
         },
         Environment: async (options) => {
@@ -6594,8 +7679,8 @@ var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
 var getHttpSigningMiddleware = __webpack_require__(7764);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 3 modules
-var getSchemaSerdePlugin = __webpack_require__(1000);
+// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
+var getSchemaSerdePlugin = __webpack_require__(1920);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
@@ -6670,8 +7755,8 @@ var nested_clients_package = __webpack_require__(9955);
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 6 modules
-var defaultUserAgent = __webpack_require__(6764);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
+var defaultUserAgent = __webpack_require__(6371);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -6684,8 +7769,8 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(9614);
-// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(2060);
+// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
+var node_http_handler = __webpack_require__(3437);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(4622);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -6893,6 +7978,7 @@ const getRuntimeConfig = (config) => {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso/runtimeConfig.js
+
 
 
 
@@ -7472,7 +8558,10 @@ function setFeature(context, feature, value) {
     context.__aws_sdk_context.features[feature] = value;
 }
 
+// EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
+var dist_es_config = __webpack_require__(7355);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/check-features.js
+
 
 const ACCOUNT_ID_ENDPOINT_REGEX = /\d{12}\.ddb/;
 async function checkFeatures(context, config, args) {
@@ -7482,16 +8571,15 @@ async function checkFeatures(context, config, args) {
     }
     if (typeof config.retryStrategy === "function") {
         const retryStrategy = await config.retryStrategy();
-        if (typeof retryStrategy.acquireInitialRetryToken === "function") {
-            if (retryStrategy.constructor?.name?.includes("Adaptive")) {
-                setFeature(context, "RETRY_MODE_ADAPTIVE", "F");
+        if (typeof retryStrategy.mode === "string") {
+            switch (retryStrategy.mode) {
+                case dist_es_config/* .RETRY_MODES.ADAPTIVE */.c.ADAPTIVE:
+                    setFeature(context, "RETRY_MODE_ADAPTIVE", "F");
+                    break;
+                case dist_es_config/* .RETRY_MODES.STANDARD */.c.STANDARD:
+                    setFeature(context, "RETRY_MODE_STANDARD", "E");
+                    break;
             }
-            else {
-                setFeature(context, "RETRY_MODE_STANDARD", "E");
-            }
-        }
-        else {
-            setFeature(context, "RETRY_MODE_LEGACY", "D");
         }
     }
     if (typeof config.accountIdEndpointMode === "function") {
@@ -7666,8 +8754,8 @@ var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
 var getHttpSigningMiddleware = __webpack_require__(7764);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 3 modules
-var getSchemaSerdePlugin = __webpack_require__(1000);
+// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
+var getSchemaSerdePlugin = __webpack_require__(1920);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
@@ -7757,8 +8845,8 @@ var nested_clients_package = __webpack_require__(9955);
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 6 modules
-var defaultUserAgent = __webpack_require__(6764);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
+var defaultUserAgent = __webpack_require__(6371);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -7771,8 +8859,8 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(9614);
-// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(2060);
+// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
+var node_http_handler = __webpack_require__(3437);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(4622);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -8217,6 +9305,7 @@ const getRuntimeConfig = (config) => {
 
 
 
+
 const runtimeConfig_getRuntimeConfig = (config) => {
     (0,dist_es_emitWarningIfUnsupportedVersion/* .emitWarningIfUnsupportedVersion */.I)(process.version);
     const defaultsMode = (0,resolveDefaultsModeConfig/* .resolveDefaultsModeConfig */.I)(config);
@@ -8426,8 +9515,8 @@ var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
 var getHttpSigningMiddleware = __webpack_require__(7764);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 3 modules
-var getSchemaSerdePlugin = __webpack_require__(1000);
+// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
+var getSchemaSerdePlugin = __webpack_require__(1920);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
@@ -8517,8 +9606,8 @@ var nested_clients_package = __webpack_require__(9955);
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 6 modules
-var defaultUserAgent = __webpack_require__(6764);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
+var defaultUserAgent = __webpack_require__(6371);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -8531,8 +9620,8 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(9614);
-// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(2060);
+// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
+var node_http_handler = __webpack_require__(3437);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(4622);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -9076,6 +10165,7 @@ const getRuntimeConfig = (config) => {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/runtimeConfig.js
+
 
 
 
@@ -9781,8 +10871,8 @@ var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
 var getHttpSigningMiddleware = __webpack_require__(7764);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 3 modules
-var getSchemaSerdePlugin = __webpack_require__(1000);
+// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
+var getSchemaSerdePlugin = __webpack_require__(1920);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
@@ -9864,8 +10954,8 @@ var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 4 modules
 var AwsSdkSigV4Signer = __webpack_require__(6177);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 6 modules
-var defaultUserAgent = __webpack_require__(6764);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
+var defaultUserAgent = __webpack_require__(6371);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/endpointsConfig/NodeUseDualstackEndpointConfigOptions.js
@@ -9876,8 +10966,8 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
-// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(2060);
+// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
+var node_http_handler = __webpack_require__(3437);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(4622);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -9890,8 +10980,8 @@ var calculateBodyLength = __webpack_require__(2291);
 var resolveDefaultsModeConfig = __webpack_require__(320);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/AwsQueryProtocol.js + 15 modules
-var AwsQueryProtocol = __webpack_require__(6616);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/AwsQueryProtocol.js + 17 modules
+var AwsQueryProtocol = __webpack_require__(9768);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
@@ -10121,6 +11211,7 @@ const getRuntimeConfig = (config) => {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/runtimeConfig.js
+
 
 
 
@@ -10537,7 +11628,7 @@ const toEndpointV1 = (endpoint) => parseUrl(endpoint.url);
 
 
 },
-6764(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6371(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -10562,30 +11653,67 @@ const getRuntimeUserAgentPair = () => {
     return ["md/nodejs", external_node_process_namespaceObject.versions.node];
 };
 
+// EXTERNAL MODULE: ./node_modules/@smithy/util-config-provider/dist-es/booleanSelector.js
+var booleanSelector = __webpack_require__(5938);
+// EXTERNAL MODULE: ./node_modules/@smithy/util-config-provider/dist-es/types.js
+var types = __webpack_require__(3466);
 // EXTERNAL MODULE: external "node:fs/promises"
 var promises_ = __webpack_require__(1455);
 // EXTERNAL MODULE: external "node:path"
 var external_node_path_ = __webpack_require__(6760);
-;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/getTypeScriptPackageJsonPath.js
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/getNodeModulesParentDirs.js
 
-const getTypeScriptPackageJsonPath = (dirname = "") => {
-    let nodeModulesPath;
+const getNodeModulesParentDirs = (dirname) => {
+    const cwd = process.cwd();
+    if (!dirname) {
+        return [cwd];
+    }
     const normalizedPath = (0,external_node_path_.normalize)(dirname);
     const parts = normalizedPath.split(external_node_path_.sep);
     const nodeModulesIndex = parts.indexOf("node_modules");
-    if (nodeModulesIndex !== -1) {
-        nodeModulesPath = parts.slice(0, nodeModulesIndex).join(external_node_path_.sep);
+    const parentDir = nodeModulesIndex !== -1 ? parts.slice(0, nodeModulesIndex).join(external_node_path_.sep) : normalizedPath;
+    if (cwd === parentDir) {
+        return [cwd];
     }
-    else {
-        nodeModulesPath = dirname;
+    return [parentDir, cwd];
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/getSanitizedTypeScriptVersion.js
+const SEMVER_REGEX = /^(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-((?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*)(?:\.(?:0|[1-9]\d*|\d*[a-zA-Z-][0-9a-zA-Z-]*))*))?(?:\+[0-9a-zA-Z-]+(?:\.[0-9a-zA-Z-]+)*)?$/;
+const getSanitizedTypeScriptVersion = (version = "") => {
+    const match = version.match(SEMVER_REGEX);
+    if (!match) {
+        return undefined;
     }
-    return (0,external_node_path_.join)(nodeModulesPath, "node_modules", "typescript", "package.json");
+    const [major, minor, patch, prerelease] = [match[1], match[2], match[3], match[4]];
+    return prerelease ? `${major}.${minor}.${patch}-${prerelease}` : `${major}.${minor}.${patch}`;
+};
+
+;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/getSanitizedDevTypeScriptVersion.js
+
+const ALLOWED_PREFIXES = ["^", "~", ">=", "<=", ">", "<"];
+const ALLOWED_DIST_TAGS = ["latest", "beta", "dev", "rc", "insiders", "next"];
+const getSanitizedDevTypeScriptVersion = (version = "") => {
+    if (ALLOWED_DIST_TAGS.includes(version)) {
+        return version;
+    }
+    const prefix = ALLOWED_PREFIXES.find((p) => version.startsWith(p)) ?? "";
+    const sanitizedTypeScriptVersion = getSanitizedTypeScriptVersion(version.slice(prefix.length));
+    if (!sanitizedTypeScriptVersion) {
+        return undefined;
+    }
+    return `${prefix}${sanitizedTypeScriptVersion}`;
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/getTypeScriptUserAgentPair.js
 
 
+
+
+
+
 let tscVersion;
+const TS_PACKAGE_JSON = (0,external_node_path_.join)("node_modules", "typescript", "package.json");
 const getTypeScriptUserAgentPair = async () => {
     if (tscVersion === null) {
         return undefined;
@@ -10593,19 +11721,65 @@ const getTypeScriptUserAgentPair = async () => {
     else if (typeof tscVersion === "string") {
         return ["md/tsc", tscVersion];
     }
+    let isTypeScriptDetectionDisabled = false;
     try {
-        const packageJson = await (0,promises_.readFile)(getTypeScriptPackageJsonPath(__dirname), "utf-8");
-        const { version } = JSON.parse(packageJson);
-        if (typeof version !== "string") {
-            tscVersion = null;
-            return undefined;
+        isTypeScriptDetectionDisabled =
+            (0,booleanSelector/* .booleanSelector */.Q)(process.env, "AWS_SDK_JS_TYPESCRIPT_DETECTION_DISABLED", types/* .SelectorType.ENV */.c.ENV) || false;
+    }
+    catch { }
+    if (isTypeScriptDetectionDisabled) {
+        tscVersion = null;
+        return undefined;
+    }
+    const dirname =  true ? __dirname : 0;
+    const nodeModulesParentDirs = getNodeModulesParentDirs(dirname);
+    let versionFromApp;
+    for (const nodeModulesParentDir of nodeModulesParentDirs) {
+        try {
+            const appPackageJsonPath = (0,external_node_path_.join)(nodeModulesParentDir, "package.json");
+            const packageJson = await (0,promises_.readFile)(appPackageJsonPath, "utf-8");
+            const { dependencies, devDependencies } = JSON.parse(packageJson);
+            const version = devDependencies?.typescript ?? dependencies?.typescript;
+            if (typeof version !== "string") {
+                continue;
+            }
+            versionFromApp = version;
+            break;
         }
-        tscVersion = version;
+        catch {
+        }
+    }
+    if (!versionFromApp) {
+        tscVersion = null;
+        return undefined;
+    }
+    let versionFromNodeModules;
+    for (const nodeModulesParentDir of nodeModulesParentDirs) {
+        try {
+            const tsPackageJsonPath = (0,external_node_path_.join)(nodeModulesParentDir, TS_PACKAGE_JSON);
+            const packageJson = await (0,promises_.readFile)(tsPackageJsonPath, "utf-8");
+            const { version } = JSON.parse(packageJson);
+            const sanitizedVersion = getSanitizedTypeScriptVersion(version);
+            if (typeof sanitizedVersion !== "string") {
+                continue;
+            }
+            versionFromNodeModules = sanitizedVersion;
+            break;
+        }
+        catch {
+        }
+    }
+    if (versionFromNodeModules) {
+        tscVersion = versionFromNodeModules;
         return ["md/tsc", tscVersion];
     }
-    catch {
+    const sanitizedVersion = getSanitizedDevTypeScriptVersion(versionFromApp);
+    if (typeof sanitizedVersion !== "string") {
         tscVersion = null;
+        return undefined;
     }
+    tscVersion = `dev_${sanitizedVersion}`;
+    return ["md/tsc", tscVersion];
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/crt-availability.js
@@ -10694,6 +11868,11 @@ const NODE_USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS = {
     configFileSelector: (profile) => (0,_smithy_util_config_provider__rspack_import_0/* .booleanSelector */.Q)(profile, CONFIG_USE_DUALSTACK_ENDPOINT, _smithy_util_config_provider__rspack_import_1/* .SelectorType.CONFIG */.c.CONFIG),
     default: false,
 };
+const nodeDualstackConfigSelectors = (/* unused pure expression or super */ null && ({
+    environmentVariableSelector: (env) => booleanSelector(env, ENV_USE_DUALSTACK_ENDPOINT, SelectorType.ENV),
+    configFileSelector: (profile) => booleanSelector(profile, CONFIG_USE_DUALSTACK_ENDPOINT, SelectorType.CONFIG),
+    default: undefined,
+}));
 
 
 },
@@ -10712,6 +11891,11 @@ const NODE_USE_FIPS_ENDPOINT_CONFIG_OPTIONS = {
     configFileSelector: (profile) => (0,_smithy_util_config_provider__rspack_import_0/* .booleanSelector */.Q)(profile, CONFIG_USE_FIPS_ENDPOINT, _smithy_util_config_provider__rspack_import_1/* .SelectorType.CONFIG */.c.CONFIG),
     default: false,
 };
+const nodeFipsConfigSelectors = (/* unused pure expression or super */ null && ({
+    environmentVariableSelector: (env) => booleanSelector(env, ENV_USE_FIPS_ENDPOINT, SelectorType.ENV),
+    configFileSelector: (profile) => booleanSelector(profile, CONFIG_USE_FIPS_ENDPOINT, SelectorType.CONFIG),
+    default: undefined,
+}));
 
 
 },
@@ -11222,7 +12406,7 @@ class EventStreamSerde {
                 throw new Error("@smithy/core/event-streams - non-struct member not supported in event stream union.");
             }
         }
-        const messageSerialization = serializer.flush();
+        const messageSerialization = serializer.flush() ?? new Uint8Array();
         const body = typeof messageSerialization === "string"
             ? (this.serdeContext?.utf8Decoder ?? fromUtf8/* .fromUtf8 */.a)(messageSerialization)
             : messageSerialization;
@@ -11293,6 +12477,11 @@ class HttpProtocol extends _SerdeContext__rspack_import_0/* .SerdeContext */.f {
             for (const [k, v] of endpoint.url.searchParams.entries()) {
                 request.query[k] = v;
             }
+            if (endpoint.headers) {
+                for (const [name, values] of Object.entries(endpoint.headers)) {
+                    request.headers[name] = values.join(", ");
+                }
+            }
             return request;
         }
         else {
@@ -11303,6 +12492,11 @@ class HttpProtocol extends _SerdeContext__rspack_import_0/* .SerdeContext */.f {
             request.query = {
                 ...endpoint.query,
             };
+            if (endpoint.headers) {
+                for (const [name, value] of Object.entries(endpoint.headers)) {
+                    request.headers[name] = value;
+                }
+            }
             return request;
         }
     }
@@ -11310,7 +12504,7 @@ class HttpProtocol extends _SerdeContext__rspack_import_0/* .SerdeContext */.f {
         if (this.serdeContext?.disableHostPrefix) {
             return;
         }
-        const inputNs = _smithy_core_schema__rspack_import_4/* .NormalizedSchema.of */.l.of(operationSchema.input);
+        const inputNs = _smithy_core_schema__rspack_import_4/* .NormalizedSchema.of */.l1.of(operationSchema.input);
         const opTraits = (0,_smithy_core_schema__rspack_import_5/* .translateTraits */.c)(operationSchema.traits ?? {});
         if (opTraits.endpoint) {
             let hostPrefix = opTraits.endpoint?.[0];
@@ -11603,7 +12797,7 @@ class FromStringShapeDeserializer extends SerdeContext/* .SerdeContext */.f {
         this.settings = settings;
     }
     read(_schema, data) {
-        const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(_schema);
+        const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(_schema);
         if (ns.isListSchema()) {
             return (0,split_header/* .splitHeader */.G)(data).map((item) => this.read(ns.getValueSchema(), item));
         }
@@ -11789,7 +12983,7 @@ const deref = (schemaRef) => {
 
 
 },
-1000(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1920(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11878,14 +13072,36 @@ const findHeader = (pattern, headers) => {
     }) || [void 0, void 1])[1];
 };
 
+// EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
+var dist_es = __webpack_require__(3871);
+;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/endpoints/toEndpointV1.js
+
+const toEndpointV1 = (endpoint) => {
+    if (typeof endpoint === "object") {
+        if ("url" in endpoint) {
+            const v1Endpoint = (0,dist_es/* .parseUrl */.D)(endpoint.url);
+            if (endpoint.headers) {
+                v1Endpoint.headers = {};
+                for (const [name, values] of Object.entries(endpoint.headers)) {
+                    v1Endpoint.headers[name.toLowerCase()] = values.join(", ");
+                }
+            }
+            return v1Endpoint;
+        }
+        return endpoint;
+    }
+    return (0,dist_es/* .parseUrl */.D)(endpoint);
+};
+
 ;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/schemaSerializationMiddleware.js
+
 
 
 const schemaSerializationMiddleware = (config) => (next, context) => async (args) => {
     const { operationSchema } = (0,getSmithyContext/* .getSmithyContext */.u)(context);
     const [, ns, n, t, i, o] = operationSchema ?? [];
-    const endpoint = context.endpointV2?.url && config.urlParser
-        ? async () => config.urlParser(context.endpointV2.url)
+    const endpoint = context.endpointV2
+        ? async () => toEndpointV1(context.endpointV2)
         : config.endpoint;
     const request = await config.protocol.serializeRequest(operation(ns, n, t, i, o), args.input, {
         ...config,
@@ -11927,7 +13143,7 @@ function getSchemaSerdePlugin(config) {
 },
 8754(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 __webpack_require__.d(__webpack_exports__, {
-  l: () => (NormalizedSchema)
+  l1: () => (NormalizedSchema)
 });
 /* import */ var _deref__rspack_import_0 = __webpack_require__(6625);
 /* import */ var _translateTraits__rspack_import_1 = __webpack_require__(6081);
@@ -11935,7 +13151,10 @@ __webpack_require__.d(__webpack_exports__, {
 
 const anno = {
     it: Symbol.for("@smithy/nor-struct-it"),
+    ns: Symbol.for("@smithy/ns"),
 };
+const simpleSchemaCacheN = [];
+const simpleSchemaCacheS = {};
 class NormalizedSchema {
     ref;
     memberName;
@@ -12000,6 +13219,22 @@ class NormalizedSchema {
         return isPrototype;
     }
     static of(ref) {
+        const keyAble = typeof ref === "function" || (typeof ref === "object" && ref !== null);
+        if (typeof ref === "number") {
+            if (simpleSchemaCacheN[ref]) {
+                return simpleSchemaCacheN[ref];
+            }
+        }
+        else if (typeof ref === "string") {
+            if (simpleSchemaCacheS[ref]) {
+                return simpleSchemaCacheS[ref];
+            }
+        }
+        else if (keyAble) {
+            if (ref[anno.ns]) {
+                return ref[anno.ns];
+            }
+        }
         const sc = (0,_deref__rspack_import_0/* .deref */.L)(ref);
         if (sc instanceof NormalizedSchema) {
             return sc;
@@ -12012,7 +13247,17 @@ class NormalizedSchema {
             }
             throw new Error(`@smithy/core/schema - may not init unwrapped member schema=${JSON.stringify(ref, null, 2)}.`);
         }
-        return new NormalizedSchema(sc);
+        const ns = new NormalizedSchema(sc);
+        if (keyAble) {
+            return (ref[anno.ns] = ns);
+        }
+        if (typeof sc === "string") {
+            return (simpleSchemaCacheS[sc] = ns);
+        }
+        if (typeof sc === "number") {
+            return (simpleSchemaCacheN[sc] = ns);
+        }
+        return ns;
     }
     getSchema() {
         const sc = this.schema;
@@ -12148,7 +13393,7 @@ class NormalizedSchema {
         if (this.isDocumentSchema()) {
             return member([15, 0], memberName);
         }
-        throw new Error(`@smithy/core/schema - ${this.getName(true)} has no no member=${memberName}.`);
+        throw new Error(`@smithy/core/schema - ${this.getName(true)} has no member=${memberName}.`);
     }
     getMemberSchemas() {
         const buffer = {};
@@ -12212,11 +13457,15 @@ const isStaticSchema = (sc) => Array.isArray(sc) && sc.length >= 5;
 __webpack_require__.d(__webpack_exports__, {
   c: () => (translateTraits)
 });
+const traitsCache = [];
 function translateTraits(indicator) {
     if (typeof indicator === "object") {
         return indicator;
     }
     indicator = indicator | 0;
+    if (traitsCache[indicator]) {
+        return traitsCache[indicator];
+    }
     const traits = {};
     let i = 0;
     for (const trait of [
@@ -12232,7 +13481,7 @@ function translateTraits(indicator) {
             traits[trait] = 1;
         }
     }
-    return traits;
+    return (traitsCache[indicator] = traits);
 }
 
 
@@ -12813,7 +14062,7 @@ class NoAuthSigner {
 
 
 },
-5301(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6579(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -12835,15 +14084,15 @@ const external_url_namespaceObject = require("url");
 var ProviderError = __webpack_require__(6014);
 // EXTERNAL MODULE: external "buffer"
 var external_buffer_ = __webpack_require__(181);
-// EXTERNAL MODULE: external "http"
-var external_http_ = __webpack_require__(8611);
+;// CONCATENATED MODULE: external "http"
+const external_http_namespaceObject = require("http");
 ;// CONCATENATED MODULE: ./node_modules/@smithy/credential-provider-imds/dist-es/remoteProvider/httpRequest.js
 
 
 
 function httpRequest(options) {
     return new Promise((resolve, reject) => {
-        const req = (0,external_http_.request)({
+        const req = (0,external_http_namespaceObject.request)({
             method: "GET",
             ...options,
             hostname: options.hostname?.replace(/^\[(.+)\]$/, "$1"),
@@ -13410,7 +14659,14 @@ __webpack_require__.d(__webpack_exports__, {
 const toEndpointV1 = (endpoint) => {
     if (typeof endpoint === "object") {
         if ("url" in endpoint) {
-            return (0,_smithy_url_parser__rspack_import_0/* .parseUrl */.D)(endpoint.url);
+            const v1Endpoint = (0,_smithy_url_parser__rspack_import_0/* .parseUrl */.D)(endpoint.url);
+            if (endpoint.headers) {
+                v1Endpoint.headers = {};
+                for (const [name, values] of Object.entries(endpoint.headers)) {
+                    v1Endpoint.headers[name.toLowerCase()] = values.join(", ");
+                }
+            }
+            return v1Endpoint;
         }
         return endpoint;
     }
@@ -13586,6 +14842,15 @@ const getEndpointFromInstructions = async (commandInput, instructionsSupplier, c
         throw new Error("config.endpointProvider is not set.");
     }
     const endpoint = clientConfig.endpointProvider(endpointParams, context);
+    if (clientConfig.isCustomEndpoint && clientConfig.endpoint) {
+        const customEndpoint = await clientConfig.endpoint();
+        if (customEndpoint?.headers) {
+            endpoint.headers ??= {};
+            for (const [name, value] of Object.entries(customEndpoint.headers)) {
+                endpoint.headers[name] = Array.isArray(value) ? value : [value];
+            }
+        }
+    }
     return endpoint;
 };
 const resolveParams = async (commandInput, instructionsSupplier, clientConfig) => {
@@ -13739,8 +15004,8 @@ class DefaultRateLimiter {
     minFillRate;
     scaleConstant;
     smooth;
-    currentCapacity = 0;
     enabled = false;
+    availableTokens = 0;
     lastMaxRate = 0;
     measuredTxRate = 0;
     requestCount = 0;
@@ -13773,11 +15038,11 @@ class DefaultRateLimiter {
             return;
         }
         this.refillTokenBucket();
-        if (amount > this.currentCapacity) {
-            const delay = ((amount - this.currentCapacity) / this.fillRate) * 1000;
+        if (amount > this.availableTokens) {
+            const delay = ((amount - this.availableTokens) / this.fillRate) * 1000;
             await new Promise((resolve) => DefaultRateLimiter.setTimeoutFn(resolve, delay));
         }
-        this.currentCapacity = this.currentCapacity - amount;
+        this.availableTokens = this.availableTokens - amount;
     }
     refillTokenBucket() {
         const timestamp = this.getCurrentTimeInSeconds();
@@ -13786,13 +15051,15 @@ class DefaultRateLimiter {
             return;
         }
         const fillAmount = (timestamp - this.lastTimestamp) * this.fillRate;
-        this.currentCapacity = Math.min(this.maxCapacity, this.currentCapacity + fillAmount);
+        this.availableTokens = Math.min(this.maxCapacity, this.availableTokens + fillAmount);
         this.lastTimestamp = timestamp;
     }
     updateClientSendingRate(response) {
         let calculatedRate;
         this.updateMeasuredRate();
-        if ((0,dist_es/* .isThrottlingError */.Qb)(response)) {
+        const retryErrorInfo = response;
+        const isThrottling = retryErrorInfo?.errorType === "THROTTLING" || (0,dist_es/* .isThrottlingError */.Qb)(retryErrorInfo?.error ?? response);
+        if (isThrottling) {
             const rateToUse = !this.enabled ? this.measuredTxRate : Math.min(this.measuredTxRate, this.fillRate);
             this.lastMaxRate = rateToUse;
             this.calculateTimeWindow();
@@ -13823,7 +15090,7 @@ class DefaultRateLimiter {
         this.refillTokenBucket();
         this.fillRate = Math.max(newRate, this.minFillRate);
         this.maxCapacity = Math.max(newRate, this.minCapacity);
-        this.currentCapacity = Math.min(this.currentCapacity, this.maxCapacity);
+        this.availableTokens = Math.min(this.availableTokens, this.maxCapacity);
     }
     updateMeasuredRate() {
         const t = this.getCurrentTimeInSeconds();
@@ -13997,20 +15264,17 @@ const NODE_MAX_ATTEMPT_CONFIG_OPTIONS = {
     default: (/* inlined export .DEFAULT_MAX_ATTEMPTS */3),
 };
 const resolveRetryConfig = (input) => {
-    const { retryStrategy, retryMode: _retryMode, maxAttempts: _maxAttempts } = input;
-    const maxAttempts = (0,normalizeProvider/* .normalizeProvider */.t)(_maxAttempts ?? (/* inlined export .DEFAULT_MAX_ATTEMPTS */3));
+    const { retryStrategy, retryMode } = input;
+    const maxAttempts = (0,normalizeProvider/* .normalizeProvider */.t)(input.maxAttempts ?? (/* inlined export .DEFAULT_MAX_ATTEMPTS */3));
+    let controller = retryStrategy
+        ? Promise.resolve(retryStrategy)
+        : undefined;
+    const getDefault = async () => (await (0,normalizeProvider/* .normalizeProvider */.t)(retryMode)()) === config/* .RETRY_MODES.ADAPTIVE */.c.ADAPTIVE
+        ? new AdaptiveRetryStrategy(maxAttempts)
+        : new StandardRetryStrategy(maxAttempts);
     return Object.assign(input, {
         maxAttempts,
-        retryStrategy: async () => {
-            if (retryStrategy) {
-                return retryStrategy;
-            }
-            const retryMode = await (0,normalizeProvider/* .normalizeProvider */.t)(_retryMode)();
-            if (retryMode === config/* .RETRY_MODES.ADAPTIVE */.c.ADAPTIVE) {
-                return new AdaptiveRetryStrategy(maxAttempts);
-            }
-            return new StandardRetryStrategy(maxAttempts);
-        },
+        retryStrategy: () => (controller ??= getDefault()),
     });
 };
 const ENV_RETRY_MODE = "AWS_RETRY_MODE";
@@ -14568,7 +15832,7 @@ const loadConfig = ({ environmentVariableSelector, configFileSelector, default: 
 
 
 },
-2060(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3437(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -14604,10 +15868,29 @@ function buildQueryString(query) {
     return parts.join("&");
 }
 
-// EXTERNAL MODULE: external "http"
-var external_http_ = __webpack_require__(8611);
-;// CONCATENATED MODULE: external "https"
-const external_https_namespaceObject = require("https");
+;// CONCATENATED MODULE: external "node:https"
+const external_node_https_namespaceObject = require("node:https");
+;// CONCATENATED MODULE: ./node_modules/@smithy/node-http-handler/dist-es/build-abort-error.js
+function buildAbortError(abortSignal) {
+    const reason = abortSignal && typeof abortSignal === "object" && "reason" in abortSignal
+        ? abortSignal.reason
+        : undefined;
+    if (reason) {
+        if (reason instanceof Error) {
+            const abortError = new Error("Request aborted");
+            abortError.name = "AbortError";
+            abortError.cause = reason;
+            return abortError;
+        }
+        const abortError = new Error(String(reason));
+        abortError.name = "AbortError";
+        return abortError;
+    }
+    const abortError = new Error("Request aborted");
+    abortError.name = "AbortError";
+    return abortError;
+}
+
 ;// CONCATENATED MODULE: ./node_modules/@smithy/node-http-handler/dist-es/constants.js
 const NODEJS_TIMEOUT_ERROR_CODES = ["ECONNRESET", "EPIPE", "ETIMEDOUT"];
 
@@ -14738,8 +16021,8 @@ const setSocketTimeout = (request, reject, timeoutInMs = 0) => {
     return timing.setTimeout(registerTimeout.bind(null, timeoutInMs === 0 ? 0 : set_socket_timeout_DEFER_EVENT_LISTENER_TIME), set_socket_timeout_DEFER_EVENT_LISTENER_TIME);
 };
 
-// EXTERNAL MODULE: external "stream"
-var external_stream_ = __webpack_require__(2203);
+// EXTERNAL MODULE: external "node:stream"
+var external_node_stream_ = __webpack_require__(7075);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/node-http-handler/dist-es/write-request-body.js
 
 
@@ -14775,7 +16058,7 @@ async function writeRequestBody(httpRequest, request, maxContinueTimeoutMs = MIN
     }
 }
 function writeBody(httpRequest, body) {
-    if (body instanceof external_stream_.Readable) {
+    if (body instanceof external_node_stream_.Readable) {
         body.pipe(httpRequest);
         return;
     }
@@ -14819,6 +16102,8 @@ function writeBody(httpRequest, body) {
 
 
 const DEFAULT_REQUEST_TIMEOUT = 0;
+let hAgent = undefined;
+let hRequest = undefined;
 class NodeHttpHandler {
     config;
     configProvider;
@@ -14868,33 +16153,6 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
             }
         });
     }
-    resolveDefaultConfig(options) {
-        const { requestTimeout, connectionTimeout, socketTimeout, socketAcquisitionWarningTimeout, httpAgent, httpsAgent, throwOnRequestTimeout, logger, } = options || {};
-        const keepAlive = true;
-        const maxSockets = 50;
-        return {
-            connectionTimeout,
-            requestTimeout,
-            socketTimeout,
-            socketAcquisitionWarningTimeout,
-            throwOnRequestTimeout,
-            httpAgent: (() => {
-                if (httpAgent instanceof external_http_.Agent || typeof httpAgent?.destroy === "function") {
-                    this.externalAgent = true;
-                    return httpAgent;
-                }
-                return new external_http_.Agent({ keepAlive, maxSockets, ...httpAgent });
-            })(),
-            httpsAgent: (() => {
-                if (httpsAgent instanceof external_https_namespaceObject.Agent || typeof httpsAgent?.destroy === "function") {
-                    this.externalAgent = true;
-                    return httpsAgent;
-                }
-                return new external_https_namespaceObject.Agent({ keepAlive, maxSockets, ...httpsAgent });
-            })(),
-            logger,
-        };
-    }
     destroy() {
         this.config?.httpAgent?.destroy();
         this.config?.httpsAgent?.destroy();
@@ -14903,8 +16161,12 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
         if (!this.config) {
             this.config = await this.configProvider;
         }
+        const config = this.config;
+        const isSSL = request.protocol === "https:";
+        if (!isSSL && !this.config.httpAgent) {
+            this.config.httpAgent = await this.config.httpAgentProvider();
+        }
         return new Promise((_resolve, _reject) => {
-            const config = this.config;
             let writeRequestBodyPromise = undefined;
             const timeouts = [];
             const resolve = async (arg) => {
@@ -14918,17 +16180,15 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
                 _reject(arg);
             };
             if (abortSignal?.aborted) {
-                const abortError = new Error("Request aborted");
-                abortError.name = "AbortError";
+                const abortError = buildAbortError(abortSignal);
                 reject(abortError);
                 return;
             }
-            const isSSL = request.protocol === "https:";
             const headers = request.headers ?? {};
             const expectContinue = (headers.Expect ?? headers.expect) === "100-continue";
             let agent = isSSL ? config.httpsAgent : config.httpAgent;
             if (expectContinue && !this.externalAgent) {
-                agent = new (isSSL ? external_https_namespaceObject.Agent : external_http_.Agent)({
+                agent = new (isSSL ? external_node_https_namespaceObject.Agent : hAgent)({
                     keepAlive: false,
                     maxSockets: Infinity,
                 });
@@ -14966,7 +16226,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
                 agent,
                 auth,
             };
-            const requestFunc = isSSL ? external_https_namespaceObject.request : external_http_.request;
+            const requestFunc = isSSL ? external_node_https_namespaceObject.request : hRequest;
             const req = requestFunc(nodeHttpsOptions, (res) => {
                 const httpResponse = new dist_es_httpResponse/* .HttpResponse */.c({
                     statusCode: res.statusCode || -1,
@@ -14987,8 +16247,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
             if (abortSignal) {
                 const onAbort = () => {
                     req.destroy();
-                    const abortError = new Error("Request aborted");
-                    abortError.name = "AbortError";
+                    const abortError = buildAbortError(abortSignal);
                     reject(abortError);
                 };
                 if (typeof abortSignal.addEventListener === "function") {
@@ -15029,6 +16288,36 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
     httpHandlerConfigs() {
         return this.config ?? {};
     }
+    resolveDefaultConfig(options) {
+        const { requestTimeout, connectionTimeout, socketTimeout, socketAcquisitionWarningTimeout, httpAgent, httpsAgent, throwOnRequestTimeout, logger, } = options || {};
+        const keepAlive = true;
+        const maxSockets = 50;
+        return {
+            connectionTimeout,
+            requestTimeout,
+            socketTimeout,
+            socketAcquisitionWarningTimeout,
+            throwOnRequestTimeout,
+            httpAgentProvider: async () => {
+                const { Agent, request } = await Promise.resolve(/* import() */).then(__webpack_require__.t.bind(__webpack_require__, 7067, 23));
+                hRequest = request;
+                hAgent = Agent;
+                if (httpAgent instanceof hAgent || typeof httpAgent?.destroy === "function") {
+                    this.externalAgent = true;
+                    return httpAgent;
+                }
+                return new hAgent({ keepAlive, maxSockets, ...httpAgent });
+            },
+            httpsAgent: (() => {
+                if (httpsAgent instanceof external_node_https_namespaceObject.Agent || typeof httpsAgent?.destroy === "function") {
+                    this.externalAgent = true;
+                    return httpsAgent;
+                }
+                return new external_node_https_namespaceObject.Agent({ keepAlive, maxSockets, ...httpsAgent });
+            })(),
+            logger,
+        };
+    }
 }
 
 
@@ -15040,11 +16329,11 @@ __webpack_require__.d(__webpack_exports__, {
   k: () => (/* binding */ streamCollector)
 });
 
-// EXTERNAL MODULE: external "stream"
-var external_stream_ = __webpack_require__(2203);
+// EXTERNAL MODULE: external "node:stream"
+var external_node_stream_ = __webpack_require__(7075);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/collector.js
 
-class Collector extends external_stream_.Writable {
+class Collector extends external_node_stream_.Writable {
     bufferedBytes = [];
     _write(chunk, encoding, callback) {
         this.bufferedBytes.push(chunk);
@@ -15867,7 +17156,7 @@ function schemaLogFilter(schema, data) {
     if (data == null) {
         return data;
     }
-    const ns = NormalizedSchema/* .NormalizedSchema.of */.l.of(schema);
+    const ns = NormalizedSchema/* .NormalizedSchema.of */.l1.of(schema);
     if (ns.getMergedTraits().sensitive) {
         return SENSITIVE_STRING;
     }
@@ -16546,7 +17835,7 @@ const inferPhysicalRegion = async () => {
     }
     if (!process.env[ENV_IMDS_DISABLED]) {
         try {
-            const { getInstanceMetadataEndpoint, httpRequest } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5301));
+            const { getInstanceMetadataEndpoint, httpRequest } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
             const endpoint = await getInstanceMetadataEndpoint();
             return (await httpRequest({ ...endpoint, path: IMDS_REGION_PATH })).toString();
         }
@@ -17525,10 +18814,6 @@ module.exports = require("buffer");
 module.exports = require("crypto");
 
 },
-8611(module) {
-module.exports = require("http");
-
-},
 6698(module) {
 module.exports = require("node:async_hooks");
 
@@ -17541,12 +18826,20 @@ module.exports = require("node:fs");
 module.exports = require("node:fs/promises");
 
 },
+7067(module) {
+module.exports = require("node:http");
+
+},
 8161(module) {
 module.exports = require("node:os");
 
 },
 6760(module) {
 module.exports = require("node:path");
+
+},
+7075(module) {
+module.exports = require("node:stream");
 
 },
 6928(module) {
@@ -17558,7 +18851,7 @@ module.exports = require("stream");
 
 },
 9955(module) {
-module.exports = {"rE":"3.996.3"}
+module.exports = {"rE":"3.996.18"}
 
 },
 
@@ -17680,8 +18973,8 @@ var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
 var getHttpSigningMiddleware = __webpack_require__(7764);
-// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 3 modules
-var getSchemaSerdePlugin = __webpack_require__(1000);
+// EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
+var getSchemaSerdePlugin = __webpack_require__(1920);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
@@ -17780,7 +19073,7 @@ const commonParams = {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/package.json
-var package_namespaceObject = {"rE":"3.1000.0"}
+var package_namespaceObject = {"rE":"3.1021.0"}
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
@@ -17799,7 +19092,7 @@ var dist_es_chain = __webpack_require__(8062);
 
 const ENV_IMDS_DISABLED = "AWS_EC2_METADATA_DISABLED";
 const remoteProvider = async (init) => {
-    const { ENV_CMDS_FULL_URI, ENV_CMDS_RELATIVE_URI, fromContainerMetadata, fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5301));
+    const { ENV_CMDS_FULL_URI, ENV_CMDS_RELATIVE_URI, fromContainerMetadata, fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
     if (process.env[ENV_CMDS_RELATIVE_URI] || process.env[ENV_CMDS_FULL_URI]) {
         init.logger?.debug("@aws-sdk/credential-provider-node - remoteProvider::fromHttp/fromContainerMetadata");
         const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 4161));
@@ -17951,8 +19244,8 @@ const defaultProvider = (init = {}) => memoizeChain([
 const credentialsWillNeedRefresh = (credentials) => credentials?.expiration !== undefined;
 const credentialsTreatedAsExpired = (credentials) => credentials?.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000;
 
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 6 modules
-var defaultUserAgent = __webpack_require__(6764);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
+var defaultUserAgent = __webpack_require__(6371);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -17967,8 +19260,8 @@ var noAuth = __webpack_require__(5536);
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
 var configLoader = __webpack_require__(9614);
-// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 10 modules
-var node_http_handler = __webpack_require__(2060);
+// EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
+var node_http_handler = __webpack_require__(3437);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
 var stream_collector = __webpack_require__(4622);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
@@ -17981,8 +19274,8 @@ var calculateBodyLength = __webpack_require__(2291);
 var resolveDefaultsModeConfig = __webpack_require__(320);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
-// EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/AwsQueryProtocol.js + 15 modules
-var AwsQueryProtocol = __webpack_require__(6616);
+// EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/AwsQueryProtocol.js + 17 modules
+var AwsQueryProtocol = __webpack_require__(9768);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
@@ -18621,6 +19914,7 @@ const getRuntimeConfig = (config) => {
 };
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/runtimeConfig.js
+
 
 
 
