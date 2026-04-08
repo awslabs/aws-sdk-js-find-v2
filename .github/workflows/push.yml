@@ -22,7 +22,6 @@ jobs:
         run: npm i -g corepack
       - uses: actions/setup-node@v6
         with:
-          node-version: "24.x" # Trusted publishing requires npm >=v11.5.1
           cache: "yarn"
 
       - run: yarn
