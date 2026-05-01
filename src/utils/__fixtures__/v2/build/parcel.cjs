@@ -1,20 +1,20 @@
-var $8OLUh$fs = require("fs");
-var $8OLUh$util = require("util");
-var $8OLUh$crypto = require("crypto");
-var $8OLUh$stream = require("stream");
-var $8OLUh$dgram = require("dgram");
-var $8OLUh$os = require("os");
-var $8OLUh$path = require("path");
-var $8OLUh$events = require("events");
-var $8OLUh$timers = require("timers");
-var $8OLUh$string_decoder = require("string_decoder");
-var $8OLUh$buffer = require("buffer");
-var $8OLUh$domain = require("domain");
-var $8OLUh$url = require("url");
-var $8OLUh$querystring = require("querystring");
-var $8OLUh$child_process = require("child_process");
-var $8OLUh$https = require("https");
-var $8OLUh$http = require("http");
+var $bPiTa$fs = require("fs");
+var $bPiTa$util = require("util");
+var $bPiTa$crypto = require("crypto");
+var $bPiTa$stream = require("stream");
+var $bPiTa$dgram = require("dgram");
+var $bPiTa$os = require("os");
+var $bPiTa$path = require("path");
+var $bPiTa$events = require("events");
+var $bPiTa$timers = require("timers");
+var $bPiTa$string_decoder = require("string_decoder");
+var $bPiTa$buffer = require("buffer");
+var $bPiTa$domain = require("domain");
+var $bPiTa$url = require("url");
+var $bPiTa$querystring = require("querystring");
+var $bPiTa$child_process = require("child_process");
+var $bPiTa$https = require("https");
+var $bPiTa$http = require("http");
 
 
 function $parcel$export(e, n, v, s) {
@@ -58,8 +58,8 @@ if (parcelRequire == null) {
 }
 
 var parcelRegister = parcelRequire.register;
-parcelRegister("jfMGq", function(module, exports) {
-/* eslint guard-for-in:0 */ var $e0452e8665f8b4e2$var$AWS;
+parcelRegister("KHT0q", function(module, exports) {
+/* eslint guard-for-in:0 */ var $08c656e045ef2423$var$AWS;
 
 
 
@@ -80,10 +80,10 @@ parcelRegister("jfMGq", function(module, exports) {
  *   @see each
  *   @see arrayEach
  * @api private
- */ var $e0452e8665f8b4e2$var$util = {
+ */ var $08c656e045ef2423$var$util = {
     environment: 'nodejs',
     engine: function engine() {
-        if ($e0452e8665f8b4e2$var$util.isBrowser() && typeof navigator !== 'undefined') return navigator.userAgent;
+        if ($08c656e045ef2423$var$util.isBrowser() && typeof navigator !== 'undefined') return navigator.userAgent;
         else {
             var engine = process.platform + '/' + process.version;
             if (process.env.AWS_EXECUTION_ENV) engine += ' exec-env/' + process.env.AWS_EXECUTION_ENV;
@@ -91,9 +91,9 @@ parcelRegister("jfMGq", function(module, exports) {
         }
     },
     userAgent: function userAgent() {
-        var name = $e0452e8665f8b4e2$var$util.environment;
-        var agent = 'aws-sdk-' + name + '/' + (parcelRequire("1TgFO")).VERSION;
-        if (name === 'nodejs') agent += ' ' + $e0452e8665f8b4e2$var$util.engine();
+        var name = $08c656e045ef2423$var$util.environment;
+        var agent = 'aws-sdk-' + name + '/' + (parcelRequire("3ty2n")).VERSION;
+        if (name === 'nodejs') agent += ' ' + $08c656e045ef2423$var$util.engine();
         return agent;
     },
     uriEscape: function uriEscape(string) {
@@ -107,31 +107,31 @@ parcelRegister("jfMGq", function(module, exports) {
     },
     uriEscapePath: function uriEscapePath(string) {
         var parts = [];
-        $e0452e8665f8b4e2$var$util.arrayEach(string.split('/'), function(part) {
-            parts.push($e0452e8665f8b4e2$var$util.uriEscape(part));
+        $08c656e045ef2423$var$util.arrayEach(string.split('/'), function(part) {
+            parts.push($08c656e045ef2423$var$util.uriEscape(part));
         });
         return parts.join('/');
     },
     urlParse: function urlParse(url) {
-        return $e0452e8665f8b4e2$var$util.url.parse(url);
+        return $08c656e045ef2423$var$util.url.parse(url);
     },
     urlFormat: function urlFormat(url) {
-        return $e0452e8665f8b4e2$var$util.url.format(url);
+        return $08c656e045ef2423$var$util.url.format(url);
     },
     queryStringParse: function queryStringParse(qs) {
-        return $e0452e8665f8b4e2$var$util.querystring.parse(qs);
+        return $08c656e045ef2423$var$util.querystring.parse(qs);
     },
     queryParamsToString: function queryParamsToString(params) {
         var items = [];
-        var escape1 = $e0452e8665f8b4e2$var$util.uriEscape;
+        var escape1 = $08c656e045ef2423$var$util.uriEscape;
         var sortedKeys = Object.keys(params).sort();
-        $e0452e8665f8b4e2$var$util.arrayEach(sortedKeys, function(name) {
+        $08c656e045ef2423$var$util.arrayEach(sortedKeys, function(name) {
             var value = params[name];
             var ename = escape1(name);
             var result = ename + '=';
             if (Array.isArray(value)) {
                 var vals = [];
-                $e0452e8665f8b4e2$var$util.arrayEach(value, function(item) {
+                $08c656e045ef2423$var$util.arrayEach(value, function(item) {
                     vals.push(escape1(item));
                 });
                 result = ename + '=' + vals.sort().join('&' + ename + '=');
@@ -141,40 +141,40 @@ parcelRegister("jfMGq", function(module, exports) {
         return items.join('&');
     },
     readFileSync: function readFileSync(path) {
-        if ($e0452e8665f8b4e2$var$util.isBrowser()) return null;
-        return $8OLUh$fs.readFileSync(path, 'utf-8');
+        if ($08c656e045ef2423$var$util.isBrowser()) return null;
+        return $bPiTa$fs.readFileSync(path, 'utf-8');
     },
     base64: {
         encode: function encode64(string) {
-            if (typeof string === 'number') throw $e0452e8665f8b4e2$var$util.error(new Error('Cannot base64 encode number ' + string));
+            if (typeof string === 'number') throw $08c656e045ef2423$var$util.error(new Error('Cannot base64 encode number ' + string));
             if (string === null || typeof string === 'undefined') return string;
-            var buf = $e0452e8665f8b4e2$var$util.buffer.toBuffer(string);
+            var buf = $08c656e045ef2423$var$util.buffer.toBuffer(string);
             return buf.toString('base64');
         },
         decode: function decode64(string) {
-            if (typeof string === 'number') throw $e0452e8665f8b4e2$var$util.error(new Error('Cannot base64 decode number ' + string));
+            if (typeof string === 'number') throw $08c656e045ef2423$var$util.error(new Error('Cannot base64 decode number ' + string));
             if (string === null || typeof string === 'undefined') return string;
-            return $e0452e8665f8b4e2$var$util.buffer.toBuffer(string, 'base64');
+            return $08c656e045ef2423$var$util.buffer.toBuffer(string, 'base64');
         }
     },
     buffer: {
         /**
      * Buffer constructor for Node buffer and buffer pollyfill
      */ toBuffer: function(data, encoding) {
-            return typeof $e0452e8665f8b4e2$var$util.Buffer.from === 'function' && $e0452e8665f8b4e2$var$util.Buffer.from !== Uint8Array.from ? $e0452e8665f8b4e2$var$util.Buffer.from(data, encoding) : new $e0452e8665f8b4e2$var$util.Buffer(data, encoding);
+            return typeof $08c656e045ef2423$var$util.Buffer.from === 'function' && $08c656e045ef2423$var$util.Buffer.from !== Uint8Array.from ? $08c656e045ef2423$var$util.Buffer.from(data, encoding) : new $08c656e045ef2423$var$util.Buffer(data, encoding);
         },
         alloc: function(size, fill, encoding) {
             if (typeof size !== 'number') throw new Error('size passed to alloc must be a number.');
-            if (typeof $e0452e8665f8b4e2$var$util.Buffer.alloc === 'function') return $e0452e8665f8b4e2$var$util.Buffer.alloc(size, fill, encoding);
+            if (typeof $08c656e045ef2423$var$util.Buffer.alloc === 'function') return $08c656e045ef2423$var$util.Buffer.alloc(size, fill, encoding);
             else {
-                var buf = new $e0452e8665f8b4e2$var$util.Buffer(size);
+                var buf = new $08c656e045ef2423$var$util.Buffer(size);
                 if (fill !== undefined && typeof buf.fill === 'function') buf.fill(fill, undefined, undefined, encoding);
                 return buf;
             }
         },
         toStream: function toStream(buffer) {
-            if (!$e0452e8665f8b4e2$var$util.Buffer.isBuffer(buffer)) buffer = $e0452e8665f8b4e2$var$util.buffer.toBuffer(buffer);
-            var readable = new $e0452e8665f8b4e2$var$util.stream.Readable();
+            if (!$08c656e045ef2423$var$util.Buffer.isBuffer(buffer)) buffer = $08c656e045ef2423$var$util.buffer.toBuffer(buffer);
+            var readable = new $08c656e045ef2423$var$util.stream.Readable();
             var pos = 0;
             readable._read = function(size) {
                 if (pos >= buffer.length) return readable.push(null);
@@ -190,7 +190,7 @@ parcelRegister("jfMGq", function(module, exports) {
      */ concat: function(buffers) {
             var length = 0, offset = 0, buffer = null, i;
             for(i = 0; i < buffers.length; i++)length += buffers[i].length;
-            buffer = $e0452e8665f8b4e2$var$util.buffer.alloc(length);
+            buffer = $08c656e045ef2423$var$util.buffer.alloc(length);
             for(i = 0; i < buffers.length; i++){
                 buffers[i].copy(buffer, offset);
                 offset += buffers[i].length;
@@ -201,12 +201,12 @@ parcelRegister("jfMGq", function(module, exports) {
     string: {
         byteLength: function byteLength(string) {
             if (string === null || string === undefined) return 0;
-            if (typeof string === 'string') string = $e0452e8665f8b4e2$var$util.buffer.toBuffer(string);
+            if (typeof string === 'string') string = $08c656e045ef2423$var$util.buffer.toBuffer(string);
             if (typeof string.byteLength === 'number') return string.byteLength;
             else if (typeof string.length === 'number') return string.length;
             else if (typeof string.size === 'number') return string.size;
-            else if (typeof string.path === 'string') return $8OLUh$fs.lstatSync(string.path).size;
-            else throw $e0452e8665f8b4e2$var$util.error(new Error('Cannot determine length of ' + string), {
+            else if (typeof string.path === 'string') return $bPiTa$fs.lstatSync(string.path).size;
+            else throw $08c656e045ef2423$var$util.error(new Error('Cannot determine length of ' + string), {
                 object: string
             });
         },
@@ -220,12 +220,12 @@ parcelRegister("jfMGq", function(module, exports) {
     ini: {
         parse: function string(ini) {
             var currentSection, map = {};
-            $e0452e8665f8b4e2$var$util.arrayEach(ini.split(/\r?\n/), function(line) {
+            $08c656e045ef2423$var$util.arrayEach(ini.split(/\r?\n/), function(line) {
                 line = line.split(/(^|\s)[;#]/)[0].trim(); // remove comments and trim
                 var isSection = line[0] === '[' && line[line.length - 1] === ']';
                 if (isSection) {
                     currentSection = line.substring(1, line.length - 1);
-                    if (currentSection === '__proto__' || currentSection.split(/\s/)[1] === '__proto__') throw $e0452e8665f8b4e2$var$util.error(new Error('Cannot load profile name \'' + currentSection + '\' from shared ini file.'));
+                    if (currentSection === '__proto__' || currentSection.split(/\s/)[1] === '__proto__') throw $08c656e045ef2423$var$util.error(new Error('Cannot load profile name \'' + currentSection + '\' from shared ini file.'));
                 } else if (currentSection) {
                     var indexOfEqualsSign = line.indexOf('=');
                     var start = 0;
@@ -271,26 +271,26 @@ parcelRegister("jfMGq", function(module, exports) {
      *   this function to provide a special time value to AWS service
      *   requests.
      */ getDate: function getDate() {
-            if (!$e0452e8665f8b4e2$var$AWS) $e0452e8665f8b4e2$var$AWS = (parcelRequire("1TgFO"));
-            if ($e0452e8665f8b4e2$var$AWS.config.systemClockOffset) return new Date(new Date().getTime() + $e0452e8665f8b4e2$var$AWS.config.systemClockOffset);
+            if (!$08c656e045ef2423$var$AWS) $08c656e045ef2423$var$AWS = (parcelRequire("3ty2n"));
+            if ($08c656e045ef2423$var$AWS.config.systemClockOffset) return new Date(new Date().getTime() + $08c656e045ef2423$var$AWS.config.systemClockOffset);
             else return new Date();
         },
         /**
      * @return [String] the date in ISO-8601 format
      */ iso8601: function iso8601(date) {
-            if (date === undefined) date = $e0452e8665f8b4e2$var$util.date.getDate();
+            if (date === undefined) date = $08c656e045ef2423$var$util.date.getDate();
             return date.toISOString().replace(/\.\d{3}Z$/, 'Z');
         },
         /**
      * @return [String] the date in RFC 822 format
      */ rfc822: function rfc822(date) {
-            if (date === undefined) date = $e0452e8665f8b4e2$var$util.date.getDate();
+            if (date === undefined) date = $08c656e045ef2423$var$util.date.getDate();
             return date.toUTCString();
         },
         /**
      * @return [Integer] the UNIX timestamp value for the current time
      */ unixTimestamp: function unixTimestamp(date) {
-            if (date === undefined) date = $e0452e8665f8b4e2$var$util.date.getDate();
+            if (date === undefined) date = $08c656e045ef2423$var$util.date.getDate();
             return date.getTime() / 1000;
         },
         /**
@@ -311,14 +311,14 @@ parcelRegister("jfMGq", function(module, exports) {
      * @return [String]
      */ format: function format(date, formatter) {
             if (!formatter) formatter = 'iso8601';
-            return $e0452e8665f8b4e2$var$util.date[formatter]($e0452e8665f8b4e2$var$util.date.from(date));
+            return $08c656e045ef2423$var$util.date[formatter]($08c656e045ef2423$var$util.date.from(date));
         },
         parseTimestamp: function parseTimestamp(value) {
             if (typeof value === 'number') return new Date(value * 1000);
             else if (value.match(/^\d+$/)) return new Date(value * 1000);
             else if (value.match(/^\d{4}/)) return new Date(value);
             else if (value.match(/^\w{3},/)) return new Date(value);
-            else throw $e0452e8665f8b4e2$var$util.error(new Error('unhandled timestamp format: ' + value), {
+            else throw $08c656e045ef2423$var$util.error(new Error('unhandled timestamp format: ' + value), {
                 code: 'TimestampParserError'
             });
         }
@@ -583,9 +583,9 @@ parcelRegister("jfMGq", function(module, exports) {
             0x2D02EF8D
         ],
         crc32: function crc32(data) {
-            var tbl = $e0452e8665f8b4e2$var$util.crypto.crc32Table;
+            var tbl = $08c656e045ef2423$var$util.crypto.crc32Table;
             var crc = -1;
-            if (typeof data === 'string') data = $e0452e8665f8b4e2$var$util.buffer.toBuffer(data);
+            if (typeof data === 'string') data = $08c656e045ef2423$var$util.buffer.toBuffer(data);
             for(var i = 0; i < data.length; i++){
                 var code = data.readUInt8(i);
                 crc = crc >>> 8 ^ tbl[(crc ^ code) & 0xFF];
@@ -596,24 +596,24 @@ parcelRegister("jfMGq", function(module, exports) {
             if (!digest) digest = 'binary';
             if (digest === 'buffer') digest = undefined;
             if (!fn) fn = 'sha256';
-            if (typeof string === 'string') string = $e0452e8665f8b4e2$var$util.buffer.toBuffer(string);
-            return $e0452e8665f8b4e2$var$util.crypto.lib.createHmac(fn, key).update(string).digest(digest);
+            if (typeof string === 'string') string = $08c656e045ef2423$var$util.buffer.toBuffer(string);
+            return $08c656e045ef2423$var$util.crypto.lib.createHmac(fn, key).update(string).digest(digest);
         },
         md5: function md5(data, digest, callback) {
-            return $e0452e8665f8b4e2$var$util.crypto.hash('md5', data, digest, callback);
+            return $08c656e045ef2423$var$util.crypto.hash('md5', data, digest, callback);
         },
         sha256: function sha256(data, digest, callback) {
-            return $e0452e8665f8b4e2$var$util.crypto.hash('sha256', data, digest, callback);
+            return $08c656e045ef2423$var$util.crypto.hash('sha256', data, digest, callback);
         },
         hash: function(algorithm, data, digest, callback) {
-            var hash = $e0452e8665f8b4e2$var$util.crypto.createHash(algorithm);
+            var hash = $08c656e045ef2423$var$util.crypto.createHash(algorithm);
             if (!digest) digest = 'binary';
             if (digest === 'buffer') digest = undefined;
-            if (typeof data === 'string') data = $e0452e8665f8b4e2$var$util.buffer.toBuffer(data);
-            var sliceFn = $e0452e8665f8b4e2$var$util.arraySliceFn(data);
-            var isBuffer = $e0452e8665f8b4e2$var$util.Buffer.isBuffer(data);
+            if (typeof data === 'string') data = $08c656e045ef2423$var$util.buffer.toBuffer(data);
+            var sliceFn = $08c656e045ef2423$var$util.arraySliceFn(data);
+            var isBuffer = $08c656e045ef2423$var$util.Buffer.isBuffer(data);
             //Identifying objects with an ArrayBuffer as buffers
-            if ($e0452e8665f8b4e2$var$util.isBrowser() && typeof ArrayBuffer !== 'undefined' && data && data.buffer instanceof ArrayBuffer) isBuffer = true;
+            if ($08c656e045ef2423$var$util.isBrowser() && typeof ArrayBuffer !== 'undefined' && data && data.buffer instanceof ArrayBuffer) isBuffer = true;
             if (callback && typeof data === 'object' && typeof data.on === 'function' && !isBuffer) {
                 data.on('data', function(chunk) {
                     hash.update(chunk);
@@ -632,7 +632,7 @@ parcelRegister("jfMGq", function(module, exports) {
                     callback(new Error('Failed to read data.'));
                 };
                 reader.onload = function() {
-                    var buf = new $e0452e8665f8b4e2$var$util.Buffer(new Uint8Array(reader.result));
+                    var buf = new $08c656e045ef2423$var$util.Buffer(new Uint8Array(reader.result));
                     hash.update(buf);
                     index += buf.length;
                     reader._continueReading();
@@ -648,7 +648,7 @@ parcelRegister("jfMGq", function(module, exports) {
                 };
                 reader._continueReading();
             } else {
-                if ($e0452e8665f8b4e2$var$util.isBrowser() && typeof data === 'object' && !isBuffer) data = new $e0452e8665f8b4e2$var$util.Buffer(new Uint8Array(data));
+                if ($08c656e045ef2423$var$util.isBrowser() && typeof data === 'object' && !isBuffer) data = new $08c656e045ef2423$var$util.Buffer(new Uint8Array(data));
                 var out = hash.update(data).digest(digest);
                 if (callback) callback(null, out);
                 return out;
@@ -660,30 +660,30 @@ parcelRegister("jfMGq", function(module, exports) {
             return out.join('');
         },
         createHash: function createHash(algorithm) {
-            return $e0452e8665f8b4e2$var$util.crypto.lib.createHash(algorithm);
+            return $08c656e045ef2423$var$util.crypto.lib.createHash(algorithm);
         }
     },
     /** @!ignore */ /* Abort constant */ abort: {},
     each: function each(object, iterFunction) {
         for(var key in object)if (Object.prototype.hasOwnProperty.call(object, key)) {
             var ret = iterFunction.call(this, key, object[key]);
-            if (ret === $e0452e8665f8b4e2$var$util.abort) break;
+            if (ret === $08c656e045ef2423$var$util.abort) break;
         }
     },
     arrayEach: function arrayEach(array, iterFunction) {
         for(var idx in array)if (Object.prototype.hasOwnProperty.call(array, idx)) {
             var ret = iterFunction.call(this, array[idx], parseInt(idx, 10));
-            if (ret === $e0452e8665f8b4e2$var$util.abort) break;
+            if (ret === $08c656e045ef2423$var$util.abort) break;
         }
     },
     update: function update(obj1, obj2) {
-        $e0452e8665f8b4e2$var$util.each(obj2, function iterator(key, item) {
+        $08c656e045ef2423$var$util.each(obj2, function iterator(key, item) {
             obj1[key] = item;
         });
         return obj1;
     },
     merge: function merge(obj1, obj2) {
-        return $e0452e8665f8b4e2$var$util.update($e0452e8665f8b4e2$var$util.copy(obj1), obj2);
+        return $08c656e045ef2423$var$util.update($08c656e045ef2423$var$util.copy(obj1), obj2);
     },
     copy: function copy(object) {
         if (object === null || object === undefined) return object;
@@ -704,7 +704,7 @@ parcelRegister("jfMGq", function(module, exports) {
     },
     isType: function isType(obj, type) {
         // handle cross-"frame" objects
-        if (typeof type === 'function') type = $e0452e8665f8b4e2$var$util.typeName(type);
+        if (typeof type === 'function') type = $08c656e045ef2423$var$util.typeName(type);
         return Object.prototype.toString.call(obj) === '[object ' + type + ']';
     },
     typeName: function typeName(type) {
@@ -717,14 +717,14 @@ parcelRegister("jfMGq", function(module, exports) {
         var originalError = null;
         if (typeof err.message === 'string' && err.message !== '') {
             if (typeof options === 'string' || options && options.message) {
-                originalError = $e0452e8665f8b4e2$var$util.copy(err);
+                originalError = $08c656e045ef2423$var$util.copy(err);
                 originalError.message = err.message;
             }
         }
         err.message = err.message || null;
         if (typeof options === 'string') err.message = options;
         else if (typeof options === 'object' && options !== null) {
-            $e0452e8665f8b4e2$var$util.update(err, options);
+            $08c656e045ef2423$var$util.update(err, options);
             if (options.message) err.message = options.message;
             if (options.code || options.name) err.code = options.code || options.name;
             if (options.stack) err.stack = options.stack;
@@ -771,7 +771,7 @@ parcelRegister("jfMGq", function(module, exports) {
             if (klass !== Object) return klass.apply(this, arguments);
         };
         features.constructor.prototype = newObject;
-        $e0452e8665f8b4e2$var$util.update(features.constructor.prototype, features);
+        $08c656e045ef2423$var$util.update(features.constructor.prototype, features);
         features.constructor.__super__ = klass;
         return features.constructor;
     },
@@ -790,7 +790,7 @@ parcelRegister("jfMGq", function(module, exports) {
    * @api private
    */ hideProperties: function hideProperties(obj, props) {
         if (typeof Object.defineProperty !== 'function') return;
-        $e0452e8665f8b4e2$var$util.arrayEach(props, function(key) {
+        $08c656e045ef2423$var$util.arrayEach(props, function(key) {
             Object.defineProperty(obj, key, {
                 enumerable: false,
                 writable: true,
@@ -817,7 +817,7 @@ parcelRegister("jfMGq", function(module, exports) {
    */ memoizedProperty: function memoizedProperty(obj, name, get, enumerable) {
         var cachedValue = null;
         // build enumerable attribute for each value with lazy accessor.
-        $e0452e8665f8b4e2$var$util.property(obj, name, function() {
+        $08c656e045ef2423$var$util.property(obj, name, function() {
             if (cachedValue === null) cachedValue = get();
             return cachedValue;
         }, enumerable);
@@ -836,8 +836,8 @@ parcelRegister("jfMGq", function(module, exports) {
         if (output.payload && !operation.hasEventOutput) {
             var payloadMember = output.members[output.payload];
             var responsePayload = resp.data[output.payload];
-            if (payloadMember.type === 'structure') $e0452e8665f8b4e2$var$util.each(responsePayload, function(key, value) {
-                $e0452e8665f8b4e2$var$util.property(resp.data, key, value, false);
+            if (payloadMember.type === 'structure') $08c656e045ef2423$var$util.each(responsePayload, function(key, value) {
+                $08c656e045ef2423$var$util.property(resp.data, key, value, false);
             });
         }
     },
@@ -846,9 +846,9 @@ parcelRegister("jfMGq", function(module, exports) {
    *
    * @api private
    */ computeSha256: function computeSha256(body, done) {
-        if ($e0452e8665f8b4e2$var$util.isNode()) {
-            var Stream = $e0452e8665f8b4e2$var$util.stream.Stream;
-            var fs = $8OLUh$fs;
+        if ($08c656e045ef2423$var$util.isNode()) {
+            var Stream = $08c656e045ef2423$var$util.stream.Stream;
+            var fs = $bPiTa$fs;
             if (typeof Stream === 'function' && body instanceof Stream) {
                 if (typeof body.path === 'string') {
                     var settings = {};
@@ -858,7 +858,7 @@ parcelRegister("jfMGq", function(module, exports) {
                 } else return done(new Error("Non-file stream objects are not supported with SigV4"));
             }
         }
-        $e0452e8665f8b4e2$var$util.crypto.sha256(body, 'hex', function(err, sha) {
+        $08c656e045ef2423$var$util.crypto.sha256(body, 'hex', function(err, sha) {
             if (err) done(err);
             else done(null, sha);
         });
@@ -867,12 +867,12 @@ parcelRegister("jfMGq", function(module, exports) {
    * @api private
    */ isClockSkewed: function isClockSkewed(serverTime) {
         if (serverTime) {
-            $e0452e8665f8b4e2$var$util.property($e0452e8665f8b4e2$var$AWS.config, 'isClockSkewed', Math.abs(new Date().getTime() - serverTime) >= 300000, false);
-            return $e0452e8665f8b4e2$var$AWS.config.isClockSkewed;
+            $08c656e045ef2423$var$util.property($08c656e045ef2423$var$AWS.config, 'isClockSkewed', Math.abs(new Date().getTime() - serverTime) >= 300000, false);
+            return $08c656e045ef2423$var$AWS.config.isClockSkewed;
         }
     },
     applyClockOffset: function applyClockOffset(serverTime) {
-        if (serverTime) $e0452e8665f8b4e2$var$AWS.config.systemClockOffset = serverTime - new Date().getTime();
+        if (serverTime) $08c656e045ef2423$var$AWS.config.systemClockOffset = serverTime - new Date().getTime();
     },
     /**
    * @api private
@@ -886,7 +886,7 @@ parcelRegister("jfMGq", function(module, exports) {
    * @api private
    */ addPromises: function addPromises(constructors, PromiseDependency) {
         var deletePromises = false;
-        if (PromiseDependency === undefined && $e0452e8665f8b4e2$var$AWS && $e0452e8665f8b4e2$var$AWS.config) PromiseDependency = $e0452e8665f8b4e2$var$AWS.config.getPromisesDependency();
+        if (PromiseDependency === undefined && $08c656e045ef2423$var$AWS && $08c656e045ef2423$var$AWS.config) PromiseDependency = $08c656e045ef2423$var$AWS.config.getPromisesDependency();
         if (PromiseDependency === undefined && typeof Promise !== 'undefined') PromiseDependency = Promise;
         if (typeof PromiseDependency !== 'function') deletePromises = true;
         if (!Array.isArray(constructors)) constructors = [
@@ -923,7 +923,7 @@ parcelRegister("jfMGq", function(module, exports) {
    * @api private
    */ isDualstackAvailable: function isDualstackAvailable(service) {
         if (!service) return false;
-        var metadata = (parcelRequire("btHhi"));
+        var metadata = (parcelRequire("aX05d"));
         if (typeof service !== 'string') service = service.serviceIdentifier;
         if (typeof service !== 'string' || !metadata.hasOwnProperty(service)) return false;
         return !!metadata[service].dualstackAvailable;
@@ -942,7 +942,7 @@ parcelRegister("jfMGq", function(module, exports) {
    * @api private
    */ handleRequestWithRetries: function handleRequestWithRetries(httpRequest, options, cb) {
         if (!options) options = {};
-        var http = $e0452e8665f8b4e2$var$AWS.HttpClient.getInstance();
+        var http = $08c656e045ef2423$var$AWS.HttpClient.getInstance();
         var httpOptions = options.httpOptions || {};
         var retryCount = 0;
         var errCallback = function(err) {
@@ -950,7 +950,7 @@ parcelRegister("jfMGq", function(module, exports) {
             if (err && err.code === 'TimeoutError') err.retryable = true;
             // Call `calculateRetryDelay()` only when relevant, see #3401
             if (err && err.retryable && retryCount < maxRetries) {
-                var delay = $e0452e8665f8b4e2$var$util.calculateRetryDelay(retryCount, options.retryDelayOptions, err);
+                var delay = $08c656e045ef2423$var$util.calculateRetryDelay(retryCount, options.retryDelayOptions, err);
                 if (delay >= 0) {
                     retryCount++;
                     setTimeout(sendRequest, delay + (err.retryAfter || 0));
@@ -970,7 +970,7 @@ parcelRegister("jfMGq", function(module, exports) {
                     if (statusCode < 300) cb(null, data);
                     else {
                         var retryAfter = parseInt(httpResponse.headers['retry-after'], 10) * 1000 || 0;
-                        var err = $e0452e8665f8b4e2$var$util.error(new Error(), {
+                        var err = $08c656e045ef2423$var$util.error(new Error(), {
                             statusCode: statusCode,
                             retryable: statusCode >= 500 || statusCode === 429
                         });
@@ -980,13 +980,13 @@ parcelRegister("jfMGq", function(module, exports) {
                 });
             }, errCallback);
         };
-        $e0452e8665f8b4e2$var$AWS.util.defer(sendRequest);
+        $08c656e045ef2423$var$AWS.util.defer(sendRequest);
     },
     /**
    * @api private
    */ uuid: {
         v4: function uuidV4() {
-            return (parcelRequire("ay1MR")).default();
+            return (parcelRequire("jhFib")).default();
         }
     },
     /**
@@ -1016,18 +1016,18 @@ parcelRegister("jfMGq", function(module, exports) {
     getProfilesFromSharedConfig: function getProfilesFromSharedConfig(iniLoader, filename) {
         var profiles = {};
         var profilesFromConfig = {};
-        if (process.env[$e0452e8665f8b4e2$var$util.configOptInEnv]) var profilesFromConfig = iniLoader.loadFrom({
+        if (process.env[$08c656e045ef2423$var$util.configOptInEnv]) var profilesFromConfig = iniLoader.loadFrom({
             isConfig: true,
-            filename: process.env[$e0452e8665f8b4e2$var$util.sharedConfigFileEnv]
+            filename: process.env[$08c656e045ef2423$var$util.sharedConfigFileEnv]
         });
         var profilesFromCreds = {};
         try {
             var profilesFromCreds = iniLoader.loadFrom({
-                filename: filename || process.env[$e0452e8665f8b4e2$var$util.configOptInEnv] && process.env[$e0452e8665f8b4e2$var$util.sharedCredentialsFileEnv]
+                filename: filename || process.env[$08c656e045ef2423$var$util.configOptInEnv] && process.env[$08c656e045ef2423$var$util.sharedCredentialsFileEnv]
             });
         } catch (error) {
             // if using config, assume it is fully descriptive without a credentials file:
-            if (!process.env[$e0452e8665f8b4e2$var$util.configOptInEnv]) throw error;
+            if (!process.env[$08c656e045ef2423$var$util.configOptInEnv]) throw error;
         }
         for(var i = 0, profileNames = Object.keys(profilesFromConfig); i < profileNames.length; i++)profiles[profileNames[i]] = objectAssign(profiles[profileNames[i]] || {}, profilesFromConfig[profileNames[i]]);
         for(var i = 0, profileNames = Object.keys(profilesFromCreds); i < profileNames.length; i++)profiles[profileNames[i]] = objectAssign(profiles[profileNames[i]] || {}, profilesFromCreds[profileNames[i]]);
@@ -1056,7 +1056,7 @@ parcelRegister("jfMGq", function(module, exports) {
             };
         },
         build: function buildARN(arnObject) {
-            if (arnObject.service === undefined || arnObject.region === undefined || arnObject.accountId === undefined || arnObject.resource === undefined) throw $e0452e8665f8b4e2$var$util.error(new Error('Input ARN object is invalid'));
+            if (arnObject.service === undefined || arnObject.region === undefined || arnObject.accountId === undefined || arnObject.resource === undefined) throw $08c656e045ef2423$var$util.error(new Error('Input ARN object is invalid'));
             return 'arn:' + (arnObject.partition || 'aws') + ':' + arnObject.service + ':' + arnObject.region + ':' + arnObject.accountId + ':' + arnObject.resource;
         }
     },
@@ -1078,25 +1078,25 @@ parcelRegister("jfMGq", function(module, exports) {
 };
 /**
  * @api private
- */ module.exports = $e0452e8665f8b4e2$var$util;
+ */ module.exports = $08c656e045ef2423$var$util;
 
 });
-parcelRegister("1TgFO", function(module, exports) {
+parcelRegister("3ty2n", function(module, exports) {
 /**
  * The main AWS namespace
  */ 
-var $1607dc8066522526$var$AWS = {
-    util: (parcelRequire("jfMGq"))
+var $287e7b9eaed58818$var$AWS = {
+    util: (parcelRequire("KHT0q"))
 };
 /**
  * @api private
  * @!macro [new] nobrowser
  *   @note This feature is not supported in the browser environment of the SDK.
- */ var $1607dc8066522526$var$_hidden = {};
-$1607dc8066522526$var$_hidden.toString(); // hack to parse macro
+ */ var $287e7b9eaed58818$var$_hidden = {};
+$287e7b9eaed58818$var$_hidden.toString(); // hack to parse macro
 /**
  * @api private
- */ module.exports = $1607dc8066522526$var$AWS;
+ */ module.exports = $287e7b9eaed58818$var$AWS;
 
 
 
@@ -1112,7 +1112,7 @@ $1607dc8066522526$var$_hidden.toString(); // hack to parse macro
 
 
 
-$1607dc8066522526$var$AWS.util.update($1607dc8066522526$var$AWS, {
+$287e7b9eaed58818$var$AWS.util.update($287e7b9eaed58818$var$AWS, {
     /**
    * @constant
    */ VERSION: '2.1693.0',
@@ -1122,51 +1122,51 @@ $1607dc8066522526$var$AWS.util.update($1607dc8066522526$var$AWS, {
     /**
    * @api private
    */ Protocol: {
-        Json: (parcelRequire("gl4ei")),
-        Query: (parcelRequire("5LIY7")),
-        Rest: (parcelRequire("lq6Qt")),
-        RestJson: (parcelRequire("1ei0y")),
-        RestXml: (parcelRequire("aWREk"))
+        Json: (parcelRequire("dzYrM")),
+        Query: (parcelRequire("9lF8b")),
+        Rest: (parcelRequire("8Ice7")),
+        RestJson: (parcelRequire("crPSD")),
+        RestXml: (parcelRequire("kCjCH"))
     },
     /**
    * @api private
    */ XML: {
-        Builder: (parcelRequire("fVNr0")),
+        Builder: (parcelRequire("4efI4")),
         Parser: null // conditionally set based on environment
     },
     /**
    * @api private
    */ JSON: {
-        Builder: (parcelRequire("a9mEo")),
-        Parser: (parcelRequire("6UgdI"))
+        Builder: (parcelRequire("9fYnE")),
+        Parser: (parcelRequire("4hU87"))
     },
     /**
    * @api private
    */ Model: {
-        Api: (parcelRequire("byTzF")),
-        Operation: (parcelRequire("2EeqP")),
-        Shape: (parcelRequire("frmpZ")),
-        Paginator: (parcelRequire("8yB55")),
-        ResourceWaiter: (parcelRequire("hIMxK"))
+        Api: (parcelRequire("kmlFA")),
+        Operation: (parcelRequire("7jb5z")),
+        Shape: (parcelRequire("aWbwd")),
+        Paginator: (parcelRequire("kJ8HZ")),
+        ResourceWaiter: (parcelRequire("kmEOI"))
     },
     /**
    * @api private
-   */ apiLoader: (parcelRequire("fLJGf")),
+   */ apiLoader: (parcelRequire("3EazJ")),
     /**
    * @api private
-   */ EndpointCache: (parcelRequire("honyy")).EndpointCache
+   */ EndpointCache: (parcelRequire("iyMfr")).EndpointCache
 });
-parcelRequire("jgM9D");
-parcelRequire("04lg1");
-parcelRequire("jkgv3");
-parcelRequire("7DCha");
-parcelRequire("d7GW6");
-parcelRequire("3MMe5");
-parcelRequire("aTA3q");
-parcelRequire("cIjop");
-parcelRequire("aX8go");
-parcelRequire("jc97R");
-parcelRequire("5PZwn");
+parcelRequire("hYb9G");
+parcelRequire("65VGS");
+parcelRequire("itRhS");
+parcelRequire("bpL55");
+parcelRequire("3n1vm");
+parcelRequire("i1ovV");
+parcelRequire("5DtOk");
+parcelRequire("3T2fp");
+parcelRequire("4tFFS");
+parcelRequire("dZQxf");
+parcelRequire("7Yj4E");
 /**
  * @readonly
  * @return [AWS.SequentialExecutor] a collection of global event listeners that
@@ -1181,30 +1181,30 @@ parcelRequire("5PZwn");
  *   });
  *
  *   new AWS.S3().listBuckets(); // prints 'Request took 0.285 seconds'
- */ $1607dc8066522526$var$AWS.events = new $1607dc8066522526$var$AWS.SequentialExecutor();
+ */ $287e7b9eaed58818$var$AWS.events = new $287e7b9eaed58818$var$AWS.SequentialExecutor();
 //create endpoint cache lazily
-$1607dc8066522526$var$AWS.util.memoizedProperty($1607dc8066522526$var$AWS, 'endpointCache', function() {
-    return new $1607dc8066522526$var$AWS.EndpointCache($1607dc8066522526$var$AWS.config.endpointCacheSize);
+$287e7b9eaed58818$var$AWS.util.memoizedProperty($287e7b9eaed58818$var$AWS, 'endpointCache', function() {
+    return new $287e7b9eaed58818$var$AWS.EndpointCache($287e7b9eaed58818$var$AWS.config.endpointCacheSize);
 }, true);
 
 });
-parcelRegister("gl4ei", function(module, exports) {
+parcelRegister("dzYrM", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $a9mEo = parcelRequire("a9mEo");
+var $9fYnE = parcelRequire("9fYnE");
 
-var $6UgdI = parcelRequire("6UgdI");
+var $4hU87 = parcelRequire("4hU87");
 
-var $17ka8 = parcelRequire("17ka8");
-var $be51e369c81c0813$require$populateHostPrefix = $17ka8.populateHostPrefix;
-function $be51e369c81c0813$var$buildRequest(req) {
+var $dVrt6 = parcelRequire("dVrt6");
+var $9e2d6ecad2bdebea$require$populateHostPrefix = $dVrt6.populateHostPrefix;
+function $9e2d6ecad2bdebea$var$buildRequest(req) {
     var httpRequest = req.httpRequest;
     var api = req.service.api;
     var target = api.targetPrefix + '.' + api.operations[req.operation].name;
     var version = api.jsonVersion || '1.0';
     var input = api.operations[req.operation].input;
-    var builder = new $a9mEo();
+    var builder = new $9fYnE();
     if (version === 1) version = '1.0';
     if (api.awsQueryCompatible) {
         if (!httpRequest.params) httpRequest.params = {};
@@ -1214,9 +1214,9 @@ function $be51e369c81c0813$var$buildRequest(req) {
     httpRequest.body = builder.build(req.params || {}, input);
     httpRequest.headers['Content-Type'] = 'application/x-amz-json-' + version;
     httpRequest.headers['X-Amz-Target'] = target;
-    $be51e369c81c0813$require$populateHostPrefix(req);
+    $9e2d6ecad2bdebea$require$populateHostPrefix(req);
 }
-function $be51e369c81c0813$var$extractError(resp) {
+function $9e2d6ecad2bdebea$var$extractError(resp) {
     var error = {};
     var httpResponse = resp.httpResponse;
     error.code = httpResponse.headers['x-amzn-errortype'] || 'UnknownError';
@@ -1249,117 +1249,117 @@ function $be51e369c81c0813$var$extractError(resp) {
         error.statusCode = httpResponse.statusCode;
         error.message = httpResponse.statusCode.toString();
     }
-    resp.error = $jfMGq.error(new Error(), error);
+    resp.error = $KHT0q.error(new Error(), error);
 }
-function $be51e369c81c0813$var$extractData(resp) {
+function $9e2d6ecad2bdebea$var$extractData(resp) {
     var body = resp.httpResponse.body.toString() || '{}';
     if (resp.request.service.config.convertResponseTypes === false) resp.data = JSON.parse(body);
     else {
         var operation = resp.request.service.api.operations[resp.request.operation];
         var shape = operation.output || {};
-        var parser = new $6UgdI();
+        var parser = new $4hU87();
         resp.data = parser.parse(body, shape);
     }
 }
 /**
  * @api private
  */ module.exports = {
-    buildRequest: $be51e369c81c0813$var$buildRequest,
-    extractError: $be51e369c81c0813$var$extractError,
-    extractData: $be51e369c81c0813$var$extractData
+    buildRequest: $9e2d6ecad2bdebea$var$buildRequest,
+    extractError: $9e2d6ecad2bdebea$var$extractError,
+    extractData: $9e2d6ecad2bdebea$var$extractData
 };
 
 });
-parcelRegister("a9mEo", function(module, exports) {
+parcelRegister("9fYnE", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
-function $763c5089da5ae2b1$var$JsonBuilder() {}
-$763c5089da5ae2b1$var$JsonBuilder.prototype.build = function(value, shape) {
-    return JSON.stringify($763c5089da5ae2b1$var$translate(value, shape));
+var $KHT0q = parcelRequire("KHT0q");
+function $6bd45a175980fc0f$var$JsonBuilder() {}
+$6bd45a175980fc0f$var$JsonBuilder.prototype.build = function(value, shape) {
+    return JSON.stringify($6bd45a175980fc0f$var$translate(value, shape));
 };
-function $763c5089da5ae2b1$var$translate(value, shape) {
+function $6bd45a175980fc0f$var$translate(value, shape) {
     if (!shape || value === undefined || value === null) return undefined;
     switch(shape.type){
         case 'structure':
-            return $763c5089da5ae2b1$var$translateStructure(value, shape);
+            return $6bd45a175980fc0f$var$translateStructure(value, shape);
         case 'map':
-            return $763c5089da5ae2b1$var$translateMap(value, shape);
+            return $6bd45a175980fc0f$var$translateMap(value, shape);
         case 'list':
-            return $763c5089da5ae2b1$var$translateList(value, shape);
+            return $6bd45a175980fc0f$var$translateList(value, shape);
         default:
-            return $763c5089da5ae2b1$var$translateScalar(value, shape);
+            return $6bd45a175980fc0f$var$translateScalar(value, shape);
     }
 }
-function $763c5089da5ae2b1$var$translateStructure(structure, shape) {
+function $6bd45a175980fc0f$var$translateStructure(structure, shape) {
     if (shape.isDocument) return structure;
     var struct = {};
-    $jfMGq.each(structure, function(name, value) {
+    $KHT0q.each(structure, function(name, value) {
         var memberShape = shape.members[name];
         if (memberShape) {
             if (memberShape.location !== 'body') return;
             var locationName = memberShape.isLocationName ? memberShape.name : name;
-            var result = $763c5089da5ae2b1$var$translate(value, memberShape);
+            var result = $6bd45a175980fc0f$var$translate(value, memberShape);
             if (result !== undefined) struct[locationName] = result;
         }
     });
     return struct;
 }
-function $763c5089da5ae2b1$var$translateList(list, shape) {
+function $6bd45a175980fc0f$var$translateList(list, shape) {
     var out = [];
-    $jfMGq.arrayEach(list, function(value) {
-        var result = $763c5089da5ae2b1$var$translate(value, shape.member);
+    $KHT0q.arrayEach(list, function(value) {
+        var result = $6bd45a175980fc0f$var$translate(value, shape.member);
         if (result !== undefined) out.push(result);
     });
     return out;
 }
-function $763c5089da5ae2b1$var$translateMap(map, shape) {
+function $6bd45a175980fc0f$var$translateMap(map, shape) {
     var out = {};
-    $jfMGq.each(map, function(key, value) {
-        var result = $763c5089da5ae2b1$var$translate(value, shape.value);
+    $KHT0q.each(map, function(key, value) {
+        var result = $6bd45a175980fc0f$var$translate(value, shape.value);
         if (result !== undefined) out[key] = result;
     });
     return out;
 }
-function $763c5089da5ae2b1$var$translateScalar(value, shape) {
+function $6bd45a175980fc0f$var$translateScalar(value, shape) {
     return shape.toWireFormat(value);
 }
 /**
  * @api private
- */ module.exports = $763c5089da5ae2b1$var$JsonBuilder;
+ */ module.exports = $6bd45a175980fc0f$var$JsonBuilder;
 
 });
 
-parcelRegister("6UgdI", function(module, exports) {
+parcelRegister("4hU87", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
-function $50748e03e3ac402b$var$JsonParser() {}
-$50748e03e3ac402b$var$JsonParser.prototype.parse = function(value, shape) {
-    return $50748e03e3ac402b$var$translate(JSON.parse(value), shape);
+var $KHT0q = parcelRequire("KHT0q");
+function $31f44a321d1dece8$var$JsonParser() {}
+$31f44a321d1dece8$var$JsonParser.prototype.parse = function(value, shape) {
+    return $31f44a321d1dece8$var$translate(JSON.parse(value), shape);
 };
-function $50748e03e3ac402b$var$translate(value, shape) {
+function $31f44a321d1dece8$var$translate(value, shape) {
     if (!shape || value === undefined) return undefined;
     switch(shape.type){
         case 'structure':
-            return $50748e03e3ac402b$var$translateStructure(value, shape);
+            return $31f44a321d1dece8$var$translateStructure(value, shape);
         case 'map':
-            return $50748e03e3ac402b$var$translateMap(value, shape);
+            return $31f44a321d1dece8$var$translateMap(value, shape);
         case 'list':
-            return $50748e03e3ac402b$var$translateList(value, shape);
+            return $31f44a321d1dece8$var$translateList(value, shape);
         default:
-            return $50748e03e3ac402b$var$translateScalar(value, shape);
+            return $31f44a321d1dece8$var$translateScalar(value, shape);
     }
 }
-function $50748e03e3ac402b$var$translateStructure(structure, shape) {
+function $31f44a321d1dece8$var$translateStructure(structure, shape) {
     if (structure == null) return undefined;
     if (shape.isDocument) return structure;
     var struct = {};
     var shapeMembers = shape.members;
     var isAwsQueryCompatible = shape.api && shape.api.awsQueryCompatible;
-    $jfMGq.each(shapeMembers, function(name, memberShape) {
+    $KHT0q.each(shapeMembers, function(name, memberShape) {
         var locationName = memberShape.isLocationName ? memberShape.name : name;
         if (Object.prototype.hasOwnProperty.call(structure, locationName)) {
             var value = structure[locationName];
-            var result = $50748e03e3ac402b$var$translate(value, memberShape);
+            var result = $31f44a321d1dece8$var$translate(value, memberShape);
             if (result !== undefined) struct[name] = result;
         } else if (isAwsQueryCompatible && memberShape.defaultValue) {
             if (memberShape.type === 'list') struct[name] = typeof memberShape.defaultValue === 'function' ? memberShape.defaultValue() : memberShape.defaultValue;
@@ -1367,73 +1367,73 @@ function $50748e03e3ac402b$var$translateStructure(structure, shape) {
     });
     return struct;
 }
-function $50748e03e3ac402b$var$translateList(list, shape) {
+function $31f44a321d1dece8$var$translateList(list, shape) {
     if (list == null) return undefined;
     var out = [];
-    $jfMGq.arrayEach(list, function(value) {
-        var result = $50748e03e3ac402b$var$translate(value, shape.member);
+    $KHT0q.arrayEach(list, function(value) {
+        var result = $31f44a321d1dece8$var$translate(value, shape.member);
         if (result === undefined) out.push(null);
         else out.push(result);
     });
     return out;
 }
-function $50748e03e3ac402b$var$translateMap(map, shape) {
+function $31f44a321d1dece8$var$translateMap(map, shape) {
     if (map == null) return undefined;
     var out = {};
-    $jfMGq.each(map, function(key, value) {
-        var result = $50748e03e3ac402b$var$translate(value, shape.value);
+    $KHT0q.each(map, function(key, value) {
+        var result = $31f44a321d1dece8$var$translate(value, shape.value);
         if (result === undefined) out[key] = null;
         else out[key] = result;
     });
     return out;
 }
-function $50748e03e3ac402b$var$translateScalar(value, shape) {
+function $31f44a321d1dece8$var$translateScalar(value, shape) {
     return shape.toType(value);
 }
 /**
  * @api private
- */ module.exports = $50748e03e3ac402b$var$JsonParser;
+ */ module.exports = $31f44a321d1dece8$var$JsonParser;
 
 });
 
-parcelRegister("17ka8", function(module, exports) {
+parcelRegister("dVrt6", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Prepend prefix defined by API model to endpoint that's already
  * constructed. This feature does not apply to operations using
  * endpoint discovery and can be disabled.
  * @api private
- */ function $0d0615be7641e477$var$populateHostPrefix(request) {
+ */ function $a235e7e26309defa$var$populateHostPrefix(request) {
     var enabled = request.service.config.hostPrefixEnabled;
     if (!enabled) return request;
     var operationModel = request.service.api.operations[request.operation];
     //don't marshal host prefix when operation has endpoint discovery traits
-    if ($0d0615be7641e477$var$hasEndpointDiscover(request)) return request;
+    if ($a235e7e26309defa$var$hasEndpointDiscover(request)) return request;
     if (operationModel.endpoint && operationModel.endpoint.hostPrefix) {
         var hostPrefixNotation = operationModel.endpoint.hostPrefix;
-        var hostPrefix = $0d0615be7641e477$var$expandHostPrefix(hostPrefixNotation, request.params, operationModel.input);
-        $0d0615be7641e477$var$prependEndpointPrefix(request.httpRequest.endpoint, hostPrefix);
-        $0d0615be7641e477$var$validateHostname(request.httpRequest.endpoint.hostname);
+        var hostPrefix = $a235e7e26309defa$var$expandHostPrefix(hostPrefixNotation, request.params, operationModel.input);
+        $a235e7e26309defa$var$prependEndpointPrefix(request.httpRequest.endpoint, hostPrefix);
+        $a235e7e26309defa$var$validateHostname(request.httpRequest.endpoint.hostname);
     }
     return request;
 }
 /**
  * @api private
- */ function $0d0615be7641e477$var$hasEndpointDiscover(request) {
+ */ function $a235e7e26309defa$var$hasEndpointDiscover(request) {
     var api = request.service.api;
     var operationModel = api.operations[request.operation];
-    var isEndpointOperation = api.endpointOperation && api.endpointOperation === $jfMGq.string.lowerFirst(operationModel.name);
+    var isEndpointOperation = api.endpointOperation && api.endpointOperation === $KHT0q.string.lowerFirst(operationModel.name);
     return operationModel.endpointDiscoveryRequired !== 'NULL' || isEndpointOperation === true;
 }
 /**
  * @api private
- */ function $0d0615be7641e477$var$expandHostPrefix(hostPrefixNotation, params, shape) {
-    $jfMGq.each(shape.members, function(name, member) {
+ */ function $a235e7e26309defa$var$expandHostPrefix(hostPrefixNotation, params, shape) {
+    $KHT0q.each(shape.members, function(name, member) {
         if (member.hostLabel === true) {
-            if (typeof params[name] !== 'string' || params[name] === '') throw $jfMGq.error(new Error(), {
+            if (typeof params[name] !== 'string' || params[name] === '') throw $KHT0q.error(new Error(), {
                 message: 'Parameter ' + name + ' should be a non-empty string.',
                 code: 'InvalidParameter'
             });
@@ -1445,47 +1445,47 @@ var $1TgFO = parcelRequire("1TgFO");
 }
 /**
  * @api private
- */ function $0d0615be7641e477$var$prependEndpointPrefix(endpoint, prefix) {
+ */ function $a235e7e26309defa$var$prependEndpointPrefix(endpoint, prefix) {
     if (endpoint.host) endpoint.host = prefix + endpoint.host;
     if (endpoint.hostname) endpoint.hostname = prefix + endpoint.hostname;
 }
 /**
  * @api private
- */ function $0d0615be7641e477$var$validateHostname(hostname) {
+ */ function $a235e7e26309defa$var$validateHostname(hostname) {
     var labels = hostname.split('.');
     //Reference: https://tools.ietf.org/html/rfc1123#section-2
     var hostPattern = /^[a-zA-Z0-9]{1}$|^[a-zA-Z0-9][a-zA-Z0-9\-]*[a-zA-Z0-9]$/;
-    $jfMGq.arrayEach(labels, function(label) {
-        if (!label.length || label.length < 1 || label.length > 63) throw $jfMGq.error(new Error(), {
+    $KHT0q.arrayEach(labels, function(label) {
+        if (!label.length || label.length < 1 || label.length > 63) throw $KHT0q.error(new Error(), {
             code: 'ValidationError',
             message: 'Hostname label length should be between 1 to 63 characters, inclusive.'
         });
-        if (!hostPattern.test(label)) throw $1TgFO.util.error(new Error(), {
+        if (!hostPattern.test(label)) throw $3ty2n.util.error(new Error(), {
             code: 'ValidationError',
             message: label + ' is not hostname compatible.'
         });
     });
 }
 module.exports = {
-    populateHostPrefix: $0d0615be7641e477$var$populateHostPrefix
+    populateHostPrefix: $a235e7e26309defa$var$populateHostPrefix
 };
 
 });
 
 
-parcelRegister("5LIY7", function(module, exports) {
+parcelRegister("9lF8b", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $3wFAG = parcelRequire("3wFAG");
+var $9qtTF = parcelRequire("9qtTF");
 
-var $frmpZ = parcelRequire("frmpZ");
+var $aWbwd = parcelRequire("aWbwd");
 
-var $17ka8 = parcelRequire("17ka8");
-var $4334395cc916d459$require$populateHostPrefix = $17ka8.populateHostPrefix;
-function $4334395cc916d459$var$buildRequest(req) {
+var $dVrt6 = parcelRequire("dVrt6");
+var $6ce5fafe2e71e342$require$populateHostPrefix = $dVrt6.populateHostPrefix;
+function $6ce5fafe2e71e342$var$buildRequest(req) {
     var operation = req.service.api.operations[req.operation];
     var httpRequest = req.httpRequest;
     httpRequest.headers['Content-Type'] = 'application/x-www-form-urlencoded; charset=utf-8';
@@ -1495,21 +1495,21 @@ function $4334395cc916d459$var$buildRequest(req) {
     };
     // convert the request parameters into a list of query params,
     // e.g. Deeply.NestedParam.0.Name=value
-    var builder = new $3wFAG();
+    var builder = new $9qtTF();
     builder.serialize(req.params, operation.input, function(name, value) {
         httpRequest.params[name] = value;
     });
-    httpRequest.body = $jfMGq.queryParamsToString(httpRequest.params);
-    $4334395cc916d459$require$populateHostPrefix(req);
+    httpRequest.body = $KHT0q.queryParamsToString(httpRequest.params);
+    $6ce5fafe2e71e342$require$populateHostPrefix(req);
 }
-function $4334395cc916d459$var$extractError(resp) {
+function $6ce5fafe2e71e342$var$extractError(resp) {
     var data, body = resp.httpResponse.body.toString();
     if (body.match('<UnknownOperationException')) data = {
         Code: 'UnknownOperation',
         Message: 'Unknown operation ' + resp.request.operation
     };
     else try {
-        data = new $1TgFO.XML.Parser().parse(body);
+        data = new $3ty2n.XML.Parser().parse(body);
     } catch (e) {
         data = {
             Code: resp.httpResponse.statusCode,
@@ -1519,35 +1519,35 @@ function $4334395cc916d459$var$extractError(resp) {
     if (data.requestId && !resp.requestId) resp.requestId = data.requestId;
     if (data.Errors) data = data.Errors;
     if (data.Error) data = data.Error;
-    if (data.Code) resp.error = $jfMGq.error(new Error(), {
+    if (data.Code) resp.error = $KHT0q.error(new Error(), {
         code: data.Code,
         message: data.Message
     });
-    else resp.error = $jfMGq.error(new Error(), {
+    else resp.error = $KHT0q.error(new Error(), {
         code: resp.httpResponse.statusCode,
         message: null
     });
 }
-function $4334395cc916d459$var$extractData(resp) {
+function $6ce5fafe2e71e342$var$extractData(resp) {
     var req = resp.request;
     var operation = req.service.api.operations[req.operation];
     var shape = operation.output || {};
     var origRules = shape;
     if (origRules.resultWrapper) {
-        var tmp = $frmpZ.create({
+        var tmp = $aWbwd.create({
             type: 'structure'
         });
         tmp.members[origRules.resultWrapper] = shape;
         tmp.memberNames = [
             origRules.resultWrapper
         ];
-        $jfMGq.property(shape, 'name', shape.resultWrapper);
+        $KHT0q.property(shape, 'name', shape.resultWrapper);
         shape = tmp;
     }
-    var parser = new $1TgFO.XML.Parser();
+    var parser = new $3ty2n.XML.Parser();
     // TODO: Refactor XML Parser to parse RequestId from response.
     if (shape && shape.members && !shape.members._XAMZRequestId) {
-        var requestIdShape = $frmpZ.create({
+        var requestIdShape = $aWbwd.create({
             type: 'string'
         }, {
             api: {
@@ -1561,7 +1561,7 @@ function $4334395cc916d459$var$extractData(resp) {
     if (data._XAMZRequestId) delete data._XAMZRequestId;
     if (origRules.resultWrapper) {
         if (data[origRules.resultWrapper]) {
-            $jfMGq.update(data, data[origRules.resultWrapper]);
+            $KHT0q.update(data, data[origRules.resultWrapper]);
             delete data[origRules.resultWrapper];
         }
     }
@@ -1570,50 +1570,50 @@ function $4334395cc916d459$var$extractData(resp) {
 /**
  * @api private
  */ module.exports = {
-    buildRequest: $4334395cc916d459$var$buildRequest,
-    extractError: $4334395cc916d459$var$extractError,
-    extractData: $4334395cc916d459$var$extractData
+    buildRequest: $6ce5fafe2e71e342$var$buildRequest,
+    extractError: $6ce5fafe2e71e342$var$extractError,
+    extractData: $6ce5fafe2e71e342$var$extractData
 };
 
 });
-parcelRegister("3wFAG", function(module, exports) {
+parcelRegister("9qtTF", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
-function $29149f521dc32278$var$QueryParamSerializer() {}
-$29149f521dc32278$var$QueryParamSerializer.prototype.serialize = function(params, shape, fn) {
-    $29149f521dc32278$var$serializeStructure('', params, shape, fn);
+var $KHT0q = parcelRequire("KHT0q");
+function $6dcdbba2803f5dd0$var$QueryParamSerializer() {}
+$6dcdbba2803f5dd0$var$QueryParamSerializer.prototype.serialize = function(params, shape, fn) {
+    $6dcdbba2803f5dd0$var$serializeStructure('', params, shape, fn);
 };
-function $29149f521dc32278$var$ucfirst(shape) {
+function $6dcdbba2803f5dd0$var$ucfirst(shape) {
     if (shape.isQueryName || shape.api.protocol !== 'ec2') return shape.name;
     else return shape.name[0].toUpperCase() + shape.name.substr(1);
 }
-function $29149f521dc32278$var$serializeStructure(prefix, struct, rules, fn) {
-    $jfMGq.each(rules.members, function(name, member) {
+function $6dcdbba2803f5dd0$var$serializeStructure(prefix, struct, rules, fn) {
+    $KHT0q.each(rules.members, function(name, member) {
         var value = struct[name];
         if (value === null || value === undefined) return;
-        var memberName = $29149f521dc32278$var$ucfirst(member);
+        var memberName = $6dcdbba2803f5dd0$var$ucfirst(member);
         memberName = prefix ? prefix + '.' + memberName : memberName;
-        $29149f521dc32278$var$serializeMember(memberName, value, member, fn);
+        $6dcdbba2803f5dd0$var$serializeMember(memberName, value, member, fn);
     });
 }
-function $29149f521dc32278$var$serializeMap(name, map, rules, fn) {
+function $6dcdbba2803f5dd0$var$serializeMap(name, map, rules, fn) {
     var i = 1;
-    $jfMGq.each(map, function(key, value) {
+    $KHT0q.each(map, function(key, value) {
         var prefix = rules.flattened ? '.' : '.entry.';
         var position = prefix + i++ + '.';
         var keyName = position + (rules.key.name || 'key');
         var valueName = position + (rules.value.name || 'value');
-        $29149f521dc32278$var$serializeMember(name + keyName, key, rules.key, fn);
-        $29149f521dc32278$var$serializeMember(name + valueName, value, rules.value, fn);
+        $6dcdbba2803f5dd0$var$serializeMember(name + keyName, key, rules.key, fn);
+        $6dcdbba2803f5dd0$var$serializeMember(name + valueName, value, rules.value, fn);
     });
 }
-function $29149f521dc32278$var$serializeList(name, list, rules, fn) {
+function $6dcdbba2803f5dd0$var$serializeList(name, list, rules, fn) {
     var memberRules = rules.member || {};
     if (list.length === 0) {
         if (rules.api.protocol !== 'ec2') fn.call(this, name, null);
         return;
     }
-    $jfMGq.arrayEach(list, function(v, n) {
+    $KHT0q.arrayEach(list, function(v, n) {
         var suffix = '.' + (n + 1);
         if (rules.api.protocol === 'ec2') // Do nothing for EC2
         suffix = suffix + ''; // make linter happy
@@ -1621,71 +1621,71 @@ function $29149f521dc32278$var$serializeList(name, list, rules, fn) {
             if (memberRules.name) {
                 var parts = name.split('.');
                 parts.pop();
-                parts.push($29149f521dc32278$var$ucfirst(memberRules));
+                parts.push($6dcdbba2803f5dd0$var$ucfirst(memberRules));
                 name = parts.join('.');
             }
         } else suffix = '.' + (memberRules.name ? memberRules.name : 'member') + suffix;
-        $29149f521dc32278$var$serializeMember(name + suffix, v, memberRules, fn);
+        $6dcdbba2803f5dd0$var$serializeMember(name + suffix, v, memberRules, fn);
     });
 }
-function $29149f521dc32278$var$serializeMember(name, value, rules, fn) {
+function $6dcdbba2803f5dd0$var$serializeMember(name, value, rules, fn) {
     if (value === null || value === undefined) return;
-    if (rules.type === 'structure') $29149f521dc32278$var$serializeStructure(name, value, rules, fn);
-    else if (rules.type === 'list') $29149f521dc32278$var$serializeList(name, value, rules, fn);
-    else if (rules.type === 'map') $29149f521dc32278$var$serializeMap(name, value, rules, fn);
+    if (rules.type === 'structure') $6dcdbba2803f5dd0$var$serializeStructure(name, value, rules, fn);
+    else if (rules.type === 'list') $6dcdbba2803f5dd0$var$serializeList(name, value, rules, fn);
+    else if (rules.type === 'map') $6dcdbba2803f5dd0$var$serializeMap(name, value, rules, fn);
     else fn(name, rules.toWireFormat(value).toString());
 }
 /**
  * @api private
- */ module.exports = $29149f521dc32278$var$QueryParamSerializer;
+ */ module.exports = $6dcdbba2803f5dd0$var$QueryParamSerializer;
 
 });
 
-parcelRegister("frmpZ", function(module, exports) {
+parcelRegister("aWbwd", function(module, exports) {
 
-var $aMm0e = parcelRequire("aMm0e");
+var $bQWKa = parcelRequire("bQWKa");
 
-var $jfMGq = parcelRequire("jfMGq");
-function $b3dac46fef800664$var$property(obj, name, value) {
-    if (value !== null && value !== undefined) $jfMGq.property.apply(this, arguments);
+var $KHT0q = parcelRequire("KHT0q");
+function $7f68418ae6e07145$var$property(obj, name, value) {
+    if (value !== null && value !== undefined) $KHT0q.property.apply(this, arguments);
 }
-function $b3dac46fef800664$var$memoizedProperty(obj, name) {
-    if (!obj.constructor.prototype[name]) $jfMGq.memoizedProperty.apply(this, arguments);
+function $7f68418ae6e07145$var$memoizedProperty(obj, name) {
+    if (!obj.constructor.prototype[name]) $KHT0q.memoizedProperty.apply(this, arguments);
 }
-function $b3dac46fef800664$var$Shape(shape, options, memberName) {
+function $7f68418ae6e07145$var$Shape(shape, options, memberName) {
     options = options || {};
-    $b3dac46fef800664$var$property(this, 'shape', shape.shape);
-    $b3dac46fef800664$var$property(this, 'api', options.api, false);
-    $b3dac46fef800664$var$property(this, 'type', shape.type);
-    $b3dac46fef800664$var$property(this, 'enum', shape.enum);
-    $b3dac46fef800664$var$property(this, 'min', shape.min);
-    $b3dac46fef800664$var$property(this, 'max', shape.max);
-    $b3dac46fef800664$var$property(this, 'pattern', shape.pattern);
-    $b3dac46fef800664$var$property(this, 'location', shape.location || this.location || 'body');
-    $b3dac46fef800664$var$property(this, 'name', this.name || shape.xmlName || shape.queryName || shape.locationName || memberName);
-    $b3dac46fef800664$var$property(this, 'isStreaming', shape.streaming || this.isStreaming || false);
-    $b3dac46fef800664$var$property(this, 'requiresLength', shape.requiresLength, false);
-    $b3dac46fef800664$var$property(this, 'isComposite', shape.isComposite || false);
-    $b3dac46fef800664$var$property(this, 'isShape', true, false);
-    $b3dac46fef800664$var$property(this, 'isQueryName', Boolean(shape.queryName), false);
-    $b3dac46fef800664$var$property(this, 'isLocationName', Boolean(shape.locationName), false);
-    $b3dac46fef800664$var$property(this, 'isIdempotent', shape.idempotencyToken === true);
-    $b3dac46fef800664$var$property(this, 'isJsonValue', shape.jsonvalue === true);
-    $b3dac46fef800664$var$property(this, 'isSensitive', shape.sensitive === true || shape.prototype && shape.prototype.sensitive === true);
-    $b3dac46fef800664$var$property(this, 'isEventStream', Boolean(shape.eventstream), false);
-    $b3dac46fef800664$var$property(this, 'isEvent', Boolean(shape.event), false);
-    $b3dac46fef800664$var$property(this, 'isEventPayload', Boolean(shape.eventpayload), false);
-    $b3dac46fef800664$var$property(this, 'isEventHeader', Boolean(shape.eventheader), false);
-    $b3dac46fef800664$var$property(this, 'isTimestampFormatSet', Boolean(shape.timestampFormat) || shape.prototype && shape.prototype.isTimestampFormatSet === true, false);
-    $b3dac46fef800664$var$property(this, 'endpointDiscoveryId', Boolean(shape.endpointdiscoveryid), false);
-    $b3dac46fef800664$var$property(this, 'hostLabel', Boolean(shape.hostLabel), false);
+    $7f68418ae6e07145$var$property(this, 'shape', shape.shape);
+    $7f68418ae6e07145$var$property(this, 'api', options.api, false);
+    $7f68418ae6e07145$var$property(this, 'type', shape.type);
+    $7f68418ae6e07145$var$property(this, 'enum', shape.enum);
+    $7f68418ae6e07145$var$property(this, 'min', shape.min);
+    $7f68418ae6e07145$var$property(this, 'max', shape.max);
+    $7f68418ae6e07145$var$property(this, 'pattern', shape.pattern);
+    $7f68418ae6e07145$var$property(this, 'location', shape.location || this.location || 'body');
+    $7f68418ae6e07145$var$property(this, 'name', this.name || shape.xmlName || shape.queryName || shape.locationName || memberName);
+    $7f68418ae6e07145$var$property(this, 'isStreaming', shape.streaming || this.isStreaming || false);
+    $7f68418ae6e07145$var$property(this, 'requiresLength', shape.requiresLength, false);
+    $7f68418ae6e07145$var$property(this, 'isComposite', shape.isComposite || false);
+    $7f68418ae6e07145$var$property(this, 'isShape', true, false);
+    $7f68418ae6e07145$var$property(this, 'isQueryName', Boolean(shape.queryName), false);
+    $7f68418ae6e07145$var$property(this, 'isLocationName', Boolean(shape.locationName), false);
+    $7f68418ae6e07145$var$property(this, 'isIdempotent', shape.idempotencyToken === true);
+    $7f68418ae6e07145$var$property(this, 'isJsonValue', shape.jsonvalue === true);
+    $7f68418ae6e07145$var$property(this, 'isSensitive', shape.sensitive === true || shape.prototype && shape.prototype.sensitive === true);
+    $7f68418ae6e07145$var$property(this, 'isEventStream', Boolean(shape.eventstream), false);
+    $7f68418ae6e07145$var$property(this, 'isEvent', Boolean(shape.event), false);
+    $7f68418ae6e07145$var$property(this, 'isEventPayload', Boolean(shape.eventpayload), false);
+    $7f68418ae6e07145$var$property(this, 'isEventHeader', Boolean(shape.eventheader), false);
+    $7f68418ae6e07145$var$property(this, 'isTimestampFormatSet', Boolean(shape.timestampFormat) || shape.prototype && shape.prototype.isTimestampFormatSet === true, false);
+    $7f68418ae6e07145$var$property(this, 'endpointDiscoveryId', Boolean(shape.endpointdiscoveryid), false);
+    $7f68418ae6e07145$var$property(this, 'hostLabel', Boolean(shape.hostLabel), false);
     if (options.documentation) {
-        $b3dac46fef800664$var$property(this, 'documentation', shape.documentation);
-        $b3dac46fef800664$var$property(this, 'documentationUrl', shape.documentationUrl);
+        $7f68418ae6e07145$var$property(this, 'documentation', shape.documentation);
+        $7f68418ae6e07145$var$property(this, 'documentationUrl', shape.documentationUrl);
     }
-    if (shape.xmlAttribute) $b3dac46fef800664$var$property(this, 'isXmlAttribute', shape.xmlAttribute || false);
+    if (shape.xmlAttribute) $7f68418ae6e07145$var$property(this, 'isXmlAttribute', shape.xmlAttribute || false);
     // type conversion and parsing
-    $b3dac46fef800664$var$property(this, 'defaultValue', null);
+    $7f68418ae6e07145$var$property(this, 'defaultValue', null);
     this.toWireFormat = function(value) {
         if (value === null || value === undefined) return '';
         return value;
@@ -1696,7 +1696,7 @@ function $b3dac46fef800664$var$Shape(shape, options, memberName) {
 }
 /**
  * @api private
- */ $b3dac46fef800664$var$Shape.normalizedTypes = {
+ */ $7f68418ae6e07145$var$Shape.normalizedTypes = {
     character: 'string',
     double: 'float',
     long: 'integer',
@@ -1707,28 +1707,28 @@ function $b3dac46fef800664$var$Shape(shape, options, memberName) {
 };
 /**
  * @api private
- */ $b3dac46fef800664$var$Shape.types = {
-    'structure': $b3dac46fef800664$var$StructureShape,
-    'list': $b3dac46fef800664$var$ListShape,
-    'map': $b3dac46fef800664$var$MapShape,
-    'boolean': $b3dac46fef800664$var$BooleanShape,
-    'timestamp': $b3dac46fef800664$var$TimestampShape,
-    'float': $b3dac46fef800664$var$FloatShape,
-    'integer': $b3dac46fef800664$var$IntegerShape,
-    'string': $b3dac46fef800664$var$StringShape,
-    'base64': $b3dac46fef800664$var$Base64Shape,
-    'binary': $b3dac46fef800664$var$BinaryShape
+ */ $7f68418ae6e07145$var$Shape.types = {
+    'structure': $7f68418ae6e07145$var$StructureShape,
+    'list': $7f68418ae6e07145$var$ListShape,
+    'map': $7f68418ae6e07145$var$MapShape,
+    'boolean': $7f68418ae6e07145$var$BooleanShape,
+    'timestamp': $7f68418ae6e07145$var$TimestampShape,
+    'float': $7f68418ae6e07145$var$FloatShape,
+    'integer': $7f68418ae6e07145$var$IntegerShape,
+    'string': $7f68418ae6e07145$var$StringShape,
+    'base64': $7f68418ae6e07145$var$Base64Shape,
+    'binary': $7f68418ae6e07145$var$BinaryShape
 };
-$b3dac46fef800664$var$Shape.resolve = function resolve(shape, options) {
+$7f68418ae6e07145$var$Shape.resolve = function resolve(shape, options) {
     if (shape.shape) {
         var refShape = options.api.shapes[shape.shape];
         if (!refShape) throw new Error('Cannot find shape reference: ' + shape.shape);
         return refShape;
     } else return null;
 };
-$b3dac46fef800664$var$Shape.create = function create(shape, options, memberName) {
+$7f68418ae6e07145$var$Shape.create = function create(shape, options, memberName) {
     if (shape.isShape) return shape;
-    var refShape = $b3dac46fef800664$var$Shape.resolve(shape, options);
+    var refShape = $7f68418ae6e07145$var$Shape.resolve(shape, options);
     if (refShape) {
         var filteredKeys = Object.keys(shape);
         if (!options.documentation) filteredKeys = filteredKeys.filter(function(name) {
@@ -1750,41 +1750,41 @@ $b3dac46fef800664$var$Shape.create = function create(shape, options, memberName)
         }
         // normalize types
         var origType = shape.type;
-        if ($b3dac46fef800664$var$Shape.normalizedTypes[shape.type]) shape.type = $b3dac46fef800664$var$Shape.normalizedTypes[shape.type];
-        if ($b3dac46fef800664$var$Shape.types[shape.type]) return new $b3dac46fef800664$var$Shape.types[shape.type](shape, options, memberName);
+        if ($7f68418ae6e07145$var$Shape.normalizedTypes[shape.type]) shape.type = $7f68418ae6e07145$var$Shape.normalizedTypes[shape.type];
+        if ($7f68418ae6e07145$var$Shape.types[shape.type]) return new $7f68418ae6e07145$var$Shape.types[shape.type](shape, options, memberName);
         else throw new Error('Unrecognized shape type: ' + origType);
     }
 };
-function $b3dac46fef800664$var$CompositeShape(shape) {
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
-    $b3dac46fef800664$var$property(this, 'isComposite', true);
-    if (shape.flattened) $b3dac46fef800664$var$property(this, 'flattened', shape.flattened || false);
+function $7f68418ae6e07145$var$CompositeShape(shape) {
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
+    $7f68418ae6e07145$var$property(this, 'isComposite', true);
+    if (shape.flattened) $7f68418ae6e07145$var$property(this, 'flattened', shape.flattened || false);
 }
-function $b3dac46fef800664$var$StructureShape(shape, options) {
+function $7f68418ae6e07145$var$StructureShape(shape, options) {
     var self = this;
     var requiredMap = null, firstInit = !this.isShape;
-    $b3dac46fef800664$var$CompositeShape.apply(this, arguments);
+    $7f68418ae6e07145$var$CompositeShape.apply(this, arguments);
     if (firstInit) {
-        $b3dac46fef800664$var$property(this, 'defaultValue', function() {
+        $7f68418ae6e07145$var$property(this, 'defaultValue', function() {
             return {};
         });
-        $b3dac46fef800664$var$property(this, 'members', {});
-        $b3dac46fef800664$var$property(this, 'memberNames', []);
-        $b3dac46fef800664$var$property(this, 'required', []);
-        $b3dac46fef800664$var$property(this, 'isRequired', function() {
+        $7f68418ae6e07145$var$property(this, 'members', {});
+        $7f68418ae6e07145$var$property(this, 'memberNames', []);
+        $7f68418ae6e07145$var$property(this, 'required', []);
+        $7f68418ae6e07145$var$property(this, 'isRequired', function() {
             return false;
         });
-        $b3dac46fef800664$var$property(this, 'isDocument', Boolean(shape.document));
+        $7f68418ae6e07145$var$property(this, 'isDocument', Boolean(shape.document));
     }
     if (shape.members) {
-        $b3dac46fef800664$var$property(this, 'members', new $aMm0e(shape.members, options, function(name, member) {
-            return $b3dac46fef800664$var$Shape.create(member, options, name);
+        $7f68418ae6e07145$var$property(this, 'members', new $bQWKa(shape.members, options, function(name, member) {
+            return $7f68418ae6e07145$var$Shape.create(member, options, name);
         }));
-        $b3dac46fef800664$var$memoizedProperty(this, 'memberNames', function() {
+        $7f68418ae6e07145$var$memoizedProperty(this, 'memberNames', function() {
             return shape.xmlOrder || Object.keys(shape.members);
         });
         if (shape.event) {
-            $b3dac46fef800664$var$memoizedProperty(this, 'eventPayloadMemberName', function() {
+            $7f68418ae6e07145$var$memoizedProperty(this, 'eventPayloadMemberName', function() {
                 var members = self.members;
                 var memberNames = self.memberNames;
                 // iterate over members to find ones that are event payloads
@@ -1792,7 +1792,7 @@ function $b3dac46fef800664$var$StructureShape(shape, options) {
                     if (members[memberNames[i]].isEventPayload) return memberNames[i];
                 }
             });
-            $b3dac46fef800664$var$memoizedProperty(this, 'eventHeaderMemberNames', function() {
+            $7f68418ae6e07145$var$memoizedProperty(this, 'eventHeaderMemberNames', function() {
                 var members = self.members;
                 var memberNames = self.memberNames;
                 var eventHeaderMemberNames = [];
@@ -1803,8 +1803,8 @@ function $b3dac46fef800664$var$StructureShape(shape, options) {
         }
     }
     if (shape.required) {
-        $b3dac46fef800664$var$property(this, 'required', shape.required);
-        $b3dac46fef800664$var$property(this, 'isRequired', function(name) {
+        $7f68418ae6e07145$var$property(this, 'required', shape.required);
+        $7f68418ae6e07145$var$property(this, 'isRequired', function(name) {
             if (!requiredMap) {
                 requiredMap = {};
                 for(var i = 0; i < shape.required.length; i++)requiredMap[shape.required[i]] = true;
@@ -1812,80 +1812,80 @@ function $b3dac46fef800664$var$StructureShape(shape, options) {
             return requiredMap[name];
         }, false, true);
     }
-    $b3dac46fef800664$var$property(this, 'resultWrapper', shape.resultWrapper || null);
-    if (shape.payload) $b3dac46fef800664$var$property(this, 'payload', shape.payload);
-    if (typeof shape.xmlNamespace === 'string') $b3dac46fef800664$var$property(this, 'xmlNamespaceUri', shape.xmlNamespace);
+    $7f68418ae6e07145$var$property(this, 'resultWrapper', shape.resultWrapper || null);
+    if (shape.payload) $7f68418ae6e07145$var$property(this, 'payload', shape.payload);
+    if (typeof shape.xmlNamespace === 'string') $7f68418ae6e07145$var$property(this, 'xmlNamespaceUri', shape.xmlNamespace);
     else if (typeof shape.xmlNamespace === 'object') {
-        $b3dac46fef800664$var$property(this, 'xmlNamespacePrefix', shape.xmlNamespace.prefix);
-        $b3dac46fef800664$var$property(this, 'xmlNamespaceUri', shape.xmlNamespace.uri);
+        $7f68418ae6e07145$var$property(this, 'xmlNamespacePrefix', shape.xmlNamespace.prefix);
+        $7f68418ae6e07145$var$property(this, 'xmlNamespaceUri', shape.xmlNamespace.uri);
     }
 }
-function $b3dac46fef800664$var$ListShape(shape, options) {
+function $7f68418ae6e07145$var$ListShape(shape, options) {
     var self = this, firstInit = !this.isShape;
-    $b3dac46fef800664$var$CompositeShape.apply(this, arguments);
-    if (firstInit) $b3dac46fef800664$var$property(this, 'defaultValue', function() {
+    $7f68418ae6e07145$var$CompositeShape.apply(this, arguments);
+    if (firstInit) $7f68418ae6e07145$var$property(this, 'defaultValue', function() {
         return [];
     });
-    if (shape.member) $b3dac46fef800664$var$memoizedProperty(this, 'member', function() {
-        return $b3dac46fef800664$var$Shape.create(shape.member, options);
+    if (shape.member) $7f68418ae6e07145$var$memoizedProperty(this, 'member', function() {
+        return $7f68418ae6e07145$var$Shape.create(shape.member, options);
     });
     if (this.flattened) {
         var oldName = this.name;
-        $b3dac46fef800664$var$memoizedProperty(this, 'name', function() {
+        $7f68418ae6e07145$var$memoizedProperty(this, 'name', function() {
             return self.member.name || oldName;
         });
     }
 }
-function $b3dac46fef800664$var$MapShape(shape, options) {
+function $7f68418ae6e07145$var$MapShape(shape, options) {
     var firstInit = !this.isShape;
-    $b3dac46fef800664$var$CompositeShape.apply(this, arguments);
+    $7f68418ae6e07145$var$CompositeShape.apply(this, arguments);
     if (firstInit) {
-        $b3dac46fef800664$var$property(this, 'defaultValue', function() {
+        $7f68418ae6e07145$var$property(this, 'defaultValue', function() {
             return {};
         });
-        $b3dac46fef800664$var$property(this, 'key', $b3dac46fef800664$var$Shape.create({
+        $7f68418ae6e07145$var$property(this, 'key', $7f68418ae6e07145$var$Shape.create({
             type: 'string'
         }, options));
-        $b3dac46fef800664$var$property(this, 'value', $b3dac46fef800664$var$Shape.create({
+        $7f68418ae6e07145$var$property(this, 'value', $7f68418ae6e07145$var$Shape.create({
             type: 'string'
         }, options));
     }
-    if (shape.key) $b3dac46fef800664$var$memoizedProperty(this, 'key', function() {
-        return $b3dac46fef800664$var$Shape.create(shape.key, options);
+    if (shape.key) $7f68418ae6e07145$var$memoizedProperty(this, 'key', function() {
+        return $7f68418ae6e07145$var$Shape.create(shape.key, options);
     });
-    if (shape.value) $b3dac46fef800664$var$memoizedProperty(this, 'value', function() {
-        return $b3dac46fef800664$var$Shape.create(shape.value, options);
+    if (shape.value) $7f68418ae6e07145$var$memoizedProperty(this, 'value', function() {
+        return $7f68418ae6e07145$var$Shape.create(shape.value, options);
     });
 }
-function $b3dac46fef800664$var$TimestampShape(shape) {
+function $7f68418ae6e07145$var$TimestampShape(shape) {
     var self = this;
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
-    if (shape.timestampFormat) $b3dac46fef800664$var$property(this, 'timestampFormat', shape.timestampFormat);
-    else if (self.isTimestampFormatSet && this.timestampFormat) $b3dac46fef800664$var$property(this, 'timestampFormat', this.timestampFormat);
-    else if (this.location === 'header') $b3dac46fef800664$var$property(this, 'timestampFormat', 'rfc822');
-    else if (this.location === 'querystring') $b3dac46fef800664$var$property(this, 'timestampFormat', 'iso8601');
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
+    if (shape.timestampFormat) $7f68418ae6e07145$var$property(this, 'timestampFormat', shape.timestampFormat);
+    else if (self.isTimestampFormatSet && this.timestampFormat) $7f68418ae6e07145$var$property(this, 'timestampFormat', this.timestampFormat);
+    else if (this.location === 'header') $7f68418ae6e07145$var$property(this, 'timestampFormat', 'rfc822');
+    else if (this.location === 'querystring') $7f68418ae6e07145$var$property(this, 'timestampFormat', 'iso8601');
     else if (this.api) switch(this.api.protocol){
         case 'json':
         case 'rest-json':
-            $b3dac46fef800664$var$property(this, 'timestampFormat', 'unixTimestamp');
+            $7f68418ae6e07145$var$property(this, 'timestampFormat', 'unixTimestamp');
             break;
         case 'rest-xml':
         case 'query':
         case 'ec2':
-            $b3dac46fef800664$var$property(this, 'timestampFormat', 'iso8601');
+            $7f68418ae6e07145$var$property(this, 'timestampFormat', 'iso8601');
             break;
     }
     this.toType = function(value) {
         if (value === null || value === undefined) return null;
         if (typeof value.toUTCString === 'function') return value;
-        return typeof value === 'string' || typeof value === 'number' ? $jfMGq.date.parseTimestamp(value) : null;
+        return typeof value === 'string' || typeof value === 'number' ? $KHT0q.date.parseTimestamp(value) : null;
     };
     this.toWireFormat = function(value) {
-        return $jfMGq.date.format(value, self.timestampFormat);
+        return $KHT0q.date.format(value, self.timestampFormat);
     };
 }
-function $b3dac46fef800664$var$StringShape() {
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
+function $7f68418ae6e07145$var$StringShape() {
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
     var nullLessProtocols = [
         'rest-xml',
         'query',
@@ -1900,46 +1900,46 @@ function $b3dac46fef800664$var$StringShape() {
         return this.isJsonValue ? JSON.stringify(value) : value;
     };
 }
-function $b3dac46fef800664$var$FloatShape() {
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
+function $7f68418ae6e07145$var$FloatShape() {
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
     this.toType = function(value) {
         if (value === null || value === undefined) return null;
         return parseFloat(value);
     };
     this.toWireFormat = this.toType;
 }
-function $b3dac46fef800664$var$IntegerShape() {
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
+function $7f68418ae6e07145$var$IntegerShape() {
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
     this.toType = function(value) {
         if (value === null || value === undefined) return null;
         return parseInt(value, 10);
     };
     this.toWireFormat = this.toType;
 }
-function $b3dac46fef800664$var$BinaryShape() {
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
+function $7f68418ae6e07145$var$BinaryShape() {
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
     this.toType = function(value) {
-        var buf = $jfMGq.base64.decode(value);
-        if (this.isSensitive && $jfMGq.isNode() && typeof $jfMGq.Buffer.alloc === 'function') {
+        var buf = $KHT0q.base64.decode(value);
+        if (this.isSensitive && $KHT0q.isNode() && typeof $KHT0q.Buffer.alloc === 'function') {
             /* Node.js can create a Buffer that is not isolated.
    * i.e. buf.byteLength !== buf.buffer.byteLength
    * This means that the sensitive data is accessible to anyone with access to buf.buffer.
    * If this is the node shared Buffer, then other code within this process _could_ find this secret.
    * Copy sensitive data to an isolated Buffer and zero the sensitive data.
    * While this is safe to do here, copying this code somewhere else may produce unexpected results.
-   */ var secureBuf = $jfMGq.Buffer.alloc(buf.length, buf);
+   */ var secureBuf = $KHT0q.Buffer.alloc(buf.length, buf);
             buf.fill(0);
             buf = secureBuf;
         }
         return buf;
     };
-    this.toWireFormat = $jfMGq.base64.encode;
+    this.toWireFormat = $KHT0q.base64.encode;
 }
-function $b3dac46fef800664$var$Base64Shape() {
-    $b3dac46fef800664$var$BinaryShape.apply(this, arguments);
+function $7f68418ae6e07145$var$Base64Shape() {
+    $7f68418ae6e07145$var$BinaryShape.apply(this, arguments);
 }
-function $b3dac46fef800664$var$BooleanShape() {
-    $b3dac46fef800664$var$Shape.apply(this, arguments);
+function $7f68418ae6e07145$var$BooleanShape() {
+    $7f68418ae6e07145$var$Shape.apply(this, arguments);
     this.toType = function(value) {
         if (typeof value === 'boolean') return value;
         if (value === null || value === undefined) return null;
@@ -1948,125 +1948,125 @@ function $b3dac46fef800664$var$BooleanShape() {
 }
 /**
  * @api private
- */ $b3dac46fef800664$var$Shape.shapes = {
-    StructureShape: $b3dac46fef800664$var$StructureShape,
-    ListShape: $b3dac46fef800664$var$ListShape,
-    MapShape: $b3dac46fef800664$var$MapShape,
-    StringShape: $b3dac46fef800664$var$StringShape,
-    BooleanShape: $b3dac46fef800664$var$BooleanShape,
-    Base64Shape: $b3dac46fef800664$var$Base64Shape
+ */ $7f68418ae6e07145$var$Shape.shapes = {
+    StructureShape: $7f68418ae6e07145$var$StructureShape,
+    ListShape: $7f68418ae6e07145$var$ListShape,
+    MapShape: $7f68418ae6e07145$var$MapShape,
+    StringShape: $7f68418ae6e07145$var$StringShape,
+    BooleanShape: $7f68418ae6e07145$var$BooleanShape,
+    Base64Shape: $7f68418ae6e07145$var$Base64Shape
 };
 /**
  * @api private
- */ module.exports = $b3dac46fef800664$var$Shape;
+ */ module.exports = $7f68418ae6e07145$var$Shape;
 
 });
-parcelRegister("aMm0e", function(module, exports) {
+parcelRegister("bQWKa", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
-var $7d8f74614fa5086d$require$memoizedProperty = $jfMGq.memoizedProperty;
-function $7d8f74614fa5086d$var$memoize(name, value, factory, nameTr) {
-    $7d8f74614fa5086d$require$memoizedProperty(this, nameTr(name), function() {
+var $KHT0q = parcelRequire("KHT0q");
+var $8a121e4af55533ae$require$memoizedProperty = $KHT0q.memoizedProperty;
+function $8a121e4af55533ae$var$memoize(name, value, factory, nameTr) {
+    $8a121e4af55533ae$require$memoizedProperty(this, nameTr(name), function() {
         return factory(name, value);
     });
 }
-function $7d8f74614fa5086d$var$Collection(iterable, options, factory, nameTr, callback) {
+function $8a121e4af55533ae$var$Collection(iterable, options, factory, nameTr, callback) {
     nameTr = nameTr || String;
     var self = this;
     for(var id in iterable)if (Object.prototype.hasOwnProperty.call(iterable, id)) {
-        $7d8f74614fa5086d$var$memoize.call(self, id, iterable[id], factory, nameTr);
+        $8a121e4af55533ae$var$memoize.call(self, id, iterable[id], factory, nameTr);
         if (callback) callback(id, iterable[id]);
     }
 }
 /**
  * @api private
- */ module.exports = $7d8f74614fa5086d$var$Collection;
+ */ module.exports = $8a121e4af55533ae$var$Collection;
 
 });
 
 
 
-parcelRegister("lq6Qt", function(module, exports) {
+parcelRegister("8Ice7", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $17ka8 = parcelRequire("17ka8");
-var $f9815601d23d10cf$require$populateHostPrefix = $17ka8.populateHostPrefix;
-function $f9815601d23d10cf$var$populateMethod(req) {
+var $dVrt6 = parcelRequire("dVrt6");
+var $657beac11c446b29$require$populateHostPrefix = $dVrt6.populateHostPrefix;
+function $657beac11c446b29$var$populateMethod(req) {
     req.httpRequest.method = req.service.api.operations[req.operation].httpMethod;
 }
-function $f9815601d23d10cf$var$generateURI(endpointPath, operationPath, input, params) {
+function $657beac11c446b29$var$generateURI(endpointPath, operationPath, input, params) {
     var uri = [
         endpointPath,
         operationPath
     ].join('/');
     uri = uri.replace(/\/+/g, '/');
     var queryString = {}, queryStringSet = false;
-    $jfMGq.each(input.members, function(name, member) {
+    $KHT0q.each(input.members, function(name, member) {
         var paramValue = params[name];
         if (paramValue === null || paramValue === undefined) return;
         if (member.location === 'uri') {
             var regex = new RegExp('\\{' + member.name + '(\\+)?\\}');
             uri = uri.replace(regex, function(_, plus) {
-                var fn = plus ? $jfMGq.uriEscapePath : $jfMGq.uriEscape;
+                var fn = plus ? $KHT0q.uriEscapePath : $KHT0q.uriEscape;
                 return fn(String(paramValue));
             });
         } else if (member.location === 'querystring') {
             queryStringSet = true;
             if (member.type === 'list') queryString[member.name] = paramValue.map(function(val) {
-                return $jfMGq.uriEscape(member.member.toWireFormat(val).toString());
+                return $KHT0q.uriEscape(member.member.toWireFormat(val).toString());
             });
-            else if (member.type === 'map') $jfMGq.each(paramValue, function(key, value) {
+            else if (member.type === 'map') $KHT0q.each(paramValue, function(key, value) {
                 if (Array.isArray(value)) queryString[key] = value.map(function(val) {
-                    return $jfMGq.uriEscape(String(val));
+                    return $KHT0q.uriEscape(String(val));
                 });
-                else queryString[key] = $jfMGq.uriEscape(String(value));
+                else queryString[key] = $KHT0q.uriEscape(String(value));
             });
-            else queryString[member.name] = $jfMGq.uriEscape(member.toWireFormat(paramValue).toString());
+            else queryString[member.name] = $KHT0q.uriEscape(member.toWireFormat(paramValue).toString());
         }
     });
     if (queryStringSet) {
         uri += uri.indexOf('?') >= 0 ? '&' : '?';
         var parts = [];
-        $jfMGq.arrayEach(Object.keys(queryString).sort(), function(key) {
+        $KHT0q.arrayEach(Object.keys(queryString).sort(), function(key) {
             if (!Array.isArray(queryString[key])) queryString[key] = [
                 queryString[key]
             ];
-            for(var i = 0; i < queryString[key].length; i++)parts.push($jfMGq.uriEscape(String(key)) + '=' + queryString[key][i]);
+            for(var i = 0; i < queryString[key].length; i++)parts.push($KHT0q.uriEscape(String(key)) + '=' + queryString[key][i]);
         });
         uri += parts.join('&');
     }
     return uri;
 }
-function $f9815601d23d10cf$var$populateURI(req) {
+function $657beac11c446b29$var$populateURI(req) {
     var operation = req.service.api.operations[req.operation];
     var input = operation.input;
-    var uri = $f9815601d23d10cf$var$generateURI(req.httpRequest.endpoint.path, operation.httpPath, input, req.params);
+    var uri = $657beac11c446b29$var$generateURI(req.httpRequest.endpoint.path, operation.httpPath, input, req.params);
     req.httpRequest.path = uri;
 }
-function $f9815601d23d10cf$var$populateHeaders(req) {
+function $657beac11c446b29$var$populateHeaders(req) {
     var operation = req.service.api.operations[req.operation];
-    $jfMGq.each(operation.input.members, function(name, member) {
+    $KHT0q.each(operation.input.members, function(name, member) {
         var value = req.params[name];
         if (value === null || value === undefined) return;
-        if (member.location === 'headers' && member.type === 'map') $jfMGq.each(value, function(key, memberValue) {
+        if (member.location === 'headers' && member.type === 'map') $KHT0q.each(value, function(key, memberValue) {
             req.httpRequest.headers[member.name + key] = memberValue;
         });
         else if (member.location === 'header') {
             value = member.toWireFormat(value).toString();
-            if (member.isJsonValue) value = $jfMGq.base64.encode(value);
+            if (member.isJsonValue) value = $KHT0q.base64.encode(value);
             req.httpRequest.headers[member.name] = value;
         }
     });
 }
-function $f9815601d23d10cf$var$buildRequest(req) {
-    $f9815601d23d10cf$var$populateMethod(req);
-    $f9815601d23d10cf$var$populateURI(req);
-    $f9815601d23d10cf$var$populateHeaders(req);
-    $f9815601d23d10cf$require$populateHostPrefix(req);
+function $657beac11c446b29$var$buildRequest(req) {
+    $657beac11c446b29$var$populateMethod(req);
+    $657beac11c446b29$var$populateURI(req);
+    $657beac11c446b29$var$populateHeaders(req);
+    $657beac11c446b29$require$populateHostPrefix(req);
 }
-function $f9815601d23d10cf$var$extractError() {}
-function $f9815601d23d10cf$var$extractData(resp) {
+function $657beac11c446b29$var$extractError() {}
+function $657beac11c446b29$var$extractData(resp) {
     var req = resp.request;
     var data = {};
     var r = resp.httpResponse;
@@ -2074,22 +2074,22 @@ function $f9815601d23d10cf$var$extractData(resp) {
     var output = operation.output;
     // normalize headers names to lower-cased keys for matching
     var headers = {};
-    $jfMGq.each(r.headers, function(k, v) {
+    $KHT0q.each(r.headers, function(k, v) {
         headers[k.toLowerCase()] = v;
     });
-    $jfMGq.each(output.members, function(name, member) {
+    $KHT0q.each(output.members, function(name, member) {
         var header = (member.name || name).toLowerCase();
         if (member.location === 'headers' && member.type === 'map') {
             data[name] = {};
             var location = member.isLocationName ? member.name : '';
             var pattern = new RegExp('^' + location + '(.+)', 'i');
-            $jfMGq.each(r.headers, function(k, v) {
+            $KHT0q.each(r.headers, function(k, v) {
                 var result = k.match(pattern);
                 if (result !== null) data[name][result[1]] = v;
             });
         } else if (member.location === 'header') {
             if (headers[header] !== undefined) {
-                var value = member.isJsonValue ? $jfMGq.base64.decode(headers[header]) : headers[header];
+                var value = member.isJsonValue ? $KHT0q.base64.decode(headers[header]) : headers[header];
                 data[name] = member.toType(value);
             }
         } else if (member.location === 'statusCode') data[name] = parseInt(r.statusCode, 10);
@@ -2099,38 +2099,38 @@ function $f9815601d23d10cf$var$extractData(resp) {
 /**
  * @api private
  */ module.exports = {
-    buildRequest: $f9815601d23d10cf$var$buildRequest,
-    extractError: $f9815601d23d10cf$var$extractError,
-    extractData: $f9815601d23d10cf$var$extractData,
-    generateURI: $f9815601d23d10cf$var$generateURI
+    buildRequest: $657beac11c446b29$var$buildRequest,
+    extractError: $657beac11c446b29$var$extractError,
+    extractData: $657beac11c446b29$var$extractData,
+    generateURI: $657beac11c446b29$var$generateURI
 };
 
 });
 
-parcelRegister("1ei0y", function(module, exports) {
+parcelRegister("crPSD", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $lq6Qt = parcelRequire("lq6Qt");
+var $8Ice7 = parcelRequire("8Ice7");
 
-var $gl4ei = parcelRequire("gl4ei");
+var $dzYrM = parcelRequire("dzYrM");
 
-var $a9mEo = parcelRequire("a9mEo");
+var $9fYnE = parcelRequire("9fYnE");
 
-var $6UgdI = parcelRequire("6UgdI");
-var $0e55114650f396cd$var$METHODS_WITHOUT_BODY = [
+var $4hU87 = parcelRequire("4hU87");
+var $91003ff4e78e5695$var$METHODS_WITHOUT_BODY = [
     'GET',
     'HEAD',
     'DELETE'
 ];
-function $0e55114650f396cd$var$unsetContentLength(req) {
-    var payloadMember = $jfMGq.getRequestPayloadShape(req);
-    if (payloadMember === undefined && $0e55114650f396cd$var$METHODS_WITHOUT_BODY.indexOf(req.httpRequest.method) >= 0) delete req.httpRequest.headers['Content-Length'];
+function $91003ff4e78e5695$var$unsetContentLength(req) {
+    var payloadMember = $KHT0q.getRequestPayloadShape(req);
+    if (payloadMember === undefined && $91003ff4e78e5695$var$METHODS_WITHOUT_BODY.indexOf(req.httpRequest.method) >= 0) delete req.httpRequest.headers['Content-Length'];
 }
-function $0e55114650f396cd$var$populateBody(req) {
-    var builder = new $a9mEo();
+function $91003ff4e78e5695$var$populateBody(req) {
+    var builder = new $9fYnE();
     var input = req.service.api.operations[req.operation].input;
     if (input.payload) {
         var params = {};
@@ -2138,33 +2138,33 @@ function $0e55114650f396cd$var$populateBody(req) {
         params = req.params[input.payload];
         if (payloadShape.type === 'structure') {
             req.httpRequest.body = builder.build(params || {}, payloadShape);
-            $0e55114650f396cd$var$applyContentTypeHeader(req);
+            $91003ff4e78e5695$var$applyContentTypeHeader(req);
         } else if (params !== undefined) {
             // non-JSON payload
             req.httpRequest.body = params;
-            if (payloadShape.type === 'binary' || payloadShape.isStreaming) $0e55114650f396cd$var$applyContentTypeHeader(req, true);
+            if (payloadShape.type === 'binary' || payloadShape.isStreaming) $91003ff4e78e5695$var$applyContentTypeHeader(req, true);
         }
     } else {
         req.httpRequest.body = builder.build(req.params, input);
-        $0e55114650f396cd$var$applyContentTypeHeader(req);
+        $91003ff4e78e5695$var$applyContentTypeHeader(req);
     }
 }
-function $0e55114650f396cd$var$applyContentTypeHeader(req, isBinary) {
+function $91003ff4e78e5695$var$applyContentTypeHeader(req, isBinary) {
     if (!req.httpRequest.headers['Content-Type']) {
         var type = isBinary ? 'binary/octet-stream' : 'application/json';
         req.httpRequest.headers['Content-Type'] = type;
     }
 }
-function $0e55114650f396cd$var$buildRequest(req) {
-    $lq6Qt.buildRequest(req);
+function $91003ff4e78e5695$var$buildRequest(req) {
+    $8Ice7.buildRequest(req);
     // never send body payload on GET/HEAD/DELETE
-    if ($0e55114650f396cd$var$METHODS_WITHOUT_BODY.indexOf(req.httpRequest.method) < 0) $0e55114650f396cd$var$populateBody(req);
+    if ($91003ff4e78e5695$var$METHODS_WITHOUT_BODY.indexOf(req.httpRequest.method) < 0) $91003ff4e78e5695$var$populateBody(req);
 }
-function $0e55114650f396cd$var$extractError(resp) {
-    $gl4ei.extractError(resp);
+function $91003ff4e78e5695$var$extractError(resp) {
+    $dzYrM.extractError(resp);
 }
-function $0e55114650f396cd$var$extractData(resp) {
-    $lq6Qt.extractData(resp);
+function $91003ff4e78e5695$var$extractData(resp) {
+    $8Ice7.extractData(resp);
     var req = resp.request;
     var operation = req.service.api.operations[req.operation];
     var rules = req.service.api.operations[req.operation].output || {};
@@ -2174,40 +2174,40 @@ function $0e55114650f396cd$var$extractData(resp) {
         var payloadMember = rules.members[rules.payload];
         var body = resp.httpResponse.body;
         if (payloadMember.isEventStream) {
-            parser = new $6UgdI();
-            resp.data[rules.payload] = $jfMGq.createEventStream($1TgFO.HttpClient.streamsApiVersion === 2 ? resp.httpResponse.stream : body, parser, payloadMember);
+            parser = new $4hU87();
+            resp.data[rules.payload] = $KHT0q.createEventStream($3ty2n.HttpClient.streamsApiVersion === 2 ? resp.httpResponse.stream : body, parser, payloadMember);
         } else if (payloadMember.type === 'structure' || payloadMember.type === 'list') {
-            var parser = new $6UgdI();
+            var parser = new $4hU87();
             resp.data[rules.payload] = parser.parse(body, payloadMember);
         } else if (payloadMember.type === 'binary' || payloadMember.isStreaming) resp.data[rules.payload] = body;
         else resp.data[rules.payload] = payloadMember.toType(body);
     } else {
         var data = resp.data;
-        $gl4ei.extractData(resp);
-        resp.data = $jfMGq.merge(data, resp.data);
+        $dzYrM.extractData(resp);
+        resp.data = $KHT0q.merge(data, resp.data);
     }
 }
 /**
  * @api private
  */ module.exports = {
-    buildRequest: $0e55114650f396cd$var$buildRequest,
-    extractError: $0e55114650f396cd$var$extractError,
-    extractData: $0e55114650f396cd$var$extractData,
-    unsetContentLength: $0e55114650f396cd$var$unsetContentLength
+    buildRequest: $91003ff4e78e5695$var$buildRequest,
+    extractError: $91003ff4e78e5695$var$extractError,
+    extractData: $91003ff4e78e5695$var$extractData,
+    unsetContentLength: $91003ff4e78e5695$var$unsetContentLength
 };
 
 });
 
-parcelRegister("aWREk", function(module, exports) {
+parcelRegister("kCjCH", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $lq6Qt = parcelRequire("lq6Qt");
-function $7f88efd91f58ce5a$var$populateBody(req) {
+var $8Ice7 = parcelRequire("8Ice7");
+function $f0269403ed11ada7$var$populateBody(req) {
     var input = req.service.api.operations[req.operation].input;
-    var builder = new $1TgFO.XML.Builder();
+    var builder = new $3ty2n.XML.Builder();
     var params = req.params;
     var payload = input.payload;
     if (payload) {
@@ -2218,21 +2218,21 @@ function $7f88efd91f58ce5a$var$populateBody(req) {
             var rootElement = payloadMember.name;
             req.httpRequest.body = builder.toXML(params, payloadMember, rootElement, true);
         } else req.httpRequest.body = params;
-    } else req.httpRequest.body = builder.toXML(params, input, input.name || input.shape || $jfMGq.string.upperFirst(req.operation) + 'Request');
+    } else req.httpRequest.body = builder.toXML(params, input, input.name || input.shape || $KHT0q.string.upperFirst(req.operation) + 'Request');
 }
-function $7f88efd91f58ce5a$var$buildRequest(req) {
-    $lq6Qt.buildRequest(req);
+function $f0269403ed11ada7$var$buildRequest(req) {
+    $8Ice7.buildRequest(req);
     // never send body payload on GET/HEAD
     if ([
         'GET',
         'HEAD'
-    ].indexOf(req.httpRequest.method) < 0) $7f88efd91f58ce5a$var$populateBody(req);
+    ].indexOf(req.httpRequest.method) < 0) $f0269403ed11ada7$var$populateBody(req);
 }
-function $7f88efd91f58ce5a$var$extractError(resp) {
-    $lq6Qt.extractError(resp);
+function $f0269403ed11ada7$var$extractError(resp) {
+    $8Ice7.extractError(resp);
     var data;
     try {
-        data = new $1TgFO.XML.Parser().parse(resp.httpResponse.body.toString());
+        data = new $3ty2n.XML.Parser().parse(resp.httpResponse.body.toString());
     } catch (e) {
         data = {
             Code: resp.httpResponse.statusCode,
@@ -2241,17 +2241,17 @@ function $7f88efd91f58ce5a$var$extractError(resp) {
     }
     if (data.Errors) data = data.Errors;
     if (data.Error) data = data.Error;
-    if (data.Code) resp.error = $jfMGq.error(new Error(), {
+    if (data.Code) resp.error = $KHT0q.error(new Error(), {
         code: data.Code,
         message: data.Message
     });
-    else resp.error = $jfMGq.error(new Error(), {
+    else resp.error = $KHT0q.error(new Error(), {
         code: resp.httpResponse.statusCode,
         message: null
     });
 }
-function $7f88efd91f58ce5a$var$extractData(resp) {
-    $lq6Qt.extractData(resp);
+function $f0269403ed11ada7$var$extractData(resp) {
+    $8Ice7.extractData(resp);
     var parser;
     var req = resp.request;
     var body = resp.httpResponse.body;
@@ -2262,107 +2262,107 @@ function $7f88efd91f58ce5a$var$extractData(resp) {
     if (payload) {
         var payloadMember = output.members[payload];
         if (payloadMember.isEventStream) {
-            parser = new $1TgFO.XML.Parser();
-            resp.data[payload] = $jfMGq.createEventStream($1TgFO.HttpClient.streamsApiVersion === 2 ? resp.httpResponse.stream : resp.httpResponse.body, parser, payloadMember);
+            parser = new $3ty2n.XML.Parser();
+            resp.data[payload] = $KHT0q.createEventStream($3ty2n.HttpClient.streamsApiVersion === 2 ? resp.httpResponse.stream : resp.httpResponse.body, parser, payloadMember);
         } else if (payloadMember.type === 'structure') {
-            parser = new $1TgFO.XML.Parser();
+            parser = new $3ty2n.XML.Parser();
             resp.data[payload] = parser.parse(body.toString(), payloadMember);
         } else if (payloadMember.type === 'binary' || payloadMember.isStreaming) resp.data[payload] = body;
         else resp.data[payload] = payloadMember.toType(body);
     } else if (body.length > 0) {
-        parser = new $1TgFO.XML.Parser();
+        parser = new $3ty2n.XML.Parser();
         var data = parser.parse(body.toString(), output);
-        $jfMGq.update(resp.data, data);
+        $KHT0q.update(resp.data, data);
     }
 }
 /**
  * @api private
  */ module.exports = {
-    buildRequest: $7f88efd91f58ce5a$var$buildRequest,
-    extractError: $7f88efd91f58ce5a$var$extractError,
-    extractData: $7f88efd91f58ce5a$var$extractData
+    buildRequest: $f0269403ed11ada7$var$buildRequest,
+    extractError: $f0269403ed11ada7$var$extractError,
+    extractData: $f0269403ed11ada7$var$extractData
 };
 
 });
 
-parcelRegister("fVNr0", function(module, exports) {
+parcelRegister("4efI4", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $5M13x = parcelRequire("5M13x");
-var $b9928694618167c6$require$XmlNode = $5M13x.XmlNode;
+var $kHlvH = parcelRequire("kHlvH");
+var $3144a7e2fd208a64$require$XmlNode = $kHlvH.XmlNode;
 
-var $dZASg = parcelRequire("dZASg");
-var $b9928694618167c6$require$XmlText = $dZASg.XmlText;
-function $b9928694618167c6$var$XmlBuilder() {}
-$b9928694618167c6$var$XmlBuilder.prototype.toXML = function(params, shape, rootElement, noEmpty) {
-    var xml = new $b9928694618167c6$require$XmlNode(rootElement);
-    $b9928694618167c6$var$applyNamespaces(xml, shape, true);
-    $b9928694618167c6$var$serialize(xml, params, shape);
+var $e5B3h = parcelRequire("e5B3h");
+var $3144a7e2fd208a64$require$XmlText = $e5B3h.XmlText;
+function $3144a7e2fd208a64$var$XmlBuilder() {}
+$3144a7e2fd208a64$var$XmlBuilder.prototype.toXML = function(params, shape, rootElement, noEmpty) {
+    var xml = new $3144a7e2fd208a64$require$XmlNode(rootElement);
+    $3144a7e2fd208a64$var$applyNamespaces(xml, shape, true);
+    $3144a7e2fd208a64$var$serialize(xml, params, shape);
     return xml.children.length > 0 || noEmpty ? xml.toString() : '';
 };
-function $b9928694618167c6$var$serialize(xml, value, shape) {
+function $3144a7e2fd208a64$var$serialize(xml, value, shape) {
     switch(shape.type){
         case 'structure':
-            return $b9928694618167c6$var$serializeStructure(xml, value, shape);
+            return $3144a7e2fd208a64$var$serializeStructure(xml, value, shape);
         case 'map':
-            return $b9928694618167c6$var$serializeMap(xml, value, shape);
+            return $3144a7e2fd208a64$var$serializeMap(xml, value, shape);
         case 'list':
-            return $b9928694618167c6$var$serializeList(xml, value, shape);
+            return $3144a7e2fd208a64$var$serializeList(xml, value, shape);
         default:
-            return $b9928694618167c6$var$serializeScalar(xml, value, shape);
+            return $3144a7e2fd208a64$var$serializeScalar(xml, value, shape);
     }
 }
-function $b9928694618167c6$var$serializeStructure(xml, params, shape) {
-    $jfMGq.arrayEach(shape.memberNames, function(memberName) {
+function $3144a7e2fd208a64$var$serializeStructure(xml, params, shape) {
+    $KHT0q.arrayEach(shape.memberNames, function(memberName) {
         var memberShape = shape.members[memberName];
         if (memberShape.location !== 'body') return;
         var value = params[memberName];
         var name = memberShape.name;
         if (value !== undefined && value !== null) {
             if (memberShape.isXmlAttribute) xml.addAttribute(name, value);
-            else if (memberShape.flattened) $b9928694618167c6$var$serialize(xml, value, memberShape);
+            else if (memberShape.flattened) $3144a7e2fd208a64$var$serialize(xml, value, memberShape);
             else {
-                var element = new $b9928694618167c6$require$XmlNode(name);
+                var element = new $3144a7e2fd208a64$require$XmlNode(name);
                 xml.addChildNode(element);
-                $b9928694618167c6$var$applyNamespaces(element, memberShape);
-                $b9928694618167c6$var$serialize(element, value, memberShape);
+                $3144a7e2fd208a64$var$applyNamespaces(element, memberShape);
+                $3144a7e2fd208a64$var$serialize(element, value, memberShape);
             }
         }
     });
 }
-function $b9928694618167c6$var$serializeMap(xml, map, shape) {
+function $3144a7e2fd208a64$var$serializeMap(xml, map, shape) {
     var xmlKey = shape.key.name || 'key';
     var xmlValue = shape.value.name || 'value';
-    $jfMGq.each(map, function(key, value) {
-        var entry = new $b9928694618167c6$require$XmlNode(shape.flattened ? shape.name : 'entry');
+    $KHT0q.each(map, function(key, value) {
+        var entry = new $3144a7e2fd208a64$require$XmlNode(shape.flattened ? shape.name : 'entry');
         xml.addChildNode(entry);
-        var entryKey = new $b9928694618167c6$require$XmlNode(xmlKey);
-        var entryValue = new $b9928694618167c6$require$XmlNode(xmlValue);
+        var entryKey = new $3144a7e2fd208a64$require$XmlNode(xmlKey);
+        var entryValue = new $3144a7e2fd208a64$require$XmlNode(xmlValue);
         entry.addChildNode(entryKey);
         entry.addChildNode(entryValue);
-        $b9928694618167c6$var$serialize(entryKey, key, shape.key);
-        $b9928694618167c6$var$serialize(entryValue, value, shape.value);
+        $3144a7e2fd208a64$var$serialize(entryKey, key, shape.key);
+        $3144a7e2fd208a64$var$serialize(entryValue, value, shape.value);
     });
 }
-function $b9928694618167c6$var$serializeList(xml, list, shape) {
-    if (shape.flattened) $jfMGq.arrayEach(list, function(value) {
+function $3144a7e2fd208a64$var$serializeList(xml, list, shape) {
+    if (shape.flattened) $KHT0q.arrayEach(list, function(value) {
         var name = shape.member.name || shape.name;
-        var element = new $b9928694618167c6$require$XmlNode(name);
+        var element = new $3144a7e2fd208a64$require$XmlNode(name);
         xml.addChildNode(element);
-        $b9928694618167c6$var$serialize(element, value, shape.member);
+        $3144a7e2fd208a64$var$serialize(element, value, shape.member);
     });
-    else $jfMGq.arrayEach(list, function(value) {
+    else $KHT0q.arrayEach(list, function(value) {
         var name = shape.member.name || 'member';
-        var element = new $b9928694618167c6$require$XmlNode(name);
+        var element = new $3144a7e2fd208a64$require$XmlNode(name);
         xml.addChildNode(element);
-        $b9928694618167c6$var$serialize(element, value, shape.member);
+        $3144a7e2fd208a64$var$serialize(element, value, shape.member);
     });
 }
-function $b9928694618167c6$var$serializeScalar(xml, value, shape) {
-    xml.addChildNode(new $b9928694618167c6$require$XmlText(shape.toWireFormat(value)));
+function $3144a7e2fd208a64$var$serializeScalar(xml, value, shape) {
+    xml.addChildNode(new $3144a7e2fd208a64$require$XmlText(shape.toWireFormat(value)));
 }
-function $b9928694618167c6$var$applyNamespaces(xml, shape, isRoot) {
+function $3144a7e2fd208a64$var$applyNamespaces(xml, shape, isRoot) {
     var uri, prefix = 'xmlns';
     if (shape.xmlNamespaceUri) {
         uri = shape.xmlNamespaceUri;
@@ -2372,35 +2372,35 @@ function $b9928694618167c6$var$applyNamespaces(xml, shape, isRoot) {
 }
 /**
  * @api private
- */ module.exports = $b9928694618167c6$var$XmlBuilder;
+ */ module.exports = $3144a7e2fd208a64$var$XmlBuilder;
 
 });
-parcelRegister("5M13x", function(module, exports) {
+parcelRegister("kHlvH", function(module, exports) {
 
-var $2Afod = parcelRequire("2Afod");
-var $4342412b669799e7$require$escapeAttribute = $2Afod.escapeAttribute;
+var $3W8yR = parcelRequire("3W8yR");
+var $f11882516e9d0433$require$escapeAttribute = $3W8yR.escapeAttribute;
 /**
  * Represents an XML node.
  * @api private
- */ function $4342412b669799e7$var$XmlNode(name, children) {
+ */ function $f11882516e9d0433$var$XmlNode(name, children) {
     if (children === void 0) children = [];
     this.name = name;
     this.children = children;
     this.attributes = {};
 }
-$4342412b669799e7$var$XmlNode.prototype.addAttribute = function(name, value) {
+$f11882516e9d0433$var$XmlNode.prototype.addAttribute = function(name, value) {
     this.attributes[name] = value;
     return this;
 };
-$4342412b669799e7$var$XmlNode.prototype.addChildNode = function(child) {
+$f11882516e9d0433$var$XmlNode.prototype.addChildNode = function(child) {
     this.children.push(child);
     return this;
 };
-$4342412b669799e7$var$XmlNode.prototype.removeAttribute = function(name) {
+$f11882516e9d0433$var$XmlNode.prototype.removeAttribute = function(name) {
     delete this.attributes[name];
     return this;
 };
-$4342412b669799e7$var$XmlNode.prototype.toString = function() {
+$f11882516e9d0433$var$XmlNode.prototype.toString = function() {
     var hasChildren = Boolean(this.children.length);
     var xmlText = '<' + this.name;
     // add attributes
@@ -2408,7 +2408,7 @@ $4342412b669799e7$var$XmlNode.prototype.toString = function() {
     for(var i = 0, attributeNames = Object.keys(attributes); i < attributeNames.length; i++){
         var attributeName = attributeNames[i];
         var attribute = attributes[attributeName];
-        if (typeof attribute !== 'undefined' && attribute !== null) xmlText += ' ' + attributeName + '=\"' + $4342412b669799e7$require$escapeAttribute('' + attribute) + '\"';
+        if (typeof attribute !== 'undefined' && attribute !== null) xmlText += ' ' + attributeName + '=\"' + $f11882516e9d0433$require$escapeAttribute('' + attribute) + '\"';
     }
     return xmlText += !hasChildren ? '/>' : '>' + this.children.map(function(c) {
         return c.toString();
@@ -2417,79 +2417,79 @@ $4342412b669799e7$var$XmlNode.prototype.toString = function() {
 /**
  * @api private
  */ module.exports = {
-    XmlNode: $4342412b669799e7$var$XmlNode
+    XmlNode: $f11882516e9d0433$var$XmlNode
 };
 
 });
-parcelRegister("2Afod", function(module, exports) {
+parcelRegister("3W8yR", function(module, exports) {
 /**
  * Escapes characters that can not be in an XML attribute.
- */ function $1e1ae19674b126a6$var$escapeAttribute(value) {
+ */ function $2ddd6dfd8077935c$var$escapeAttribute(value) {
     return value.replace(/&/g, '&amp;').replace(/'/g, '&apos;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 /**
  * @api private
  */ module.exports = {
-    escapeAttribute: $1e1ae19674b126a6$var$escapeAttribute
+    escapeAttribute: $2ddd6dfd8077935c$var$escapeAttribute
 };
 
 });
 
 
-parcelRegister("dZASg", function(module, exports) {
+parcelRegister("e5B3h", function(module, exports) {
 
-var $R2NS3 = parcelRequire("R2NS3");
-var $a2fd9356046b4ffd$require$escapeElement = $R2NS3.escapeElement;
+var $gu7zY = parcelRequire("gu7zY");
+var $a41e460d5df37975$require$escapeElement = $gu7zY.escapeElement;
 /**
  * Represents an XML text value.
  * @api private
- */ function $a2fd9356046b4ffd$var$XmlText(value) {
+ */ function $a41e460d5df37975$var$XmlText(value) {
     this.value = value;
 }
-$a2fd9356046b4ffd$var$XmlText.prototype.toString = function() {
-    return $a2fd9356046b4ffd$require$escapeElement('' + this.value);
+$a41e460d5df37975$var$XmlText.prototype.toString = function() {
+    return $a41e460d5df37975$require$escapeElement('' + this.value);
 };
 /**
  * @api private
  */ module.exports = {
-    XmlText: $a2fd9356046b4ffd$var$XmlText
+    XmlText: $a41e460d5df37975$var$XmlText
 };
 
 });
-parcelRegister("R2NS3", function(module, exports) {
+parcelRegister("gu7zY", function(module, exports) {
 /**
  * Escapes characters that can not be in an XML element.
- */ function $09f7200adaa7391f$var$escapeElement(value) {
+ */ function $c00553bbed69bf63$var$escapeElement(value) {
     return value.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/\r/g, '&#x0D;').replace(/\n/g, '&#x0A;').replace(/\u0085/g, '&#x85;').replace(/\u2028/, '&#x2028;');
 }
 /**
  * @api private
  */ module.exports = {
-    escapeElement: $09f7200adaa7391f$var$escapeElement
+    escapeElement: $c00553bbed69bf63$var$escapeElement
 };
 
 });
 
 
 
-parcelRegister("byTzF", function(module, exports) {
+parcelRegister("kmlFA", function(module, exports) {
 
-var $aMm0e = parcelRequire("aMm0e");
+var $bQWKa = parcelRequire("bQWKa");
 
-var $2EeqP = parcelRequire("2EeqP");
+var $7jb5z = parcelRequire("7jb5z");
 
-var $frmpZ = parcelRequire("frmpZ");
+var $aWbwd = parcelRequire("aWbwd");
 
-var $8yB55 = parcelRequire("8yB55");
+var $kJ8HZ = parcelRequire("kJ8HZ");
 
-var $hIMxK = parcelRequire("hIMxK");
+var $kmEOI = parcelRequire("kmEOI");
 
-var $btHhi = parcelRequire("btHhi");
+var $aX05d = parcelRequire("aX05d");
 
-var $jfMGq = parcelRequire("jfMGq");
-var $86adfa99c5ec6447$var$property = $jfMGq.property;
-var $86adfa99c5ec6447$var$memoizedProperty = $jfMGq.memoizedProperty;
-function $86adfa99c5ec6447$var$Api(api, options) {
+var $KHT0q = parcelRequire("KHT0q");
+var $ed26abe20b4f956e$var$property = $KHT0q.property;
+var $ed26abe20b4f956e$var$memoizedProperty = $KHT0q.memoizedProperty;
+function $ed26abe20b4f956e$var$Api(api, options) {
     var self = this;
     api = api || {};
     options = options || {};
@@ -2497,22 +2497,22 @@ function $86adfa99c5ec6447$var$Api(api, options) {
     api.metadata = api.metadata || {};
     var serviceIdentifier = options.serviceIdentifier;
     delete options.serviceIdentifier;
-    $86adfa99c5ec6447$var$property(this, 'isApi', true, false);
-    $86adfa99c5ec6447$var$property(this, 'apiVersion', api.metadata.apiVersion);
-    $86adfa99c5ec6447$var$property(this, 'endpointPrefix', api.metadata.endpointPrefix);
-    $86adfa99c5ec6447$var$property(this, 'signingName', api.metadata.signingName);
-    $86adfa99c5ec6447$var$property(this, 'globalEndpoint', api.metadata.globalEndpoint);
-    $86adfa99c5ec6447$var$property(this, 'signatureVersion', api.metadata.signatureVersion);
-    $86adfa99c5ec6447$var$property(this, 'jsonVersion', api.metadata.jsonVersion);
-    $86adfa99c5ec6447$var$property(this, 'targetPrefix', api.metadata.targetPrefix);
-    $86adfa99c5ec6447$var$property(this, 'protocol', api.metadata.protocol);
-    $86adfa99c5ec6447$var$property(this, 'timestampFormat', api.metadata.timestampFormat);
-    $86adfa99c5ec6447$var$property(this, 'xmlNamespaceUri', api.metadata.xmlNamespace);
-    $86adfa99c5ec6447$var$property(this, 'abbreviation', api.metadata.serviceAbbreviation);
-    $86adfa99c5ec6447$var$property(this, 'fullName', api.metadata.serviceFullName);
-    $86adfa99c5ec6447$var$property(this, 'serviceId', api.metadata.serviceId);
-    if (serviceIdentifier && $btHhi[serviceIdentifier]) $86adfa99c5ec6447$var$property(this, 'xmlNoDefaultLists', $btHhi[serviceIdentifier].xmlNoDefaultLists, false);
-    $86adfa99c5ec6447$var$memoizedProperty(this, 'className', function() {
+    $ed26abe20b4f956e$var$property(this, 'isApi', true, false);
+    $ed26abe20b4f956e$var$property(this, 'apiVersion', api.metadata.apiVersion);
+    $ed26abe20b4f956e$var$property(this, 'endpointPrefix', api.metadata.endpointPrefix);
+    $ed26abe20b4f956e$var$property(this, 'signingName', api.metadata.signingName);
+    $ed26abe20b4f956e$var$property(this, 'globalEndpoint', api.metadata.globalEndpoint);
+    $ed26abe20b4f956e$var$property(this, 'signatureVersion', api.metadata.signatureVersion);
+    $ed26abe20b4f956e$var$property(this, 'jsonVersion', api.metadata.jsonVersion);
+    $ed26abe20b4f956e$var$property(this, 'targetPrefix', api.metadata.targetPrefix);
+    $ed26abe20b4f956e$var$property(this, 'protocol', api.metadata.protocol);
+    $ed26abe20b4f956e$var$property(this, 'timestampFormat', api.metadata.timestampFormat);
+    $ed26abe20b4f956e$var$property(this, 'xmlNamespaceUri', api.metadata.xmlNamespace);
+    $ed26abe20b4f956e$var$property(this, 'abbreviation', api.metadata.serviceAbbreviation);
+    $ed26abe20b4f956e$var$property(this, 'fullName', api.metadata.serviceFullName);
+    $ed26abe20b4f956e$var$property(this, 'serviceId', api.metadata.serviceId);
+    if (serviceIdentifier && $aX05d[serviceIdentifier]) $ed26abe20b4f956e$var$property(this, 'xmlNoDefaultLists', $aX05d[serviceIdentifier].xmlNoDefaultLists, false);
+    $ed26abe20b4f956e$var$memoizedProperty(this, 'className', function() {
         var name = api.metadata.serviceAbbreviation || api.metadata.serviceFullName;
         if (!name) return null;
         name = name.replace(/^Amazon|AWS\s*|\(.*|\s+|\W+/g, '');
@@ -2520,81 +2520,81 @@ function $86adfa99c5ec6447$var$Api(api, options) {
         return name;
     });
     function addEndpointOperation(name, operation) {
-        if (operation.endpointoperation === true) $86adfa99c5ec6447$var$property(self, 'endpointOperation', $jfMGq.string.lowerFirst(name));
-        if (operation.endpointdiscovery && !self.hasRequiredEndpointDiscovery) $86adfa99c5ec6447$var$property(self, 'hasRequiredEndpointDiscovery', operation.endpointdiscovery.required === true);
+        if (operation.endpointoperation === true) $ed26abe20b4f956e$var$property(self, 'endpointOperation', $KHT0q.string.lowerFirst(name));
+        if (operation.endpointdiscovery && !self.hasRequiredEndpointDiscovery) $ed26abe20b4f956e$var$property(self, 'hasRequiredEndpointDiscovery', operation.endpointdiscovery.required === true);
     }
-    $86adfa99c5ec6447$var$property(this, 'operations', new $aMm0e(api.operations, options, function(name, operation) {
-        return new $2EeqP(name, operation, options);
-    }, $jfMGq.string.lowerFirst, addEndpointOperation));
-    $86adfa99c5ec6447$var$property(this, 'shapes', new $aMm0e(api.shapes, options, function(name, shape) {
-        return $frmpZ.create(shape, options);
+    $ed26abe20b4f956e$var$property(this, 'operations', new $bQWKa(api.operations, options, function(name, operation) {
+        return new $7jb5z(name, operation, options);
+    }, $KHT0q.string.lowerFirst, addEndpointOperation));
+    $ed26abe20b4f956e$var$property(this, 'shapes', new $bQWKa(api.shapes, options, function(name, shape) {
+        return $aWbwd.create(shape, options);
     }));
-    $86adfa99c5ec6447$var$property(this, 'paginators', new $aMm0e(api.paginators, options, function(name, paginator) {
-        return new $8yB55(name, paginator, options);
+    $ed26abe20b4f956e$var$property(this, 'paginators', new $bQWKa(api.paginators, options, function(name, paginator) {
+        return new $kJ8HZ(name, paginator, options);
     }));
-    $86adfa99c5ec6447$var$property(this, 'waiters', new $aMm0e(api.waiters, options, function(name, waiter) {
-        return new $hIMxK(name, waiter, options);
-    }, $jfMGq.string.lowerFirst));
+    $ed26abe20b4f956e$var$property(this, 'waiters', new $bQWKa(api.waiters, options, function(name, waiter) {
+        return new $kmEOI(name, waiter, options);
+    }, $KHT0q.string.lowerFirst));
     if (options.documentation) {
-        $86adfa99c5ec6447$var$property(this, 'documentation', api.documentation);
-        $86adfa99c5ec6447$var$property(this, 'documentationUrl', api.documentationUrl);
+        $ed26abe20b4f956e$var$property(this, 'documentation', api.documentation);
+        $ed26abe20b4f956e$var$property(this, 'documentationUrl', api.documentationUrl);
     }
-    $86adfa99c5ec6447$var$property(this, 'awsQueryCompatible', api.metadata.awsQueryCompatible);
+    $ed26abe20b4f956e$var$property(this, 'awsQueryCompatible', api.metadata.awsQueryCompatible);
 }
 /**
  * @api private
- */ module.exports = $86adfa99c5ec6447$var$Api;
+ */ module.exports = $ed26abe20b4f956e$var$Api;
 
 });
-parcelRegister("2EeqP", function(module, exports) {
+parcelRegister("7jb5z", function(module, exports) {
 
-var $frmpZ = parcelRequire("frmpZ");
+var $aWbwd = parcelRequire("aWbwd");
 
-var $jfMGq = parcelRequire("jfMGq");
-var $1eda830e61484197$var$property = $jfMGq.property;
-var $1eda830e61484197$var$memoizedProperty = $jfMGq.memoizedProperty;
-function $1eda830e61484197$var$Operation(name, operation, options) {
+var $KHT0q = parcelRequire("KHT0q");
+var $5522e8bd9d4493e2$var$property = $KHT0q.property;
+var $5522e8bd9d4493e2$var$memoizedProperty = $KHT0q.memoizedProperty;
+function $5522e8bd9d4493e2$var$Operation(name, operation, options) {
     var self = this;
     options = options || {};
-    $1eda830e61484197$var$property(this, 'name', operation.name || name);
-    $1eda830e61484197$var$property(this, 'api', options.api, false);
+    $5522e8bd9d4493e2$var$property(this, 'name', operation.name || name);
+    $5522e8bd9d4493e2$var$property(this, 'api', options.api, false);
     operation.http = operation.http || {};
-    $1eda830e61484197$var$property(this, 'endpoint', operation.endpoint);
-    $1eda830e61484197$var$property(this, 'httpMethod', operation.http.method || 'POST');
-    $1eda830e61484197$var$property(this, 'httpPath', operation.http.requestUri || '/');
-    $1eda830e61484197$var$property(this, 'authtype', operation.authtype || '');
-    $1eda830e61484197$var$property(this, 'endpointDiscoveryRequired', operation.endpointdiscovery ? operation.endpointdiscovery.required ? 'REQUIRED' : 'OPTIONAL' : 'NULL');
+    $5522e8bd9d4493e2$var$property(this, 'endpoint', operation.endpoint);
+    $5522e8bd9d4493e2$var$property(this, 'httpMethod', operation.http.method || 'POST');
+    $5522e8bd9d4493e2$var$property(this, 'httpPath', operation.http.requestUri || '/');
+    $5522e8bd9d4493e2$var$property(this, 'authtype', operation.authtype || '');
+    $5522e8bd9d4493e2$var$property(this, 'endpointDiscoveryRequired', operation.endpointdiscovery ? operation.endpointdiscovery.required ? 'REQUIRED' : 'OPTIONAL' : 'NULL');
     // httpChecksum replaces usage of httpChecksumRequired, but some APIs
     // (s3control) still uses old trait.
     var httpChecksumRequired = operation.httpChecksumRequired || operation.httpChecksum && operation.httpChecksum.requestChecksumRequired;
-    $1eda830e61484197$var$property(this, 'httpChecksumRequired', httpChecksumRequired, false);
-    $1eda830e61484197$var$memoizedProperty(this, 'input', function() {
-        if (!operation.input) return new $frmpZ.create({
+    $5522e8bd9d4493e2$var$property(this, 'httpChecksumRequired', httpChecksumRequired, false);
+    $5522e8bd9d4493e2$var$memoizedProperty(this, 'input', function() {
+        if (!operation.input) return new $aWbwd.create({
             type: 'structure'
         }, options);
-        return $frmpZ.create(operation.input, options);
+        return $aWbwd.create(operation.input, options);
     });
-    $1eda830e61484197$var$memoizedProperty(this, 'output', function() {
-        if (!operation.output) return new $frmpZ.create({
+    $5522e8bd9d4493e2$var$memoizedProperty(this, 'output', function() {
+        if (!operation.output) return new $aWbwd.create({
             type: 'structure'
         }, options);
-        return $frmpZ.create(operation.output, options);
+        return $aWbwd.create(operation.output, options);
     });
-    $1eda830e61484197$var$memoizedProperty(this, 'errors', function() {
+    $5522e8bd9d4493e2$var$memoizedProperty(this, 'errors', function() {
         var list = [];
         if (!operation.errors) return null;
-        for(var i = 0; i < operation.errors.length; i++)list.push($frmpZ.create(operation.errors[i], options));
+        for(var i = 0; i < operation.errors.length; i++)list.push($aWbwd.create(operation.errors[i], options));
         return list;
     });
-    $1eda830e61484197$var$memoizedProperty(this, 'paginator', function() {
+    $5522e8bd9d4493e2$var$memoizedProperty(this, 'paginator', function() {
         return options.api.paginators[name];
     });
     if (options.documentation) {
-        $1eda830e61484197$var$property(this, 'documentation', operation.documentation);
-        $1eda830e61484197$var$property(this, 'documentationUrl', operation.documentationUrl);
+        $5522e8bd9d4493e2$var$property(this, 'documentation', operation.documentation);
+        $5522e8bd9d4493e2$var$property(this, 'documentationUrl', operation.documentationUrl);
     }
     // idempotentMembers only tracks top-level input shapes
-    $1eda830e61484197$var$memoizedProperty(this, 'idempotentMembers', function() {
+    $5522e8bd9d4493e2$var$memoizedProperty(this, 'idempotentMembers', function() {
         var idempotentMembers = [];
         var input = self.input;
         var members = input.members;
@@ -2605,12 +2605,12 @@ function $1eda830e61484197$var$Operation(name, operation, options) {
         }
         return idempotentMembers;
     });
-    $1eda830e61484197$var$memoizedProperty(this, 'hasEventOutput', function() {
+    $5522e8bd9d4493e2$var$memoizedProperty(this, 'hasEventOutput', function() {
         var output = self.output;
-        return $1eda830e61484197$var$hasEventStream(output);
+        return $5522e8bd9d4493e2$var$hasEventStream(output);
     });
 }
-function $1eda830e61484197$var$hasEventStream(topLevelShape) {
+function $5522e8bd9d4493e2$var$hasEventStream(topLevelShape) {
     var members = topLevelShape.members;
     var payload = topLevelShape.payload;
     if (!topLevelShape.members) return false;
@@ -2626,36 +2626,36 @@ function $1eda830e61484197$var$hasEventStream(topLevelShape) {
 }
 /**
  * @api private
- */ module.exports = $1eda830e61484197$var$Operation;
+ */ module.exports = $5522e8bd9d4493e2$var$Operation;
 
 });
 
-parcelRegister("8yB55", function(module, exports) {
+parcelRegister("kJ8HZ", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
-var $63ae43369386a8d9$require$property = $jfMGq.property;
-function $63ae43369386a8d9$var$Paginator(name, paginator) {
-    $63ae43369386a8d9$require$property(this, 'inputToken', paginator.input_token);
-    $63ae43369386a8d9$require$property(this, 'limitKey', paginator.limit_key);
-    $63ae43369386a8d9$require$property(this, 'moreResults', paginator.more_results);
-    $63ae43369386a8d9$require$property(this, 'outputToken', paginator.output_token);
-    $63ae43369386a8d9$require$property(this, 'resultKey', paginator.result_key);
+var $KHT0q = parcelRequire("KHT0q");
+var $f16ec3f70fe103f5$require$property = $KHT0q.property;
+function $f16ec3f70fe103f5$var$Paginator(name, paginator) {
+    $f16ec3f70fe103f5$require$property(this, 'inputToken', paginator.input_token);
+    $f16ec3f70fe103f5$require$property(this, 'limitKey', paginator.limit_key);
+    $f16ec3f70fe103f5$require$property(this, 'moreResults', paginator.more_results);
+    $f16ec3f70fe103f5$require$property(this, 'outputToken', paginator.output_token);
+    $f16ec3f70fe103f5$require$property(this, 'resultKey', paginator.result_key);
 }
 /**
  * @api private
- */ module.exports = $63ae43369386a8d9$var$Paginator;
+ */ module.exports = $f16ec3f70fe103f5$var$Paginator;
 
 });
 
-parcelRegister("hIMxK", function(module, exports) {
+parcelRegister("kmEOI", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
-var $ce6c336ac846ad0e$var$property = $jfMGq.property;
-function $ce6c336ac846ad0e$var$ResourceWaiter(name, waiter, options) {
+var $KHT0q = parcelRequire("KHT0q");
+var $ed35861fc4778214$var$property = $KHT0q.property;
+function $ed35861fc4778214$var$ResourceWaiter(name, waiter, options) {
     options = options || {};
-    $ce6c336ac846ad0e$var$property(this, 'name', name);
-    $ce6c336ac846ad0e$var$property(this, 'api', options.api, false);
-    if (waiter.operation) $ce6c336ac846ad0e$var$property(this, 'operation', $jfMGq.string.lowerFirst(waiter.operation));
+    $ed35861fc4778214$var$property(this, 'name', name);
+    $ed35861fc4778214$var$property(this, 'api', options.api, false);
+    if (waiter.operation) $ed35861fc4778214$var$property(this, 'operation', $KHT0q.string.lowerFirst(waiter.operation));
     var self = this;
     var keys = [
         'type',
@@ -2666,53 +2666,53 @@ function $ce6c336ac846ad0e$var$ResourceWaiter(name, waiter, options) {
     ];
     keys.forEach(function(key) {
         var value = waiter[key];
-        if (value) $ce6c336ac846ad0e$var$property(self, key, value);
+        if (value) $ed35861fc4778214$var$property(self, key, value);
     });
 }
 /**
  * @api private
- */ module.exports = $ce6c336ac846ad0e$var$ResourceWaiter;
+ */ module.exports = $ed35861fc4778214$var$ResourceWaiter;
 
 });
 
-parcelRegister("btHhi", function(module, exports) {
+parcelRegister("aX05d", function(module, exports) {
 module.exports = JSON.parse("{\"acm\":{\"name\":\"ACM\",\"cors\":true},\"apigateway\":{\"name\":\"APIGateway\",\"cors\":true},\"applicationautoscaling\":{\"prefix\":\"application-autoscaling\",\"name\":\"ApplicationAutoScaling\",\"cors\":true},\"appstream\":{\"name\":\"AppStream\"},\"autoscaling\":{\"name\":\"AutoScaling\",\"cors\":true},\"batch\":{\"name\":\"Batch\"},\"budgets\":{\"name\":\"Budgets\"},\"clouddirectory\":{\"name\":\"CloudDirectory\",\"versions\":[\"2016-05-10*\"]},\"cloudformation\":{\"name\":\"CloudFormation\",\"cors\":true},\"cloudfront\":{\"name\":\"CloudFront\",\"versions\":[\"2013-05-12*\",\"2013-11-11*\",\"2014-05-31*\",\"2014-10-21*\",\"2014-11-06*\",\"2015-04-17*\",\"2015-07-27*\",\"2015-09-17*\",\"2016-01-13*\",\"2016-01-28*\",\"2016-08-01*\",\"2016-08-20*\",\"2016-09-07*\",\"2016-09-29*\",\"2016-11-25*\",\"2017-03-25*\",\"2017-10-30*\",\"2018-06-18*\",\"2018-11-05*\",\"2019-03-26*\"],\"cors\":true},\"cloudhsm\":{\"name\":\"CloudHSM\",\"cors\":true},\"cloudsearch\":{\"name\":\"CloudSearch\"},\"cloudsearchdomain\":{\"name\":\"CloudSearchDomain\"},\"cloudtrail\":{\"name\":\"CloudTrail\",\"cors\":true},\"cloudwatch\":{\"prefix\":\"monitoring\",\"name\":\"CloudWatch\",\"cors\":true},\"cloudwatchevents\":{\"prefix\":\"events\",\"name\":\"CloudWatchEvents\",\"versions\":[\"2014-02-03*\"],\"cors\":true},\"cloudwatchlogs\":{\"prefix\":\"logs\",\"name\":\"CloudWatchLogs\",\"cors\":true},\"codebuild\":{\"name\":\"CodeBuild\",\"cors\":true},\"codecommit\":{\"name\":\"CodeCommit\",\"cors\":true},\"codedeploy\":{\"name\":\"CodeDeploy\",\"cors\":true},\"codepipeline\":{\"name\":\"CodePipeline\",\"cors\":true},\"cognitoidentity\":{\"prefix\":\"cognito-identity\",\"name\":\"CognitoIdentity\",\"cors\":true},\"cognitoidentityserviceprovider\":{\"prefix\":\"cognito-idp\",\"name\":\"CognitoIdentityServiceProvider\",\"cors\":true},\"cognitosync\":{\"prefix\":\"cognito-sync\",\"name\":\"CognitoSync\",\"cors\":true},\"configservice\":{\"prefix\":\"config\",\"name\":\"ConfigService\",\"cors\":true},\"cur\":{\"name\":\"CUR\",\"cors\":true},\"datapipeline\":{\"name\":\"DataPipeline\"},\"devicefarm\":{\"name\":\"DeviceFarm\",\"cors\":true},\"directconnect\":{\"name\":\"DirectConnect\",\"cors\":true},\"directoryservice\":{\"prefix\":\"ds\",\"name\":\"DirectoryService\"},\"discovery\":{\"name\":\"Discovery\"},\"dms\":{\"name\":\"DMS\"},\"dynamodb\":{\"name\":\"DynamoDB\",\"cors\":true},\"dynamodbstreams\":{\"prefix\":\"streams.dynamodb\",\"name\":\"DynamoDBStreams\",\"cors\":true},\"ec2\":{\"name\":\"EC2\",\"versions\":[\"2013-06-15*\",\"2013-10-15*\",\"2014-02-01*\",\"2014-05-01*\",\"2014-06-15*\",\"2014-09-01*\",\"2014-10-01*\",\"2015-03-01*\",\"2015-04-15*\",\"2015-10-01*\",\"2016-04-01*\",\"2016-09-15*\"],\"cors\":true},\"ecr\":{\"name\":\"ECR\",\"cors\":true},\"ecs\":{\"name\":\"ECS\",\"cors\":true},\"efs\":{\"prefix\":\"elasticfilesystem\",\"name\":\"EFS\",\"cors\":true},\"elasticache\":{\"name\":\"ElastiCache\",\"versions\":[\"2012-11-15*\",\"2014-03-24*\",\"2014-07-15*\",\"2014-09-30*\"],\"cors\":true},\"elasticbeanstalk\":{\"name\":\"ElasticBeanstalk\",\"cors\":true},\"elb\":{\"prefix\":\"elasticloadbalancing\",\"name\":\"ELB\",\"cors\":true},\"elbv2\":{\"prefix\":\"elasticloadbalancingv2\",\"name\":\"ELBv2\",\"cors\":true},\"emr\":{\"prefix\":\"elasticmapreduce\",\"name\":\"EMR\",\"cors\":true},\"es\":{\"name\":\"ES\"},\"elastictranscoder\":{\"name\":\"ElasticTranscoder\",\"cors\":true},\"firehose\":{\"name\":\"Firehose\",\"cors\":true},\"gamelift\":{\"name\":\"GameLift\",\"cors\":true},\"glacier\":{\"name\":\"Glacier\"},\"health\":{\"name\":\"Health\"},\"iam\":{\"name\":\"IAM\",\"cors\":true},\"importexport\":{\"name\":\"ImportExport\"},\"inspector\":{\"name\":\"Inspector\",\"versions\":[\"2015-08-18*\"],\"cors\":true},\"iot\":{\"name\":\"Iot\",\"cors\":true},\"iotdata\":{\"prefix\":\"iot-data\",\"name\":\"IotData\",\"cors\":true},\"kinesis\":{\"name\":\"Kinesis\",\"cors\":true},\"kinesisanalytics\":{\"name\":\"KinesisAnalytics\"},\"kms\":{\"name\":\"KMS\",\"cors\":true},\"lambda\":{\"name\":\"Lambda\",\"cors\":true},\"lexruntime\":{\"prefix\":\"runtime.lex\",\"name\":\"LexRuntime\",\"cors\":true},\"lightsail\":{\"name\":\"Lightsail\"},\"machinelearning\":{\"name\":\"MachineLearning\",\"cors\":true},\"marketplacecommerceanalytics\":{\"name\":\"MarketplaceCommerceAnalytics\",\"cors\":true},\"marketplacemetering\":{\"prefix\":\"meteringmarketplace\",\"name\":\"MarketplaceMetering\"},\"mturk\":{\"prefix\":\"mturk-requester\",\"name\":\"MTurk\",\"cors\":true},\"mobileanalytics\":{\"name\":\"MobileAnalytics\",\"cors\":true},\"opsworks\":{\"name\":\"OpsWorks\",\"cors\":true},\"opsworkscm\":{\"name\":\"OpsWorksCM\"},\"organizations\":{\"name\":\"Organizations\"},\"pinpoint\":{\"name\":\"Pinpoint\"},\"polly\":{\"name\":\"Polly\",\"cors\":true},\"rds\":{\"name\":\"RDS\",\"versions\":[\"2014-09-01*\"],\"cors\":true},\"redshift\":{\"name\":\"Redshift\",\"cors\":true},\"rekognition\":{\"name\":\"Rekognition\",\"cors\":true},\"resourcegroupstaggingapi\":{\"name\":\"ResourceGroupsTaggingAPI\"},\"route53\":{\"name\":\"Route53\",\"cors\":true},\"route53domains\":{\"name\":\"Route53Domains\",\"cors\":true},\"s3\":{\"name\":\"S3\",\"dualstackAvailable\":true,\"cors\":true},\"s3control\":{\"name\":\"S3Control\",\"dualstackAvailable\":true,\"xmlNoDefaultLists\":true},\"servicecatalog\":{\"name\":\"ServiceCatalog\",\"cors\":true},\"ses\":{\"prefix\":\"email\",\"name\":\"SES\",\"cors\":true},\"shield\":{\"name\":\"Shield\"},\"simpledb\":{\"prefix\":\"sdb\",\"name\":\"SimpleDB\"},\"sms\":{\"name\":\"SMS\"},\"snowball\":{\"name\":\"Snowball\"},\"sns\":{\"name\":\"SNS\",\"cors\":true},\"sqs\":{\"name\":\"SQS\",\"cors\":true},\"ssm\":{\"name\":\"SSM\",\"cors\":true},\"storagegateway\":{\"name\":\"StorageGateway\",\"cors\":true},\"stepfunctions\":{\"prefix\":\"states\",\"name\":\"StepFunctions\"},\"sts\":{\"name\":\"STS\",\"cors\":true},\"support\":{\"name\":\"Support\"},\"swf\":{\"name\":\"SWF\"},\"xray\":{\"name\":\"XRay\",\"cors\":true},\"waf\":{\"name\":\"WAF\",\"cors\":true},\"wafregional\":{\"prefix\":\"waf-regional\",\"name\":\"WAFRegional\"},\"workdocs\":{\"name\":\"WorkDocs\",\"cors\":true},\"workspaces\":{\"name\":\"WorkSpaces\"},\"lexmodelbuildingservice\":{\"prefix\":\"lex-models\",\"name\":\"LexModelBuildingService\",\"cors\":true},\"marketplaceentitlementservice\":{\"prefix\":\"entitlement.marketplace\",\"name\":\"MarketplaceEntitlementService\"},\"athena\":{\"name\":\"Athena\",\"cors\":true},\"greengrass\":{\"name\":\"Greengrass\"},\"dax\":{\"name\":\"DAX\"},\"migrationhub\":{\"prefix\":\"AWSMigrationHub\",\"name\":\"MigrationHub\"},\"cloudhsmv2\":{\"name\":\"CloudHSMV2\",\"cors\":true},\"glue\":{\"name\":\"Glue\"},\"pricing\":{\"name\":\"Pricing\",\"cors\":true},\"costexplorer\":{\"prefix\":\"ce\",\"name\":\"CostExplorer\",\"cors\":true},\"mediaconvert\":{\"name\":\"MediaConvert\"},\"medialive\":{\"name\":\"MediaLive\"},\"mediapackage\":{\"name\":\"MediaPackage\"},\"mediastore\":{\"name\":\"MediaStore\"},\"mediastoredata\":{\"prefix\":\"mediastore-data\",\"name\":\"MediaStoreData\",\"cors\":true},\"appsync\":{\"name\":\"AppSync\"},\"guardduty\":{\"name\":\"GuardDuty\"},\"mq\":{\"name\":\"MQ\"},\"comprehend\":{\"name\":\"Comprehend\",\"cors\":true},\"iotjobsdataplane\":{\"prefix\":\"iot-jobs-data\",\"name\":\"IoTJobsDataPlane\"},\"kinesisvideoarchivedmedia\":{\"prefix\":\"kinesis-video-archived-media\",\"name\":\"KinesisVideoArchivedMedia\",\"cors\":true},\"kinesisvideomedia\":{\"prefix\":\"kinesis-video-media\",\"name\":\"KinesisVideoMedia\",\"cors\":true},\"kinesisvideo\":{\"name\":\"KinesisVideo\",\"cors\":true},\"sagemakerruntime\":{\"prefix\":\"runtime.sagemaker\",\"name\":\"SageMakerRuntime\"},\"sagemaker\":{\"name\":\"SageMaker\"},\"translate\":{\"name\":\"Translate\",\"cors\":true},\"resourcegroups\":{\"prefix\":\"resource-groups\",\"name\":\"ResourceGroups\",\"cors\":true},\"cloud9\":{\"name\":\"Cloud9\"},\"serverlessapplicationrepository\":{\"prefix\":\"serverlessrepo\",\"name\":\"ServerlessApplicationRepository\"},\"servicediscovery\":{\"name\":\"ServiceDiscovery\"},\"workmail\":{\"name\":\"WorkMail\"},\"autoscalingplans\":{\"prefix\":\"autoscaling-plans\",\"name\":\"AutoScalingPlans\"},\"transcribeservice\":{\"prefix\":\"transcribe\",\"name\":\"TranscribeService\"},\"connect\":{\"name\":\"Connect\",\"cors\":true},\"acmpca\":{\"prefix\":\"acm-pca\",\"name\":\"ACMPCA\"},\"fms\":{\"name\":\"FMS\"},\"secretsmanager\":{\"name\":\"SecretsManager\",\"cors\":true},\"iotanalytics\":{\"name\":\"IoTAnalytics\",\"cors\":true},\"iot1clickdevicesservice\":{\"prefix\":\"iot1click-devices\",\"name\":\"IoT1ClickDevicesService\"},\"iot1clickprojects\":{\"prefix\":\"iot1click-projects\",\"name\":\"IoT1ClickProjects\"},\"pi\":{\"name\":\"PI\"},\"neptune\":{\"name\":\"Neptune\"},\"mediatailor\":{\"name\":\"MediaTailor\"},\"eks\":{\"name\":\"EKS\"},\"dlm\":{\"name\":\"DLM\"},\"signer\":{\"name\":\"Signer\"},\"chime\":{\"name\":\"Chime\"},\"pinpointemail\":{\"prefix\":\"pinpoint-email\",\"name\":\"PinpointEmail\"},\"ram\":{\"name\":\"RAM\"},\"route53resolver\":{\"name\":\"Route53Resolver\"},\"pinpointsmsvoice\":{\"prefix\":\"sms-voice\",\"name\":\"PinpointSMSVoice\"},\"quicksight\":{\"name\":\"QuickSight\"},\"rdsdataservice\":{\"prefix\":\"rds-data\",\"name\":\"RDSDataService\"},\"amplify\":{\"name\":\"Amplify\"},\"datasync\":{\"name\":\"DataSync\"},\"robomaker\":{\"name\":\"RoboMaker\"},\"transfer\":{\"name\":\"Transfer\"},\"globalaccelerator\":{\"name\":\"GlobalAccelerator\"},\"comprehendmedical\":{\"name\":\"ComprehendMedical\",\"cors\":true},\"kinesisanalyticsv2\":{\"name\":\"KinesisAnalyticsV2\"},\"mediaconnect\":{\"name\":\"MediaConnect\"},\"fsx\":{\"name\":\"FSx\"},\"securityhub\":{\"name\":\"SecurityHub\"},\"appmesh\":{\"name\":\"AppMesh\",\"versions\":[\"2018-10-01*\"]},\"licensemanager\":{\"prefix\":\"license-manager\",\"name\":\"LicenseManager\"},\"kafka\":{\"name\":\"Kafka\"},\"apigatewaymanagementapi\":{\"name\":\"ApiGatewayManagementApi\"},\"apigatewayv2\":{\"name\":\"ApiGatewayV2\"},\"docdb\":{\"name\":\"DocDB\"},\"backup\":{\"name\":\"Backup\"},\"worklink\":{\"name\":\"WorkLink\"},\"textract\":{\"name\":\"Textract\"},\"managedblockchain\":{\"name\":\"ManagedBlockchain\"},\"mediapackagevod\":{\"prefix\":\"mediapackage-vod\",\"name\":\"MediaPackageVod\"},\"groundstation\":{\"name\":\"GroundStation\"},\"iotthingsgraph\":{\"name\":\"IoTThingsGraph\"},\"iotevents\":{\"name\":\"IoTEvents\"},\"ioteventsdata\":{\"prefix\":\"iotevents-data\",\"name\":\"IoTEventsData\"},\"personalize\":{\"name\":\"Personalize\",\"cors\":true},\"personalizeevents\":{\"prefix\":\"personalize-events\",\"name\":\"PersonalizeEvents\",\"cors\":true},\"personalizeruntime\":{\"prefix\":\"personalize-runtime\",\"name\":\"PersonalizeRuntime\",\"cors\":true},\"applicationinsights\":{\"prefix\":\"application-insights\",\"name\":\"ApplicationInsights\"},\"servicequotas\":{\"prefix\":\"service-quotas\",\"name\":\"ServiceQuotas\"},\"ec2instanceconnect\":{\"prefix\":\"ec2-instance-connect\",\"name\":\"EC2InstanceConnect\"},\"eventbridge\":{\"name\":\"EventBridge\"},\"lakeformation\":{\"name\":\"LakeFormation\"},\"forecastservice\":{\"prefix\":\"forecast\",\"name\":\"ForecastService\",\"cors\":true},\"forecastqueryservice\":{\"prefix\":\"forecastquery\",\"name\":\"ForecastQueryService\",\"cors\":true},\"qldb\":{\"name\":\"QLDB\"},\"qldbsession\":{\"prefix\":\"qldb-session\",\"name\":\"QLDBSession\"},\"workmailmessageflow\":{\"name\":\"WorkMailMessageFlow\"},\"codestarnotifications\":{\"prefix\":\"codestar-notifications\",\"name\":\"CodeStarNotifications\"},\"savingsplans\":{\"name\":\"SavingsPlans\"},\"sso\":{\"name\":\"SSO\"},\"ssooidc\":{\"prefix\":\"sso-oidc\",\"name\":\"SSOOIDC\"},\"marketplacecatalog\":{\"prefix\":\"marketplace-catalog\",\"name\":\"MarketplaceCatalog\",\"cors\":true},\"dataexchange\":{\"name\":\"DataExchange\"},\"sesv2\":{\"name\":\"SESV2\"},\"migrationhubconfig\":{\"prefix\":\"migrationhub-config\",\"name\":\"MigrationHubConfig\"},\"connectparticipant\":{\"name\":\"ConnectParticipant\"},\"appconfig\":{\"name\":\"AppConfig\"},\"iotsecuretunneling\":{\"name\":\"IoTSecureTunneling\"},\"wafv2\":{\"name\":\"WAFV2\"},\"elasticinference\":{\"prefix\":\"elastic-inference\",\"name\":\"ElasticInference\"},\"imagebuilder\":{\"name\":\"Imagebuilder\"},\"schemas\":{\"name\":\"Schemas\"},\"accessanalyzer\":{\"name\":\"AccessAnalyzer\"},\"codegurureviewer\":{\"prefix\":\"codeguru-reviewer\",\"name\":\"CodeGuruReviewer\"},\"codeguruprofiler\":{\"name\":\"CodeGuruProfiler\"},\"computeoptimizer\":{\"prefix\":\"compute-optimizer\",\"name\":\"ComputeOptimizer\"},\"frauddetector\":{\"name\":\"FraudDetector\"},\"kendra\":{\"name\":\"Kendra\"},\"networkmanager\":{\"name\":\"NetworkManager\"},\"outposts\":{\"name\":\"Outposts\"},\"augmentedairuntime\":{\"prefix\":\"sagemaker-a2i-runtime\",\"name\":\"AugmentedAIRuntime\"},\"ebs\":{\"name\":\"EBS\"},\"kinesisvideosignalingchannels\":{\"prefix\":\"kinesis-video-signaling\",\"name\":\"KinesisVideoSignalingChannels\",\"cors\":true},\"detective\":{\"name\":\"Detective\"},\"codestarconnections\":{\"prefix\":\"codestar-connections\",\"name\":\"CodeStarconnections\"},\"synthetics\":{\"name\":\"Synthetics\"},\"iotsitewise\":{\"name\":\"IoTSiteWise\"},\"macie2\":{\"name\":\"Macie2\"},\"codeartifact\":{\"name\":\"CodeArtifact\"},\"ivs\":{\"name\":\"IVS\"},\"braket\":{\"name\":\"Braket\"},\"identitystore\":{\"name\":\"IdentityStore\"},\"appflow\":{\"name\":\"Appflow\"},\"redshiftdata\":{\"prefix\":\"redshift-data\",\"name\":\"RedshiftData\"},\"ssoadmin\":{\"prefix\":\"sso-admin\",\"name\":\"SSOAdmin\"},\"timestreamquery\":{\"prefix\":\"timestream-query\",\"name\":\"TimestreamQuery\"},\"timestreamwrite\":{\"prefix\":\"timestream-write\",\"name\":\"TimestreamWrite\"},\"s3outposts\":{\"name\":\"S3Outposts\"},\"databrew\":{\"name\":\"DataBrew\"},\"servicecatalogappregistry\":{\"prefix\":\"servicecatalog-appregistry\",\"name\":\"ServiceCatalogAppRegistry\"},\"networkfirewall\":{\"prefix\":\"network-firewall\",\"name\":\"NetworkFirewall\"},\"mwaa\":{\"name\":\"MWAA\"},\"amplifybackend\":{\"name\":\"AmplifyBackend\"},\"appintegrations\":{\"name\":\"AppIntegrations\"},\"connectcontactlens\":{\"prefix\":\"connect-contact-lens\",\"name\":\"ConnectContactLens\"},\"devopsguru\":{\"prefix\":\"devops-guru\",\"name\":\"DevOpsGuru\"},\"ecrpublic\":{\"prefix\":\"ecr-public\",\"name\":\"ECRPUBLIC\"},\"lookoutvision\":{\"name\":\"LookoutVision\"},\"sagemakerfeaturestoreruntime\":{\"prefix\":\"sagemaker-featurestore-runtime\",\"name\":\"SageMakerFeatureStoreRuntime\"},\"customerprofiles\":{\"prefix\":\"customer-profiles\",\"name\":\"CustomerProfiles\"},\"auditmanager\":{\"name\":\"AuditManager\"},\"emrcontainers\":{\"prefix\":\"emr-containers\",\"name\":\"EMRcontainers\"},\"healthlake\":{\"name\":\"HealthLake\"},\"sagemakeredge\":{\"prefix\":\"sagemaker-edge\",\"name\":\"SagemakerEdge\"},\"amp\":{\"name\":\"Amp\",\"cors\":true},\"greengrassv2\":{\"name\":\"GreengrassV2\"},\"iotdeviceadvisor\":{\"name\":\"IotDeviceAdvisor\"},\"iotfleethub\":{\"name\":\"IoTFleetHub\"},\"iotwireless\":{\"name\":\"IoTWireless\"},\"location\":{\"name\":\"Location\",\"cors\":true},\"wellarchitected\":{\"name\":\"WellArchitected\"},\"lexmodelsv2\":{\"prefix\":\"models.lex.v2\",\"name\":\"LexModelsV2\"},\"lexruntimev2\":{\"prefix\":\"runtime.lex.v2\",\"name\":\"LexRuntimeV2\",\"cors\":true},\"fis\":{\"name\":\"Fis\"},\"lookoutmetrics\":{\"name\":\"LookoutMetrics\"},\"mgn\":{\"name\":\"Mgn\"},\"lookoutequipment\":{\"name\":\"LookoutEquipment\"},\"nimble\":{\"name\":\"Nimble\"},\"finspace\":{\"name\":\"Finspace\"},\"finspacedata\":{\"prefix\":\"finspace-data\",\"name\":\"Finspacedata\"},\"ssmcontacts\":{\"prefix\":\"ssm-contacts\",\"name\":\"SSMContacts\"},\"ssmincidents\":{\"prefix\":\"ssm-incidents\",\"name\":\"SSMIncidents\"},\"applicationcostprofiler\":{\"name\":\"ApplicationCostProfiler\"},\"apprunner\":{\"name\":\"AppRunner\"},\"proton\":{\"name\":\"Proton\"},\"route53recoverycluster\":{\"prefix\":\"route53-recovery-cluster\",\"name\":\"Route53RecoveryCluster\"},\"route53recoverycontrolconfig\":{\"prefix\":\"route53-recovery-control-config\",\"name\":\"Route53RecoveryControlConfig\"},\"route53recoveryreadiness\":{\"prefix\":\"route53-recovery-readiness\",\"name\":\"Route53RecoveryReadiness\"},\"chimesdkidentity\":{\"prefix\":\"chime-sdk-identity\",\"name\":\"ChimeSDKIdentity\"},\"chimesdkmessaging\":{\"prefix\":\"chime-sdk-messaging\",\"name\":\"ChimeSDKMessaging\"},\"snowdevicemanagement\":{\"prefix\":\"snow-device-management\",\"name\":\"SnowDeviceManagement\"},\"memorydb\":{\"name\":\"MemoryDB\"},\"opensearch\":{\"name\":\"OpenSearch\"},\"kafkaconnect\":{\"name\":\"KafkaConnect\"},\"voiceid\":{\"prefix\":\"voice-id\",\"name\":\"VoiceID\"},\"wisdom\":{\"name\":\"Wisdom\"},\"account\":{\"name\":\"Account\"},\"cloudcontrol\":{\"name\":\"CloudControl\"},\"grafana\":{\"name\":\"Grafana\"},\"panorama\":{\"name\":\"Panorama\"},\"chimesdkmeetings\":{\"prefix\":\"chime-sdk-meetings\",\"name\":\"ChimeSDKMeetings\"},\"resiliencehub\":{\"name\":\"Resiliencehub\"},\"migrationhubstrategy\":{\"name\":\"MigrationHubStrategy\"},\"appconfigdata\":{\"name\":\"AppConfigData\"},\"drs\":{\"name\":\"Drs\"},\"migrationhubrefactorspaces\":{\"prefix\":\"migration-hub-refactor-spaces\",\"name\":\"MigrationHubRefactorSpaces\"},\"evidently\":{\"name\":\"Evidently\"},\"inspector2\":{\"name\":\"Inspector2\"},\"rbin\":{\"name\":\"Rbin\"},\"rum\":{\"name\":\"RUM\"},\"backupgateway\":{\"prefix\":\"backup-gateway\",\"name\":\"BackupGateway\"},\"iottwinmaker\":{\"name\":\"IoTTwinMaker\"},\"workspacesweb\":{\"prefix\":\"workspaces-web\",\"name\":\"WorkSpacesWeb\"},\"amplifyuibuilder\":{\"name\":\"AmplifyUIBuilder\"},\"keyspaces\":{\"name\":\"Keyspaces\"},\"billingconductor\":{\"name\":\"Billingconductor\"},\"pinpointsmsvoicev2\":{\"prefix\":\"pinpoint-sms-voice-v2\",\"name\":\"PinpointSMSVoiceV2\"},\"ivschat\":{\"name\":\"Ivschat\"},\"chimesdkmediapipelines\":{\"prefix\":\"chime-sdk-media-pipelines\",\"name\":\"ChimeSDKMediaPipelines\"},\"emrserverless\":{\"prefix\":\"emr-serverless\",\"name\":\"EMRServerless\"},\"m2\":{\"name\":\"M2\"},\"connectcampaigns\":{\"name\":\"ConnectCampaigns\"},\"redshiftserverless\":{\"prefix\":\"redshift-serverless\",\"name\":\"RedshiftServerless\"},\"rolesanywhere\":{\"name\":\"RolesAnywhere\"},\"licensemanagerusersubscriptions\":{\"prefix\":\"license-manager-user-subscriptions\",\"name\":\"LicenseManagerUserSubscriptions\"},\"privatenetworks\":{\"name\":\"PrivateNetworks\"},\"supportapp\":{\"prefix\":\"support-app\",\"name\":\"SupportApp\"},\"controltower\":{\"name\":\"ControlTower\"},\"iotfleetwise\":{\"name\":\"IoTFleetWise\"},\"migrationhuborchestrator\":{\"name\":\"MigrationHubOrchestrator\"},\"connectcases\":{\"name\":\"ConnectCases\"},\"resourceexplorer2\":{\"prefix\":\"resource-explorer-2\",\"name\":\"ResourceExplorer2\"},\"scheduler\":{\"name\":\"Scheduler\"},\"chimesdkvoice\":{\"prefix\":\"chime-sdk-voice\",\"name\":\"ChimeSDKVoice\"},\"ssmsap\":{\"prefix\":\"ssm-sap\",\"name\":\"SsmSap\"},\"oam\":{\"name\":\"OAM\"},\"arczonalshift\":{\"prefix\":\"arc-zonal-shift\",\"name\":\"ARCZonalShift\"},\"omics\":{\"name\":\"Omics\"},\"opensearchserverless\":{\"name\":\"OpenSearchServerless\"},\"securitylake\":{\"name\":\"SecurityLake\"},\"simspaceweaver\":{\"name\":\"SimSpaceWeaver\"},\"docdbelastic\":{\"prefix\":\"docdb-elastic\",\"name\":\"DocDBElastic\"},\"sagemakergeospatial\":{\"prefix\":\"sagemaker-geospatial\",\"name\":\"SageMakerGeospatial\"},\"codecatalyst\":{\"name\":\"CodeCatalyst\"},\"pipes\":{\"name\":\"Pipes\"},\"sagemakermetrics\":{\"prefix\":\"sagemaker-metrics\",\"name\":\"SageMakerMetrics\"},\"kinesisvideowebrtcstorage\":{\"prefix\":\"kinesis-video-webrtc-storage\",\"name\":\"KinesisVideoWebRTCStorage\"},\"licensemanagerlinuxsubscriptions\":{\"prefix\":\"license-manager-linux-subscriptions\",\"name\":\"LicenseManagerLinuxSubscriptions\"},\"kendraranking\":{\"prefix\":\"kendra-ranking\",\"name\":\"KendraRanking\"},\"cleanrooms\":{\"name\":\"CleanRooms\"},\"cloudtraildata\":{\"prefix\":\"cloudtrail-data\",\"name\":\"CloudTrailData\"},\"tnb\":{\"name\":\"Tnb\"},\"internetmonitor\":{\"name\":\"InternetMonitor\"},\"ivsrealtime\":{\"prefix\":\"ivs-realtime\",\"name\":\"IVSRealTime\"},\"vpclattice\":{\"prefix\":\"vpc-lattice\",\"name\":\"VPCLattice\"},\"osis\":{\"name\":\"OSIS\"},\"mediapackagev2\":{\"name\":\"MediaPackageV2\"},\"paymentcryptography\":{\"prefix\":\"payment-cryptography\",\"name\":\"PaymentCryptography\"},\"paymentcryptographydata\":{\"prefix\":\"payment-cryptography-data\",\"name\":\"PaymentCryptographyData\"},\"codegurusecurity\":{\"prefix\":\"codeguru-security\",\"name\":\"CodeGuruSecurity\"},\"verifiedpermissions\":{\"name\":\"VerifiedPermissions\"},\"appfabric\":{\"name\":\"AppFabric\"},\"medicalimaging\":{\"prefix\":\"medical-imaging\",\"name\":\"MedicalImaging\"},\"entityresolution\":{\"name\":\"EntityResolution\"},\"managedblockchainquery\":{\"prefix\":\"managedblockchain-query\",\"name\":\"ManagedBlockchainQuery\"},\"neptunedata\":{\"name\":\"Neptunedata\"},\"pcaconnectorad\":{\"prefix\":\"pca-connector-ad\",\"name\":\"PcaConnectorAd\"},\"bedrock\":{\"name\":\"Bedrock\"},\"bedrockruntime\":{\"prefix\":\"bedrock-runtime\",\"name\":\"BedrockRuntime\"},\"datazone\":{\"name\":\"DataZone\"},\"launchwizard\":{\"prefix\":\"launch-wizard\",\"name\":\"LaunchWizard\"},\"trustedadvisor\":{\"name\":\"TrustedAdvisor\"},\"inspectorscan\":{\"prefix\":\"inspector-scan\",\"name\":\"InspectorScan\"},\"bcmdataexports\":{\"prefix\":\"bcm-data-exports\",\"name\":\"BCMDataExports\"},\"costoptimizationhub\":{\"prefix\":\"cost-optimization-hub\",\"name\":\"CostOptimizationHub\"},\"eksauth\":{\"prefix\":\"eks-auth\",\"name\":\"EKSAuth\"},\"freetier\":{\"name\":\"FreeTier\"},\"repostspace\":{\"name\":\"Repostspace\"},\"workspacesthinclient\":{\"prefix\":\"workspaces-thin-client\",\"name\":\"WorkSpacesThinClient\"},\"b2bi\":{\"name\":\"B2bi\"},\"bedrockagent\":{\"prefix\":\"bedrock-agent\",\"name\":\"BedrockAgent\"},\"bedrockagentruntime\":{\"prefix\":\"bedrock-agent-runtime\",\"name\":\"BedrockAgentRuntime\"},\"qbusiness\":{\"name\":\"QBusiness\"},\"qconnect\":{\"name\":\"QConnect\"},\"cleanroomsml\":{\"name\":\"CleanRoomsML\"},\"marketplaceagreement\":{\"prefix\":\"marketplace-agreement\",\"name\":\"MarketplaceAgreement\"},\"marketplacedeployment\":{\"prefix\":\"marketplace-deployment\",\"name\":\"MarketplaceDeployment\"},\"networkmonitor\":{\"name\":\"NetworkMonitor\"},\"supplychain\":{\"name\":\"SupplyChain\"},\"artifact\":{\"name\":\"Artifact\"},\"chatbot\":{\"name\":\"Chatbot\"},\"timestreaminfluxdb\":{\"prefix\":\"timestream-influxdb\",\"name\":\"TimestreamInfluxDB\"},\"codeconnections\":{\"name\":\"CodeConnections\"},\"deadline\":{\"name\":\"Deadline\"},\"controlcatalog\":{\"name\":\"ControlCatalog\"},\"route53profiles\":{\"name\":\"Route53Profiles\"},\"mailmanager\":{\"name\":\"MailManager\"},\"taxsettings\":{\"name\":\"TaxSettings\"},\"applicationsignals\":{\"prefix\":\"application-signals\",\"name\":\"ApplicationSignals\"},\"pcaconnectorscep\":{\"prefix\":\"pca-connector-scep\",\"name\":\"PcaConnectorScep\"},\"apptest\":{\"name\":\"AppTest\"},\"qapps\":{\"name\":\"QApps\"},\"ssmquicksetup\":{\"prefix\":\"ssm-quicksetup\",\"name\":\"SSMQuickSetup\"},\"pcs\":{\"name\":\"PCS\"}}");
 
 });
 
 
-parcelRegister("fLJGf", function(module, exports) {
-function $b7aeadf47a18a488$var$apiLoader(svc, version) {
-    if (!$b7aeadf47a18a488$var$apiLoader.services.hasOwnProperty(svc)) throw new Error('InvalidService: Failed to load api for ' + svc);
-    return $b7aeadf47a18a488$var$apiLoader.services[svc][version];
+parcelRegister("3EazJ", function(module, exports) {
+function $2a7d4f95ecf39c01$var$apiLoader(svc, version) {
+    if (!$2a7d4f95ecf39c01$var$apiLoader.services.hasOwnProperty(svc)) throw new Error('InvalidService: Failed to load api for ' + svc);
+    return $2a7d4f95ecf39c01$var$apiLoader.services[svc][version];
 }
 /**
  * @api private
  *
  * This member of AWS.apiLoader is private, but changing it will necessitate a
  * change to ../scripts/services-table-generator.ts
- */ $b7aeadf47a18a488$var$apiLoader.services = {};
+ */ $2a7d4f95ecf39c01$var$apiLoader.services = {};
 /**
  * @api private
- */ module.exports = $b7aeadf47a18a488$var$apiLoader;
+ */ module.exports = $2a7d4f95ecf39c01$var$apiLoader;
 
 });
 
-parcelRegister("honyy", function(module, exports) {
+parcelRegister("iyMfr", function(module, exports) {
 "use strict";
 Object.defineProperty(module.exports, "__esModule", {
     value: true
 });
 
-var $1sBiS = parcelRequire("1sBiS");
-var $ca96f3563c5b3f20$var$CACHE_SIZE = 1000;
+var $1yqdW = parcelRequire("1yqdW");
+var $d830d40d7f66f765$var$CACHE_SIZE = 1000;
 /**
  * Inspired node-lru-cache[https://github.com/isaacs/node-lru-cache]
- */ var $ca96f3563c5b3f20$var$EndpointCache = /** @class */ function() {
+ */ var $d830d40d7f66f765$var$EndpointCache = /** @class */ function() {
     function EndpointCache(maxSize) {
-        if (maxSize === void 0) maxSize = $ca96f3563c5b3f20$var$CACHE_SIZE;
+        if (maxSize === void 0) maxSize = $d830d40d7f66f765$var$CACHE_SIZE;
         this.maxSize = maxSize;
-        this.cache = new $1sBiS.LRUCache(maxSize);
+        this.cache = new $1yqdW.LRUCache(maxSize);
     }
     Object.defineProperty(EndpointCache.prototype, "size", {
         get: function() {
@@ -2770,22 +2770,22 @@ var $ca96f3563c5b3f20$var$CACHE_SIZE = 1000;
     };
     return EndpointCache;
 }();
-module.exports.EndpointCache = $ca96f3563c5b3f20$var$EndpointCache;
+module.exports.EndpointCache = $d830d40d7f66f765$var$EndpointCache;
 
 });
-parcelRegister("1sBiS", function(module, exports) {
+parcelRegister("1yqdW", function(module, exports) {
 "use strict";
 Object.defineProperty(module.exports, "__esModule", {
     value: true
 });
-var $110557acadf5cb7c$var$LinkedListNode = /** @class */ function() {
+var $121d4ef4276730ab$var$LinkedListNode = /** @class */ function() {
     function LinkedListNode(key, value) {
         this.key = key;
         this.value = value;
     }
     return LinkedListNode;
 }();
-var $110557acadf5cb7c$var$LRUCache = /** @class */ function() {
+var $121d4ef4276730ab$var$LRUCache = /** @class */ function() {
     function LRUCache(size) {
         this.nodeMap = {};
         this.size = 0;
@@ -2849,7 +2849,7 @@ var $110557acadf5cb7c$var$LRUCache = /** @class */ function() {
             var key_1 = tailNode.key;
             delete this.nodeMap[key_1];
         }
-        var newNode = new $110557acadf5cb7c$var$LinkedListNode(key, value);
+        var newNode = new $121d4ef4276730ab$var$LinkedListNode(key, value);
         this.nodeMap[key] = newNode;
         this.prependToList(newNode);
     };
@@ -2864,14 +2864,14 @@ var $110557acadf5cb7c$var$LRUCache = /** @class */ function() {
     };
     return LRUCache;
 }();
-module.exports.LRUCache = $110557acadf5cb7c$var$LRUCache;
+module.exports.LRUCache = $121d4ef4276730ab$var$LRUCache;
 
 });
 
 
-parcelRegister("jgM9D", function(module, exports) {
+parcelRegister("hYb9G", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * @api private
  * @!method on(eventName, callback)
@@ -2884,7 +2884,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @param toHead [Boolean] attach the listener callback to the head of callback array if set to true.
  *     Default to be false.
  *   @return [AWS.SequentialExecutor] the same object for chaining
- */ $1TgFO.SequentialExecutor = $1TgFO.util.inherit({
+ */ $3ty2n.SequentialExecutor = $3ty2n.util.inherit({
     constructor: function SequentialExecutor() {
         this._events = {};
     },
@@ -2935,7 +2935,7 @@ var $1TgFO = parcelRequire("1TgFO");
         var error = prevError || null;
         function callNextListener(err) {
             if (err) {
-                error = $1TgFO.util.error(error || new Error(), err);
+                error = $3ty2n.util.error(error || new Error(), err);
                 if (self._haltHandlersOnError) return doneCallback.call(self, error);
             }
             self.callListeners(listeners, args, doneCallback, error);
@@ -2951,7 +2951,7 @@ var $1TgFO = parcelRequire("1TgFO");
                 try {
                     listener.apply(self, args);
                 } catch (err) {
-                    error = $1TgFO.util.error(error || new Error(), err);
+                    error = $3ty2n.util.error(error || new Error(), err);
                 }
                 if (error && self._haltHandlersOnError) {
                     doneCallback.call(self, error);
@@ -2988,11 +2988,11 @@ var $1TgFO = parcelRequire("1TgFO");
         var self = this;
         // extract listeners if parameter is an SequentialExecutor object
         if (listeners._events) listeners = listeners._events;
-        $1TgFO.util.each(listeners, function(event, callbacks) {
+        $3ty2n.util.each(listeners, function(event, callbacks) {
             if (typeof callbacks === 'function') callbacks = [
                 callbacks
             ];
-            $1TgFO.util.arrayEach(callbacks, function(callback) {
+            $3ty2n.util.arrayEach(callbacks, function(callback) {
                 self.on(event, callback);
             });
         });
@@ -3059,24 +3059,24 @@ var $1TgFO = parcelRequire("1TgFO");
 /**
  * {on} is the prefered method.
  * @api private
- */ $1TgFO.SequentialExecutor.prototype.addListener = $1TgFO.SequentialExecutor.prototype.on;
+ */ $3ty2n.SequentialExecutor.prototype.addListener = $3ty2n.SequentialExecutor.prototype.on;
 /**
  * @api private
- */ module.exports = $1TgFO.SequentialExecutor;
+ */ module.exports = $3ty2n.SequentialExecutor;
 
 });
 
-parcelRegister("04lg1", function(module, exports) {
+parcelRegister("65VGS", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $byTzF = parcelRequire("byTzF");
+var $kmlFA = parcelRequire("kmlFA");
 
-var $fj1SR = parcelRequire("fj1SR");
-var $00d0dd1a5f3fe748$var$inherit = $1TgFO.util.inherit;
-var $00d0dd1a5f3fe748$var$clientCount = 0;
+var $aVaZq = parcelRequire("aVaZq");
+var $46fff5d46def3ea7$var$inherit = $3ty2n.util.inherit;
+var $46fff5d46def3ea7$var$clientCount = 0;
 
-var $dlQvn = parcelRequire("dlQvn");
+var $hTkKp = parcelRequire("hTkKp");
 /**
  * The service class representing an AWS service.
  *
@@ -3085,27 +3085,27 @@ var $dlQvn = parcelRequire("dlQvn");
  * @!attribute apiVersions
  *   @return [Array<String>] the list of API versions supported by this service.
  *   @readonly
- */ $1TgFO.Service = $00d0dd1a5f3fe748$var$inherit({
+ */ $3ty2n.Service = $46fff5d46def3ea7$var$inherit({
     /**
    * Create a new service object with a configuration object
    *
    * @param config [map] a map of configuration options
    */ constructor: function Service(config) {
-        if (!this.loadServiceClass) throw $1TgFO.util.error(new Error(), 'Service must be constructed with `new\' operator');
+        if (!this.loadServiceClass) throw $3ty2n.util.error(new Error(), 'Service must be constructed with `new\' operator');
         if (config) {
             if (config.region) {
                 var region = config.region;
-                if ($dlQvn.isFipsRegion(region)) {
-                    config.region = $dlQvn.getRealRegion(region);
+                if ($hTkKp.isFipsRegion(region)) {
+                    config.region = $hTkKp.getRealRegion(region);
                     config.useFipsEndpoint = true;
                 }
-                if ($dlQvn.isGlobalRegion(region)) config.region = $dlQvn.getRealRegion(region);
+                if ($hTkKp.isGlobalRegion(region)) config.region = $hTkKp.getRealRegion(region);
             }
             if (typeof config.useDualstack === 'boolean' && typeof config.useDualstackEndpoint !== 'boolean') config.useDualstackEndpoint = config.useDualstack;
         }
         var ServiceClass = this.loadServiceClass(config || {});
         if (ServiceClass) {
-            var originalConfig = $1TgFO.util.copy(config);
+            var originalConfig = $3ty2n.util.copy(config);
             var svc = new ServiceClass(config);
             Object.defineProperty(svc, '_originalConfig', {
                 get: function() {
@@ -3114,7 +3114,7 @@ var $dlQvn = parcelRequire("dlQvn");
                 enumerable: false,
                 configurable: true
             });
-            svc._clientId = ++$00d0dd1a5f3fe748$var$clientCount;
+            svc._clientId = ++$46fff5d46def3ea7$var$clientCount;
             return svc;
         }
         this.initialize(config);
@@ -3122,18 +3122,18 @@ var $dlQvn = parcelRequire("dlQvn");
     /**
    * @api private
    */ initialize: function initialize(config) {
-        var svcConfig = $1TgFO.config[this.serviceIdentifier];
-        this.config = new $1TgFO.Config($1TgFO.config);
+        var svcConfig = $3ty2n.config[this.serviceIdentifier];
+        this.config = new $3ty2n.Config($3ty2n.config);
         if (svcConfig) this.config.update(svcConfig, true);
         if (config) this.config.update(config, true);
         this.validateService();
-        if (!this.config.endpoint) $fj1SR.configureEndpoint(this);
+        if (!this.config.endpoint) $aVaZq.configureEndpoint(this);
         this.config.endpoint = this.endpointFromTemplate(this.config.endpoint);
         this.setEndpoint(this.config.endpoint);
         //enable attaching listeners to service client
-        $1TgFO.SequentialExecutor.call(this);
-        $1TgFO.Service.addDefaultMonitoringListeners(this);
-        if ((this.config.clientSideMonitoring || $1TgFO.Service._clientSideMonitoring) && this.publisher) {
+        $3ty2n.SequentialExecutor.call(this);
+        $3ty2n.Service.addDefaultMonitoringListeners(this);
+        if ((this.config.clientSideMonitoring || $3ty2n.Service._clientSideMonitoring) && this.publisher) {
             var publisher = this.publisher;
             this.addNamedListener('PUBLISH_API_CALL', 'apiCall', function PUBLISH_API_CALL(event) {
                 process.nextTick(function() {
@@ -3154,11 +3154,11 @@ var $dlQvn = parcelRequire("dlQvn");
    * @api private
    */ loadServiceClass: function loadServiceClass(serviceConfig) {
         var config = serviceConfig;
-        if (!$1TgFO.util.isEmpty(this.api)) return null;
-        else if (config.apiConfig) return $1TgFO.Service.defineServiceApi(this.constructor, config.apiConfig);
+        if (!$3ty2n.util.isEmpty(this.api)) return null;
+        else if (config.apiConfig) return $3ty2n.Service.defineServiceApi(this.constructor, config.apiConfig);
         else if (!this.constructor.services) return null;
         else {
-            config = new $1TgFO.Config($1TgFO.config);
+            config = new $3ty2n.Config($3ty2n.config);
             config.update(serviceConfig, true);
             var version = config.apiVersions[this.constructor.serviceIdentifier];
             version = version || config.apiVersion;
@@ -3169,7 +3169,7 @@ var $dlQvn = parcelRequire("dlQvn");
    * @api private
    */ getLatestServiceClass: function getLatestServiceClass(version) {
         version = this.getLatestServiceVersion(version);
-        if (this.constructor.services[version] === null) $1TgFO.Service.defineServiceApi(this.constructor, version);
+        if (this.constructor.services[version] === null) $3ty2n.Service.defineServiceApi(this.constructor, version);
         return this.constructor.services[version];
     },
     /**
@@ -3177,7 +3177,7 @@ var $dlQvn = parcelRequire("dlQvn");
    */ getLatestServiceVersion: function getLatestServiceVersion(version) {
         if (!this.constructor.services || this.constructor.services.length === 0) throw new Error('No services defined on ' + this.constructor.serviceIdentifier);
         if (!version) version = 'latest';
-        else if ($1TgFO.util.isType(version, Date)) version = $1TgFO.util.date.iso8601(version).split('T')[0];
+        else if ($3ty2n.util.isType(version, Date)) version = $3ty2n.util.date.iso8601(version).split('T')[0];
         if (Object.hasOwnProperty(this.constructor.services, version)) return version;
         var keys = Object.keys(this.constructor.services).sort();
         var selectedVersion = null;
@@ -3223,15 +3223,15 @@ var $dlQvn = parcelRequire("dlQvn");
         if (this.config.params) {
             var rules = this.api.operations[operation];
             if (rules) {
-                params = $1TgFO.util.copy(params);
-                $1TgFO.util.each(this.config.params, function(key, value) {
+                params = $3ty2n.util.copy(params);
+                $3ty2n.util.each(this.config.params, function(key, value) {
                     if (rules.input.members[key]) {
                         if (params[key] === undefined || params[key] === null) params[key] = value;
                     }
                 });
             }
         }
-        var request = new $1TgFO.Request(this, operation, params);
+        var request = new $3ty2n.Request(this, operation, params);
         this.addAllRequestListeners(request);
         this.attachMonitoringEmitter(request);
         if (callback) request.send(callback);
@@ -3276,22 +3276,22 @@ var $dlQvn = parcelRequire("dlQvn");
    *   @param data [Object] the de-serialized data returned from
    *     the request. Set to `null` if a request error occurs.
    */ waitFor: function waitFor(state, params, callback) {
-        var waiter = new $1TgFO.ResourceWaiter(this, state);
+        var waiter = new $3ty2n.ResourceWaiter(this, state);
         return waiter.wait(params, callback);
     },
     /**
    * @api private
    */ addAllRequestListeners: function addAllRequestListeners(request) {
         var list = [
-            $1TgFO.events,
-            $1TgFO.EventListeners.Core,
+            $3ty2n.events,
+            $3ty2n.EventListeners.Core,
             this.serviceInterface(),
-            $1TgFO.EventListeners.CorePost
+            $3ty2n.EventListeners.CorePost
         ];
         for(var i = 0; i < list.length; i++)if (list[i]) request.addListeners(list[i]);
         // disable parameter validation
-        if (!this.config.paramValidation) request.removeListener('validate', $1TgFO.EventListeners.Core.VALIDATE_PARAMETERS);
-        if (this.config.logger) request.addListeners($1TgFO.EventListeners.Logger);
+        if (!this.config.paramValidation) request.removeListener('validate', $3ty2n.EventListeners.Core.VALIDATE_PARAMETERS);
+        if (this.config.logger) request.addListeners($3ty2n.EventListeners.Logger);
         this.setupRequestListeners(request);
         // call prototype's customRequestHandler
         if (typeof this.constructor.prototype.customRequestHandler === 'function') this.constructor.prototype.customRequestHandler(request);
@@ -3383,17 +3383,17 @@ var $dlQvn = parcelRequire("dlQvn");
         var self = this;
         var addToHead = true;
         request.on('validate', function() {
-            callStartRealTime = $1TgFO.util.realClock.now();
+            callStartRealTime = $3ty2n.util.realClock.now();
             callTimestamp = Date.now();
         }, addToHead);
         request.on('sign', function() {
-            attemptStartRealTime = $1TgFO.util.realClock.now();
+            attemptStartRealTime = $3ty2n.util.realClock.now();
             attemptTimestamp = Date.now();
             region = request.httpRequest.region;
             attemptCount++;
         }, addToHead);
         request.on('validateResponse', function() {
-            attemptLatency = Math.round($1TgFO.util.realClock.now() - attemptStartRealTime);
+            attemptLatency = Math.round($3ty2n.util.realClock.now() - attemptStartRealTime);
         });
         request.addNamedListener('API_CALL_ATTEMPT', 'success', function API_CALL_ATTEMPT() {
             var apiAttemptEvent = self.apiAttemptEvent(request);
@@ -3408,7 +3408,7 @@ var $dlQvn = parcelRequire("dlQvn");
             var apiAttemptEvent = self.attemptFailEvent(request);
             apiAttemptEvent.Timestamp = attemptTimestamp;
             //attemptLatency may not be available if fail before response
-            attemptLatency = attemptLatency || Math.round($1TgFO.util.realClock.now() - attemptStartRealTime);
+            attemptLatency = attemptLatency || Math.round($3ty2n.util.realClock.now() - attemptStartRealTime);
             apiAttemptEvent.AttemptLatency = attemptLatency >= 0 ? attemptLatency : 0;
             apiAttemptEvent.Region = region;
             self.emit('apiCallAttempt', [
@@ -3420,7 +3420,7 @@ var $dlQvn = parcelRequire("dlQvn");
             apiCallEvent.AttemptCount = attemptCount;
             if (apiCallEvent.AttemptCount <= 0) return;
             apiCallEvent.Timestamp = callTimestamp;
-            var latency = Math.round($1TgFO.util.realClock.now() - callStartRealTime);
+            var latency = Math.round($3ty2n.util.realClock.now() - callStartRealTime);
             apiCallEvent.Latency = latency >= 0 ? latency : 0;
             var response = request.response;
             if (response.error && response.error.retryable && typeof response.retryCount === 'number' && typeof response.maxRetries === 'number' && response.retryCount >= response.maxRetries) apiCallEvent.MaxRetriesExceeded = 1;
@@ -3458,22 +3458,22 @@ var $dlQvn = parcelRequire("dlQvn");
         else if (authtype === 'v4' || authtype === 'v4-unsigned-body') version = 'v4';
         else if (authtype === 'bearer') version = 'bearer';
         else version = this.api.signatureVersion;
-        return $1TgFO.Signers.RequestSigner.getVersion(version);
+        return $3ty2n.Signers.RequestSigner.getVersion(version);
     },
     /**
    * @api private
    */ serviceInterface: function serviceInterface() {
         switch(this.api.protocol){
             case 'ec2':
-                return $1TgFO.EventListeners.Query;
+                return $3ty2n.EventListeners.Query;
             case 'query':
-                return $1TgFO.EventListeners.Query;
+                return $3ty2n.EventListeners.Query;
             case 'json':
-                return $1TgFO.EventListeners.Json;
+                return $3ty2n.EventListeners.Json;
             case 'rest-json':
-                return $1TgFO.EventListeners.RestJson;
+                return $3ty2n.EventListeners.RestJson;
             case 'rest-xml':
-                return $1TgFO.EventListeners.RestXml;
+                return $3ty2n.EventListeners.RestXml;
         }
         if (this.api.protocol) throw new Error('Invalid service `protocol\' ' + this.api.protocol + ' in API config');
     },
@@ -3494,7 +3494,7 @@ var $dlQvn = parcelRequire("dlQvn");
     /**
    * @api private
    */ retryDelays: function retryDelays(retryCount, err) {
-        return $1TgFO.util.calculateRetryDelay(retryCount, this.config.retryDelayOptions, err);
+        return $3ty2n.util.calculateRetryDelay(retryCount, this.config.retryDelayOptions, err);
     },
     /**
    * @api private
@@ -3585,7 +3585,7 @@ var $dlQvn = parcelRequire("dlQvn");
     /**
    * @api private
    */ setEndpoint: function setEndpoint(endpoint) {
-        this.endpoint = new $1TgFO.Endpoint(endpoint, this.config);
+        this.endpoint = new $3ty2n.Endpoint(endpoint, this.config);
     },
     /**
    * @api private
@@ -3594,20 +3594,20 @@ var $dlQvn = parcelRequire("dlQvn");
         if (!paginator) {
             if (throwException) {
                 var e = new Error();
-                throw $1TgFO.util.error(e, 'No pagination configuration for ' + operation);
+                throw $3ty2n.util.error(e, 'No pagination configuration for ' + operation);
             }
             return null;
         }
         return paginator;
     }
 });
-$1TgFO.util.update($1TgFO.Service, {
+$3ty2n.util.update($3ty2n.Service, {
     /**
    * Adds one method for each operation described in the api configuration
    *
    * @api private
    */ defineMethods: function defineMethods(svc) {
-        $1TgFO.util.each(svc.prototype.api.operations, function iterator(method) {
+        $3ty2n.util.each(svc.prototype.api.operations, function iterator(method) {
             if (svc.prototype[method]) return;
             var operation = svc.prototype.api.operations[method];
             if (operation.authtype === 'none') svc.prototype[method] = function(params, callback) {
@@ -3629,32 +3629,32 @@ $1TgFO.util.update($1TgFO.Service, {
    * @param features [Object] an object to attach to the prototype
    * @return [Class<Service>] the service class defined by this function.
    */ defineService: function defineService(serviceIdentifier, versions, features) {
-        $1TgFO.Service._serviceMap[serviceIdentifier] = true;
+        $3ty2n.Service._serviceMap[serviceIdentifier] = true;
         if (!Array.isArray(versions)) {
             features = versions;
             versions = [];
         }
-        var svc = $00d0dd1a5f3fe748$var$inherit($1TgFO.Service, features || {});
+        var svc = $46fff5d46def3ea7$var$inherit($3ty2n.Service, features || {});
         if (typeof serviceIdentifier === 'string') {
-            $1TgFO.Service.addVersions(svc, versions);
+            $3ty2n.Service.addVersions(svc, versions);
             var identifier = svc.serviceIdentifier || serviceIdentifier;
             svc.serviceIdentifier = identifier;
         } else {
             svc.prototype.api = serviceIdentifier;
-            $1TgFO.Service.defineMethods(svc);
+            $3ty2n.Service.defineMethods(svc);
         }
-        $1TgFO.SequentialExecutor.call(this.prototype);
+        $3ty2n.SequentialExecutor.call(this.prototype);
         //util.clientSideMonitoring is only available in node
-        if (!this.prototype.publisher && $1TgFO.util.clientSideMonitoring) {
-            var Publisher = $1TgFO.util.clientSideMonitoring.Publisher;
-            var configProvider = $1TgFO.util.clientSideMonitoring.configProvider;
+        if (!this.prototype.publisher && $3ty2n.util.clientSideMonitoring) {
+            var Publisher = $3ty2n.util.clientSideMonitoring.Publisher;
+            var configProvider = $3ty2n.util.clientSideMonitoring.configProvider;
             var publisherConfig = configProvider();
             this.prototype.publisher = new Publisher(publisherConfig);
             if (publisherConfig.enabled) //if csm is enabled in environment, SDK should send all metrics
-            $1TgFO.Service._clientSideMonitoring = true;
+            $3ty2n.Service._clientSideMonitoring = true;
         }
-        $1TgFO.SequentialExecutor.call(svc.prototype);
-        $1TgFO.Service.addDefaultMonitoringListeners(svc.prototype);
+        $3ty2n.SequentialExecutor.call(svc.prototype);
+        $3ty2n.Service.addDefaultMonitoringListeners(svc.prototype);
         return svc;
     },
     /**
@@ -3670,34 +3670,34 @@ $1TgFO.util.update($1TgFO.Service, {
     /**
    * @api private
    */ defineServiceApi: function defineServiceApi(superclass, version, apiConfig) {
-        var svc = $00d0dd1a5f3fe748$var$inherit(superclass, {
+        var svc = $46fff5d46def3ea7$var$inherit(superclass, {
             serviceIdentifier: superclass.serviceIdentifier
         });
         function setApi(api) {
             if (api.isApi) svc.prototype.api = api;
-            else svc.prototype.api = new $byTzF(api, {
+            else svc.prototype.api = new $kmlFA(api, {
                 serviceIdentifier: superclass.serviceIdentifier
             });
         }
         if (typeof version === 'string') {
             if (apiConfig) setApi(apiConfig);
             else try {
-                setApi($1TgFO.apiLoader(superclass.serviceIdentifier, version));
+                setApi($3ty2n.apiLoader(superclass.serviceIdentifier, version));
             } catch (err) {
-                throw $1TgFO.util.error(err, {
+                throw $3ty2n.util.error(err, {
                     message: 'Could not find API configuration ' + superclass.serviceIdentifier + '-' + version
                 });
             }
             if (!Object.prototype.hasOwnProperty.call(superclass.services, version)) superclass.apiVersions = superclass.apiVersions.concat(version).sort();
             superclass.services[version] = svc;
         } else setApi(version);
-        $1TgFO.Service.defineMethods(svc);
+        $3ty2n.Service.defineMethods(svc);
         return svc;
     },
     /**
    * @api private
    */ hasService: function(identifier) {
-        return Object.prototype.hasOwnProperty.call($1TgFO.Service._serviceMap, identifier);
+        return Object.prototype.hasOwnProperty.call($3ty2n.Service._serviceMap, identifier);
     },
     /**
    * @param attachOn attach default monitoring listeners to object
@@ -3724,26 +3724,26 @@ $1TgFO.util.update($1TgFO.Service, {
    * @api private
    */ _serviceMap: {}
 });
-$1TgFO.util.mixin($1TgFO.Service, $1TgFO.SequentialExecutor);
+$3ty2n.util.mixin($3ty2n.Service, $3ty2n.SequentialExecutor);
 /**
  * @api private
- */ module.exports = $1TgFO.Service;
+ */ module.exports = $3ty2n.Service;
 
 });
-parcelRegister("fj1SR", function(module, exports) {
+parcelRegister("aVaZq", function(module, exports) {
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $bNcTB = parcelRequire("bNcTB");
-function $b24a1773a6691596$var$generateRegionPrefix(region) {
+var $5wdAU = parcelRequire("5wdAU");
+function $7f37c09853f63cf5$var$generateRegionPrefix(region) {
     if (!region) return null;
     var parts = region.split('-');
     if (parts.length < 3) return null;
     return parts.slice(0, parts.length - 2).join('-') + '-*';
 }
-function $b24a1773a6691596$var$derivedKeys(service) {
+function $7f37c09853f63cf5$var$derivedKeys(service) {
     var region = service.config.region;
-    var regionPrefix = $b24a1773a6691596$var$generateRegionPrefix(region);
+    var regionPrefix = $7f37c09853f63cf5$var$generateRegionPrefix(region);
     var endpointPrefix = service.api.endpointPrefix;
     return [
         [
@@ -3778,23 +3778,23 @@ function $b24a1773a6691596$var$derivedKeys(service) {
         return item[0] && item[1] ? item.join('/') : null;
     });
 }
-function $b24a1773a6691596$var$applyConfig(service, config) {
-    $jfMGq.each(config, function(key, value) {
+function $7f37c09853f63cf5$var$applyConfig(service, config) {
+    $KHT0q.each(config, function(key, value) {
         if (key === 'globalEndpoint') return;
         if (service.config[key] === undefined || service.config[key] === null) service.config[key] = value;
     });
 }
-function $b24a1773a6691596$var$configureEndpoint(service) {
-    var keys = $b24a1773a6691596$var$derivedKeys(service);
+function $7f37c09853f63cf5$var$configureEndpoint(service) {
+    var keys = $7f37c09853f63cf5$var$derivedKeys(service);
     var useFipsEndpoint = service.config.useFipsEndpoint;
     var useDualstackEndpoint = service.config.useDualstackEndpoint;
     for(var i = 0; i < keys.length; i++){
         var key = keys[i];
         if (!key) continue;
-        var rules = useFipsEndpoint ? useDualstackEndpoint ? $bNcTB.dualstackFipsRules : $bNcTB.fipsRules : useDualstackEndpoint ? $bNcTB.dualstackRules : $bNcTB.rules;
+        var rules = useFipsEndpoint ? useDualstackEndpoint ? $5wdAU.dualstackFipsRules : $5wdAU.fipsRules : useDualstackEndpoint ? $5wdAU.dualstackRules : $5wdAU.rules;
         if (Object.prototype.hasOwnProperty.call(rules, key)) {
             var config = rules[key];
-            if (typeof config === 'string') config = $bNcTB.patterns[config];
+            if (typeof config === 'string') config = $5wdAU.patterns[config];
             // set global endpoint
             service.isGlobalEndpoint = !!config.globalEndpoint;
             if (config.signingRegion) service.signingRegion = config.signingRegion;
@@ -3805,14 +3805,14 @@ function $b24a1773a6691596$var$configureEndpoint(service) {
             config.signatureVersion = 'v4';
             var useBearer = (service.api && service.api.signatureVersion) === 'bearer';
             // merge config
-            $b24a1773a6691596$var$applyConfig(service, Object.assign({}, config, {
+            $7f37c09853f63cf5$var$applyConfig(service, Object.assign({}, config, {
                 signatureVersion: useBearer ? 'bearer' : config.signatureVersion
             }));
             return;
         }
     }
 }
-function $b24a1773a6691596$var$getEndpointSuffix(region) {
+function $7f37c09853f63cf5$var$getEndpointSuffix(region) {
     var regionRegexes = {
         '^(us|eu|ap|sa|ca|me)\\-\\w+\\-\\d+$': 'amazonaws.com',
         '^cn\\-\\w+\\-\\d+$': 'amazonaws.com.cn',
@@ -3834,28 +3834,28 @@ function $b24a1773a6691596$var$getEndpointSuffix(region) {
 /**
  * @api private
  */ module.exports = {
-    configureEndpoint: $b24a1773a6691596$var$configureEndpoint,
-    getEndpointSuffix: $b24a1773a6691596$var$getEndpointSuffix
+    configureEndpoint: $7f37c09853f63cf5$var$configureEndpoint,
+    getEndpointSuffix: $7f37c09853f63cf5$var$getEndpointSuffix
 };
 
 });
-parcelRegister("bNcTB", function(module, exports) {
+parcelRegister("5wdAU", function(module, exports) {
 module.exports = JSON.parse("{\"rules\":{\"*/*\":{\"endpoint\":\"{service}.{region}.amazonaws.com\"},\"cn-*/*\":{\"endpoint\":\"{service}.{region}.amazonaws.com.cn\"},\"eu-isoe-*/*\":\"euIsoe\",\"us-iso-*/*\":\"usIso\",\"us-isob-*/*\":\"usIsob\",\"us-isof-*/*\":\"usIsof\",\"*/budgets\":\"globalSSL\",\"*/cloudfront\":\"globalSSL\",\"*/sts\":\"globalSSL\",\"*/importexport\":{\"endpoint\":\"{service}.amazonaws.com\",\"signatureVersion\":\"v2\",\"globalEndpoint\":true},\"*/route53\":\"globalSSL\",\"cn-*/route53\":{\"endpoint\":\"{service}.amazonaws.com.cn\",\"globalEndpoint\":true,\"signingRegion\":\"cn-northwest-1\"},\"us-gov-*/route53\":\"globalGovCloud\",\"us-iso-*/route53\":{\"endpoint\":\"{service}.c2s.ic.gov\",\"globalEndpoint\":true,\"signingRegion\":\"us-iso-east-1\"},\"us-isob-*/route53\":{\"endpoint\":\"{service}.sc2s.sgov.gov\",\"globalEndpoint\":true,\"signingRegion\":\"us-isob-east-1\"},\"us-isof-*/route53\":\"globalUsIsof\",\"eu-isoe-*/route53\":\"globalEuIsoe\",\"*/waf\":\"globalSSL\",\"*/iam\":\"globalSSL\",\"cn-*/iam\":{\"endpoint\":\"{service}.cn-north-1.amazonaws.com.cn\",\"globalEndpoint\":true,\"signingRegion\":\"cn-north-1\"},\"us-iso-*/iam\":{\"endpoint\":\"{service}.us-iso-east-1.c2s.ic.gov\",\"globalEndpoint\":true,\"signingRegion\":\"us-iso-east-1\"},\"us-gov-*/iam\":\"globalGovCloud\",\"*/ce\":{\"endpoint\":\"{service}.us-east-1.amazonaws.com\",\"globalEndpoint\":true,\"signingRegion\":\"us-east-1\"},\"cn-*/ce\":{\"endpoint\":\"{service}.cn-northwest-1.amazonaws.com.cn\",\"globalEndpoint\":true,\"signingRegion\":\"cn-northwest-1\"},\"us-gov-*/sts\":{\"endpoint\":\"{service}.{region}.amazonaws.com\"},\"us-gov-west-1/s3\":\"s3signature\",\"us-west-1/s3\":\"s3signature\",\"us-west-2/s3\":\"s3signature\",\"eu-west-1/s3\":\"s3signature\",\"ap-southeast-1/s3\":\"s3signature\",\"ap-southeast-2/s3\":\"s3signature\",\"ap-northeast-1/s3\":\"s3signature\",\"sa-east-1/s3\":\"s3signature\",\"us-east-1/s3\":{\"endpoint\":\"{service}.amazonaws.com\",\"signatureVersion\":\"s3\"},\"us-east-1/sdb\":{\"endpoint\":\"{service}.amazonaws.com\",\"signatureVersion\":\"v2\"},\"*/sdb\":{\"endpoint\":\"{service}.{region}.amazonaws.com\",\"signatureVersion\":\"v2\"},\"*/resource-explorer-2\":\"dualstackByDefault\",\"*/kendra-ranking\":\"dualstackByDefault\",\"*/internetmonitor\":\"dualstackByDefault\",\"*/codecatalyst\":\"globalDualstackByDefault\"},\"fipsRules\":{\"*/*\":\"fipsStandard\",\"us-gov-*/*\":\"fipsStandard\",\"us-iso-*/*\":{\"endpoint\":\"{service}-fips.{region}.c2s.ic.gov\"},\"us-iso-*/dms\":\"usIso\",\"us-isob-*/*\":{\"endpoint\":\"{service}-fips.{region}.sc2s.sgov.gov\"},\"us-isob-*/dms\":\"usIsob\",\"cn-*/*\":{\"endpoint\":\"{service}-fips.{region}.amazonaws.com.cn\"},\"*/api.ecr\":\"fips.api.ecr\",\"*/api.sagemaker\":\"fips.api.sagemaker\",\"*/batch\":\"fipsDotPrefix\",\"*/eks\":\"fipsDotPrefix\",\"*/models.lex\":\"fips.models.lex\",\"*/runtime.lex\":\"fips.runtime.lex\",\"*/runtime.sagemaker\":{\"endpoint\":\"runtime-fips.sagemaker.{region}.amazonaws.com\"},\"*/iam\":\"fipsWithoutRegion\",\"*/route53\":\"fipsWithoutRegion\",\"*/transcribe\":\"fipsDotPrefix\",\"*/waf\":\"fipsWithoutRegion\",\"us-gov-*/transcribe\":\"fipsDotPrefix\",\"us-gov-*/api.ecr\":\"fips.api.ecr\",\"us-gov-*/models.lex\":\"fips.models.lex\",\"us-gov-*/runtime.lex\":\"fips.runtime.lex\",\"us-gov-*/access-analyzer\":\"fipsWithServiceOnly\",\"us-gov-*/acm\":\"fipsWithServiceOnly\",\"us-gov-*/acm-pca\":\"fipsWithServiceOnly\",\"us-gov-*/api.sagemaker\":\"fipsWithServiceOnly\",\"us-gov-*/appconfig\":\"fipsWithServiceOnly\",\"us-gov-*/application-autoscaling\":\"fipsWithServiceOnly\",\"us-gov-*/autoscaling\":\"fipsWithServiceOnly\",\"us-gov-*/autoscaling-plans\":\"fipsWithServiceOnly\",\"us-gov-*/batch\":\"fipsWithServiceOnly\",\"us-gov-*/cassandra\":\"fipsWithServiceOnly\",\"us-gov-*/clouddirectory\":\"fipsWithServiceOnly\",\"us-gov-*/cloudformation\":\"fipsWithServiceOnly\",\"us-gov-*/cloudshell\":\"fipsWithServiceOnly\",\"us-gov-*/cloudtrail\":\"fipsWithServiceOnly\",\"us-gov-*/config\":\"fipsWithServiceOnly\",\"us-gov-*/connect\":\"fipsWithServiceOnly\",\"us-gov-*/databrew\":\"fipsWithServiceOnly\",\"us-gov-*/dlm\":\"fipsWithServiceOnly\",\"us-gov-*/dms\":\"fipsWithServiceOnly\",\"us-gov-*/dynamodb\":\"fipsWithServiceOnly\",\"us-gov-*/ec2\":\"fipsWithServiceOnly\",\"us-gov-*/eks\":\"fipsWithServiceOnly\",\"us-gov-*/elasticache\":\"fipsWithServiceOnly\",\"us-gov-*/elasticbeanstalk\":\"fipsWithServiceOnly\",\"us-gov-*/elasticloadbalancing\":\"fipsWithServiceOnly\",\"us-gov-*/elasticmapreduce\":\"fipsWithServiceOnly\",\"us-gov-*/events\":\"fipsWithServiceOnly\",\"us-gov-*/fis\":\"fipsWithServiceOnly\",\"us-gov-*/glacier\":\"fipsWithServiceOnly\",\"us-gov-*/greengrass\":\"fipsWithServiceOnly\",\"us-gov-*/guardduty\":\"fipsWithServiceOnly\",\"us-gov-*/identitystore\":\"fipsWithServiceOnly\",\"us-gov-*/imagebuilder\":\"fipsWithServiceOnly\",\"us-gov-*/kafka\":\"fipsWithServiceOnly\",\"us-gov-*/kinesis\":\"fipsWithServiceOnly\",\"us-gov-*/logs\":\"fipsWithServiceOnly\",\"us-gov-*/mediaconvert\":\"fipsWithServiceOnly\",\"us-gov-*/monitoring\":\"fipsWithServiceOnly\",\"us-gov-*/networkmanager\":\"fipsWithServiceOnly\",\"us-gov-*/organizations\":\"fipsWithServiceOnly\",\"us-gov-*/outposts\":\"fipsWithServiceOnly\",\"us-gov-*/participant.connect\":\"fipsWithServiceOnly\",\"us-gov-*/ram\":\"fipsWithServiceOnly\",\"us-gov-*/rds\":\"fipsWithServiceOnly\",\"us-gov-*/redshift\":\"fipsWithServiceOnly\",\"us-gov-*/resource-groups\":\"fipsWithServiceOnly\",\"us-gov-*/runtime.sagemaker\":\"fipsWithServiceOnly\",\"us-gov-*/serverlessrepo\":\"fipsWithServiceOnly\",\"us-gov-*/servicecatalog-appregistry\":\"fipsWithServiceOnly\",\"us-gov-*/servicequotas\":\"fipsWithServiceOnly\",\"us-gov-*/sns\":\"fipsWithServiceOnly\",\"us-gov-*/sqs\":\"fipsWithServiceOnly\",\"us-gov-*/ssm\":\"fipsWithServiceOnly\",\"us-gov-*/streams.dynamodb\":\"fipsWithServiceOnly\",\"us-gov-*/sts\":\"fipsWithServiceOnly\",\"us-gov-*/support\":\"fipsWithServiceOnly\",\"us-gov-*/swf\":\"fipsWithServiceOnly\",\"us-gov-west-1/states\":\"fipsWithServiceOnly\",\"us-iso-east-1/elasticfilesystem\":{\"endpoint\":\"elasticfilesystem-fips.{region}.c2s.ic.gov\"},\"us-gov-west-1/organizations\":\"fipsWithServiceOnly\",\"us-gov-west-1/route53\":{\"endpoint\":\"route53.us-gov.amazonaws.com\"},\"*/resource-explorer-2\":\"fipsDualstackByDefault\",\"*/kendra-ranking\":\"dualstackByDefault\",\"*/internetmonitor\":\"dualstackByDefault\",\"*/codecatalyst\":\"fipsGlobalDualstackByDefault\"},\"dualstackRules\":{\"*/*\":{\"endpoint\":\"{service}.{region}.api.aws\"},\"cn-*/*\":{\"endpoint\":\"{service}.{region}.api.amazonwebservices.com.cn\"},\"*/s3\":\"dualstackLegacy\",\"cn-*/s3\":\"dualstackLegacyCn\",\"*/s3-control\":\"dualstackLegacy\",\"cn-*/s3-control\":\"dualstackLegacyCn\",\"ap-south-1/ec2\":\"dualstackLegacyEc2\",\"eu-west-1/ec2\":\"dualstackLegacyEc2\",\"sa-east-1/ec2\":\"dualstackLegacyEc2\",\"us-east-1/ec2\":\"dualstackLegacyEc2\",\"us-east-2/ec2\":\"dualstackLegacyEc2\",\"us-west-2/ec2\":\"dualstackLegacyEc2\"},\"dualstackFipsRules\":{\"*/*\":{\"endpoint\":\"{service}-fips.{region}.api.aws\"},\"cn-*/*\":{\"endpoint\":\"{service}-fips.{region}.api.amazonwebservices.com.cn\"},\"*/s3\":\"dualstackFipsLegacy\",\"cn-*/s3\":\"dualstackFipsLegacyCn\",\"*/s3-control\":\"dualstackFipsLegacy\",\"cn-*/s3-control\":\"dualstackFipsLegacyCn\"},\"patterns\":{\"globalSSL\":{\"endpoint\":\"https://{service}.amazonaws.com\",\"globalEndpoint\":true,\"signingRegion\":\"us-east-1\"},\"globalGovCloud\":{\"endpoint\":\"{service}.us-gov.amazonaws.com\",\"globalEndpoint\":true,\"signingRegion\":\"us-gov-west-1\"},\"globalUsIsof\":{\"endpoint\":\"{service}.csp.hci.ic.gov\",\"globalEndpoint\":true,\"signingRegion\":\"us-isof-south-1\"},\"globalEuIsoe\":{\"endpoint\":\"{service}.cloud.adc-e.uk\",\"globalEndpoint\":true,\"signingRegion\":\"eu-isoe-west-1\"},\"s3signature\":{\"endpoint\":\"{service}.{region}.amazonaws.com\",\"signatureVersion\":\"s3\"},\"euIsoe\":{\"endpoint\":\"{service}.{region}.cloud.adc-e.uk\"},\"usIso\":{\"endpoint\":\"{service}.{region}.c2s.ic.gov\"},\"usIsob\":{\"endpoint\":\"{service}.{region}.sc2s.sgov.gov\"},\"usIsof\":{\"endpoint\":\"{service}.{region}.csp.hci.ic.gov\"},\"fipsStandard\":{\"endpoint\":\"{service}-fips.{region}.amazonaws.com\"},\"fipsDotPrefix\":{\"endpoint\":\"fips.{service}.{region}.amazonaws.com\"},\"fipsWithoutRegion\":{\"endpoint\":\"{service}-fips.amazonaws.com\"},\"fips.api.ecr\":{\"endpoint\":\"ecr-fips.{region}.amazonaws.com\"},\"fips.api.sagemaker\":{\"endpoint\":\"api-fips.sagemaker.{region}.amazonaws.com\"},\"fips.models.lex\":{\"endpoint\":\"models-fips.lex.{region}.amazonaws.com\"},\"fips.runtime.lex\":{\"endpoint\":\"runtime-fips.lex.{region}.amazonaws.com\"},\"fipsWithServiceOnly\":{\"endpoint\":\"{service}.{region}.amazonaws.com\"},\"dualstackLegacy\":{\"endpoint\":\"{service}.dualstack.{region}.amazonaws.com\"},\"dualstackLegacyCn\":{\"endpoint\":\"{service}.dualstack.{region}.amazonaws.com.cn\"},\"dualstackFipsLegacy\":{\"endpoint\":\"{service}-fips.dualstack.{region}.amazonaws.com\"},\"dualstackFipsLegacyCn\":{\"endpoint\":\"{service}-fips.dualstack.{region}.amazonaws.com.cn\"},\"dualstackLegacyEc2\":{\"endpoint\":\"api.ec2.{region}.aws\"},\"dualstackByDefault\":{\"endpoint\":\"{service}.{region}.api.aws\"},\"fipsDualstackByDefault\":{\"endpoint\":\"{service}-fips.{region}.api.aws\"},\"globalDualstackByDefault\":{\"endpoint\":\"{service}.global.api.aws\"},\"fipsGlobalDualstackByDefault\":{\"endpoint\":\"{service}-fips.global.api.aws\"}}}");
 
 });
 
 
-parcelRegister("dlQvn", function(module, exports) {
-function $9b85f6edbc64261c$var$isFipsRegion(region) {
+parcelRegister("hTkKp", function(module, exports) {
+function $d067aac1d17b76c7$var$isFipsRegion(region) {
     return typeof region === 'string' && (region.startsWith('fips-') || region.endsWith('-fips'));
 }
-function $9b85f6edbc64261c$var$isGlobalRegion(region) {
+function $d067aac1d17b76c7$var$isGlobalRegion(region) {
     return typeof region === 'string' && [
         'aws-global',
         'aws-us-gov-global'
     ].includes(region);
 }
-function $9b85f6edbc64261c$var$getRealRegion(region) {
+function $d067aac1d17b76c7$var$getRealRegion(region) {
     return [
         'fips-aws-global',
         'aws-fips',
@@ -3866,20 +3866,20 @@ function $9b85f6edbc64261c$var$getRealRegion(region) {
     ].includes(region) ? 'us-gov-west-1' : region.replace(/fips-(dkr-|prod-)?|-fips/, '');
 }
 module.exports = {
-    isFipsRegion: $9b85f6edbc64261c$var$isFipsRegion,
-    isGlobalRegion: $9b85f6edbc64261c$var$isGlobalRegion,
-    getRealRegion: $9b85f6edbc64261c$var$getRealRegion
+    isFipsRegion: $d067aac1d17b76c7$var$isFipsRegion,
+    isGlobalRegion: $d067aac1d17b76c7$var$isGlobalRegion,
+    getRealRegion: $d067aac1d17b76c7$var$getRealRegion
 };
 
 });
 
 
-parcelRegister("jkgv3", function(module, exports) {
+parcelRegister("itRhS", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-parcelRequire("dupZh");
-parcelRequire("dHQAs");
-var $e11caf2278a935bb$var$PromisesDependency;
+var $3ty2n = parcelRequire("3ty2n");
+parcelRequire("bqAch");
+parcelRequire("7U7Ye");
+var $d744452ab0a31e2b$var$PromisesDependency;
 /**
  * The main configuration class used by all service objects to set
  * the region, credentials, and other options for requests.
@@ -4069,7 +4069,7 @@ var $e11caf2278a935bb$var$PromisesDependency;
  *
  * @!attribute useDualstackEndpoint
  *   @return [Boolean] Enables IPv6 dualstack endpoint. Defaults to `false`.
- */ $1TgFO.Config = $1TgFO.util.inherit({
+ */ $3ty2n.Config = $3ty2n.util.inherit({
     /**
    * @!endgroup
    */ /**
@@ -4227,7 +4227,7 @@ var $e11caf2278a935bb$var$PromisesDependency;
    */ constructor: function Config(options) {
         if (options === undefined) options = {};
         options = this.extractCredentials(options);
-        $1TgFO.util.each.call(this, this.keys, function(key, value) {
+        $3ty2n.util.each.call(this, this.keys, function(key, value) {
             this.set(key, options[key], value);
         });
     },
@@ -4263,7 +4263,7 @@ var $e11caf2278a935bb$var$PromisesDependency;
             callback(err, err ? null : self.credentials);
         }
         function credError(msg, err) {
-            return new $1TgFO.util.error(err || new Error(), {
+            return new $3ty2n.util.error(err || new Error(), {
                 code: 'CredentialsError',
                 message: msg,
                 name: 'CredentialsError'
@@ -4321,7 +4321,7 @@ var $e11caf2278a935bb$var$PromisesDependency;
             callback(err, err ? null : self.token);
         }
         function tokenError(msg, err) {
-            return new $1TgFO.util.error(err || new Error(), {
+            return new $3ty2n.util.error(err || new Error(), {
                 code: 'TokenError',
                 message: msg,
                 name: 'TokenError'
@@ -4366,8 +4366,8 @@ var $e11caf2278a935bb$var$PromisesDependency;
    */ update: function update(options, allowUnknownKeys) {
         allowUnknownKeys = allowUnknownKeys || false;
         options = this.extractCredentials(options);
-        $1TgFO.util.each.call(this, options, function(key, value) {
-            if (allowUnknownKeys || Object.prototype.hasOwnProperty.call(this.keys, key) || $1TgFO.Service.hasService(key)) this.set(key, value);
+        $3ty2n.util.each.call(this, options, function(key, value) {
+            if (allowUnknownKeys || Object.prototype.hasOwnProperty.call(this.keys, key) || $3ty2n.Service.hasService(key)) this.set(key, value);
         });
     },
     /**
@@ -4380,9 +4380,9 @@ var $e11caf2278a935bb$var$PromisesDependency;
    * @return [AWS.Config] the same configuration object
    */ loadFromPath: function loadFromPath(path) {
         this.clear();
-        var options = JSON.parse($1TgFO.util.readFileSync(path));
-        var fileSystemCreds = new $1TgFO.FileSystemCredentials(path);
-        var chain = new $1TgFO.CredentialProviderChain();
+        var options = JSON.parse($3ty2n.util.readFileSync(path));
+        var fileSystemCreds = new $3ty2n.FileSystemCredentials(path);
+        var chain = new $3ty2n.CredentialProviderChain();
         chain.providers.unshift(fileSystemCreds);
         chain.resolve(function(err, creds) {
             if (err) throw err;
@@ -4396,7 +4396,7 @@ var $e11caf2278a935bb$var$PromisesDependency;
    *
    * @api private
    */ clear: function clear() {
-        /*jshint forin:false */ $1TgFO.util.each.call(this, this.keys, function(key) {
+        /*jshint forin:false */ $3ty2n.util.each.call(this, this.keys, function(key) {
             delete this[key];
         });
         // reset credential provider
@@ -4413,7 +4413,7 @@ var $e11caf2278a935bb$var$PromisesDependency;
             if (typeof defaultValue === 'function') this[property] = defaultValue.call(this);
             else this[property] = defaultValue;
         } else if (property === 'httpOptions' && this[property]) // deep merge httpOptions
-        this[property] = $1TgFO.util.merge(this[property], value);
+        this[property] = $3ty2n.util.merge(this[property], value);
         else this[property] = value;
     },
     /**
@@ -4467,8 +4467,8 @@ var $e11caf2278a935bb$var$PromisesDependency;
    * @api private
    */ extractCredentials: function extractCredentials(options) {
         if (options.accessKeyId && options.secretAccessKey) {
-            options = $1TgFO.util.copy(options);
-            options.credentials = new $1TgFO.Credentials(options);
+            options = $3ty2n.util.copy(options);
+            options.credentials = new $3ty2n.Credentials(options);
         }
         return options;
     },
@@ -4478,36 +4478,36 @@ var $e11caf2278a935bb$var$PromisesDependency;
    * If native Promises are not available, passing `null` will have no effect.
    * @param [Constructor] dep A reference to a Promise constructor
    */ setPromisesDependency: function setPromisesDependency(dep) {
-        $e11caf2278a935bb$var$PromisesDependency = dep;
+        $d744452ab0a31e2b$var$PromisesDependency = dep;
         // if null was passed in, we should try to use native promises
-        if (dep === null && typeof Promise === 'function') $e11caf2278a935bb$var$PromisesDependency = Promise;
+        if (dep === null && typeof Promise === 'function') $d744452ab0a31e2b$var$PromisesDependency = Promise;
         var constructors = [
-            $1TgFO.Request,
-            $1TgFO.Credentials,
-            $1TgFO.CredentialProviderChain
+            $3ty2n.Request,
+            $3ty2n.Credentials,
+            $3ty2n.CredentialProviderChain
         ];
-        if ($1TgFO.S3) {
-            constructors.push($1TgFO.S3);
-            if ($1TgFO.S3.ManagedUpload) constructors.push($1TgFO.S3.ManagedUpload);
+        if ($3ty2n.S3) {
+            constructors.push($3ty2n.S3);
+            if ($3ty2n.S3.ManagedUpload) constructors.push($3ty2n.S3.ManagedUpload);
         }
-        $1TgFO.util.addPromises(constructors, $e11caf2278a935bb$var$PromisesDependency);
+        $3ty2n.util.addPromises(constructors, $d744452ab0a31e2b$var$PromisesDependency);
     },
     /**
    * Gets the promise dependency set by `AWS.config.setPromisesDependency`.
    */ getPromisesDependency: function getPromisesDependency() {
-        return $e11caf2278a935bb$var$PromisesDependency;
+        return $d744452ab0a31e2b$var$PromisesDependency;
     }
 });
 /**
  * @return [AWS.Config] The global configuration object singleton instance
  * @readonly
  * @see AWS.Config
- */ $1TgFO.config = new $1TgFO.Config();
+ */ $3ty2n.config = new $3ty2n.Config();
 
 });
-parcelRegister("dupZh", function(module, exports) {
+parcelRegister("bqAch", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Represents your AWS security credentials, specifically the
  * {accessKeyId}, {secretAccessKey}, and optional {sessionToken}.
@@ -4545,7 +4545,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @return [String] the AWS secret access key
  * @!attribute sessionToken
  *   @return [String] an optional AWS session token
- */ $1TgFO.Credentials = $1TgFO.util.inherit({
+ */ $3ty2n.Credentials = $3ty2n.util.inherit({
     /**
    * A credentials object can be created using positional arguments or an options
    * hash.
@@ -4570,7 +4570,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *     });
    */ constructor: function Credentials() {
         // hide secretAccessKey from being displayed with util.inspect
-        $1TgFO.util.hideProperties(this, [
+        $3ty2n.util.hideProperties(this, [
             'secretAccessKey'
         ]);
         this.expired = false;
@@ -4596,7 +4596,7 @@ var $1TgFO = parcelRequire("1TgFO");
    * @note Subclasses should override this method to provide custom refresh
    *   logic.
    */ needsRefresh: function needsRefresh() {
-        var currentTime = $1TgFO.util.date.getDate().getTime();
+        var currentTime = $3ty2n.util.date.getDate().getTime();
         var adjustedTime = new Date(currentTime + this.expiryWindow * 1000);
         if (this.expireTime && adjustedTime > this.expireTime) return true;
         else return this.expired || !this.accessKeyId || !this.secretAccessKey;
@@ -4688,10 +4688,10 @@ var $1TgFO = parcelRequire("1TgFO");
    */ coalesceRefresh: function coalesceRefresh(callback, sync) {
         var self = this;
         if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
-            $1TgFO.util.arrayEach(self.refreshCallbacks, function(callback) {
+            $3ty2n.util.arrayEach(self.refreshCallbacks, function(callback) {
                 if (sync) callback(err);
                 else // callback could throw, so defer to ensure all callbacks are notified
-                $1TgFO.util.defer(function() {
+                $3ty2n.util.defer(function() {
                     callback(err);
                 });
             });
@@ -4707,23 +4707,23 @@ var $1TgFO = parcelRequire("1TgFO");
 });
 /**
  * @api private
- */ $1TgFO.Credentials.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
-    this.prototype.getPromise = $1TgFO.util.promisifyMethod('get', PromiseDependency);
-    this.prototype.refreshPromise = $1TgFO.util.promisifyMethod('refresh', PromiseDependency);
+ */ $3ty2n.Credentials.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+    this.prototype.getPromise = $3ty2n.util.promisifyMethod('get', PromiseDependency);
+    this.prototype.refreshPromise = $3ty2n.util.promisifyMethod('refresh', PromiseDependency);
 };
 /**
  * @api private
- */ $1TgFO.Credentials.deletePromisesFromClass = function deletePromisesFromClass() {
+ */ $3ty2n.Credentials.deletePromisesFromClass = function deletePromisesFromClass() {
     delete this.prototype.getPromise;
     delete this.prototype.refreshPromise;
 };
-$1TgFO.util.addPromises($1TgFO.Credentials);
+$3ty2n.util.addPromises($3ty2n.Credentials);
 
 });
 
-parcelRegister("dHQAs", function(module, exports) {
+parcelRegister("7U7Ye", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Creates a credential provider chain that searches for AWS credentials
  * in a list of credential providers specified by the {providers} property.
@@ -4765,13 +4765,13 @@ var $1TgFO = parcelRequire("1TgFO");
  *     credentials. By default, this object will be set to the
  *     {defaultProviders}.
  *   @see defaultProviders
- */ $1TgFO.CredentialProviderChain = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.CredentialProviderChain = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new CredentialProviderChain with a default set of providers
    * specified by {defaultProviders}.
    */ constructor: function CredentialProviderChain(providers) {
         if (providers) this.providers = providers;
-        else this.providers = $1TgFO.CredentialProviderChain.defaultProviders.slice(0);
+        else this.providers = $3ty2n.CredentialProviderChain.defaultProviders.slice(0);
         this.resolveCallbacks = [];
     },
     /**
@@ -4819,7 +4819,7 @@ var $1TgFO = parcelRequire("1TgFO");
             var providers = self.providers.slice(0);
             function resolveNext(err, creds) {
                 if (!err && creds || index === providers.length) {
-                    $1TgFO.util.arrayEach(self.resolveCallbacks, function(callback) {
+                    $3ty2n.util.arrayEach(self.resolveCallbacks, function(callback) {
                         callback(err, creds);
                     });
                     self.resolveCallbacks.length = 0;
@@ -4861,26 +4861,26 @@ var $1TgFO = parcelRequire("1TgFO");
  *   function () { return new AWS.EC2MetadataCredentials() }
  * ]
  * ```
- */ $1TgFO.CredentialProviderChain.defaultProviders = [];
+ */ $3ty2n.CredentialProviderChain.defaultProviders = [];
 /**
  * @api private
- */ $1TgFO.CredentialProviderChain.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
-    this.prototype.resolvePromise = $1TgFO.util.promisifyMethod('resolve', PromiseDependency);
+ */ $3ty2n.CredentialProviderChain.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+    this.prototype.resolvePromise = $3ty2n.util.promisifyMethod('resolve', PromiseDependency);
 };
 /**
  * @api private
- */ $1TgFO.CredentialProviderChain.deletePromisesFromClass = function deletePromisesFromClass() {
+ */ $3ty2n.CredentialProviderChain.deletePromisesFromClass = function deletePromisesFromClass() {
     delete this.prototype.resolvePromise;
 };
-$1TgFO.util.addPromises($1TgFO.CredentialProviderChain);
+$3ty2n.util.addPromises($3ty2n.CredentialProviderChain);
 
 });
 
 
-parcelRegister("7DCha", function(module, exports) {
+parcelRegister("bpL55", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $84f68cd00622f344$var$inherit = $3ty2n.util.inherit;
 /**
  * The endpoint that a service will talk to, for example,
  * `'https://ec2.ap-southeast-1.amazonaws.com'`. If
@@ -4910,7 +4910,7 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
  *   @return [Integer] the port of the endpoint
  * @!attribute href
  *   @return [String] the full URL of the endpoint
- */ $1TgFO.Endpoint = $58f9ddbbc5633c21$var$inherit({
+ */ $3ty2n.Endpoint = $84f68cd00622f344$var$inherit({
     /**
    * @overload Endpoint(endpoint)
    *   Constructs a new endpoint given an endpoint URL. If the
@@ -4918,7 +4918,7 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
    *   set in the global {AWS.config} will be used.
    *   @param endpoint [String] the URL to construct an endpoint from
    */ constructor: function Endpoint(endpoint, config) {
-        $1TgFO.util.hideProperties(this, [
+        $3ty2n.util.hideProperties(this, [
             'slashes',
             'auth',
             'hash',
@@ -4926,12 +4926,12 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
             'query'
         ]);
         if (typeof endpoint === 'undefined' || endpoint === null) throw new Error('Invalid endpoint: ' + endpoint);
-        else if (typeof endpoint !== 'string') return $1TgFO.util.copy(endpoint);
+        else if (typeof endpoint !== 'string') return $3ty2n.util.copy(endpoint);
         if (!endpoint.match(/^http/)) {
-            var useSSL = config && config.sslEnabled !== undefined ? config.sslEnabled : $1TgFO.config.sslEnabled;
+            var useSSL = config && config.sslEnabled !== undefined ? config.sslEnabled : $3ty2n.config.sslEnabled;
             endpoint = (useSSL ? 'https' : 'http') + '://' + endpoint;
         }
-        $1TgFO.util.update(this, $1TgFO.util.urlParse(endpoint));
+        $3ty2n.util.update(this, $3ty2n.util.urlParse(endpoint));
         // Ensure the port property is set as an integer
         if (this.port) this.port = parseInt(this.port, 10);
         else this.port = this.protocol === 'https:' ? 443 : 80;
@@ -4956,11 +4956,11 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
  * @!attribute region
  *   @api private
  *   @return [String] the region, for signing purposes only.
- */ $1TgFO.HttpRequest = $58f9ddbbc5633c21$var$inherit({
+ */ $3ty2n.HttpRequest = $84f68cd00622f344$var$inherit({
     /**
    * @api private
    */ constructor: function HttpRequest(endpoint, region) {
-        endpoint = new $1TgFO.Endpoint(endpoint);
+        endpoint = new $3ty2n.Endpoint(endpoint);
         this.method = 'POST';
         this.path = endpoint.path || '/';
         this.headers = {};
@@ -4973,10 +4973,10 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
     /**
    * @api private
    */ setUserAgent: function setUserAgent() {
-        this._userAgent = this.headers[this.getUserAgentHeaderName()] = $1TgFO.util.userAgent();
+        this._userAgent = this.headers[this.getUserAgentHeaderName()] = $3ty2n.util.userAgent();
     },
     getUserAgentHeaderName: function getUserAgentHeaderName() {
-        var prefix = $1TgFO.util.isBrowser() ? 'X-Amz-' : '';
+        var prefix = $3ty2n.util.isBrowser() ? 'X-Amz-' : '';
         return prefix + 'User-Agent';
     },
     /**
@@ -5001,8 +5001,8 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
    */ search: function search() {
         var query = this.path.split('?', 2)[1];
         if (query) {
-            query = $1TgFO.util.queryStringParse(query);
-            return $1TgFO.util.queryParamsToString(query);
+            query = $3ty2n.util.queryStringParse(query);
+            return $3ty2n.util.queryParamsToString(query);
         }
         return '';
     },
@@ -5010,7 +5010,7 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
    * @api private
    * update httpRequest endpoint with endpoint string
    */ updateEndpoint: function updateEndpoint(endpointStr) {
-        var newEndpoint = new $1TgFO.Endpoint(endpointStr);
+        var newEndpoint = new $3ty2n.Endpoint(endpointStr);
         this.endpoint = newEndpoint;
         this.path = newEndpoint.path || '/';
         if (this.headers['Host']) this.headers['Host'] = newEndpoint.host;
@@ -5032,7 +5032,7 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
  *     Defaults to `false` (buffered reads). Do not modify this manually, use
  *     {createUnbufferedStream} to convert the stream to unbuffered mode
  *     instead.
- */ $1TgFO.HttpResponse = $58f9ddbbc5633c21$var$inherit({
+ */ $3ty2n.HttpResponse = $84f68cd00622f344$var$inherit({
     /**
    * @api private
    */ constructor: function HttpResponse() {
@@ -5067,28 +5067,28 @@ var $58f9ddbbc5633c21$var$inherit = $1TgFO.util.inherit;
         return this.stream;
     }
 });
-$1TgFO.HttpClient = $58f9ddbbc5633c21$var$inherit({});
+$3ty2n.HttpClient = $84f68cd00622f344$var$inherit({});
 /**
  * @api private
- */ $1TgFO.HttpClient.getInstance = function getInstance() {
+ */ $3ty2n.HttpClient.getInstance = function getInstance() {
     if (this.singleton === undefined) this.singleton = new this();
     return this.singleton;
 };
 
 });
 
-parcelRegister("d7GW6", function(module, exports) {
+parcelRegister("3n1vm", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $jgM9D = parcelRequire("jgM9D");
+var $hYb9G = parcelRequire("hYb9G");
 
-var $64Oes = parcelRequire("64Oes");
-var $98dd3c0ae604ddcc$require$DISCOVER_ENDPOINT = $64Oes.discoverEndpoint;
+var $kHPih = parcelRequire("kHPih");
+var $2744afeb88ce5e80$require$DISCOVER_ENDPOINT = $kHPih.discoverEndpoint;
 /**
  * The namespace used to register global event listeners for request building
  * and sending.
- */ $1TgFO.EventListeners = {
+ */ $3ty2n.EventListeners = {
     /**
    * @!attribute VALIDATE_CREDENTIALS
    *   A request listener that validates whether the request is being
@@ -5145,18 +5145,18 @@ var $98dd3c0ae604ddcc$require$DISCOVER_ENDPOINT = $64Oes.discoverEndpoint;
 };
 /**
  * @api private
- */ function $98dd3c0ae604ddcc$var$getOperationAuthtype(req) {
+ */ function $2744afeb88ce5e80$var$getOperationAuthtype(req) {
     if (!req.service.api.operations) return '';
     var operation = req.service.api.operations[req.operation];
     return operation ? operation.authtype : '';
 }
 /**
  * @api private
- */ function $98dd3c0ae604ddcc$var$getIdentityType(req) {
+ */ function $2744afeb88ce5e80$var$getIdentityType(req) {
     var service = req.service;
     if (service.config.signatureVersion) return service.config.signatureVersion;
     if (service.api.signatureVersion) return service.api.signatureVersion;
-    return $98dd3c0ae604ddcc$var$getOperationAuthtype(req);
+    return $2744afeb88ce5e80$var$getOperationAuthtype(req);
 }
 
 
@@ -5164,14 +5164,14 @@ var $98dd3c0ae604ddcc$require$DISCOVER_ENDPOINT = $64Oes.discoverEndpoint;
 
 
 
-$1TgFO.EventListeners = {
-    Core: new $jgM9D().addNamedListeners(function(add, addAsync) {
+$3ty2n.EventListeners = {
+    Core: new $hYb9G().addNamedListeners(function(add, addAsync) {
         addAsync('VALIDATE_CREDENTIALS', 'validate', function VALIDATE_CREDENTIALS(req, done) {
             if (!req.service.api.signatureVersion && !req.service.config.signatureVersion) return done(); // none
-            var identityType = $98dd3c0ae604ddcc$var$getIdentityType(req);
+            var identityType = $2744afeb88ce5e80$var$getIdentityType(req);
             if (identityType === 'bearer') {
                 req.service.config.getToken(function(err) {
-                    if (err) req.response.error = $1TgFO.util.error(err, {
+                    if (err) req.response.error = $3ty2n.util.error(err, {
                         code: 'TokenError'
                     });
                     done();
@@ -5179,7 +5179,7 @@ $1TgFO.EventListeners = {
                 return;
             }
             req.service.config.getCredentials(function(err) {
-                if (err) req.response.error = $1TgFO.util.error(err, {
+                if (err) req.response.error = $3ty2n.util.error(err, {
                     code: 'CredentialsError',
                     message: 'Missing credentials in config, if using AWS_CONFIG_FILE, set AWS_SDK_LOAD_CONFIG=1'
                 });
@@ -5189,11 +5189,11 @@ $1TgFO.EventListeners = {
         add('VALIDATE_REGION', 'validate', function VALIDATE_REGION(req) {
             if (!req.service.isGlobalEndpoint) {
                 var dnsHostRegex = new RegExp(/^([a-zA-Z0-9]|[a-zA-Z0-9][a-zA-Z0-9-]{0,61}[a-zA-Z0-9])$/);
-                if (!req.service.config.region) req.response.error = $1TgFO.util.error(new Error(), {
+                if (!req.service.config.region) req.response.error = $3ty2n.util.error(new Error(), {
                     code: 'ConfigError',
                     message: 'Missing region in config'
                 });
-                else if (!dnsHostRegex.test(req.service.config.region)) req.response.error = $1TgFO.util.error(new Error(), {
+                else if (!dnsHostRegex.test(req.service.config.region)) req.response.error = $3ty2n.util.error(new Error(), {
                     code: 'ConfigError',
                     message: 'Invalid region in config'
                 });
@@ -5206,26 +5206,26 @@ $1TgFO.EventListeners = {
             var idempotentMembers = operation.idempotentMembers;
             if (!idempotentMembers.length) return;
             // creates a copy of params so user's param object isn't mutated
-            var params = $1TgFO.util.copy(req.params);
+            var params = $3ty2n.util.copy(req.params);
             for(var i = 0, iLen = idempotentMembers.length; i < iLen; i++)if (!params[idempotentMembers[i]]) // add the member
-            params[idempotentMembers[i]] = $1TgFO.util.uuid.v4();
+            params[idempotentMembers[i]] = $3ty2n.util.uuid.v4();
             req.params = params;
         });
         add('VALIDATE_PARAMETERS', 'validate', function VALIDATE_PARAMETERS(req) {
             if (!req.service.api.operations) return;
             var rules = req.service.api.operations[req.operation].input;
             var validation = req.service.config.paramValidation;
-            new $1TgFO.ParamValidator(validation).validate(rules, req.params);
+            new $3ty2n.ParamValidator(validation).validate(rules, req.params);
         });
         add('COMPUTE_CHECKSUM', 'afterBuild', function COMPUTE_CHECKSUM(req) {
             if (!req.service.api.operations) return;
             var operation = req.service.api.operations[req.operation];
             if (!operation) return;
             var body = req.httpRequest.body;
-            var isNonStreamingPayload = body && ($1TgFO.util.Buffer.isBuffer(body) || typeof body === 'string');
+            var isNonStreamingPayload = body && ($3ty2n.util.Buffer.isBuffer(body) || typeof body === 'string');
             var headers = req.httpRequest.headers;
             if (operation.httpChecksumRequired && req.service.config.computeChecksums && isNonStreamingPayload && !headers['Content-MD5']) {
-                var md5 = $1TgFO.util.crypto.md5(body, 'base64');
+                var md5 = $3ty2n.util.crypto.md5(body, 'base64');
                 headers['Content-MD5'] = md5;
             }
         });
@@ -5235,13 +5235,13 @@ $1TgFO.EventListeners = {
             var operation = req.service.api.operations[req.operation];
             var authtype = operation ? operation.authtype : '';
             if (!req.service.api.signatureVersion && !authtype && !req.service.config.signatureVersion) return done(); // none
-            if (req.service.getSignerClass(req) === $1TgFO.Signers.V4) {
+            if (req.service.getSignerClass(req) === $3ty2n.Signers.V4) {
                 var body = req.httpRequest.body || '';
                 if (authtype.indexOf('unsigned-body') >= 0) {
                     req.httpRequest.headers['X-Amz-Content-Sha256'] = 'UNSIGNED-PAYLOAD';
                     return done();
                 }
-                $1TgFO.util.computeSha256(body, function(err, sha) {
+                $3ty2n.util.computeSha256(body, function(err, sha) {
                     if (err) done(err);
                     else {
                         req.httpRequest.headers['X-Amz-Content-Sha256'] = sha;
@@ -5251,10 +5251,10 @@ $1TgFO.EventListeners = {
             } else done();
         });
         add('SET_CONTENT_LENGTH', 'afterBuild', function SET_CONTENT_LENGTH(req) {
-            var authtype = $98dd3c0ae604ddcc$var$getOperationAuthtype(req);
-            var payloadMember = $1TgFO.util.getRequestPayloadShape(req);
+            var authtype = $2744afeb88ce5e80$var$getOperationAuthtype(req);
+            var payloadMember = $3ty2n.util.getRequestPayloadShape(req);
             if (req.httpRequest.headers['Content-Length'] === undefined) try {
-                var length = $1TgFO.util.string.byteLength(req.httpRequest.body);
+                var length = $3ty2n.util.string.byteLength(req.httpRequest.body);
                 req.httpRequest.headers['Content-Length'] = length;
             } catch (err) {
                 if (payloadMember && payloadMember.isStreaming) {
@@ -5274,7 +5274,7 @@ $1TgFO.EventListeners = {
         });
         add('SET_TRACE_ID', 'afterBuild', function SET_TRACE_ID(req) {
             var traceIdHeaderName = 'X-Amzn-Trace-Id';
-            if ($1TgFO.util.isNode() && !Object.hasOwnProperty.call(req.httpRequest.headers, traceIdHeaderName)) {
+            if ($3ty2n.util.isNode() && !Object.hasOwnProperty.call(req.httpRequest.headers, traceIdHeaderName)) {
                 var ENV_LAMBDA_FUNCTION_NAME = 'AWS_LAMBDA_FUNCTION_NAME';
                 var ENV_TRACE_ID = '_X_AMZN_TRACE_ID';
                 var functionName = process.env[ENV_LAMBDA_FUNCTION_NAME];
@@ -5285,15 +5285,15 @@ $1TgFO.EventListeners = {
         add('RESTART', 'restart', function RESTART() {
             var err = this.response.error;
             if (!err || !err.retryable) return;
-            this.httpRequest = new $1TgFO.HttpRequest(this.service.endpoint, this.service.region);
+            this.httpRequest = new $3ty2n.HttpRequest(this.service.endpoint, this.service.region);
             if (this.response.retryCount < this.service.config.maxRetries) this.response.retryCount++;
             else this.response.error = null;
         });
         var addToHead = true;
-        addAsync('DISCOVER_ENDPOINT', 'sign', $98dd3c0ae604ddcc$require$DISCOVER_ENDPOINT, addToHead);
+        addAsync('DISCOVER_ENDPOINT', 'sign', $2744afeb88ce5e80$require$DISCOVER_ENDPOINT, addToHead);
         addAsync('SIGN', 'sign', function SIGN(req, done) {
             var service = req.service;
-            var identityType = $98dd3c0ae604ddcc$var$getIdentityType(req);
+            var identityType = $2744afeb88ce5e80$var$getIdentityType(req);
             if (!identityType || identityType.length === 0) return done(); // none
             if (identityType === 'bearer') service.config.getToken(function(err, token) {
                 if (err) {
@@ -5344,7 +5344,7 @@ $1TgFO.EventListeners = {
                 resp.error = null;
             } else {
                 resp.data = null;
-                resp.error = $1TgFO.util.error(new Error(), {
+                resp.error = $3ty2n.util.error(new Error(), {
                     code: 'UnknownError',
                     message: 'An unknown error occurred.'
                 });
@@ -5377,7 +5377,7 @@ $1TgFO.EventListeners = {
                         statusMessage
                     ]);
                     if (!resp.httpResponse.streaming) {
-                        if ($1TgFO.HttpClient.streamsApiVersion === 2) {
+                        if ($3ty2n.HttpClient.streamsApiVersion === 2) {
                             // if we detect event streams, we're going to have to
                             // return the stream immediately
                             if (operation.hasEventOutput && service.successfulResponse(resp)) {
@@ -5403,7 +5403,7 @@ $1TgFO.EventListeners = {
                 });
                 httpResp.on('end', function onEnd() {
                     if (!stream || !stream.didCallback) {
-                        if ($1TgFO.HttpClient.streamsApiVersion === 2 && operation.hasEventOutput && service.successfulResponse(resp)) // don't concatenate response chunks when streaming event stream data when response is successful
+                        if ($3ty2n.HttpClient.streamsApiVersion === 2 && operation.hasEventOutput && service.successfulResponse(resp)) // don't concatenate response chunks when streaming event stream data when response is successful
                         return;
                         resp.request.emit('httpDone');
                         done();
@@ -5427,7 +5427,7 @@ $1TgFO.EventListeners = {
             function error(err) {
                 if (err.code !== 'RequestAbortedError') {
                     var errCode = err.code === 'TimeoutError' ? err.code : 'NetworkingError';
-                    err = $1TgFO.util.error(err, {
+                    err = $3ty2n.util.error(err, {
                         code: errCode,
                         region: resp.request.httpRequest.region,
                         hostname: resp.request.httpRequest.endpoint.hostname,
@@ -5443,7 +5443,7 @@ $1TgFO.EventListeners = {
                 });
             }
             function executeSend() {
-                var http = $1TgFO.HttpClient.getInstance();
+                var http = $3ty2n.HttpClient.getInstance();
                 var httpOptions = resp.request.service.config.httpOptions || {};
                 try {
                     var stream = http.handleRequest(resp.request.httpRequest, httpOptions, callback, error);
@@ -5465,7 +5465,7 @@ $1TgFO.EventListeners = {
             resp.httpResponse.statusCode = statusCode;
             resp.httpResponse.statusMessage = statusMessage;
             resp.httpResponse.headers = headers;
-            resp.httpResponse.body = $1TgFO.util.buffer.toBuffer('');
+            resp.httpResponse.body = $3ty2n.util.buffer.toBuffer('');
             resp.httpResponse.buffers = [];
             resp.httpResponse.numBytes = 0;
             var dateHeader = headers.date || headers.Date;
@@ -5477,7 +5477,7 @@ $1TgFO.EventListeners = {
         });
         add('HTTP_DATA', 'httpData', function HTTP_DATA(chunk, resp) {
             if (chunk) {
-                if ($1TgFO.util.isNode()) {
+                if ($3ty2n.util.isNode()) {
                     resp.httpResponse.numBytes += chunk.length;
                     var total = resp.httpResponse.headers['content-length'];
                     var progress = {
@@ -5489,13 +5489,13 @@ $1TgFO.EventListeners = {
                         resp
                     ]);
                 }
-                resp.httpResponse.buffers.push($1TgFO.util.buffer.toBuffer(chunk));
+                resp.httpResponse.buffers.push($3ty2n.util.buffer.toBuffer(chunk));
             }
         });
         add('HTTP_DONE', 'httpDone', function HTTP_DONE(resp) {
             // convert buffers array into single buffer
             if (resp.httpResponse.buffers && resp.httpResponse.buffers.length > 0) {
-                var body = $1TgFO.util.buffer.concat(resp.httpResponse.buffers);
+                var body = $3ty2n.util.buffer.concat(resp.httpResponse.buffers);
                 resp.httpResponse.body = body;
             }
             delete resp.httpResponse.numBytes;
@@ -5530,7 +5530,7 @@ $1TgFO.EventListeners = {
         });
         add('REDIRECT', 'retry', function REDIRECT(resp) {
             if (resp.error && resp.error.statusCode >= 300 && resp.error.statusCode < 400 && resp.httpResponse.headers['location']) {
-                this.httpRequest.endpoint = new $1TgFO.Endpoint(resp.httpResponse.headers['location']);
+                this.httpRequest.endpoint = new $3ty2n.Endpoint(resp.httpResponse.headers['location']);
                 this.httpRequest.headers['Host'] = this.httpRequest.endpoint.host;
                 this.httpRequest.path = this.httpRequest.endpoint.path;
                 resp.error.redirect = true;
@@ -5562,19 +5562,19 @@ $1TgFO.EventListeners = {
             } else done();
         });
     }),
-    CorePost: new $jgM9D().addNamedListeners(function(add) {
-        add('EXTRACT_REQUEST_ID', 'extractData', $1TgFO.util.extractRequestId);
-        add('EXTRACT_REQUEST_ID', 'extractError', $1TgFO.util.extractRequestId);
+    CorePost: new $hYb9G().addNamedListeners(function(add) {
+        add('EXTRACT_REQUEST_ID', 'extractData', $3ty2n.util.extractRequestId);
+        add('EXTRACT_REQUEST_ID', 'extractError', $3ty2n.util.extractRequestId);
         add('ENOTFOUND_ERROR', 'httpError', function ENOTFOUND_ERROR(err) {
             function isDNSError(err) {
-                return err.errno === 'ENOTFOUND' || typeof err.errno === 'number' && typeof $1TgFO.util.getSystemErrorName === 'function' && [
+                return err.errno === 'ENOTFOUND' || typeof err.errno === 'number' && typeof $3ty2n.util.getSystemErrorName === 'function' && [
                     'EAI_NONAME',
                     'EAI_NODATA'
-                ].indexOf($1TgFO.util.getSystemErrorName(err.errno) >= 0);
+                ].indexOf($3ty2n.util.getSystemErrorName(err.errno) >= 0);
             }
             if (err.code === 'NetworkingError' && isDNSError(err)) {
                 var message = 'Inaccessible host: `' + err.hostname + '\' at port `' + err.port + '\'. This service may not be available in the `' + err.region + '\' region.';
-                this.response.error = $1TgFO.util.error(new Error(message), {
+                this.response.error = $3ty2n.util.error(new Error(message), {
                     code: 'UnknownEndpoint',
                     region: err.region,
                     hostname: err.hostname,
@@ -5584,7 +5584,7 @@ $1TgFO.EventListeners = {
             }
         });
     }),
-    Logger: new $jgM9D().addNamedListeners(function(add) {
+    Logger: new $hYb9G().addNamedListeners(function(add) {
         add('LOG_REQUEST', 'complete', function LOG_REQUEST(resp) {
             var req = resp.request;
             var logger = req.service.config.logger;
@@ -5595,20 +5595,20 @@ $1TgFO.EventListeners = {
                 switch(inputShape.type){
                     case 'structure':
                         var struct = {};
-                        $1TgFO.util.each(shape, function(subShapeName, subShape) {
+                        $3ty2n.util.each(shape, function(subShapeName, subShape) {
                             if (Object.prototype.hasOwnProperty.call(inputShape.members, subShapeName)) struct[subShapeName] = filterSensitiveLog(inputShape.members[subShapeName], subShape);
                             else struct[subShapeName] = subShape;
                         });
                         return struct;
                     case 'list':
                         var list = [];
-                        $1TgFO.util.arrayEach(shape, function(subShape, index) {
+                        $3ty2n.util.arrayEach(shape, function(subShape, index) {
                             list.push(filterSensitiveLog(inputShape.member, subShape));
                         });
                         return list;
                     case 'map':
                         var map = {};
-                        $1TgFO.util.each(shape, function(key, value) {
+                        $3ty2n.util.each(shape, function(key, value) {
                             map[key] = filterSensitiveLog(inputShape.value, value);
                         });
                         return map;
@@ -5626,13 +5626,13 @@ $1TgFO.EventListeners = {
                     var inputShape = req.service.api.operations[req.operation].input;
                     censoredParams = filterSensitiveLog(inputShape, req.params);
                 }
-                var params = $8OLUh$util.inspect(censoredParams, true, null);
+                var params = $bPiTa$util.inspect(censoredParams, true, null);
                 var message = '';
                 if (ansi) message += '\x1B[33m';
                 message += '[AWS ' + req.service.serviceIdentifier + ' ' + status;
                 message += ' ' + delta.toString() + 's ' + resp.retryCount + ' retries]';
                 if (ansi) message += '\x1B[0;1m';
-                message += ' ' + $1TgFO.util.string.lowerFirst(req.operation);
+                message += ' ' + $3ty2n.util.string.lowerFirst(req.operation);
                 message += '(' + params + ')';
                 if (ansi) message += '\x1B[0m';
                 return message;
@@ -5642,33 +5642,33 @@ $1TgFO.EventListeners = {
             else if (typeof logger.write === 'function') logger.write(line + '\n');
         });
     }),
-    Json: new $jgM9D().addNamedListeners(function(add) {
-        var svc = (parcelRequire("gl4ei"));
+    Json: new $hYb9G().addNamedListeners(function(add) {
+        var svc = (parcelRequire("dzYrM"));
         add('BUILD', 'build', svc.buildRequest);
         add('EXTRACT_DATA', 'extractData', svc.extractData);
         add('EXTRACT_ERROR', 'extractError', svc.extractError);
     }),
-    Rest: new $jgM9D().addNamedListeners(function(add) {
-        var svc = (parcelRequire("lq6Qt"));
+    Rest: new $hYb9G().addNamedListeners(function(add) {
+        var svc = (parcelRequire("8Ice7"));
         add('BUILD', 'build', svc.buildRequest);
         add('EXTRACT_DATA', 'extractData', svc.extractData);
         add('EXTRACT_ERROR', 'extractError', svc.extractError);
     }),
-    RestJson: new $jgM9D().addNamedListeners(function(add) {
-        var svc = (parcelRequire("1ei0y"));
+    RestJson: new $hYb9G().addNamedListeners(function(add) {
+        var svc = (parcelRequire("crPSD"));
         add('BUILD', 'build', svc.buildRequest);
         add('EXTRACT_DATA', 'extractData', svc.extractData);
         add('EXTRACT_ERROR', 'extractError', svc.extractError);
         add('UNSET_CONTENT_LENGTH', 'afterBuild', svc.unsetContentLength);
     }),
-    RestXml: new $jgM9D().addNamedListeners(function(add) {
-        var svc = (parcelRequire("aWREk"));
+    RestXml: new $hYb9G().addNamedListeners(function(add) {
+        var svc = (parcelRequire("kCjCH"));
         add('BUILD', 'build', svc.buildRequest);
         add('EXTRACT_DATA', 'extractData', svc.extractData);
         add('EXTRACT_ERROR', 'extractError', svc.extractError);
     }),
-    Query: new $jgM9D().addNamedListeners(function(add) {
-        var svc = (parcelRequire("5LIY7"));
+    Query: new $hYb9G().addNamedListeners(function(add) {
+        var svc = (parcelRequire("9lF8b"));
         add('BUILD', 'build', svc.buildRequest);
         add('EXTRACT_DATA', 'extractData', svc.extractData);
         add('EXTRACT_ERROR', 'extractError', svc.extractError);
@@ -5676,12 +5676,12 @@ $1TgFO.EventListeners = {
 };
 
 });
-parcelRegister("64Oes", function(module, exports) {
+parcelRegister("kHPih", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $jfMGq = parcelRequire("jfMGq");
-var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
+var $KHT0q = parcelRequire("KHT0q");
+var $f12f9cb599fe1f7f$var$endpointDiscoveryEnabledEnvs = [
     'AWS_ENABLE_ENDPOINT_DISCOVERY',
     'AWS_ENDPOINT_DISCOVERY_ENABLED'
 ];
@@ -5693,7 +5693,7 @@ var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
  *   accessKey + region + service as cache key
  * @return [map<String,String>] object with keys to index endpoints.
  * @api private
- */ function $46ca14db38450257$var$getCacheKey(request) {
+ */ function $f12f9cb599fe1f7f$var$getCacheKey(request) {
     var service = request.service;
     var api = service.api || {};
     var operations = api.operations;
@@ -5707,14 +5707,14 @@ var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
  * Recursive helper for marshallCustomIdentifiers().
  * Looks for required string input members that have 'endpointdiscoveryid' trait.
  * @api private
- */ function $46ca14db38450257$var$marshallCustomIdentifiersHelper(result, params, shape) {
+ */ function $f12f9cb599fe1f7f$var$marshallCustomIdentifiersHelper(result, params, shape) {
     if (!shape || params === undefined || params === null) return;
-    if (shape.type === 'structure' && shape.required && shape.required.length > 0) $jfMGq.arrayEach(shape.required, function(name) {
+    if (shape.type === 'structure' && shape.required && shape.required.length > 0) $KHT0q.arrayEach(shape.required, function(name) {
         var memberShape = shape.members[name];
         if (memberShape.endpointDiscoveryId === true) {
             var locationName = memberShape.isLocationName ? memberShape.name : name;
             result[locationName] = String(params[name]);
-        } else $46ca14db38450257$var$marshallCustomIdentifiersHelper(result, params[name], memberShape);
+        } else $f12f9cb599fe1f7f$var$marshallCustomIdentifiersHelper(result, params[name], memberShape);
     });
 }
 /**
@@ -5723,9 +5723,9 @@ var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
  * @param [object] request object
  * @param [object] input shape of the given operation's api
  * @api private
- */ function $46ca14db38450257$var$marshallCustomIdentifiers(request, shape) {
+ */ function $f12f9cb599fe1f7f$var$marshallCustomIdentifiers(request, shape) {
     var identifiers = {};
-    $46ca14db38450257$var$marshallCustomIdentifiersHelper(identifiers, request.params, shape);
+    $f12f9cb599fe1f7f$var$marshallCustomIdentifiersHelper(identifiers, request.params, shape);
     return identifiers;
 }
 /**
@@ -5735,18 +5735,18 @@ var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
  * asynchronously. This is turned off by default.
  * @param [object] request object
  * @api private
- */ function $46ca14db38450257$var$optionalDiscoverEndpoint(request) {
+ */ function $f12f9cb599fe1f7f$var$optionalDiscoverEndpoint(request) {
     var service = request.service;
     var api = service.api;
     var operationModel = api.operations ? api.operations[request.operation] : undefined;
     var inputShape = operationModel ? operationModel.input : undefined;
-    var identifiers = $46ca14db38450257$var$marshallCustomIdentifiers(request, inputShape);
-    var cacheKey = $46ca14db38450257$var$getCacheKey(request);
+    var identifiers = $f12f9cb599fe1f7f$var$marshallCustomIdentifiers(request, inputShape);
+    var cacheKey = $f12f9cb599fe1f7f$var$getCacheKey(request);
     if (Object.keys(identifiers).length > 0) {
-        cacheKey = $jfMGq.update(cacheKey, identifiers);
+        cacheKey = $KHT0q.update(cacheKey, identifiers);
         if (operationModel) cacheKey.operation = operationModel.name;
     }
-    var endpoints = $1TgFO.endpointCache.get(cacheKey);
+    var endpoints = $3ty2n.endpointCache.get(cacheKey);
     if (endpoints && endpoints.length === 1 && endpoints[0].Address === '') //endpoint operation is being made but response not yet received
     //or endpoint operation just failed in 1 minute
     return;
@@ -5758,20 +5758,20 @@ var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
             Operation: operationModel.name,
             Identifiers: identifiers
         });
-        $46ca14db38450257$var$addApiVersionHeader(endpointRequest);
-        endpointRequest.removeListener('validate', $1TgFO.EventListeners.Core.VALIDATE_PARAMETERS);
-        endpointRequest.removeListener('retry', $1TgFO.EventListeners.Core.RETRY_CHECK);
+        $f12f9cb599fe1f7f$var$addApiVersionHeader(endpointRequest);
+        endpointRequest.removeListener('validate', $3ty2n.EventListeners.Core.VALIDATE_PARAMETERS);
+        endpointRequest.removeListener('retry', $3ty2n.EventListeners.Core.RETRY_CHECK);
         //put in a placeholder for endpoints already requested, prevent
         //too much in-flight calls
-        $1TgFO.endpointCache.put(cacheKey, [
+        $3ty2n.endpointCache.put(cacheKey, [
             {
                 Address: '',
                 CachePeriodInMinutes: 1
             }
         ]);
         endpointRequest.send(function(err, data) {
-            if (data && data.Endpoints) $1TgFO.endpointCache.put(cacheKey, data.Endpoints);
-            else if (err) $1TgFO.endpointCache.put(cacheKey, [
+            if (data && data.Endpoints) $3ty2n.endpointCache.put(cacheKey, data.Endpoints);
+            else if (err) $3ty2n.endpointCache.put(cacheKey, [
                 {
                     Address: '',
                     CachePeriodInMinutes: 1 //not to make more endpoint operation in next 1 minute
@@ -5780,7 +5780,7 @@ var $46ca14db38450257$var$endpointDiscoveryEnabledEnvs = [
         });
     }
 }
-var $46ca14db38450257$var$requestQueue = {};
+var $f12f9cb599fe1f7f$var$requestQueue = {};
 /**
  * Call endpoint discovery operation when it's required.
  * When endpoint is available in cache then use cached ones. If endpoints are
@@ -5789,24 +5789,24 @@ var $46ca14db38450257$var$requestQueue = {};
  * discovery. This is turned off by default
  * @param [object] request object
  * @api private
- */ function $46ca14db38450257$var$requiredDiscoverEndpoint(request, done) {
+ */ function $f12f9cb599fe1f7f$var$requiredDiscoverEndpoint(request, done) {
     var service = request.service;
     var api = service.api;
     var operationModel = api.operations ? api.operations[request.operation] : undefined;
     var inputShape = operationModel ? operationModel.input : undefined;
-    var identifiers = $46ca14db38450257$var$marshallCustomIdentifiers(request, inputShape);
-    var cacheKey = $46ca14db38450257$var$getCacheKey(request);
+    var identifiers = $f12f9cb599fe1f7f$var$marshallCustomIdentifiers(request, inputShape);
+    var cacheKey = $f12f9cb599fe1f7f$var$getCacheKey(request);
     if (Object.keys(identifiers).length > 0) {
-        cacheKey = $jfMGq.update(cacheKey, identifiers);
+        cacheKey = $KHT0q.update(cacheKey, identifiers);
         if (operationModel) cacheKey.operation = operationModel.name;
     }
-    var cacheKeyStr = $1TgFO.EndpointCache.getKeyString(cacheKey);
-    var endpoints = $1TgFO.endpointCache.get(cacheKeyStr); //endpoint cache also accepts string keys
+    var cacheKeyStr = $3ty2n.EndpointCache.getKeyString(cacheKey);
+    var endpoints = $3ty2n.endpointCache.get(cacheKeyStr); //endpoint cache also accepts string keys
     if (endpoints && endpoints.length === 1 && endpoints[0].Address === '') {
         //endpoint operation is being made but response not yet received
         //push request object to a pending queue
-        if (!$46ca14db38450257$var$requestQueue[cacheKeyStr]) $46ca14db38450257$var$requestQueue[cacheKeyStr] = [];
-        $46ca14db38450257$var$requestQueue[cacheKeyStr].push({
+        if (!$f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr]) $f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr] = [];
+        $f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr].push({
             request: request,
             callback: done
         });
@@ -5819,11 +5819,11 @@ var $46ca14db38450257$var$requestQueue = {};
             Operation: operationModel.name,
             Identifiers: identifiers
         });
-        endpointRequest.removeListener('validate', $1TgFO.EventListeners.Core.VALIDATE_PARAMETERS);
-        $46ca14db38450257$var$addApiVersionHeader(endpointRequest);
+        endpointRequest.removeListener('validate', $3ty2n.EventListeners.Core.VALIDATE_PARAMETERS);
+        $f12f9cb599fe1f7f$var$addApiVersionHeader(endpointRequest);
         //put in a placeholder for endpoints already requested, prevent
         //too much in-flight calls
-        $1TgFO.endpointCache.put(cacheKeyStr, [
+        $3ty2n.endpointCache.put(cacheKeyStr, [
             {
                 Address: '',
                 CachePeriodInMinutes: 60 //long-live cache
@@ -5831,32 +5831,32 @@ var $46ca14db38450257$var$requestQueue = {};
         ]);
         endpointRequest.send(function(err, data) {
             if (err) {
-                request.response.error = $jfMGq.error(err, {
+                request.response.error = $KHT0q.error(err, {
                     retryable: false
                 });
-                $1TgFO.endpointCache.remove(cacheKey);
+                $3ty2n.endpointCache.remove(cacheKey);
                 //fail all the pending requests in batch
-                if ($46ca14db38450257$var$requestQueue[cacheKeyStr]) {
-                    var pendingRequests = $46ca14db38450257$var$requestQueue[cacheKeyStr];
-                    $jfMGq.arrayEach(pendingRequests, function(requestContext) {
-                        requestContext.request.response.error = $jfMGq.error(err, {
+                if ($f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr]) {
+                    var pendingRequests = $f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr];
+                    $KHT0q.arrayEach(pendingRequests, function(requestContext) {
+                        requestContext.request.response.error = $KHT0q.error(err, {
                             retryable: false
                         });
                         requestContext.callback();
                     });
-                    delete $46ca14db38450257$var$requestQueue[cacheKeyStr];
+                    delete $f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr];
                 }
             } else if (data) {
-                $1TgFO.endpointCache.put(cacheKeyStr, data.Endpoints);
+                $3ty2n.endpointCache.put(cacheKeyStr, data.Endpoints);
                 request.httpRequest.updateEndpoint(data.Endpoints[0].Address);
                 //update the endpoint for all the pending requests in batch
-                if ($46ca14db38450257$var$requestQueue[cacheKeyStr]) {
-                    var pendingRequests = $46ca14db38450257$var$requestQueue[cacheKeyStr];
-                    $jfMGq.arrayEach(pendingRequests, function(requestContext) {
+                if ($f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr]) {
+                    var pendingRequests = $f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr];
+                    $KHT0q.arrayEach(pendingRequests, function(requestContext) {
                         requestContext.request.httpRequest.updateEndpoint(data.Endpoints[0].Address);
                         requestContext.callback();
                     });
-                    delete $46ca14db38450257$var$requestQueue[cacheKeyStr];
+                    delete $f12f9cb599fe1f7f$var$requestQueue[cacheKeyStr];
                 }
             }
             done();
@@ -5866,7 +5866,7 @@ var $46ca14db38450257$var$requestQueue = {};
 /**
  * add api version header to endpoint operation
  * @api private
- */ function $46ca14db38450257$var$addApiVersionHeader(endpointRequest) {
+ */ function $f12f9cb599fe1f7f$var$addApiVersionHeader(endpointRequest) {
     var api = endpointRequest.service.api;
     var apiVersion = api.apiVersion;
     if (apiVersion && !endpointRequest.httpRequest.headers['x-amz-api-version']) endpointRequest.httpRequest.headers['x-amz-api-version'] = apiVersion;
@@ -5875,38 +5875,38 @@ var $46ca14db38450257$var$requestQueue = {};
  * If api call gets invalid endpoint exception, SDK should attempt to remove the invalid
  * endpoint from cache.
  * @api private
- */ function $46ca14db38450257$var$invalidateCachedEndpoints(response) {
+ */ function $f12f9cb599fe1f7f$var$invalidateCachedEndpoints(response) {
     var error = response.error;
     var httpResponse = response.httpResponse;
     if (error && (error.code === 'InvalidEndpointException' || httpResponse.statusCode === 421)) {
         var request = response.request;
         var operations = request.service.api.operations || {};
         var inputShape = operations[request.operation] ? operations[request.operation].input : undefined;
-        var identifiers = $46ca14db38450257$var$marshallCustomIdentifiers(request, inputShape);
-        var cacheKey = $46ca14db38450257$var$getCacheKey(request);
+        var identifiers = $f12f9cb599fe1f7f$var$marshallCustomIdentifiers(request, inputShape);
+        var cacheKey = $f12f9cb599fe1f7f$var$getCacheKey(request);
         if (Object.keys(identifiers).length > 0) {
-            cacheKey = $jfMGq.update(cacheKey, identifiers);
+            cacheKey = $KHT0q.update(cacheKey, identifiers);
             if (operations[request.operation]) cacheKey.operation = operations[request.operation].name;
         }
-        $1TgFO.endpointCache.remove(cacheKey);
+        $3ty2n.endpointCache.remove(cacheKey);
     }
 }
 /**
  * If endpoint is explicitly configured, SDK should not do endpoint discovery in anytime.
  * @param [object] client Service client object.
  * @api private
- */ function $46ca14db38450257$var$hasCustomEndpoint(client) {
+ */ function $f12f9cb599fe1f7f$var$hasCustomEndpoint(client) {
     //if set endpoint is set for specific client, enable endpoint discovery will raise an error.
-    if (client._originalConfig && client._originalConfig.endpoint && client._originalConfig.endpointDiscoveryEnabled === true) throw $jfMGq.error(new Error(), {
+    if (client._originalConfig && client._originalConfig.endpoint && client._originalConfig.endpointDiscoveryEnabled === true) throw $KHT0q.error(new Error(), {
         code: 'ConfigurationException',
         message: 'Custom endpoint is supplied; endpointDiscoveryEnabled must not be true.'
     });
-    var svcConfig = $1TgFO.config[client.serviceIdentifier] || {};
-    return Boolean($1TgFO.config.endpoint || svcConfig.endpoint || client._originalConfig && client._originalConfig.endpoint);
+    var svcConfig = $3ty2n.config[client.serviceIdentifier] || {};
+    return Boolean($3ty2n.config.endpoint || svcConfig.endpoint || client._originalConfig && client._originalConfig.endpoint);
 }
 /**
  * @api private
- */ function $46ca14db38450257$var$isFalsy(value) {
+ */ function $f12f9cb599fe1f7f$var$isFalsy(value) {
     return [
         'false',
         '0'
@@ -5923,37 +5923,37 @@ var $46ca14db38450257$var$requestQueue = {};
  * @returns [boolean|undefined] if endpoint discovery config is not set in any source, this
  *  function returns undefined
  * @api private
- */ function $46ca14db38450257$var$resolveEndpointDiscoveryConfig(request) {
+ */ function $f12f9cb599fe1f7f$var$resolveEndpointDiscoveryConfig(request) {
     var service = request.service || {};
     if (service.config.endpointDiscoveryEnabled !== undefined) return service.config.endpointDiscoveryEnabled;
     //shared ini file is only available in Node
     //not to check env in browser
-    if ($jfMGq.isBrowser()) return undefined;
+    if ($KHT0q.isBrowser()) return undefined;
     // If any of recognized endpoint discovery config env is set
-    for(var i = 0; i < $46ca14db38450257$var$endpointDiscoveryEnabledEnvs.length; i++){
-        var env = $46ca14db38450257$var$endpointDiscoveryEnabledEnvs[i];
+    for(var i = 0; i < $f12f9cb599fe1f7f$var$endpointDiscoveryEnabledEnvs.length; i++){
+        var env = $f12f9cb599fe1f7f$var$endpointDiscoveryEnabledEnvs[i];
         if (Object.prototype.hasOwnProperty.call(process.env, env)) {
-            if (process.env[env] === '' || process.env[env] === undefined) throw $jfMGq.error(new Error(), {
+            if (process.env[env] === '' || process.env[env] === undefined) throw $KHT0q.error(new Error(), {
                 code: 'ConfigurationException',
                 message: 'environmental variable ' + env + ' cannot be set to nothing'
             });
-            return !$46ca14db38450257$var$isFalsy(process.env[env]);
+            return !$f12f9cb599fe1f7f$var$isFalsy(process.env[env]);
         }
     }
     var configFile = {};
     try {
-        configFile = $1TgFO.util.iniLoader ? $1TgFO.util.iniLoader.loadFrom({
+        configFile = $3ty2n.util.iniLoader ? $3ty2n.util.iniLoader.loadFrom({
             isConfig: true,
-            filename: process.env[$1TgFO.util.sharedConfigFileEnv]
+            filename: process.env[$3ty2n.util.sharedConfigFileEnv]
         }) : {};
     } catch (e) {}
-    var sharedFileConfig = configFile[process.env.AWS_PROFILE || $1TgFO.util.defaultProfile] || {};
+    var sharedFileConfig = configFile[process.env.AWS_PROFILE || $3ty2n.util.defaultProfile] || {};
     if (Object.prototype.hasOwnProperty.call(sharedFileConfig, 'endpoint_discovery_enabled')) {
-        if (sharedFileConfig.endpoint_discovery_enabled === undefined) throw $jfMGq.error(new Error(), {
+        if (sharedFileConfig.endpoint_discovery_enabled === undefined) throw $KHT0q.error(new Error(), {
             code: 'ConfigurationException',
             message: 'config file entry \'endpoint_discovery_enabled\' cannot be set to nothing'
         });
-        return !$46ca14db38450257$var$isFalsy(sharedFileConfig.endpoint_discovery_enabled);
+        return !$f12f9cb599fe1f7f$var$isFalsy(sharedFileConfig.endpoint_discovery_enabled);
     }
     return undefined;
 }
@@ -5961,13 +5961,13 @@ var $46ca14db38450257$var$requestQueue = {};
  * attach endpoint discovery logic to request object
  * @param [object] request
  * @api private
- */ function $46ca14db38450257$var$discoverEndpoint(request, done) {
+ */ function $f12f9cb599fe1f7f$var$discoverEndpoint(request, done) {
     var service = request.service || {};
-    if ($46ca14db38450257$var$hasCustomEndpoint(service) || request.isPresigned()) return done();
+    if ($f12f9cb599fe1f7f$var$hasCustomEndpoint(service) || request.isPresigned()) return done();
     var operations = service.api.operations || {};
     var operationModel = operations[request.operation];
     var isEndpointDiscoveryRequired = operationModel ? operationModel.endpointDiscoveryRequired : 'NULL';
-    var isEnabled = $46ca14db38450257$var$resolveEndpointDiscoveryConfig(request);
+    var isEnabled = $f12f9cb599fe1f7f$var$resolveEndpointDiscoveryConfig(request);
     var hasRequiredEndpointDiscovery = service.api.hasRequiredEndpointDiscovery;
     if (isEnabled || hasRequiredEndpointDiscovery) // Once a customer enables endpoint discovery, the SDK should start appending
     // the string endpoint-discovery to the user-agent on all requests.
@@ -5977,8 +5977,8 @@ var $46ca14db38450257$var$requestQueue = {};
             if (isEnabled || hasRequiredEndpointDiscovery) {
                 // For a given service; if at least one operation requires endpoint discovery then the SDK must enable endpoint discovery
                 // by default for all operations of that service, including operations where endpoint discovery is optional.
-                $46ca14db38450257$var$optionalDiscoverEndpoint(request);
-                request.addNamedListener('INVALIDATE_CACHED_ENDPOINTS', 'extractError', $46ca14db38450257$var$invalidateCachedEndpoints);
+                $f12f9cb599fe1f7f$var$optionalDiscoverEndpoint(request);
+                request.addNamedListener('INVALIDATE_CACHED_ENDPOINTS', 'extractError', $f12f9cb599fe1f7f$var$invalidateCachedEndpoints);
             }
             done();
             break;
@@ -5986,15 +5986,15 @@ var $46ca14db38450257$var$requestQueue = {};
             if (isEnabled === false) {
                 // For a given operation; if endpoint discovery is required and it has been disabled on the SDK client,
                 // then the SDK must return a clear and actionable exception.
-                request.response.error = $jfMGq.error(new Error(), {
+                request.response.error = $KHT0q.error(new Error(), {
                     code: 'ConfigurationException',
                     message: 'Endpoint Discovery is disabled but ' + service.api.className + '.' + request.operation + '() requires it. Please check your configurations.'
                 });
                 done();
                 break;
             }
-            request.addNamedListener('INVALIDATE_CACHED_ENDPOINTS', 'extractError', $46ca14db38450257$var$invalidateCachedEndpoints);
-            $46ca14db38450257$var$requiredDiscoverEndpoint(request, done);
+            request.addNamedListener('INVALIDATE_CACHED_ENDPOINTS', 'extractError', $f12f9cb599fe1f7f$var$invalidateCachedEndpoints);
+            $f12f9cb599fe1f7f$var$requiredDiscoverEndpoint(request, done);
             break;
         case 'NULL':
         default:
@@ -6003,45 +6003,45 @@ var $46ca14db38450257$var$requestQueue = {};
     }
 }
 module.exports = {
-    discoverEndpoint: $46ca14db38450257$var$discoverEndpoint,
-    requiredDiscoverEndpoint: $46ca14db38450257$var$requiredDiscoverEndpoint,
-    optionalDiscoverEndpoint: $46ca14db38450257$var$optionalDiscoverEndpoint,
-    marshallCustomIdentifiers: $46ca14db38450257$var$marshallCustomIdentifiers,
-    getCacheKey: $46ca14db38450257$var$getCacheKey,
-    invalidateCachedEndpoint: $46ca14db38450257$var$invalidateCachedEndpoints
+    discoverEndpoint: $f12f9cb599fe1f7f$var$discoverEndpoint,
+    requiredDiscoverEndpoint: $f12f9cb599fe1f7f$var$requiredDiscoverEndpoint,
+    optionalDiscoverEndpoint: $f12f9cb599fe1f7f$var$optionalDiscoverEndpoint,
+    marshallCustomIdentifiers: $f12f9cb599fe1f7f$var$marshallCustomIdentifiers,
+    getCacheKey: $f12f9cb599fe1f7f$var$getCacheKey,
+    invalidateCachedEndpoint: $f12f9cb599fe1f7f$var$invalidateCachedEndpoints
 };
 
 });
 
 
-parcelRegister("3MMe5", function(module, exports) {
+parcelRegister("i1ovV", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $3eAUV = parcelRequire("3eAUV");
-var $2c1b437c9ebb0244$var$inherit = $1TgFO.util.inherit;
-var $2c1b437c9ebb0244$var$domain = $1TgFO.util.domain;
+var $bTj3i = parcelRequire("bTj3i");
+var $d1eb55f5c0142065$var$inherit = $3ty2n.util.inherit;
+var $d1eb55f5c0142065$var$domain = $3ty2n.util.domain;
 
-var $5X94o = parcelRequire("5X94o");
+var $92cAb = parcelRequire("92cAb");
 /**
  * @api private
- */ var $2c1b437c9ebb0244$var$hardErrorStates = {
+ */ var $d1eb55f5c0142065$var$hardErrorStates = {
     success: 1,
     error: 1,
     complete: 1
 };
-function $2c1b437c9ebb0244$var$isTerminalState(machine) {
-    return Object.prototype.hasOwnProperty.call($2c1b437c9ebb0244$var$hardErrorStates, machine._asm.currentState);
+function $d1eb55f5c0142065$var$isTerminalState(machine) {
+    return Object.prototype.hasOwnProperty.call($d1eb55f5c0142065$var$hardErrorStates, machine._asm.currentState);
 }
-var $2c1b437c9ebb0244$var$fsm = new $3eAUV();
-$2c1b437c9ebb0244$var$fsm.setupStates = function() {
+var $d1eb55f5c0142065$var$fsm = new $bTj3i();
+$d1eb55f5c0142065$var$fsm.setupStates = function() {
     var transition = function(_, done) {
         var self = this;
         self._haltHandlersOnError = false;
         self.emit(self._asm.currentState, function(err) {
             if (err) {
-                if ($2c1b437c9ebb0244$var$isTerminalState(self)) {
-                    if ($2c1b437c9ebb0244$var$domain && self.domain instanceof $2c1b437c9ebb0244$var$domain.Domain) {
+                if ($d1eb55f5c0142065$var$isTerminalState(self)) {
+                    if ($d1eb55f5c0142065$var$domain && self.domain instanceof $d1eb55f5c0142065$var$domain.Domain) {
                         err.domainEmitter = self;
                         err.domain = self.domain;
                         err.domainThrown = false;
@@ -6069,7 +6069,7 @@ $2c1b437c9ebb0244$var$fsm.setupStates = function() {
     this.addState('error', 'complete', 'complete', transition);
     this.addState('complete', null, null, transition);
 };
-$2c1b437c9ebb0244$var$fsm.setupStates();
+$d1eb55f5c0142065$var$fsm.setupStates();
 /**
  * ## Asynchronous Requests
  *
@@ -6307,7 +6307,7 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
  *   @context (see AWS.Request~send)
  *
  * @see AWS.Response
- */ $1TgFO.Request = $2c1b437c9ebb0244$var$inherit({
+ */ $3ty2n.Request = $d1eb55f5c0142065$var$inherit({
     /**
    * Creates a request for an operation on a given service with
    * a set of input parameters.
@@ -6323,17 +6323,17 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
         var customUserAgent = service.config.customUserAgent;
         if (service.signingRegion) region = service.signingRegion;
         else if (service.isGlobalEndpoint) region = 'us-east-1';
-        this.domain = $2c1b437c9ebb0244$var$domain && $2c1b437c9ebb0244$var$domain.active;
+        this.domain = $d1eb55f5c0142065$var$domain && $d1eb55f5c0142065$var$domain.active;
         this.service = service;
         this.operation = operation;
         this.params = params || {};
-        this.httpRequest = new $1TgFO.HttpRequest(endpoint, region);
+        this.httpRequest = new $3ty2n.HttpRequest(endpoint, region);
         this.httpRequest.appendToUserAgent(customUserAgent);
         this.startTime = service.getSkewCorrectedDate();
-        this.response = new $1TgFO.Response(this);
-        this._asm = new $3eAUV($2c1b437c9ebb0244$var$fsm.states, 'validate');
+        this.response = new $3ty2n.Response(this);
+        this._asm = new $bTj3i($d1eb55f5c0142065$var$fsm.states, 'validate');
         this._haltHandlersOnError = false;
-        $1TgFO.SequentialExecutor.call(this);
+        $3ty2n.SequentialExecutor.call(this);
         this.emit = this.emitEvent;
     },
     /**
@@ -6422,7 +6422,7 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
         this.removeAllListeners('validateResponse');
         this.removeAllListeners('extractError');
         this.on('validateResponse', function addAbortedError(resp) {
-            resp.error = $1TgFO.util.error(new Error('Request aborted by user'), {
+            resp.error = $3ty2n.util.error(new Error('Request aborted by user'), {
                 code: 'RequestAbortedError',
                 retryable: false
             });
@@ -6474,12 +6474,12 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
    * @since v1.4.0
    */ eachPage: function eachPage(callback) {
         // Make all callbacks async-ish
-        callback = $1TgFO.util.fn.makeAsync(callback, 3);
+        callback = $3ty2n.util.fn.makeAsync(callback, 3);
         function wrappedCallback(response) {
             callback.call(response, response.error, response.data, function(result) {
                 if (result === false) return;
                 if (response.hasNextPage()) response.nextPage().on('complete', wrappedCallback).send();
-                else callback.call(response, null, null, $1TgFO.util.fn.noop);
+                else callback.call(response, null, null, $3ty2n.util.fn.noop);
             });
         }
         this.on('complete', wrappedCallback).send();
@@ -6498,11 +6498,11 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
             var config = self.service.paginationConfig(self.operation);
             var resultKey = config.resultKey;
             if (Array.isArray(resultKey)) resultKey = resultKey[0];
-            var items = $5X94o.search(data, resultKey);
+            var items = $92cAb.search(data, resultKey);
             var continueIteration = true;
-            $1TgFO.util.arrayEach(items, function(item) {
+            $3ty2n.util.arrayEach(items, function(item) {
                 continueIteration = callback(null, item);
-                if (continueIteration === false) return $1TgFO.util.abort;
+                if (continueIteration === false) return $3ty2n.util.abort;
             });
             return continueIteration;
         }
@@ -6533,10 +6533,10 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
    *   or read from (by registering 'data' event listeners).
    * @!macro nobrowser
    */ createReadStream: function createReadStream() {
-        var streams = $1TgFO.util.stream;
+        var streams = $3ty2n.util.stream;
         var req = this;
         var stream = null;
-        if ($1TgFO.HttpClient.streamsApiVersion === 2) {
+        if ($3ty2n.HttpClient.streamsApiVersion === 2) {
             stream = new streams.PassThrough();
             process.nextTick(function() {
                 req.send();
@@ -6559,8 +6559,8 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
         });
         this.on('httpHeaders', function streamHeaders(statusCode, headers, resp) {
             if (statusCode < 300) {
-                req.removeListener('httpData', $1TgFO.EventListeners.Core.HTTP_DATA);
-                req.removeListener('httpError', $1TgFO.EventListeners.Core.HTTP_ERROR);
+                req.removeListener('httpData', $3ty2n.EventListeners.Core.HTTP_DATA);
+                req.removeListener('httpError', $3ty2n.EventListeners.Core.HTTP_ERROR);
                 req.on('httpError', function streamHttpError(error) {
                     resp.error = error;
                     resp.error.retryable = false;
@@ -6573,14 +6573,14 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
                     var receivedLen = 0;
                 }
                 var checkContentLengthAndEmit = function checkContentLengthAndEmit() {
-                    if (shouldCheckContentLength && receivedLen !== expectedLen) stream.emit('error', $1TgFO.util.error(new Error('Stream content length mismatch. Received ' + receivedLen + ' of ' + expectedLen + ' bytes.'), {
+                    if (shouldCheckContentLength && receivedLen !== expectedLen) stream.emit('error', $3ty2n.util.error(new Error('Stream content length mismatch. Received ' + receivedLen + ' of ' + expectedLen + ' bytes.'), {
                         code: 'StreamContentLengthMismatch'
                     }));
-                    else if ($1TgFO.HttpClient.streamsApiVersion === 2) stream.end();
+                    else if ($3ty2n.HttpClient.streamsApiVersion === 2) stream.end();
                     else stream.emit('end');
                 };
                 var httpStream = resp.httpResponse.createUnbufferedStream();
-                if ($1TgFO.HttpClient.streamsApiVersion === 2) {
+                if ($3ty2n.HttpClient.streamsApiVersion === 2) {
                     if (shouldCheckContentLength) {
                         var lengthAccumulator = new streams.PassThrough();
                         lengthAccumulator._write = function(chunk) {
@@ -6626,7 +6626,7 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
         }
         if (!done) done = function() {};
         if (!args) args = this.eventParameters(eventName, this.response);
-        var origEmit = $1TgFO.SequentialExecutor.prototype.emit;
+        var origEmit = $3ty2n.SequentialExecutor.prototype.emit;
         origEmit.call(this, eventName, args, function(err) {
             if (err) this.response.error = err;
             done.call(this, err);
@@ -6663,7 +6663,7 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
             callback = expires;
             expires = null;
         }
-        return new $1TgFO.Signers.Presign().sign(this.toGet(), expires, callback);
+        return new $3ty2n.Signers.Presign().sign(this.toGet(), expires, callback);
     },
     /**
    * @api private
@@ -6674,8 +6674,8 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
    * @api private
    */ toUnauthenticated: function toUnauthenticated() {
         this._unAuthenticated = true;
-        this.removeListener('validate', $1TgFO.EventListeners.Core.VALIDATE_CREDENTIALS);
-        this.removeListener('sign', $1TgFO.EventListeners.Core.SIGN);
+        this.removeListener('validate', $3ty2n.EventListeners.Core.VALIDATE_CREDENTIALS);
+        this.removeListener('sign', $3ty2n.EventListeners.Core.SIGN);
         return this;
     },
     /**
@@ -6705,7 +6705,7 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
 });
 /**
  * @api private
- */ $1TgFO.Request.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+ */ $3ty2n.Request.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
     this.prototype.promise = function promise() {
         var self = this;
         // append to user agent
@@ -6725,19 +6725,19 @@ $2c1b437c9ebb0244$var$fsm.setupStates();
 };
 /**
  * @api private
- */ $1TgFO.Request.deletePromisesFromClass = function deletePromisesFromClass() {
+ */ $3ty2n.Request.deletePromisesFromClass = function deletePromisesFromClass() {
     delete this.prototype.promise;
 };
-$1TgFO.util.addPromises($1TgFO.Request);
-$1TgFO.util.mixin($1TgFO.Request, $1TgFO.SequentialExecutor);
+$3ty2n.util.addPromises($3ty2n.Request);
+$3ty2n.util.mixin($3ty2n.Request, $3ty2n.SequentialExecutor);
 
 });
-parcelRegister("3eAUV", function(module, exports) {
-function $25af50e283a6788b$var$AcceptorStateMachine(states, state) {
+parcelRegister("bTj3i", function(module, exports) {
+function $8a839c22834fa37f$var$AcceptorStateMachine(states, state) {
     this.currentState = state || null;
     this.states = states || {};
 }
-$25af50e283a6788b$var$AcceptorStateMachine.prototype.runTo = function runTo(finalState, done, bindObject, inputError) {
+$8a839c22834fa37f$var$AcceptorStateMachine.prototype.runTo = function runTo(finalState, done, bindObject, inputError) {
     if (typeof finalState === 'function') {
         inputError = bindObject;
         bindObject = done;
@@ -6758,7 +6758,7 @@ $25af50e283a6788b$var$AcceptorStateMachine.prototype.runTo = function runTo(fina
         self.runTo(finalState, done, bindObject, err);
     });
 };
-$25af50e283a6788b$var$AcceptorStateMachine.prototype.addState = function addState(name, acceptState, failState, fn) {
+$8a839c22834fa37f$var$AcceptorStateMachine.prototype.addState = function addState(name, acceptState, failState, fn) {
     if (typeof acceptState === 'function') {
         fn = acceptState;
         acceptState = null;
@@ -6777,11 +6777,11 @@ $25af50e283a6788b$var$AcceptorStateMachine.prototype.addState = function addStat
 };
 /**
  * @api private
- */ module.exports = $25af50e283a6788b$var$AcceptorStateMachine;
+ */ module.exports = $8a839c22834fa37f$var$AcceptorStateMachine;
 
 });
 
-parcelRegister("5X94o", function(module, exports) {
+parcelRegister("92cAb", function(module, exports) {
 (function(exports1) {
     "use strict";
     function isArray(obj) {
@@ -8590,12 +8590,12 @@ parcelRegister("5X94o", function(module, exports) {
 });
 
 
-parcelRegister("aTA3q", function(module, exports) {
+parcelRegister("5DtOk", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $7eeb020e541c23cd$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $41a7b8098a03b70c$var$inherit = $3ty2n.util.inherit;
 
-var $5X94o = parcelRequire("5X94o");
+var $92cAb = parcelRequire("92cAb");
 /**
  * This class encapsulates the response information
  * from a service request operation sent through {AWS.Request}.
@@ -8689,7 +8689,7 @@ var $5X94o = parcelRequire("5X94o");
  *     from the server.
  *
  * @see AWS.Request
- */ $1TgFO.Response = $7eeb020e541c23cd$var$inherit({
+ */ $3ty2n.Response = $41a7b8098a03b70c$var$inherit({
     /**
    * @api private
    */ constructor: function Response(request) {
@@ -8698,7 +8698,7 @@ var $5X94o = parcelRequire("5X94o");
         this.error = null;
         this.retryCount = 0;
         this.redirectCount = 0;
-        this.httpResponse = new $1TgFO.HttpResponse();
+        this.httpResponse = new $3ty2n.HttpResponse();
         if (request) {
             this.maxRetries = request.service.numRetries();
             this.maxRedirects = request.service.config.maxRedirects;
@@ -8732,7 +8732,7 @@ var $5X94o = parcelRequire("5X94o");
             else if (this.error) throw this.error;
             return null;
         }
-        var params = $1TgFO.util.copy(this.request.params);
+        var params = $3ty2n.util.copy(this.request.params);
         if (!this.nextPageTokens) return callback ? callback(null, null) : null;
         else {
             var inputTokens = config.inputToken;
@@ -8762,14 +8762,14 @@ var $5X94o = parcelRequire("5X94o");
         if (!config) return this.nextPageTokens;
         this.nextPageTokens = null;
         if (config.moreResults) {
-            if (!$5X94o.search(this.data, config.moreResults)) return this.nextPageTokens;
+            if (!$92cAb.search(this.data, config.moreResults)) return this.nextPageTokens;
         }
         var exprs = config.outputToken;
         if (typeof exprs === 'string') exprs = [
             exprs
         ];
-        $1TgFO.util.arrayEach.call(this, exprs, function(expr) {
-            var output = $5X94o.search(this.data, expr);
+        $3ty2n.util.arrayEach.call(this, exprs, function(expr) {
+            var output = $92cAb.search(this.data, expr);
             if (output) {
                 this.nextPageTokens = this.nextPageTokens || [];
                 this.nextPageTokens.push(output);
@@ -8781,7 +8781,7 @@ var $5X94o = parcelRequire("5X94o");
 
 });
 
-parcelRegister("cIjop", function(module, exports) {
+parcelRegister("3T2fp", function(module, exports) {
 /**
  * Copyright 2012-2013 Amazon.com, Inc. or its affiliates. All Rights Reserved.
  *
@@ -8796,13 +8796,13 @@ parcelRegister("cIjop", function(module, exports) {
  * ANY KIND, either express or implied. See the License for the specific
  * language governing permissions and limitations under the License.
  */ 
-var $1TgFO = parcelRequire("1TgFO");
-var $9418a3130b129c8f$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $2d48407892723149$var$inherit = $3ty2n.util.inherit;
 
-var $5X94o = parcelRequire("5X94o");
+var $92cAb = parcelRequire("92cAb");
 /**
  * @api private
- */ function $9418a3130b129c8f$var$CHECK_ACCEPTORS(resp) {
+ */ function $2d48407892723149$var$CHECK_ACCEPTORS(resp) {
     var waiter = resp.request._waiter;
     var acceptors = waiter.config.acceptors;
     var acceptorMatched = false;
@@ -8822,7 +8822,7 @@ var $5X94o = parcelRequire("5X94o");
 }
 /**
  * @api private
- */ $1TgFO.ResourceWaiter = $9418a3130b129c8f$var$inherit({
+ */ $3ty2n.ResourceWaiter = $2d48407892723149$var$inherit({
     /**
    * Waits for a given state on a service object
    * @param service [Service] the service object to wait on
@@ -8842,15 +8842,15 @@ var $5X94o = parcelRequire("5X94o");
     matchers: {
         path: function(resp, expected, argument) {
             try {
-                var result = $5X94o.search(resp.data, argument);
+                var result = $92cAb.search(resp.data, argument);
             } catch (err) {
                 return false;
             }
-            return $5X94o.strictDeepEqual(result, expected);
+            return $92cAb.strictDeepEqual(result, expected);
         },
         pathAll: function(resp, expected, argument) {
             try {
-                var results = $5X94o.search(resp.data, argument);
+                var results = $92cAb.search(resp.data, argument);
             } catch (err) {
                 return false;
             }
@@ -8860,13 +8860,13 @@ var $5X94o = parcelRequire("5X94o");
             var numResults = results.length;
             if (!numResults) return false;
             for(var ind = 0; ind < numResults; ind++){
-                if (!$5X94o.strictDeepEqual(results[ind], expected)) return false;
+                if (!$92cAb.strictDeepEqual(results[ind], expected)) return false;
             }
             return true;
         },
         pathAny: function(resp, expected, argument) {
             try {
-                var results = $5X94o.search(resp.data, argument);
+                var results = $92cAb.search(resp.data, argument);
             } catch (err) {
                 return false;
             }
@@ -8875,7 +8875,7 @@ var $5X94o = parcelRequire("5X94o");
             ];
             var numResults = results.length;
             for(var ind = 0; ind < numResults; ind++){
-                if ($5X94o.strictDeepEqual(results[ind], expected)) return true;
+                if ($92cAb.strictDeepEqual(results[ind], expected)) return true;
             }
             return false;
         },
@@ -8889,13 +8889,13 @@ var $5X94o = parcelRequire("5X94o");
             return expected === !!resp.error;
         }
     },
-    listeners: new $1TgFO.SequentialExecutor().addNamedListeners(function(add) {
+    listeners: new $3ty2n.SequentialExecutor().addNamedListeners(function(add) {
         add('RETRY_CHECK', 'retry', function(resp) {
             var waiter = resp.request._waiter;
             if (resp.error && resp.error.code === 'ResourceNotReady') resp.error.retryDelay = (waiter.config.delay || 0) * 1000;
         });
-        add('CHECK_OUTPUT', 'extractData', $9418a3130b129c8f$var$CHECK_ACCEPTORS);
-        add('CHECK_ERROR', 'extractError', $9418a3130b129c8f$var$CHECK_ACCEPTORS);
+        add('CHECK_OUTPUT', 'extractData', $2d48407892723149$var$CHECK_ACCEPTORS);
+        add('CHECK_ERROR', 'extractError', $2d48407892723149$var$CHECK_ACCEPTORS);
     }),
     /**
    * @return [AWS.Request]
@@ -8905,7 +8905,7 @@ var $5X94o = parcelRequire("5X94o");
             params = undefined;
         }
         if (params && params.$waiter) {
-            params = $1TgFO.util.copy(params);
+            params = $3ty2n.util.copy(params);
             if (typeof params.$waiter.delay === 'number') this.config.delay = params.$waiter.delay;
             if (typeof params.$waiter.maxAttempts === 'number') this.config.maxAttempts = params.$waiter.maxAttempts;
             delete params.$waiter;
@@ -8924,7 +8924,7 @@ var $5X94o = parcelRequire("5X94o");
     },
     setError: function setError(resp, retryable) {
         resp.data = null;
-        resp.error = $1TgFO.util.error(resp.error || new Error(), {
+        resp.error = $3ty2n.util.error(resp.error || new Error(), {
             code: 'ResourceNotReady',
             message: 'Resource is not in the state ' + this.state,
             retryable: retryable
@@ -8935,23 +8935,23 @@ var $5X94o = parcelRequire("5X94o");
    *
    * @api private
    */ loadWaiterConfig: function loadWaiterConfig(state) {
-        if (!this.service.api.waiters[state]) throw new $1TgFO.util.error(new Error(), {
+        if (!this.service.api.waiters[state]) throw new $3ty2n.util.error(new Error(), {
             code: 'StateNotFoundError',
             message: 'State ' + state + ' not found.'
         });
-        this.config = $1TgFO.util.copy(this.service.api.waiters[state]);
+        this.config = $3ty2n.util.copy(this.service.api.waiters[state]);
     }
 });
 
 });
 
-parcelRegister("aX8go", function(module, exports) {
+parcelRegister("4tFFS", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $7f95d2ffb18fbade$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $342a328c088ee5b6$var$inherit = $3ty2n.util.inherit;
 /**
  * @api private
- */ $1TgFO.Signers.RequestSigner = $7f95d2ffb18fbade$var$inherit({
+ */ $3ty2n.Signers.RequestSigner = $342a328c088ee5b6$var$inherit({
     constructor: function RequestSigner(request) {
         this.request = request;
     },
@@ -8962,81 +8962,81 @@ var $7f95d2ffb18fbade$var$inherit = $1TgFO.util.inherit;
         return this.serviceClientId;
     }
 });
-$1TgFO.Signers.RequestSigner.getVersion = function getVersion(version) {
+$3ty2n.Signers.RequestSigner.getVersion = function getVersion(version) {
     switch(version){
         case 'v2':
-            return $1TgFO.Signers.V2;
+            return $3ty2n.Signers.V2;
         case 'v3':
-            return $1TgFO.Signers.V3;
+            return $3ty2n.Signers.V3;
         case 's3v4':
-            return $1TgFO.Signers.V4;
+            return $3ty2n.Signers.V4;
         case 'v4':
-            return $1TgFO.Signers.V4;
+            return $3ty2n.Signers.V4;
         case 's3':
-            return $1TgFO.Signers.S3;
+            return $3ty2n.Signers.S3;
         case 'v3https':
-            return $1TgFO.Signers.V3Https;
+            return $3ty2n.Signers.V3Https;
         case 'bearer':
-            return $1TgFO.Signers.Bearer;
+            return $3ty2n.Signers.Bearer;
     }
     throw new Error('Unknown signing version ' + version);
 };
-parcelRequire("lXxT1");
-parcelRequire("cTt4h");
-parcelRequire("gCrJX");
-parcelRequire("6DjY7");
-parcelRequire("aW5jJ");
-parcelRequire("6PVmJ");
-parcelRequire("cCtRm");
+parcelRequire("3Y5rq");
+parcelRequire("fR5JL");
+parcelRequire("2m7PM");
+parcelRequire("iMfgS");
+parcelRequire("k9OsQ");
+parcelRequire("hjygr");
+parcelRequire("kroaf");
 
 });
-parcelRegister("lXxT1", function(module, exports) {
+parcelRegister("3Y5rq", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $ffc964cd032d6070$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $2e3b323f9ca46ffc$var$inherit = $3ty2n.util.inherit;
 /**
  * @api private
- */ $1TgFO.Signers.V2 = $ffc964cd032d6070$var$inherit($1TgFO.Signers.RequestSigner, {
+ */ $3ty2n.Signers.V2 = $2e3b323f9ca46ffc$var$inherit($3ty2n.Signers.RequestSigner, {
     addAuthorization: function addAuthorization(credentials, date) {
-        if (!date) date = $1TgFO.util.date.getDate();
+        if (!date) date = $3ty2n.util.date.getDate();
         var r = this.request;
-        r.params.Timestamp = $1TgFO.util.date.iso8601(date);
+        r.params.Timestamp = $3ty2n.util.date.iso8601(date);
         r.params.SignatureVersion = '2';
         r.params.SignatureMethod = 'HmacSHA256';
         r.params.AWSAccessKeyId = credentials.accessKeyId;
         if (credentials.sessionToken) r.params.SecurityToken = credentials.sessionToken;
         delete r.params.Signature; // delete old Signature for re-signing
         r.params.Signature = this.signature(credentials);
-        r.body = $1TgFO.util.queryParamsToString(r.params);
+        r.body = $3ty2n.util.queryParamsToString(r.params);
         r.headers['Content-Length'] = r.body.length;
     },
     signature: function signature(credentials) {
-        return $1TgFO.util.crypto.hmac(credentials.secretAccessKey, this.stringToSign(), 'base64');
+        return $3ty2n.util.crypto.hmac(credentials.secretAccessKey, this.stringToSign(), 'base64');
     },
     stringToSign: function stringToSign() {
         var parts = [];
         parts.push(this.request.method);
         parts.push(this.request.endpoint.host.toLowerCase());
         parts.push(this.request.pathname());
-        parts.push($1TgFO.util.queryParamsToString(this.request.params));
+        parts.push($3ty2n.util.queryParamsToString(this.request.params));
         return parts.join('\n');
     }
 });
 /**
  * @api private
- */ module.exports = $1TgFO.Signers.V2;
+ */ module.exports = $3ty2n.Signers.V2;
 
 });
 
-parcelRegister("cTt4h", function(module, exports) {
+parcelRegister("fR5JL", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $026c25dc6d12ef3d$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $b8b04187c6a57dd7$var$inherit = $3ty2n.util.inherit;
 /**
  * @api private
- */ $1TgFO.Signers.V3 = $026c25dc6d12ef3d$var$inherit($1TgFO.Signers.RequestSigner, {
+ */ $3ty2n.Signers.V3 = $b8b04187c6a57dd7$var$inherit($3ty2n.Signers.RequestSigner, {
     addAuthorization: function addAuthorization(credentials, date) {
-        var datetime = $1TgFO.util.date.rfc822(date);
+        var datetime = $3ty2n.util.date.rfc822(date);
         this.request.headers['X-Amz-Date'] = datetime;
         if (credentials.sessionToken) this.request.headers['x-amz-security-token'] = credentials.sessionToken;
         this.request.headers['X-Amzn-Authorization'] = this.authorization(credentials, datetime);
@@ -9046,7 +9046,7 @@ var $026c25dc6d12ef3d$var$inherit = $1TgFO.util.inherit;
     },
     signedHeaders: function signedHeaders() {
         var headers = [];
-        $1TgFO.util.arrayEach(this.headersToSign(), function iterator(h) {
+        $3ty2n.util.arrayEach(this.headersToSign(), function iterator(h) {
             headers.push(h.toLowerCase());
         });
         return headers.sort().join(';');
@@ -9054,20 +9054,20 @@ var $026c25dc6d12ef3d$var$inherit = $1TgFO.util.inherit;
     canonicalHeaders: function canonicalHeaders() {
         var headers = this.request.headers;
         var parts = [];
-        $1TgFO.util.arrayEach(this.headersToSign(), function iterator(h) {
+        $3ty2n.util.arrayEach(this.headersToSign(), function iterator(h) {
             parts.push(h.toLowerCase().trim() + ':' + String(headers[h]).trim());
         });
         return parts.sort().join('\n') + '\n';
     },
     headersToSign: function headersToSign() {
         var headers = [];
-        $1TgFO.util.each(this.request.headers, function iterator(k) {
+        $3ty2n.util.each(this.request.headers, function iterator(k) {
             if (k === 'Host' || k === 'Content-Encoding' || k.match(/^X-Amz/i)) headers.push(k);
         });
         return headers;
     },
     signature: function signature(credentials) {
-        return $1TgFO.util.crypto.hmac(credentials.secretAccessKey, this.stringToSign(), 'base64');
+        return $3ty2n.util.crypto.hmac(credentials.secretAccessKey, this.stringToSign(), 'base64');
     },
     stringToSign: function stringToSign() {
         var parts = [];
@@ -9076,23 +9076,23 @@ var $026c25dc6d12ef3d$var$inherit = $1TgFO.util.inherit;
         parts.push('');
         parts.push(this.canonicalHeaders());
         parts.push(this.request.body);
-        return $1TgFO.util.crypto.sha256(parts.join('\n'));
+        return $3ty2n.util.crypto.sha256(parts.join('\n'));
     }
 });
 /**
  * @api private
- */ module.exports = $1TgFO.Signers.V3;
+ */ module.exports = $3ty2n.Signers.V3;
 
 });
 
-parcelRegister("gCrJX", function(module, exports) {
+parcelRegister("2m7PM", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $c195b698e7378a52$var$inherit = $1TgFO.util.inherit;
-parcelRequire("cTt4h");
+var $3ty2n = parcelRequire("3ty2n");
+var $1b73b68e5cdc340f$var$inherit = $3ty2n.util.inherit;
+parcelRequire("fR5JL");
 /**
  * @api private
- */ $1TgFO.Signers.V3Https = $c195b698e7378a52$var$inherit($1TgFO.Signers.V3, {
+ */ $3ty2n.Signers.V3Https = $1b73b68e5cdc340f$var$inherit($3ty2n.Signers.V3, {
     authorization: function authorization(credentials) {
         return "AWS3-HTTPS AWSAccessKeyId=" + credentials.accessKeyId + ',' + 'Algorithm=HmacSHA256,' + 'Signature=' + this.signature(credentials);
     },
@@ -9102,24 +9102,24 @@ parcelRequire("cTt4h");
 });
 /**
  * @api private
- */ module.exports = $1TgFO.Signers.V3Https;
+ */ module.exports = $3ty2n.Signers.V3Https;
 
 });
 
-parcelRegister("6DjY7", function(module, exports) {
+parcelRegister("iMfgS", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $9sHsU = parcelRequire("9sHsU");
-var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
+var $bmV7w = parcelRequire("bmV7w");
+var $dab88e394adc384b$var$inherit = $3ty2n.util.inherit;
 /**
  * @api private
- */ var $4d45dfef558af98a$var$expiresHeader = 'presigned-expires';
+ */ var $dab88e394adc384b$var$expiresHeader = 'presigned-expires';
 /**
  * @api private
- */ $1TgFO.Signers.V4 = $4d45dfef558af98a$var$inherit($1TgFO.Signers.RequestSigner, {
+ */ $3ty2n.Signers.V4 = $dab88e394adc384b$var$inherit($3ty2n.Signers.RequestSigner, {
     constructor: function V4(request, serviceName, options) {
-        $1TgFO.Signers.RequestSigner.call(this, request);
+        $3ty2n.Signers.RequestSigner.call(this, request);
         this.serviceName = serviceName;
         options = options || {};
         this.signatureCache = typeof options.signatureCache === 'boolean' ? options.signatureCache : true;
@@ -9128,7 +9128,7 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
     },
     algorithm: 'AWS4-HMAC-SHA256',
     addAuthorization: function addAuthorization(credentials, date) {
-        var datetime = $1TgFO.util.date.iso8601(date).replace(/[:\-]|\.\d{3}/g, '');
+        var datetime = $3ty2n.util.date.iso8601(date).replace(/[:\-]|\.\d{3}/g, '');
         if (this.isPresigned()) this.updateForPresigned(credentials, datetime);
         else this.addHeaders(credentials, datetime);
         this.request.headers['Authorization'] = this.authorization(credentials, datetime);
@@ -9143,7 +9143,7 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
             'X-Amz-Date': datetime,
             'X-Amz-Algorithm': this.algorithm,
             'X-Amz-Credential': credentials.accessKeyId + '/' + credString,
-            'X-Amz-Expires': this.request.headers[$4d45dfef558af98a$var$expiresHeader],
+            'X-Amz-Expires': this.request.headers[$dab88e394adc384b$var$expiresHeader],
             'X-Amz-SignedHeaders': this.signedHeaders()
         };
         if (credentials.sessionToken) qs['X-Amz-Security-Token'] = credentials.sessionToken;
@@ -9151,8 +9151,8 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
         if (this.request.headers['Content-MD5']) qs['Content-MD5'] = this.request.headers['Content-MD5'];
         if (this.request.headers['Cache-Control']) qs['Cache-Control'] = this.request.headers['Cache-Control'];
         // need to pull in any other X-Amz-* headers
-        $1TgFO.util.each.call(this, this.request.headers, function(key, value) {
-            if (key === $4d45dfef558af98a$var$expiresHeader) return;
+        $3ty2n.util.each.call(this, this.request.headers, function(key, value) {
+            if (key === $dab88e394adc384b$var$expiresHeader) return;
             if (this.isSignableHeader(key)) {
                 var lowerKey = key.toLowerCase();
                 // Metadata should be normalized
@@ -9161,7 +9161,7 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
             }
         });
         var sep = this.request.path.indexOf('?') >= 0 ? '&' : '?';
-        this.request.path += sep + $1TgFO.util.queryParamsToString(qs);
+        this.request.path += sep + $3ty2n.util.queryParamsToString(qs);
     },
     authorization: function authorization(credentials, datetime) {
         var parts = [];
@@ -9172,8 +9172,8 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
         return parts.join(', ');
     },
     signature: function signature(credentials, datetime) {
-        var signingKey = $9sHsU.getSigningKey(credentials, datetime.substr(0, 8), this.request.region, this.serviceName, this.signatureCache);
-        return $1TgFO.util.crypto.hmac(signingKey, this.stringToSign(datetime), 'hex');
+        var signingKey = $bmV7w.getSigningKey(credentials, datetime.substr(0, 8), this.request.region, this.serviceName, this.signatureCache);
+        return $3ty2n.util.crypto.hmac(signingKey, this.stringToSign(datetime), 'hex');
     },
     stringToSign: function stringToSign(datetime) {
         var parts = [];
@@ -9185,7 +9185,7 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
     },
     canonicalString: function canonicalString() {
         var parts = [], pathname = this.request.pathname();
-        if (this.serviceName !== 's3' && this.signatureVersion !== 's3v4') pathname = $1TgFO.util.uriEscapePath(pathname);
+        if (this.serviceName !== 's3' && this.signatureVersion !== 's3v4') pathname = $3ty2n.util.uriEscapePath(pathname);
         parts.push(this.request.method);
         parts.push(pathname);
         parts.push(this.request.search());
@@ -9196,7 +9196,7 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
     },
     canonicalHeaders: function canonicalHeaders() {
         var headers = [];
-        $1TgFO.util.each.call(this, this.request.headers, function(key, item) {
+        $3ty2n.util.each.call(this, this.request.headers, function(key, item) {
             headers.push([
                 key,
                 item
@@ -9206,11 +9206,11 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
             return a[0].toLowerCase() < b[0].toLowerCase() ? -1 : 1;
         });
         var parts = [];
-        $1TgFO.util.arrayEach.call(this, headers, function(item) {
+        $3ty2n.util.arrayEach.call(this, headers, function(item) {
             var key = item[0].toLowerCase();
             if (this.isSignableHeader(key)) {
                 var value = item[1];
-                if (typeof value === 'undefined' || value === null || typeof value.toString !== 'function') throw $1TgFO.util.error(new Error('Header ' + key + ' contains invalid value'), {
+                if (typeof value === 'undefined' || value === null || typeof value.toString !== 'function') throw $3ty2n.util.error(new Error('Header ' + key + ' contains invalid value'), {
                     code: 'InvalidHeader'
                 });
                 parts.push(key + ':' + this.canonicalHeaderValues(value.toString()));
@@ -9223,17 +9223,17 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
     },
     signedHeaders: function signedHeaders() {
         var keys = [];
-        $1TgFO.util.each.call(this, this.request.headers, function(key) {
+        $3ty2n.util.each.call(this, this.request.headers, function(key) {
             key = key.toLowerCase();
             if (this.isSignableHeader(key)) keys.push(key);
         });
         return keys.sort().join(';');
     },
     credentialString: function credentialString(datetime) {
-        return $9sHsU.createScope(datetime.substr(0, 8), this.request.region, this.serviceName);
+        return $bmV7w.createScope(datetime.substr(0, 8), this.request.region, this.serviceName);
     },
     hexEncodedHash: function hash(string) {
-        return $1TgFO.util.crypto.sha256(string, 'hex');
+        return $3ty2n.util.crypto.sha256(string, 'hex');
     },
     hexEncodedBodyHash: function hexEncodedBodyHash() {
         var request = this.request;
@@ -9249,7 +9249,7 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
         'content-type',
         'content-length',
         'user-agent',
-        $4d45dfef558af98a$var$expiresHeader,
+        $dab88e394adc384b$var$expiresHeader,
         'expect',
         'x-amzn-trace-id'
     ],
@@ -9258,29 +9258,29 @@ var $4d45dfef558af98a$var$inherit = $1TgFO.util.inherit;
         return this.unsignableHeaders.indexOf(key) < 0;
     },
     isPresigned: function isPresigned() {
-        return this.request.headers[$4d45dfef558af98a$var$expiresHeader] ? true : false;
+        return this.request.headers[$dab88e394adc384b$var$expiresHeader] ? true : false;
     }
 });
 /**
  * @api private
- */ module.exports = $1TgFO.Signers.V4;
+ */ module.exports = $3ty2n.Signers.V4;
 
 });
-parcelRegister("9sHsU", function(module, exports) {
+parcelRegister("bmV7w", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * @api private
- */ var $6e3871e79ceaaa8d$var$cachedSecret = {};
+ */ var $846e0eb6746b3db8$var$cachedSecret = {};
 /**
  * @api private
- */ var $6e3871e79ceaaa8d$var$cacheQueue = [];
+ */ var $846e0eb6746b3db8$var$cacheQueue = [];
 /**
  * @api private
- */ var $6e3871e79ceaaa8d$var$maxCacheEntries = 50;
+ */ var $846e0eb6746b3db8$var$maxCacheEntries = 50;
 /**
  * @api private
- */ var $6e3871e79ceaaa8d$var$v4Identifier = 'aws4_request';
+ */ var $846e0eb6746b3db8$var$v4Identifier = 'aws4_request';
 /**
  * @api private
  */ module.exports = {
@@ -9296,7 +9296,7 @@ var $1TgFO = parcelRequire("1TgFO");
             date.substr(0, 8),
             region,
             serviceName,
-            $6e3871e79ceaaa8d$var$v4Identifier
+            $846e0eb6746b3db8$var$v4Identifier
         ].join('/');
     },
     /**
@@ -9309,7 +9309,7 @@ var $1TgFO = parcelRequire("1TgFO");
    * @param shouldCache [Boolean]
    * @return [String]
    */ getSigningKey: function getSigningKey(credentials, date, region, service, shouldCache) {
-        var credsIdentifier = $1TgFO.util.crypto.hmac(credentials.secretAccessKey, credentials.accessKeyId, 'base64');
+        var credsIdentifier = $3ty2n.util.crypto.hmac(credentials.secretAccessKey, credentials.accessKeyId, 'base64');
         var cacheKey = [
             credsIdentifier,
             date,
@@ -9317,16 +9317,16 @@ var $1TgFO = parcelRequire("1TgFO");
             service
         ].join('_');
         shouldCache = shouldCache !== false;
-        if (shouldCache && cacheKey in $6e3871e79ceaaa8d$var$cachedSecret) return $6e3871e79ceaaa8d$var$cachedSecret[cacheKey];
-        var kDate = $1TgFO.util.crypto.hmac('AWS4' + credentials.secretAccessKey, date, 'buffer');
-        var kRegion = $1TgFO.util.crypto.hmac(kDate, region, 'buffer');
-        var kService = $1TgFO.util.crypto.hmac(kRegion, service, 'buffer');
-        var signingKey = $1TgFO.util.crypto.hmac(kService, $6e3871e79ceaaa8d$var$v4Identifier, 'buffer');
+        if (shouldCache && cacheKey in $846e0eb6746b3db8$var$cachedSecret) return $846e0eb6746b3db8$var$cachedSecret[cacheKey];
+        var kDate = $3ty2n.util.crypto.hmac('AWS4' + credentials.secretAccessKey, date, 'buffer');
+        var kRegion = $3ty2n.util.crypto.hmac(kDate, region, 'buffer');
+        var kService = $3ty2n.util.crypto.hmac(kRegion, service, 'buffer');
+        var signingKey = $3ty2n.util.crypto.hmac(kService, $846e0eb6746b3db8$var$v4Identifier, 'buffer');
         if (shouldCache) {
-            $6e3871e79ceaaa8d$var$cachedSecret[cacheKey] = signingKey;
-            $6e3871e79ceaaa8d$var$cacheQueue.push(cacheKey);
-            if ($6e3871e79ceaaa8d$var$cacheQueue.length > $6e3871e79ceaaa8d$var$maxCacheEntries) // remove the oldest entry (not the least recently used)
-            delete $6e3871e79ceaaa8d$var$cachedSecret[$6e3871e79ceaaa8d$var$cacheQueue.shift()];
+            $846e0eb6746b3db8$var$cachedSecret[cacheKey] = signingKey;
+            $846e0eb6746b3db8$var$cacheQueue.push(cacheKey);
+            if ($846e0eb6746b3db8$var$cacheQueue.length > $846e0eb6746b3db8$var$maxCacheEntries) // remove the oldest entry (not the least recently used)
+            delete $846e0eb6746b3db8$var$cachedSecret[$846e0eb6746b3db8$var$cacheQueue.shift()];
         }
         return signingKey;
     },
@@ -9336,21 +9336,21 @@ var $1TgFO = parcelRequire("1TgFO");
    * Empties the derived signing key cache. Made available for testing purposes
    * only.
    */ emptyCache: function emptyCache() {
-        $6e3871e79ceaaa8d$var$cachedSecret = {};
-        $6e3871e79ceaaa8d$var$cacheQueue = [];
+        $846e0eb6746b3db8$var$cachedSecret = {};
+        $846e0eb6746b3db8$var$cacheQueue = [];
     }
 };
 
 });
 
 
-parcelRegister("aW5jJ", function(module, exports) {
+parcelRegister("k9OsQ", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $7f6372148d22fb96$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $eacbcb0fdf4e0e07$var$inherit = $3ty2n.util.inherit;
 /**
  * @api private
- */ $1TgFO.Signers.S3 = $7f6372148d22fb96$var$inherit($1TgFO.Signers.RequestSigner, {
+ */ $3ty2n.Signers.S3 = $eacbcb0fdf4e0e07$var$inherit($3ty2n.Signers.RequestSigner, {
     /**
    * When building the stringToSign, these sub resource params should be
    * part of the canonical resource string with their NON-decoded values
@@ -9391,7 +9391,7 @@ var $7f6372148d22fb96$var$inherit = $1TgFO.util.inherit;
         'response-content-encoding': 1
     },
     addAuthorization: function addAuthorization(credentials, date) {
-        if (!this.request.headers['presigned-expires']) this.request.headers['X-Amz-Date'] = $1TgFO.util.date.rfc822(date);
+        if (!this.request.headers['presigned-expires']) this.request.headers['X-Amz-Date'] = $3ty2n.util.date.rfc822(date);
         if (credentials.sessionToken) // presigned URLs require this header to be lowercased
         this.request.headers['x-amz-security-token'] = credentials.sessionToken;
         var signature = this.sign(credentials.secretAccessKey, this.stringToSign());
@@ -9415,14 +9415,14 @@ var $7f6372148d22fb96$var$inherit = $1TgFO.util.inherit;
     },
     canonicalizedAmzHeaders: function canonicalizedAmzHeaders() {
         var amzHeaders = [];
-        $1TgFO.util.each(this.request.headers, function(name) {
+        $3ty2n.util.each(this.request.headers, function(name) {
             if (name.match(/^x-amz-/i)) amzHeaders.push(name);
         });
         amzHeaders.sort(function(a, b) {
             return a.toLowerCase() < b.toLowerCase() ? -1 : 1;
         });
         var parts = [];
-        $1TgFO.util.arrayEach.call(this, amzHeaders, function(name) {
+        $3ty2n.util.arrayEach.call(this, amzHeaders, function(name) {
             parts.push(name.toLowerCase() + ':' + String(this.request.headers[name]));
         });
         return parts.join('\n');
@@ -9438,7 +9438,7 @@ var $7f6372148d22fb96$var$inherit = $1TgFO.util.inherit;
         if (querystring) {
             // collect a list of sub resources and query params that need to be signed
             var resources = [];
-            $1TgFO.util.arrayEach.call(this, querystring.split('&'), function(param) {
+            $3ty2n.util.arrayEach.call(this, querystring.split('&'), function(param) {
                 var name = param.split('=')[0];
                 var value = param.split('=')[1];
                 if (this.subResources[name] || this.responseHeaders[name]) {
@@ -9457,7 +9457,7 @@ var $7f6372148d22fb96$var$inherit = $1TgFO.util.inherit;
             });
             if (resources.length) {
                 querystring = [];
-                $1TgFO.util.arrayEach(resources, function(res) {
+                $3ty2n.util.arrayEach(resources, function(res) {
                     if (res.value === undefined) querystring.push(res.name);
                     else querystring.push(res.name + '=' + res.value);
                 });
@@ -9467,43 +9467,43 @@ var $7f6372148d22fb96$var$inherit = $1TgFO.util.inherit;
         return resource;
     },
     sign: function sign(secret, string) {
-        return $1TgFO.util.crypto.hmac(secret, string, 'base64', 'sha1');
+        return $3ty2n.util.crypto.hmac(secret, string, 'base64', 'sha1');
     }
 });
 /**
  * @api private
- */ module.exports = $1TgFO.Signers.S3;
+ */ module.exports = $3ty2n.Signers.S3;
 
 });
 
-parcelRegister("6PVmJ", function(module, exports) {
+parcelRegister("hjygr", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $4fa40120a0700f62$var$inherit = $1TgFO.util.inherit;
+var $3ty2n = parcelRequire("3ty2n");
+var $c9aeca2da622614b$var$inherit = $3ty2n.util.inherit;
 /**
  * @api private
- */ var $4fa40120a0700f62$var$expiresHeader = 'presigned-expires';
+ */ var $c9aeca2da622614b$var$expiresHeader = 'presigned-expires';
 /**
  * @api private
- */ function $4fa40120a0700f62$var$signedUrlBuilder(request) {
-    var expires = request.httpRequest.headers[$4fa40120a0700f62$var$expiresHeader];
+ */ function $c9aeca2da622614b$var$signedUrlBuilder(request) {
+    var expires = request.httpRequest.headers[$c9aeca2da622614b$var$expiresHeader];
     var signerClass = request.service.getSignerClass(request);
     delete request.httpRequest.headers['User-Agent'];
     delete request.httpRequest.headers['X-Amz-User-Agent'];
-    if (signerClass === $1TgFO.Signers.V4) {
+    if (signerClass === $3ty2n.Signers.V4) {
         if (expires > 604800) {
             var message = "Presigning does not support expiry time greater than a week with SigV4 signing.";
-            throw $1TgFO.util.error(new Error(), {
+            throw $3ty2n.util.error(new Error(), {
                 code: 'InvalidExpiryTime',
                 message: message,
                 retryable: false
             });
         }
-        request.httpRequest.headers[$4fa40120a0700f62$var$expiresHeader] = expires;
-    } else if (signerClass === $1TgFO.Signers.S3) {
-        var now = request.service ? request.service.getSkewCorrectedDate() : $1TgFO.util.date.getDate();
-        request.httpRequest.headers[$4fa40120a0700f62$var$expiresHeader] = parseInt($1TgFO.util.date.unixTimestamp(now) + expires, 10).toString();
-    } else throw $1TgFO.util.error(new Error(), {
+        request.httpRequest.headers[$c9aeca2da622614b$var$expiresHeader] = expires;
+    } else if (signerClass === $3ty2n.Signers.S3) {
+        var now = request.service ? request.service.getSkewCorrectedDate() : $3ty2n.util.date.getDate();
+        request.httpRequest.headers[$c9aeca2da622614b$var$expiresHeader] = parseInt($3ty2n.util.date.unixTimestamp(now) + expires, 10).toString();
+    } else throw $3ty2n.util.error(new Error(), {
         message: 'Presigning only supports S3 or SigV4 signing.',
         code: 'UnsupportedSigner',
         retryable: false
@@ -9511,18 +9511,18 @@ var $4fa40120a0700f62$var$inherit = $1TgFO.util.inherit;
 }
 /**
  * @api private
- */ function $4fa40120a0700f62$var$signedUrlSigner(request) {
+ */ function $c9aeca2da622614b$var$signedUrlSigner(request) {
     var endpoint = request.httpRequest.endpoint;
-    var parsedUrl = $1TgFO.util.urlParse(request.httpRequest.path);
+    var parsedUrl = $3ty2n.util.urlParse(request.httpRequest.path);
     var queryParams = {};
-    if (parsedUrl.search) queryParams = $1TgFO.util.queryStringParse(parsedUrl.search.substr(1));
+    if (parsedUrl.search) queryParams = $3ty2n.util.queryStringParse(parsedUrl.search.substr(1));
     var auth = request.httpRequest.headers['Authorization'].split(' ');
     if (auth[0] === 'AWS') {
         auth = auth[1].split(':');
         queryParams['Signature'] = auth.pop();
         queryParams['AWSAccessKeyId'] = auth.join(':');
-        $1TgFO.util.each(request.httpRequest.headers, function(key, value) {
-            if (key === $4fa40120a0700f62$var$expiresHeader) key = 'Expires';
+        $3ty2n.util.each(request.httpRequest.headers, function(key, value) {
+            if (key === $c9aeca2da622614b$var$expiresHeader) key = 'Expires';
             if (key.indexOf('x-amz-meta-') === 0) {
                 // Delete existing, potentially not normalized key
                 delete queryParams[key];
@@ -9530,7 +9530,7 @@ var $4fa40120a0700f62$var$inherit = $1TgFO.util.inherit;
             }
             queryParams[key] = value;
         });
-        delete request.httpRequest.headers[$4fa40120a0700f62$var$expiresHeader];
+        delete request.httpRequest.headers[$c9aeca2da622614b$var$expiresHeader];
         delete queryParams['Authorization'];
         delete queryParams['Host'];
     } else if (auth[0] === 'AWS4-HMAC-SHA256') {
@@ -9542,47 +9542,47 @@ var $4fa40120a0700f62$var$inherit = $1TgFO.util.inherit;
     }
     // build URL
     endpoint.pathname = parsedUrl.pathname;
-    endpoint.search = $1TgFO.util.queryParamsToString(queryParams);
+    endpoint.search = $3ty2n.util.queryParamsToString(queryParams);
 }
 /**
  * @api private
- */ $1TgFO.Signers.Presign = $4fa40120a0700f62$var$inherit({
+ */ $3ty2n.Signers.Presign = $c9aeca2da622614b$var$inherit({
     /**
    * @api private
    */ sign: function sign(request, expireTime, callback) {
-        request.httpRequest.headers[$4fa40120a0700f62$var$expiresHeader] = expireTime || 3600;
-        request.on('build', $4fa40120a0700f62$var$signedUrlBuilder);
-        request.on('sign', $4fa40120a0700f62$var$signedUrlSigner);
-        request.removeListener('afterBuild', $1TgFO.EventListeners.Core.SET_CONTENT_LENGTH);
-        request.removeListener('afterBuild', $1TgFO.EventListeners.Core.COMPUTE_SHA256);
+        request.httpRequest.headers[$c9aeca2da622614b$var$expiresHeader] = expireTime || 3600;
+        request.on('build', $c9aeca2da622614b$var$signedUrlBuilder);
+        request.on('sign', $c9aeca2da622614b$var$signedUrlSigner);
+        request.removeListener('afterBuild', $3ty2n.EventListeners.Core.SET_CONTENT_LENGTH);
+        request.removeListener('afterBuild', $3ty2n.EventListeners.Core.COMPUTE_SHA256);
         request.emit('beforePresign', [
             request
         ]);
         if (callback) request.build(function() {
             if (this.response.error) callback(this.response.error);
-            else callback(null, $1TgFO.util.urlFormat(request.httpRequest.endpoint));
+            else callback(null, $3ty2n.util.urlFormat(request.httpRequest.endpoint));
         });
         else {
             request.build();
             if (request.response.error) throw request.response.error;
-            return $1TgFO.util.urlFormat(request.httpRequest.endpoint);
+            return $3ty2n.util.urlFormat(request.httpRequest.endpoint);
         }
     }
 });
 /**
  * @api private
- */ module.exports = $1TgFO.Signers.Presign;
+ */ module.exports = $3ty2n.Signers.Presign;
 
 });
 
-parcelRegister("cCtRm", function(module, exports) {
+parcelRegister("kroaf", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * @api private
- */ $1TgFO.Signers.Bearer = $1TgFO.util.inherit($1TgFO.Signers.RequestSigner, {
+ */ $3ty2n.Signers.Bearer = $3ty2n.util.inherit($3ty2n.Signers.RequestSigner, {
     constructor: function Bearer(request) {
-        $1TgFO.Signers.RequestSigner.call(this, request);
+        $3ty2n.Signers.RequestSigner.call(this, request);
     },
     addAuthorization: function addAuthorization(token) {
         this.request.headers['Authorization'] = 'Bearer ' + token.token;
@@ -9592,12 +9592,12 @@ var $1TgFO = parcelRequire("1TgFO");
 });
 
 
-parcelRegister("jc97R", function(module, exports) {
+parcelRegister("dZQxf", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * @api private
- */ $1TgFO.ParamValidator = $1TgFO.util.inherit({
+ */ $3ty2n.ParamValidator = $3ty2n.util.inherit({
     /**
    * Create a new validator object.
    *
@@ -9627,7 +9627,7 @@ var $1TgFO = parcelRequire("1TgFO");
         if (this.errors.length > 1) {
             var msg = this.errors.join('\n* ');
             msg = 'There were ' + this.errors.length + ' validation errors:\n* ' + msg;
-            throw $1TgFO.util.error(new Error(msg), {
+            throw $3ty2n.util.error(new Error(msg), {
                 code: 'MultipleValidationErrors',
                 errors: this.errors
             });
@@ -9635,7 +9635,7 @@ var $1TgFO = parcelRequire("1TgFO");
         else return true;
     },
     fail: function fail(code, message) {
-        this.errors.push($1TgFO.util.error(new Error(message), {
+        this.errors.push($3ty2n.util.error(new Error(message), {
             code: code
         }));
     },
@@ -9779,9 +9779,9 @@ var $1TgFO = parcelRequire("1TgFO");
                 if ((value || '').toString().match(acceptedTypes[i])) return true;
             } else {
                 if (value instanceof acceptedTypes[i]) return true;
-                if ($1TgFO.util.isType(value, acceptedTypes[i])) return true;
+                if ($3ty2n.util.isType(value, acceptedTypes[i])) return true;
                 if (!type && !foundInvalidType) acceptedTypes = acceptedTypes.slice();
-                acceptedTypes[i] = $1TgFO.util.typeName(acceptedTypes[i]);
+                acceptedTypes[i] = $3ty2n.util.typeName(acceptedTypes[i]);
             }
             foundInvalidType = true;
         }
@@ -9805,9 +9805,9 @@ var $1TgFO = parcelRequire("1TgFO");
         if (value === null || value === undefined) return;
         if (typeof value === 'string') return;
         if (value && typeof value.byteLength === 'number') return; // typed arrays
-        if ($1TgFO.util.isNode()) {
-            var Stream = $1TgFO.util.stream.Stream;
-            if ($1TgFO.util.Buffer.isBuffer(value) || value instanceof Stream) return;
+        if ($3ty2n.util.isNode()) {
+            var Stream = $3ty2n.util.stream.Stream;
+            if ($3ty2n.util.Buffer.isBuffer(value) || value instanceof Stream) return;
         } else {
             if (value instanceof Blob) return;
         }
@@ -9820,8 +9820,8 @@ var $1TgFO = parcelRequire("1TgFO");
             'DataView'
         ];
         if (value) for(var i = 0; i < types.length; i++){
-            if ($1TgFO.util.isType(value, types[i])) return;
-            if ($1TgFO.util.typeName(value.constructor) === types[i]) return;
+            if ($3ty2n.util.isType(value, types[i])) return;
+            if ($3ty2n.util.typeName(value.constructor) === types[i]) return;
         }
         this.fail('InvalidParameterType', 'Expected ' + context + ' to be a ' + 'string, Buffer, Stream, Blob, or typed array object');
     }
@@ -9829,8 +9829,8 @@ var $1TgFO = parcelRequire("1TgFO");
 
 });
 
-parcelRegister("5PZwn", function(module, exports) {
-var $44017004b53625ec$var$warning = [
+parcelRegister("7Yj4E", function(module, exports) {
+var $5cdceeb041d73435$var$warning = [
     'The AWS SDK for JavaScript (v2) has reached end-of-support.',
     'It will no longer receive updates or releases.\n',
     'Please migrate your code to use AWS SDK for JavaScript (v3).',
@@ -9843,66 +9843,66 @@ module.exports = {
  * To suppress this message:
  * @example
  * require('aws-sdk/lib/maintenance_mode_message').suppress = true;
- */ function $44017004b53625ec$var$emitWarning() {
+ */ function $5cdceeb041d73435$var$emitWarning() {
     if (typeof process === 'undefined') return;
     // Skip maintenance mode message in Lambda environments
     if (typeof process.env === 'object' && typeof process.env.AWS_EXECUTION_ENV !== 'undefined' && process.env.AWS_EXECUTION_ENV.indexOf('AWS_Lambda_') === 0) return;
     if (typeof process.env === 'object' && typeof process.env.AWS_SDK_JS_SUPPRESS_MAINTENANCE_MODE_MESSAGE !== 'undefined') return;
-    if (typeof process.emitWarning === 'function') process.emitWarning($44017004b53625ec$var$warning, {
+    if (typeof process.emitWarning === 'function') process.emitWarning($5cdceeb041d73435$var$warning, {
         type: 'NOTE'
     });
 }
 setTimeout(function() {
-    if (!module.exports.suppress) $44017004b53625ec$var$emitWarning();
+    if (!module.exports.suppress) $5cdceeb041d73435$var$emitWarning();
 }, 0);
 
 });
 
 
-parcelRegister("ay1MR", function(module, exports) {
+parcelRegister("jhFib", function(module, exports) {
 
-$parcel$export(module.exports, "default", () => $7ade7739eff2390e$export$2e2bcd8739ae039);
+$parcel$export(module.exports, "default", () => $e09fa29dafb7244d$export$2e2bcd8739ae039);
 
-var $bw3Pm = parcelRequire("bw3Pm");
+var $lNygr = parcelRequire("lNygr");
 
-var $jD9Lr = parcelRequire("jD9Lr");
-function $7ade7739eff2390e$var$v4(options, buf, offset) {
+var $cYtvk = parcelRequire("cYtvk");
+function $e09fa29dafb7244d$var$v4(options, buf, offset) {
     var i = buf && offset || 0;
     if (typeof options == 'string') {
         buf = options === 'binary' ? new Array(16) : null;
         options = null;
     }
     options = options || {};
-    var rnds = options.random || (options.rng || (0, $bw3Pm.default))(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
+    var rnds = options.random || (options.rng || (0, $lNygr.default))(); // Per 4.4, set bits for version and `clock_seq_hi_and_reserved`
     rnds[6] = rnds[6] & 0x0f | 0x40;
     rnds[8] = rnds[8] & 0x3f | 0x80; // Copy bytes to buffer, if provided
     if (buf) for(var ii = 0; ii < 16; ++ii)buf[i + ii] = rnds[ii];
-    return buf || (0, $jD9Lr.default)(rnds);
+    return buf || (0, $cYtvk.default)(rnds);
 }
-var $7ade7739eff2390e$export$2e2bcd8739ae039 = $7ade7739eff2390e$var$v4;
+var $e09fa29dafb7244d$export$2e2bcd8739ae039 = $e09fa29dafb7244d$var$v4;
 
 });
-parcelRegister("bw3Pm", function(module, exports) {
+parcelRegister("lNygr", function(module, exports) {
 
-$parcel$export(module.exports, "default", () => $8625a6eb673a1246$export$2e2bcd8739ae039);
+$parcel$export(module.exports, "default", () => $fde8c0c100a91eea$export$2e2bcd8739ae039);
 
-function $8625a6eb673a1246$export$2e2bcd8739ae039() {
-    return (0, ($parcel$interopDefault($8OLUh$crypto))).randomBytes(16);
+function $fde8c0c100a91eea$export$2e2bcd8739ae039() {
+    return (0, ($parcel$interopDefault($bPiTa$crypto))).randomBytes(16);
 }
 
 });
 
-parcelRegister("jD9Lr", function(module, exports) {
+parcelRegister("cYtvk", function(module, exports) {
 
-$parcel$export(module.exports, "default", () => $e4a93bcf21452888$export$2e2bcd8739ae039);
+$parcel$export(module.exports, "default", () => $9721f99693dbfdfb$export$2e2bcd8739ae039);
 /**
  * Convert array of 16 byte values to UUID string format of the form:
  * XXXXXXXX-XXXX-XXXX-XXXX-XXXXXXXXXXXX
- */ var $e4a93bcf21452888$var$byteToHex = [];
-for(var $e4a93bcf21452888$var$i = 0; $e4a93bcf21452888$var$i < 256; ++$e4a93bcf21452888$var$i)$e4a93bcf21452888$var$byteToHex[$e4a93bcf21452888$var$i] = ($e4a93bcf21452888$var$i + 0x100).toString(16).substr(1);
-function $e4a93bcf21452888$var$bytesToUuid(buf, offset) {
+ */ var $9721f99693dbfdfb$var$byteToHex = [];
+for(var $9721f99693dbfdfb$var$i = 0; $9721f99693dbfdfb$var$i < 256; ++$9721f99693dbfdfb$var$i)$9721f99693dbfdfb$var$byteToHex[$9721f99693dbfdfb$var$i] = ($9721f99693dbfdfb$var$i + 0x100).toString(16).substr(1);
+function $9721f99693dbfdfb$var$bytesToUuid(buf, offset) {
     var i = offset || 0;
-    var bth = $e4a93bcf21452888$var$byteToHex; // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
+    var bth = $9721f99693dbfdfb$var$byteToHex; // join used to fix memory issue caused by concatenation: https://bugs.chromium.org/p/v8/issues/detail?id=3175#c4
     return [
         bth[buf[i++]],
         bth[buf[i++]],
@@ -9926,30 +9926,30 @@ function $e4a93bcf21452888$var$bytesToUuid(buf, offset) {
         bth[buf[i++]]
     ].join('');
 }
-var $e4a93bcf21452888$export$2e2bcd8739ae039 = $e4a93bcf21452888$var$bytesToUuid;
+var $9721f99693dbfdfb$export$2e2bcd8739ae039 = $9721f99693dbfdfb$var$bytesToUuid;
 
 });
 
 
 
-parcelRegister("6QzbJ", function(module, exports) {
+parcelRegister("gqeMc", function(module, exports) {
 /**
  * What is necessary to create an event stream in node?
  *  - http response stream
  *  - parser
  *  - event stream model
  */ 
-var $5XWqD = parcelRequire("5XWqD");
-var $4fc2e50c8b71d34a$require$EventMessageChunkerStream = $5XWqD.EventMessageChunkerStream;
+var $2bSbL = parcelRequire("2bSbL");
+var $bf4a8953cd2c691f$require$EventMessageChunkerStream = $2bSbL.EventMessageChunkerStream;
 
-var $6MnKh = parcelRequire("6MnKh");
-var $4fc2e50c8b71d34a$require$EventUnmarshallerStream = $6MnKh.EventUnmarshallerStream;
-function $4fc2e50c8b71d34a$var$createEventStream(stream, parser, model) {
-    var eventStream = new $4fc2e50c8b71d34a$require$EventUnmarshallerStream({
+var $hDUOK = parcelRequire("hDUOK");
+var $bf4a8953cd2c691f$require$EventUnmarshallerStream = $hDUOK.EventUnmarshallerStream;
+function $bf4a8953cd2c691f$var$createEventStream(stream, parser, model) {
+    var eventStream = new $bf4a8953cd2c691f$require$EventUnmarshallerStream({
         parser: parser,
         eventStreamModel: model
     });
-    var eventMessageChunker = new $4fc2e50c8b71d34a$require$EventMessageChunkerStream();
+    var eventMessageChunker = new $bf4a8953cd2c691f$require$EventMessageChunkerStream();
     stream.pipe(eventMessageChunker).pipe(eventStream);
     stream.on('error', function(err) {
         eventMessageChunker.emit('error', err);
@@ -9962,31 +9962,31 @@ function $4fc2e50c8b71d34a$var$createEventStream(stream, parser, model) {
 /**
  * @api private
  */ module.exports = {
-    createEventStream: $4fc2e50c8b71d34a$var$createEventStream
+    createEventStream: $bf4a8953cd2c691f$var$createEventStream
 };
 
 });
-parcelRegister("5XWqD", function(module, exports) {
+parcelRegister("2bSbL", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $457fc923d06739a5$require$util = $1TgFO.util;
+var $3ty2n = parcelRequire("3ty2n");
+var $1986a4a176690355$require$util = $3ty2n.util;
 
-var $457fc923d06739a5$require$Transform = $8OLUh$stream.Transform;
-var $457fc923d06739a5$var$allocBuffer = $457fc923d06739a5$require$util.buffer.alloc;
-/** @type {Transform} */ function $457fc923d06739a5$var$EventMessageChunkerStream(options) {
-    $457fc923d06739a5$require$Transform.call(this, options);
+var $1986a4a176690355$require$Transform = $bPiTa$stream.Transform;
+var $1986a4a176690355$var$allocBuffer = $1986a4a176690355$require$util.buffer.alloc;
+/** @type {Transform} */ function $1986a4a176690355$var$EventMessageChunkerStream(options) {
+    $1986a4a176690355$require$Transform.call(this, options);
     this.currentMessageTotalLength = 0;
     this.currentMessagePendingLength = 0;
     /** @type {Buffer} */ this.currentMessage = null;
     /** @type {Buffer} */ this.messageLengthBuffer = null;
 }
-$457fc923d06739a5$var$EventMessageChunkerStream.prototype = Object.create($457fc923d06739a5$require$Transform.prototype);
+$1986a4a176690355$var$EventMessageChunkerStream.prototype = Object.create($1986a4a176690355$require$Transform.prototype);
 /**
  *
  * @param {Buffer} chunk
  * @param {string} encoding
  * @param {*} callback
- */ $457fc923d06739a5$var$EventMessageChunkerStream.prototype._transform = function(chunk, encoding, callback) {
+ */ $1986a4a176690355$var$EventMessageChunkerStream.prototype._transform = function(chunk, encoding, callback) {
     var chunkLength = chunk.length;
     var currentOffset = 0;
     while(currentOffset < chunkLength){
@@ -9995,7 +9995,7 @@ $457fc923d06739a5$var$EventMessageChunkerStream.prototype = Object.create($457fc
             // working on a new message, determine total length
             var bytesRemaining = chunkLength - currentOffset;
             // prevent edge case where total length spans 2 chunks
-            if (!this.messageLengthBuffer) this.messageLengthBuffer = $457fc923d06739a5$var$allocBuffer(4);
+            if (!this.messageLengthBuffer) this.messageLengthBuffer = $1986a4a176690355$var$allocBuffer(4);
             var numBytesForTotal = Math.min(4 - this.currentMessagePendingLength, bytesRemaining // bytes left in chunk
             );
             chunk.copy(this.messageLengthBuffer, this.currentMessagePendingLength, currentOffset, currentOffset + numBytesForTotal);
@@ -10024,7 +10024,7 @@ $457fc923d06739a5$var$EventMessageChunkerStream.prototype = Object.create($457fc
     }
     callback();
 };
-$457fc923d06739a5$var$EventMessageChunkerStream.prototype._flush = function(callback) {
+$1986a4a176690355$var$EventMessageChunkerStream.prototype._flush = function(callback) {
     if (this.currentMessageTotalLength) {
         if (this.currentMessageTotalLength === this.currentMessagePendingLength) callback(null, this.currentMessage);
         else callback(new Error('Truncated event message received.'));
@@ -10033,45 +10033,45 @@ $457fc923d06739a5$var$EventMessageChunkerStream.prototype._flush = function(call
 /**
  * @param {number} size Size of the message to be allocated.
  * @api private
- */ $457fc923d06739a5$var$EventMessageChunkerStream.prototype.allocateMessage = function(size) {
+ */ $1986a4a176690355$var$EventMessageChunkerStream.prototype.allocateMessage = function(size) {
     if (typeof size !== 'number') throw new Error('Attempted to allocate an event message where size was not a number: ' + size);
     this.currentMessageTotalLength = size;
     this.currentMessagePendingLength = 4;
-    this.currentMessage = $457fc923d06739a5$var$allocBuffer(size);
+    this.currentMessage = $1986a4a176690355$var$allocBuffer(size);
     this.currentMessage.writeUInt32BE(size, 0);
 };
 /**
  * @api private
  */ module.exports = {
-    EventMessageChunkerStream: $457fc923d06739a5$var$EventMessageChunkerStream
+    EventMessageChunkerStream: $1986a4a176690355$var$EventMessageChunkerStream
 };
 
 });
 
-parcelRegister("6MnKh", function(module, exports) {
+parcelRegister("hDUOK", function(module, exports) {
 
-var $4ef9a51d2e4da1f1$require$Transform = $8OLUh$stream.Transform;
+var $cd8226fc3547a731$require$Transform = $bPiTa$stream.Transform;
 
-var $7JdZD = parcelRequire("7JdZD");
-var $4ef9a51d2e4da1f1$require$parseEvent = $7JdZD.parseEvent;
-/** @type {Transform} */ function $4ef9a51d2e4da1f1$var$EventUnmarshallerStream(options) {
+var $iAJ67 = parcelRequire("iAJ67");
+var $cd8226fc3547a731$require$parseEvent = $iAJ67.parseEvent;
+/** @type {Transform} */ function $cd8226fc3547a731$var$EventUnmarshallerStream(options) {
     options = options || {};
     // set output to object mode
     options.readableObjectMode = true;
-    $4ef9a51d2e4da1f1$require$Transform.call(this, options);
+    $cd8226fc3547a731$require$Transform.call(this, options);
     this._readableState.objectMode = true;
     this.parser = options.parser;
     this.eventStreamModel = options.eventStreamModel;
 }
-$4ef9a51d2e4da1f1$var$EventUnmarshallerStream.prototype = Object.create($4ef9a51d2e4da1f1$require$Transform.prototype);
+$cd8226fc3547a731$var$EventUnmarshallerStream.prototype = Object.create($cd8226fc3547a731$require$Transform.prototype);
 /**
  *
  * @param {Buffer} chunk
  * @param {string} encoding
  * @param {*} callback
- */ $4ef9a51d2e4da1f1$var$EventUnmarshallerStream.prototype._transform = function(chunk, encoding, callback) {
+ */ $cd8226fc3547a731$var$EventUnmarshallerStream.prototype._transform = function(chunk, encoding, callback) {
     try {
-        var event = $4ef9a51d2e4da1f1$require$parseEvent(this.parser, chunk, this.eventStreamModel);
+        var event = $cd8226fc3547a731$require$parseEvent(this.parser, chunk, this.eventStreamModel);
         this.push(event);
         return callback();
     } catch (err) {
@@ -10081,26 +10081,26 @@ $4ef9a51d2e4da1f1$var$EventUnmarshallerStream.prototype = Object.create($4ef9a51
 /**
  * @api private
  */ module.exports = {
-    EventUnmarshallerStream: $4ef9a51d2e4da1f1$var$EventUnmarshallerStream
+    EventUnmarshallerStream: $cd8226fc3547a731$var$EventUnmarshallerStream
 };
 
 });
-parcelRegister("7JdZD", function(module, exports) {
+parcelRegister("iAJ67", function(module, exports) {
 
-var $fOy5o = parcelRequire("fOy5o");
-var $5a079717d369eafe$require$parseMessage = $fOy5o.parseMessage;
+var $aHnAE = parcelRequire("aHnAE");
+var $d88e9239980d52f7$require$parseMessage = $aHnAE.parseMessage;
 /**
  *
  * @param {*} parser
  * @param {Buffer} message
  * @param {*} shape
  * @api private
- */ function $5a079717d369eafe$var$parseEvent(parser, message, shape) {
-    var parsedMessage = $5a079717d369eafe$require$parseMessage(message);
+ */ function $d88e9239980d52f7$var$parseEvent(parser, message, shape) {
+    var parsedMessage = $d88e9239980d52f7$require$parseMessage(message);
     // check if message is an event or error
     var messageType = parsedMessage.headers[':message-type'];
     if (messageType) {
-        if (messageType.value === 'error') throw $5a079717d369eafe$var$parseError(parsedMessage);
+        if (messageType.value === 'error') throw $d88e9239980d52f7$var$parseError(parsedMessage);
         else if (messageType.value !== 'event') // not sure how to parse non-events/non-errors, ignore for now
         return;
     }
@@ -10129,7 +10129,7 @@ var $5a079717d369eafe$require$parseMessage = $fOy5o.parseMessage;
     output[eventType.value] = result;
     return output;
 }
-function $5a079717d369eafe$var$parseError(message) {
+function $d88e9239980d52f7$var$parseError(message) {
     var errorCode = message.headers[':error-code'];
     var errorMessage = message.headers[':error-message'];
     var error = new Error(errorMessage.value || errorMessage);
@@ -10139,31 +10139,31 @@ function $5a079717d369eafe$var$parseError(message) {
 /**
  * @api private
  */ module.exports = {
-    parseEvent: $5a079717d369eafe$var$parseEvent
+    parseEvent: $d88e9239980d52f7$var$parseEvent
 };
 
 });
-parcelRegister("fOy5o", function(module, exports) {
+parcelRegister("aHnAE", function(module, exports) {
 
-var $i2KZc = parcelRequire("i2KZc");
-var $b835f750190d2b85$require$Int64 = $i2KZc.Int64;
+var $82Lcn = parcelRequire("82Lcn");
+var $7ca0380d3bd53422$require$Int64 = $82Lcn.Int64;
 
-var $04zkU = parcelRequire("04zkU");
-var $b835f750190d2b85$require$splitMessage = $04zkU.splitMessage;
-var $b835f750190d2b85$var$BOOLEAN_TAG = 'boolean';
-var $b835f750190d2b85$var$BYTE_TAG = 'byte';
-var $b835f750190d2b85$var$SHORT_TAG = 'short';
-var $b835f750190d2b85$var$INT_TAG = 'integer';
-var $b835f750190d2b85$var$LONG_TAG = 'long';
-var $b835f750190d2b85$var$BINARY_TAG = 'binary';
-var $b835f750190d2b85$var$STRING_TAG = 'string';
-var $b835f750190d2b85$var$TIMESTAMP_TAG = 'timestamp';
-var $b835f750190d2b85$var$UUID_TAG = 'uuid';
+var $e7HTs = parcelRequire("e7HTs");
+var $7ca0380d3bd53422$require$splitMessage = $e7HTs.splitMessage;
+var $7ca0380d3bd53422$var$BOOLEAN_TAG = 'boolean';
+var $7ca0380d3bd53422$var$BYTE_TAG = 'byte';
+var $7ca0380d3bd53422$var$SHORT_TAG = 'short';
+var $7ca0380d3bd53422$var$INT_TAG = 'integer';
+var $7ca0380d3bd53422$var$LONG_TAG = 'long';
+var $7ca0380d3bd53422$var$BINARY_TAG = 'binary';
+var $7ca0380d3bd53422$var$STRING_TAG = 'string';
+var $7ca0380d3bd53422$var$TIMESTAMP_TAG = 'timestamp';
+var $7ca0380d3bd53422$var$UUID_TAG = 'uuid';
 /**
  * @api private
  *
  * @param {Buffer} headers
- */ function $b835f750190d2b85$var$parseHeaders(headers) {
+ */ function $7ca0380d3bd53422$var$parseHeaders(headers) {
     var out = {};
     var position = 0;
     while(position < headers.length){
@@ -10173,40 +10173,40 @@ var $b835f750190d2b85$var$UUID_TAG = 'uuid';
         switch(headers.readUInt8(position++)){
             case 0 /* boolTrue */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$BOOLEAN_TAG,
+                    type: $7ca0380d3bd53422$var$BOOLEAN_TAG,
                     value: true
                 };
                 break;
             case 1 /* boolFalse */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$BOOLEAN_TAG,
+                    type: $7ca0380d3bd53422$var$BOOLEAN_TAG,
                     value: false
                 };
                 break;
             case 2 /* byte */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$BYTE_TAG,
+                    type: $7ca0380d3bd53422$var$BYTE_TAG,
                     value: headers.readInt8(position++)
                 };
                 break;
             case 3 /* short */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$SHORT_TAG,
+                    type: $7ca0380d3bd53422$var$SHORT_TAG,
                     value: headers.readInt16BE(position)
                 };
                 position += 2;
                 break;
             case 4 /* integer */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$INT_TAG,
+                    type: $7ca0380d3bd53422$var$INT_TAG,
                     value: headers.readInt32BE(position)
                 };
                 position += 4;
                 break;
             case 5 /* long */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$LONG_TAG,
-                    value: new $b835f750190d2b85$require$Int64(headers.slice(position, position + 8))
+                    type: $7ca0380d3bd53422$var$LONG_TAG,
+                    value: new $7ca0380d3bd53422$require$Int64(headers.slice(position, position + 8))
                 };
                 position += 8;
                 break;
@@ -10214,7 +10214,7 @@ var $b835f750190d2b85$var$UUID_TAG = 'uuid';
                 var binaryLength = headers.readUInt16BE(position);
                 position += 2;
                 out[name] = {
-                    type: $b835f750190d2b85$var$BINARY_TAG,
+                    type: $7ca0380d3bd53422$var$BINARY_TAG,
                     value: headers.slice(position, position + binaryLength)
                 };
                 position += binaryLength;
@@ -10223,15 +10223,15 @@ var $b835f750190d2b85$var$UUID_TAG = 'uuid';
                 var stringLength = headers.readUInt16BE(position);
                 position += 2;
                 out[name] = {
-                    type: $b835f750190d2b85$var$STRING_TAG,
+                    type: $7ca0380d3bd53422$var$STRING_TAG,
                     value: headers.slice(position, position + stringLength).toString()
                 };
                 position += stringLength;
                 break;
             case 8 /* timestamp */ :
                 out[name] = {
-                    type: $b835f750190d2b85$var$TIMESTAMP_TAG,
-                    value: new Date(new $b835f750190d2b85$require$Int64(headers.slice(position, position + 8)).valueOf())
+                    type: $7ca0380d3bd53422$var$TIMESTAMP_TAG,
+                    value: new Date(new $7ca0380d3bd53422$require$Int64(headers.slice(position, position + 8)).valueOf())
                 };
                 position += 8;
                 break;
@@ -10239,7 +10239,7 @@ var $b835f750190d2b85$var$UUID_TAG = 'uuid';
                 var uuidChars = headers.slice(position, position + 16).toString('hex');
                 position += 16;
                 out[name] = {
-                    type: $b835f750190d2b85$var$UUID_TAG,
+                    type: $7ca0380d3bd53422$var$UUID_TAG,
                     value: uuidChars.substr(0, 8) + '-' + uuidChars.substr(8, 4) + '-' + uuidChars.substr(12, 4) + '-' + uuidChars.substr(16, 4) + '-' + uuidChars.substr(20)
                 };
                 break;
@@ -10249,25 +10249,25 @@ var $b835f750190d2b85$var$UUID_TAG = 'uuid';
     }
     return out;
 }
-function $b835f750190d2b85$var$parseMessage(message) {
-    var parsed = $b835f750190d2b85$require$splitMessage(message);
+function $7ca0380d3bd53422$var$parseMessage(message) {
+    var parsed = $7ca0380d3bd53422$require$splitMessage(message);
     return {
-        headers: $b835f750190d2b85$var$parseHeaders(parsed.headers),
+        headers: $7ca0380d3bd53422$var$parseHeaders(parsed.headers),
         body: parsed.body
     };
 }
 /**
  * @api private
  */ module.exports = {
-    parseMessage: $b835f750190d2b85$var$parseMessage
+    parseMessage: $7ca0380d3bd53422$var$parseMessage
 };
 
 });
-parcelRegister("i2KZc", function(module, exports) {
+parcelRegister("82Lcn", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $d22cdc5d9e34d973$require$util = $1TgFO.util;
-var $d22cdc5d9e34d973$var$toBuffer = $d22cdc5d9e34d973$require$util.buffer.toBuffer;
+var $3ty2n = parcelRequire("3ty2n");
+var $5db31f510f8b1f27$require$util = $3ty2n.util;
+var $5db31f510f8b1f27$var$toBuffer = $5db31f510f8b1f27$require$util.buffer.toBuffer;
 /**
  * A lossless representation of a signed, 64-bit integer. Instances of this
  * class may be used in arithmetic expressions as if they were numeric
@@ -10277,9 +10277,9 @@ var $d22cdc5d9e34d973$var$toBuffer = $d22cdc5d9e34d973$require$util.buffer.toBuf
  * @param {Buffer} bytes
  *
  * @api private
- */ function $d22cdc5d9e34d973$var$Int64(bytes) {
+ */ function $5db31f510f8b1f27$var$Int64(bytes) {
     if (bytes.length !== 8) throw new Error('Int64 buffers must be exactly 8 bytes');
-    if (!$d22cdc5d9e34d973$require$util.Buffer.isBuffer(bytes)) bytes = $d22cdc5d9e34d973$var$toBuffer(bytes);
+    if (!$5db31f510f8b1f27$require$util.Buffer.isBuffer(bytes)) bytes = $5db31f510f8b1f27$var$toBuffer(bytes);
     this.bytes = bytes;
 }
 /**
@@ -10287,31 +10287,31 @@ var $d22cdc5d9e34d973$var$toBuffer = $d22cdc5d9e34d973$require$util.buffer.toBuf
  * @returns {Int64}
  *
  * @api private
- */ $d22cdc5d9e34d973$var$Int64.fromNumber = function(number) {
+ */ $5db31f510f8b1f27$var$Int64.fromNumber = function(number) {
     if (number > 9223372036854775807 || number < -9223372036854776000) throw new Error(number + ' is too large (or, if negative, too small) to represent as an Int64');
     var bytes = new Uint8Array(8);
     for(var i = 7, remaining = Math.abs(Math.round(number)); i > -1 && remaining > 0; i--, remaining /= 256)bytes[i] = remaining;
-    if (number < 0) $d22cdc5d9e34d973$var$negate(bytes);
-    return new $d22cdc5d9e34d973$var$Int64(bytes);
+    if (number < 0) $5db31f510f8b1f27$var$negate(bytes);
+    return new $5db31f510f8b1f27$var$Int64(bytes);
 };
 /**
  * @returns {number}
  *
  * @api private
- */ $d22cdc5d9e34d973$var$Int64.prototype.valueOf = function() {
+ */ $5db31f510f8b1f27$var$Int64.prototype.valueOf = function() {
     var bytes = this.bytes.slice(0);
     var negative = bytes[0] & 128;
-    if (negative) $d22cdc5d9e34d973$var$negate(bytes);
+    if (negative) $5db31f510f8b1f27$var$negate(bytes);
     return parseInt(bytes.toString('hex'), 16) * (negative ? -1 : 1);
 };
-$d22cdc5d9e34d973$var$Int64.prototype.toString = function() {
+$5db31f510f8b1f27$var$Int64.prototype.toString = function() {
     return String(this.valueOf());
 };
 /**
  * @param {Buffer} bytes
  *
  * @api private
- */ function $d22cdc5d9e34d973$var$negate(bytes) {
+ */ function $5db31f510f8b1f27$var$negate(bytes) {
     for(var i = 0; i < 8; i++)bytes[i] ^= 0xFF;
     for(var i = 7; i > -1; i--){
         bytes[i]++;
@@ -10321,47 +10321,47 @@ $d22cdc5d9e34d973$var$Int64.prototype.toString = function() {
 /**
  * @api private
  */ module.exports = {
-    Int64: $d22cdc5d9e34d973$var$Int64
+    Int64: $5db31f510f8b1f27$var$Int64
 };
 
 });
 
-parcelRegister("04zkU", function(module, exports) {
+parcelRegister("e7HTs", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $00dbc8e358052ff7$require$util = $1TgFO.util;
-var $00dbc8e358052ff7$var$toBuffer = $00dbc8e358052ff7$require$util.buffer.toBuffer;
+var $3ty2n = parcelRequire("3ty2n");
+var $a483c4732c3ac3a4$require$util = $3ty2n.util;
+var $a483c4732c3ac3a4$var$toBuffer = $a483c4732c3ac3a4$require$util.buffer.toBuffer;
 // All prelude components are unsigned, 32-bit integers
-var $00dbc8e358052ff7$var$PRELUDE_MEMBER_LENGTH = 4;
+var $a483c4732c3ac3a4$var$PRELUDE_MEMBER_LENGTH = 4;
 // The prelude consists of two components
-var $00dbc8e358052ff7$var$PRELUDE_LENGTH = $00dbc8e358052ff7$var$PRELUDE_MEMBER_LENGTH * 2;
+var $a483c4732c3ac3a4$var$PRELUDE_LENGTH = $a483c4732c3ac3a4$var$PRELUDE_MEMBER_LENGTH * 2;
 // Checksums are always CRC32 hashes.
-var $00dbc8e358052ff7$var$CHECKSUM_LENGTH = 4;
+var $a483c4732c3ac3a4$var$CHECKSUM_LENGTH = 4;
 // Messages must include a full prelude, a prelude checksum, and a message checksum
-var $00dbc8e358052ff7$var$MINIMUM_MESSAGE_LENGTH = $00dbc8e358052ff7$var$PRELUDE_LENGTH + $00dbc8e358052ff7$var$CHECKSUM_LENGTH * 2;
+var $a483c4732c3ac3a4$var$MINIMUM_MESSAGE_LENGTH = $a483c4732c3ac3a4$var$PRELUDE_LENGTH + $a483c4732c3ac3a4$var$CHECKSUM_LENGTH * 2;
 /**
  * @api private
  *
  * @param {Buffer} message
- */ function $00dbc8e358052ff7$var$splitMessage(message) {
-    if (!$00dbc8e358052ff7$require$util.Buffer.isBuffer(message)) message = $00dbc8e358052ff7$var$toBuffer(message);
-    if (message.length < $00dbc8e358052ff7$var$MINIMUM_MESSAGE_LENGTH) throw new Error('Provided message too short to accommodate event stream message overhead');
+ */ function $a483c4732c3ac3a4$var$splitMessage(message) {
+    if (!$a483c4732c3ac3a4$require$util.Buffer.isBuffer(message)) message = $a483c4732c3ac3a4$var$toBuffer(message);
+    if (message.length < $a483c4732c3ac3a4$var$MINIMUM_MESSAGE_LENGTH) throw new Error('Provided message too short to accommodate event stream message overhead');
     if (message.length !== message.readUInt32BE(0)) throw new Error('Reported message length does not match received message length');
-    var expectedPreludeChecksum = message.readUInt32BE($00dbc8e358052ff7$var$PRELUDE_LENGTH);
-    if (expectedPreludeChecksum !== $00dbc8e358052ff7$require$util.crypto.crc32(message.slice(0, $00dbc8e358052ff7$var$PRELUDE_LENGTH))) throw new Error('The prelude checksum specified in the message (' + expectedPreludeChecksum + ') does not match the calculated CRC32 checksum.');
-    var expectedMessageChecksum = message.readUInt32BE(message.length - $00dbc8e358052ff7$var$CHECKSUM_LENGTH);
-    if (expectedMessageChecksum !== $00dbc8e358052ff7$require$util.crypto.crc32(message.slice(0, message.length - $00dbc8e358052ff7$var$CHECKSUM_LENGTH))) throw new Error('The message checksum did not match the expected value of ' + expectedMessageChecksum);
-    var headersStart = $00dbc8e358052ff7$var$PRELUDE_LENGTH + $00dbc8e358052ff7$var$CHECKSUM_LENGTH;
-    var headersEnd = headersStart + message.readUInt32BE($00dbc8e358052ff7$var$PRELUDE_MEMBER_LENGTH);
+    var expectedPreludeChecksum = message.readUInt32BE($a483c4732c3ac3a4$var$PRELUDE_LENGTH);
+    if (expectedPreludeChecksum !== $a483c4732c3ac3a4$require$util.crypto.crc32(message.slice(0, $a483c4732c3ac3a4$var$PRELUDE_LENGTH))) throw new Error('The prelude checksum specified in the message (' + expectedPreludeChecksum + ') does not match the calculated CRC32 checksum.');
+    var expectedMessageChecksum = message.readUInt32BE(message.length - $a483c4732c3ac3a4$var$CHECKSUM_LENGTH);
+    if (expectedMessageChecksum !== $a483c4732c3ac3a4$require$util.crypto.crc32(message.slice(0, message.length - $a483c4732c3ac3a4$var$CHECKSUM_LENGTH))) throw new Error('The message checksum did not match the expected value of ' + expectedMessageChecksum);
+    var headersStart = $a483c4732c3ac3a4$var$PRELUDE_LENGTH + $a483c4732c3ac3a4$var$CHECKSUM_LENGTH;
+    var headersEnd = headersStart + message.readUInt32BE($a483c4732c3ac3a4$var$PRELUDE_MEMBER_LENGTH);
     return {
         headers: message.slice(headersStart, headersEnd),
-        body: message.slice(headersEnd, message.length - $00dbc8e358052ff7$var$CHECKSUM_LENGTH)
+        body: message.slice(headersEnd, message.length - $a483c4732c3ac3a4$var$CHECKSUM_LENGTH)
     };
 }
 /**
  * @api private
  */ module.exports = {
-    splitMessage: $00dbc8e358052ff7$var$splitMessage
+    splitMessage: $a483c4732c3ac3a4$var$splitMessage
 };
 
 });
@@ -10370,32 +10370,32 @@ var $00dbc8e358052ff7$var$MINIMUM_MESSAGE_LENGTH = $00dbc8e358052ff7$var$PRELUDE
 
 
 
-parcelRegister("enf0o", function(module, exports) {
+parcelRegister("72V6p", function(module, exports) {
 
-var $lBNSK = parcelRequire("lBNSK");
-var $a76eda7183450418$require$eventMessageChunker = $lBNSK.eventMessageChunker;
+var $5LEFz = parcelRequire("5LEFz");
+var $521503a9e058b643$require$eventMessageChunker = $5LEFz.eventMessageChunker;
 
-var $7JdZD = parcelRequire("7JdZD");
-var $a76eda7183450418$require$parseEvent = $7JdZD.parseEvent;
-function $a76eda7183450418$var$createEventStream(body, parser, model) {
-    var eventMessages = $a76eda7183450418$require$eventMessageChunker(body);
+var $iAJ67 = parcelRequire("iAJ67");
+var $521503a9e058b643$require$parseEvent = $iAJ67.parseEvent;
+function $521503a9e058b643$var$createEventStream(body, parser, model) {
+    var eventMessages = $521503a9e058b643$require$eventMessageChunker(body);
     var events = [];
-    for(var i = 0; i < eventMessages.length; i++)events.push($a76eda7183450418$require$parseEvent(parser, eventMessages[i], model));
+    for(var i = 0; i < eventMessages.length; i++)events.push($521503a9e058b643$require$parseEvent(parser, eventMessages[i], model));
     return events;
 }
 /**
  * @api private
  */ module.exports = {
-    createEventStream: $a76eda7183450418$var$createEventStream
+    createEventStream: $521503a9e058b643$var$createEventStream
 };
 
 });
-parcelRegister("lBNSK", function(module, exports) {
+parcelRegister("5LEFz", function(module, exports) {
 /**
  * Takes in a buffer of event messages and splits them into individual messages.
  * @param {Buffer} buffer
  * @api private
- */ function $fbb3bf38d9d4a1d0$var$eventMessageChunker(buffer) {
+ */ function $4330e3a05979c9a7$var$eventMessageChunker(buffer) {
     /** @type Buffer[] */ var messages = [];
     var offset = 0;
     while(offset < buffer.length){
@@ -10411,13 +10411,13 @@ parcelRegister("lBNSK", function(module, exports) {
 /**
  * @api private
  */ module.exports = {
-    eventMessageChunker: $fbb3bf38d9d4a1d0$var$eventMessageChunker
+    eventMessageChunker: $4330e3a05979c9a7$var$eventMessageChunker
 };
 
 });
 
 
-parcelRegister("leOrx", function(module, exports) {
+parcelRegister("iFpjJ", function(module, exports) {
 module.exports = {
     //provide realtime clock for performance measurement
     now: function now() {
@@ -10428,13 +10428,13 @@ module.exports = {
 
 });
 
-parcelRegister("7rpVl", function(module, exports) {
+parcelRegister("1UQpO", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $56af29fa9a99eb44$require$util = $1TgFO.util;
+var $3ty2n = parcelRequire("3ty2n");
+var $1653adfe6cb86a2a$require$util = $3ty2n.util;
 
-var $56af29fa9a99eb44$var$stringToBuffer = $56af29fa9a99eb44$require$util.buffer.toBuffer;
-var $56af29fa9a99eb44$var$MAX_MESSAGE_SIZE = 8192; // 8 KB
+var $1653adfe6cb86a2a$var$stringToBuffer = $1653adfe6cb86a2a$require$util.buffer.toBuffer;
+var $1653adfe6cb86a2a$var$MAX_MESSAGE_SIZE = 8192; // 8 KB
 /**
  * Publishes metrics via udp.
  * @param {object} options Paramters for Publisher constructor
@@ -10442,7 +10442,7 @@ var $56af29fa9a99eb44$var$MAX_MESSAGE_SIZE = 8192; // 8 KB
  * @param {string} [options.clientId = ''] Client Identifier
  * @param {boolean} [options.enabled = false] enable sending metrics datagram
  * @api private
- */ function $56af29fa9a99eb44$var$Publisher(options) {
+ */ function $1653adfe6cb86a2a$var$Publisher(options) {
     // handle configuration
     options = options || {};
     this.enabled = options.enabled || false;
@@ -10453,7 +10453,7 @@ var $56af29fa9a99eb44$var$MAX_MESSAGE_SIZE = 8192; // 8 KB
     this.clientId = this.clientId.substr(0, 255);
     this.messagesInFlight = 0;
 }
-$56af29fa9a99eb44$var$Publisher.prototype.fieldsToTrim = {
+$1653adfe6cb86a2a$var$Publisher.prototype.fieldsToTrim = {
     UserAgent: 256,
     SdkException: 128,
     SdkExceptionMessage: 512,
@@ -10469,7 +10469,7 @@ $56af29fa9a99eb44$var$Publisher.prototype.fieldsToTrim = {
  * @param {object} event ApiCall or ApiCallAttempt event.
  * @returns {object}
  * @api private
- */ $56af29fa9a99eb44$var$Publisher.prototype.trimFields = function(event) {
+ */ $1653adfe6cb86a2a$var$Publisher.prototype.trimFields = function(event) {
     var trimmableFields = Object.keys(this.fieldsToTrim);
     for(var i = 0, iLen = trimmableFields.length; i < iLen; i++){
         var field = trimmableFields[i];
@@ -10485,12 +10485,12 @@ $56af29fa9a99eb44$var$Publisher.prototype.fieldsToTrim = {
  * Handles ApiCall and ApiCallAttempt events.
  * @param {Object} event apiCall or apiCallAttempt event.
  * @api private
- */ $56af29fa9a99eb44$var$Publisher.prototype.eventHandler = function(event) {
+ */ $1653adfe6cb86a2a$var$Publisher.prototype.eventHandler = function(event) {
     // set the clientId
     event.ClientId = this.clientId;
     this.trimFields(event);
-    var message = $56af29fa9a99eb44$var$stringToBuffer(JSON.stringify(event));
-    if (!this.enabled || message.length > $56af29fa9a99eb44$var$MAX_MESSAGE_SIZE) // drop the message if publisher not enabled or it is too large
+    var message = $1653adfe6cb86a2a$var$stringToBuffer(JSON.stringify(event));
+    if (!this.enabled || message.length > $1653adfe6cb86a2a$var$MAX_MESSAGE_SIZE) // drop the message if publisher not enabled or it is too large
     return;
     this.publishDatagram(message);
 };
@@ -10498,7 +10498,7 @@ $56af29fa9a99eb44$var$Publisher.prototype.fieldsToTrim = {
  * Publishes message to an agent.
  * @param {Buffer} message JSON message to send to agent.
  * @api private
- */ $56af29fa9a99eb44$var$Publisher.prototype.publishDatagram = function(message) {
+ */ $1653adfe6cb86a2a$var$Publisher.prototype.publishDatagram = function(message) {
     var self = this;
     var client = this.getClient();
     this.messagesInFlight++;
@@ -10510,50 +10510,50 @@ $56af29fa9a99eb44$var$Publisher.prototype.fieldsToTrim = {
 /**
  * Returns an existing udp socket, or creates one if it doesn't already exist.
  * @api private
- */ $56af29fa9a99eb44$var$Publisher.prototype.getClient = function() {
-    if (!this.client) this.client = $8OLUh$dgram.createSocket('udp4');
+ */ $1653adfe6cb86a2a$var$Publisher.prototype.getClient = function() {
+    if (!this.client) this.client = $bPiTa$dgram.createSocket('udp4');
     return this.client;
 };
 /**
  * Destroys the udp socket.
  * @api private
- */ $56af29fa9a99eb44$var$Publisher.prototype.destroyClient = function() {
+ */ $1653adfe6cb86a2a$var$Publisher.prototype.destroyClient = function() {
     if (this.client) {
         this.client.close();
         this.client = void 0;
     }
 };
 module.exports = {
-    Publisher: $56af29fa9a99eb44$var$Publisher
+    Publisher: $1653adfe6cb86a2a$var$Publisher
 };
 
 });
 
-parcelRegister("1HUyC", function(module, exports) {
+parcelRegister("7I9gU", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Resolve client-side monitoring configuration from either environmental variables
  * or shared config file. Configurations from environmental variables have higher priority
  * than those from shared config file. The resolver will try to read the shared config file
  * no matter whether the AWS_SDK_LOAD_CONFIG variable is set.
  * @api private
- */ function $13e5adb076d89867$var$resolveMonitoringConfig() {
+ */ function $59d3d5a669d0981d$var$resolveMonitoringConfig() {
     var config = {
         port: undefined,
         clientId: undefined,
         enabled: undefined,
         host: undefined
     };
-    if ($13e5adb076d89867$var$fromEnvironment(config) || $13e5adb076d89867$var$fromConfigFile(config)) return $13e5adb076d89867$var$toJSType(config);
-    return $13e5adb076d89867$var$toJSType(config);
+    if ($59d3d5a669d0981d$var$fromEnvironment(config) || $59d3d5a669d0981d$var$fromConfigFile(config)) return $59d3d5a669d0981d$var$toJSType(config);
+    return $59d3d5a669d0981d$var$toJSType(config);
 }
 /**
  * Resolve configurations from environmental variables.
  * @param {object} client side monitoring config object needs to be resolved
  * @returns {boolean} whether resolving configurations is done
  * @api private
- */ function $13e5adb076d89867$var$fromEnvironment(config) {
+ */ function $59d3d5a669d0981d$var$fromEnvironment(config) {
     config.port = config.port || process.env.AWS_CSM_PORT;
     config.enabled = config.enabled || process.env.AWS_CSM_ENABLED;
     config.clientId = config.clientId || process.env.AWS_CSM_CLIENT_ID;
@@ -10568,14 +10568,14 @@ var $1TgFO = parcelRequire("1TgFO");
  * @param {object} client side monitoring config object needs to be resolved
  * @returns {boolean} whether resolving configurations is done
  * @api private
- */ function $13e5adb076d89867$var$fromConfigFile(config) {
+ */ function $59d3d5a669d0981d$var$fromConfigFile(config) {
     var sharedFileConfig;
     try {
-        var configFile = $1TgFO.util.iniLoader.loadFrom({
+        var configFile = $3ty2n.util.iniLoader.loadFrom({
             isConfig: true,
-            filename: process.env[$1TgFO.util.sharedConfigFileEnv]
+            filename: process.env[$3ty2n.util.sharedConfigFileEnv]
         });
-        var sharedFileConfig = configFile[process.env.AWS_PROFILE || $1TgFO.util.defaultProfile];
+        var sharedFileConfig = configFile[process.env.AWS_PROFILE || $3ty2n.util.defaultProfile];
     } catch (err) {
         return false;
     }
@@ -10592,7 +10592,7 @@ var $1TgFO = parcelRequire("1TgFO");
  * to 'false' or '0'.
  * @param {object} resolved client side monitoring config
  * @api private
- */ function $13e5adb076d89867$var$toJSType(config) {
+ */ function $59d3d5a669d0981d$var$toJSType(config) {
     //config.XXX is either undefined or string
     var falsyNotations = [
         'false',
@@ -10604,32 +10604,32 @@ var $1TgFO = parcelRequire("1TgFO");
     config.port = config.port ? parseInt(config.port, 10) : undefined;
     return config;
 }
-module.exports = $13e5adb076d89867$var$resolveMonitoringConfig;
+module.exports = $59d3d5a669d0981d$var$resolveMonitoringConfig;
 
 });
 
-parcelRegister("a1rNP", function(module, exports) {
+parcelRegister("lOe0T", function(module, exports) {
 
-$parcel$export(module.exports, "iniLoader", () => $74bf90671e85c7a2$export$4f430c92d556fecd, (v) => $74bf90671e85c7a2$export$4f430c92d556fecd = v);
+$parcel$export(module.exports, "iniLoader", () => $fe09233bea7d5054$export$4f430c92d556fecd, (v) => $fe09233bea7d5054$export$4f430c92d556fecd = v);
 /**
  * Singleton object to load specified config/credentials files.
  * It will cache all the files ever loaded;
- */ var $74bf90671e85c7a2$export$4f430c92d556fecd;
+ */ var $fe09233bea7d5054$export$4f430c92d556fecd;
 
-var $PJvZ6 = parcelRequire("PJvZ6");
-var $74bf90671e85c7a2$require$IniLoader = $PJvZ6.IniLoader;
-$74bf90671e85c7a2$export$4f430c92d556fecd = new $74bf90671e85c7a2$require$IniLoader();
+var $b8QLt = parcelRequire("b8QLt");
+var $fe09233bea7d5054$require$IniLoader = $b8QLt.IniLoader;
+$fe09233bea7d5054$export$4f430c92d556fecd = new $fe09233bea7d5054$require$IniLoader();
 
 });
-parcelRegister("PJvZ6", function(module, exports) {
+parcelRegister("b8QLt", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 
-function $09b811d77fa71bba$var$parseFile(filename) {
-    return $1TgFO.util.ini.parse($1TgFO.util.readFileSync(filename));
+function $81c95f0c69621e82$var$parseFile(filename) {
+    return $3ty2n.util.ini.parse($3ty2n.util.readFileSync(filename));
 }
-function $09b811d77fa71bba$var$getProfiles(fileContent) {
+function $81c95f0c69621e82$var$getProfiles(fileContent) {
     var tmpContent = {};
     Object.keys(fileContent).forEach(function(sectionName) {
         if (/^sso-session\s/.test(sectionName)) return;
@@ -10640,7 +10640,7 @@ function $09b811d77fa71bba$var$getProfiles(fileContent) {
     });
     return tmpContent;
 }
-function $09b811d77fa71bba$var$getSsoSessions(fileContent) {
+function $81c95f0c69621e82$var$getSsoSessions(fileContent) {
     var tmpContent = {};
     Object.keys(fileContent).forEach(function(sectionName) {
         if (!/^sso-session\s/.test(sectionName)) return;
@@ -10659,7 +10659,7 @@ function $09b811d77fa71bba$var$getSsoSessions(fileContent) {
  * won't affect the behavior of SDK since SDK uses an internal singleton of
  * this class.
  * @!macro nobrowser
- */ $1TgFO.IniLoader = $1TgFO.util.inherit({
+ */ $3ty2n.IniLoader = $3ty2n.util.inherit({
     constructor: function IniLoader() {
         this.resolvedProfiles = {};
         this.resolvedSsoSessions = {};
@@ -10685,9 +10685,9 @@ function $09b811d77fa71bba$var$getSsoSessions(fileContent) {
         var isConfig = options.isConfig === true;
         var filename = options.filename || this.getDefaultFilePath(isConfig);
         if (!this.resolvedProfiles[filename]) {
-            var fileContent = $09b811d77fa71bba$var$parseFile(filename);
+            var fileContent = $81c95f0c69621e82$var$parseFile(filename);
             if (isConfig) Object.defineProperty(this.resolvedProfiles, filename, {
-                value: $09b811d77fa71bba$var$getProfiles(fileContent)
+                value: $81c95f0c69621e82$var$getProfiles(fileContent)
             });
             else Object.defineProperty(this.resolvedProfiles, filename, {
                 value: fileContent
@@ -10708,52 +10708,52 @@ function $09b811d77fa71bba$var$getSsoSessions(fileContent) {
         options = options || {};
         var filename = options.filename || this.getDefaultFilePath(true);
         if (!this.resolvedSsoSessions[filename]) {
-            var fileContent = $09b811d77fa71bba$var$parseFile(filename);
+            var fileContent = $81c95f0c69621e82$var$parseFile(filename);
             Object.defineProperty(this.resolvedSsoSessions, filename, {
-                value: $09b811d77fa71bba$var$getSsoSessions(fileContent)
+                value: $81c95f0c69621e82$var$getSsoSessions(fileContent)
             });
         }
         return this.resolvedSsoSessions[filename];
     },
     getDefaultFilePath: function getDefaultFilePath(isConfig) {
-        return $8OLUh$path.join(this.getHomeDir(), '.aws', isConfig ? 'config' : 'credentials');
+        return $bPiTa$path.join(this.getHomeDir(), '.aws', isConfig ? 'config' : 'credentials');
     },
     getHomeDir: function getHomeDir() {
         var env = process.env;
         var home = env.HOME || env.USERPROFILE || (env.HOMEPATH ? (env.HOMEDRIVE || 'C:/') + env.HOMEPATH : null);
         if (home) return home;
-        if (typeof $8OLUh$os.homedir === 'function') return $8OLUh$os.homedir();
-        throw $1TgFO.util.error(new Error('Cannot load credentials, HOME path not set'));
+        if (typeof $bPiTa$os.homedir === 'function') return $bPiTa$os.homedir();
+        throw $3ty2n.util.error(new Error('Cannot load credentials, HOME path not set'));
     }
 });
-var $09b811d77fa71bba$var$IniLoader = $1TgFO.IniLoader;
+var $81c95f0c69621e82$var$IniLoader = $3ty2n.IniLoader;
 module.exports = {
-    IniLoader: $09b811d77fa71bba$var$IniLoader
+    IniLoader: $81c95f0c69621e82$var$IniLoader
 };
 
 });
 
 
-parcelRegister("bEcgx", function(module, exports) {
+parcelRegister("ZuR8A", function(module, exports) {
 module.exports = JSON.parse("{\"version\":\"2.0\",\"metadata\":{\"apiVersion\":\"2014-06-30\",\"endpointPrefix\":\"cognito-identity\",\"jsonVersion\":\"1.1\",\"protocol\":\"json\",\"protocols\":[\"json\"],\"serviceFullName\":\"Amazon Cognito Identity\",\"serviceId\":\"Cognito Identity\",\"signatureVersion\":\"v4\",\"targetPrefix\":\"AWSCognitoIdentityService\",\"uid\":\"cognito-identity-2014-06-30\",\"auth\":[\"aws.auth#sigv4\"]},\"operations\":{\"CreateIdentityPool\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolName\",\"AllowUnauthenticatedIdentities\"],\"members\":{\"IdentityPoolName\":{},\"AllowUnauthenticatedIdentities\":{\"type\":\"boolean\"},\"AllowClassicFlow\":{\"type\":\"boolean\"},\"SupportedLoginProviders\":{\"shape\":\"S5\"},\"DeveloperProviderName\":{},\"OpenIdConnectProviderARNs\":{\"shape\":\"S9\"},\"CognitoIdentityProviders\":{\"shape\":\"Sb\"},\"SamlProviderARNs\":{\"shape\":\"Sg\"},\"IdentityPoolTags\":{\"shape\":\"Sh\"}}},\"output\":{\"shape\":\"Sk\"}},\"DeleteIdentities\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityIdsToDelete\"],\"members\":{\"IdentityIdsToDelete\":{\"type\":\"list\",\"member\":{}}}},\"output\":{\"type\":\"structure\",\"members\":{\"UnprocessedIdentityIds\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{},\"ErrorCode\":{}}}}}}},\"DeleteIdentityPool\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\"],\"members\":{\"IdentityPoolId\":{}}}},\"DescribeIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityId\"],\"members\":{\"IdentityId\":{}}},\"output\":{\"shape\":\"Sv\"}},\"DescribeIdentityPool\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\"],\"members\":{\"IdentityPoolId\":{}}},\"output\":{\"shape\":\"Sk\"}},\"GetCredentialsForIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityId\"],\"members\":{\"IdentityId\":{},\"Logins\":{\"shape\":\"S10\"},\"CustomRoleArn\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{},\"Credentials\":{\"type\":\"structure\",\"members\":{\"AccessKeyId\":{},\"SecretKey\":{},\"SessionToken\":{},\"Expiration\":{\"type\":\"timestamp\"}}}}},\"authtype\":\"none\",\"auth\":[\"smithy.api#noAuth\"]},\"GetId\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\"],\"members\":{\"AccountId\":{},\"IdentityPoolId\":{},\"Logins\":{\"shape\":\"S10\"}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{}}},\"authtype\":\"none\",\"auth\":[\"smithy.api#noAuth\"]},\"GetIdentityPoolRoles\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\"],\"members\":{\"IdentityPoolId\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityPoolId\":{},\"Roles\":{\"shape\":\"S1c\"},\"RoleMappings\":{\"shape\":\"S1e\"}}}},\"GetOpenIdToken\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityId\"],\"members\":{\"IdentityId\":{},\"Logins\":{\"shape\":\"S10\"}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{},\"Token\":{}}},\"authtype\":\"none\",\"auth\":[\"smithy.api#noAuth\"]},\"GetOpenIdTokenForDeveloperIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\",\"Logins\"],\"members\":{\"IdentityPoolId\":{},\"IdentityId\":{},\"Logins\":{\"shape\":\"S10\"},\"PrincipalTags\":{\"shape\":\"S1s\"},\"TokenDuration\":{\"type\":\"long\"}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{},\"Token\":{}}}},\"GetPrincipalTagAttributeMap\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\",\"IdentityProviderName\"],\"members\":{\"IdentityPoolId\":{},\"IdentityProviderName\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityPoolId\":{},\"IdentityProviderName\":{},\"UseDefaults\":{\"type\":\"boolean\"},\"PrincipalTags\":{\"shape\":\"S1s\"}}}},\"ListIdentities\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\",\"MaxResults\"],\"members\":{\"IdentityPoolId\":{},\"MaxResults\":{\"type\":\"integer\"},\"NextToken\":{},\"HideDisabled\":{\"type\":\"boolean\"}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityPoolId\":{},\"Identities\":{\"type\":\"list\",\"member\":{\"shape\":\"Sv\"}},\"NextToken\":{}}}},\"ListIdentityPools\":{\"input\":{\"type\":\"structure\",\"required\":[\"MaxResults\"],\"members\":{\"MaxResults\":{\"type\":\"integer\"},\"NextToken\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityPools\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"members\":{\"IdentityPoolId\":{},\"IdentityPoolName\":{}}}},\"NextToken\":{}}}},\"ListTagsForResource\":{\"input\":{\"type\":\"structure\",\"required\":[\"ResourceArn\"],\"members\":{\"ResourceArn\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"Tags\":{\"shape\":\"Sh\"}}}},\"LookupDeveloperIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\"],\"members\":{\"IdentityPoolId\":{},\"IdentityId\":{},\"DeveloperUserIdentifier\":{},\"MaxResults\":{\"type\":\"integer\"},\"NextToken\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{},\"DeveloperUserIdentifierList\":{\"type\":\"list\",\"member\":{}},\"NextToken\":{}}}},\"MergeDeveloperIdentities\":{\"input\":{\"type\":\"structure\",\"required\":[\"SourceUserIdentifier\",\"DestinationUserIdentifier\",\"DeveloperProviderName\",\"IdentityPoolId\"],\"members\":{\"SourceUserIdentifier\":{},\"DestinationUserIdentifier\":{},\"DeveloperProviderName\":{},\"IdentityPoolId\":{}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{}}}},\"SetIdentityPoolRoles\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\",\"Roles\"],\"members\":{\"IdentityPoolId\":{},\"Roles\":{\"shape\":\"S1c\"},\"RoleMappings\":{\"shape\":\"S1e\"}}}},\"SetPrincipalTagAttributeMap\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\",\"IdentityProviderName\"],\"members\":{\"IdentityPoolId\":{},\"IdentityProviderName\":{},\"UseDefaults\":{\"type\":\"boolean\"},\"PrincipalTags\":{\"shape\":\"S1s\"}}},\"output\":{\"type\":\"structure\",\"members\":{\"IdentityPoolId\":{},\"IdentityProviderName\":{},\"UseDefaults\":{\"type\":\"boolean\"},\"PrincipalTags\":{\"shape\":\"S1s\"}}}},\"TagResource\":{\"input\":{\"type\":\"structure\",\"required\":[\"ResourceArn\",\"Tags\"],\"members\":{\"ResourceArn\":{},\"Tags\":{\"shape\":\"Sh\"}}},\"output\":{\"type\":\"structure\",\"members\":{}}},\"UnlinkDeveloperIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityId\",\"IdentityPoolId\",\"DeveloperProviderName\",\"DeveloperUserIdentifier\"],\"members\":{\"IdentityId\":{},\"IdentityPoolId\":{},\"DeveloperProviderName\":{},\"DeveloperUserIdentifier\":{}}}},\"UnlinkIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"IdentityId\",\"Logins\",\"LoginsToRemove\"],\"members\":{\"IdentityId\":{},\"Logins\":{\"shape\":\"S10\"},\"LoginsToRemove\":{\"shape\":\"Sw\"}}},\"authtype\":\"none\",\"auth\":[\"smithy.api#noAuth\"]},\"UntagResource\":{\"input\":{\"type\":\"structure\",\"required\":[\"ResourceArn\",\"TagKeys\"],\"members\":{\"ResourceArn\":{},\"TagKeys\":{\"type\":\"list\",\"member\":{}}}},\"output\":{\"type\":\"structure\",\"members\":{}}},\"UpdateIdentityPool\":{\"input\":{\"shape\":\"Sk\"},\"output\":{\"shape\":\"Sk\"}}},\"shapes\":{\"S5\":{\"type\":\"map\",\"key\":{},\"value\":{}},\"S9\":{\"type\":\"list\",\"member\":{}},\"Sb\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"members\":{\"ProviderName\":{},\"ClientId\":{},\"ServerSideTokenCheck\":{\"type\":\"boolean\"}}}},\"Sg\":{\"type\":\"list\",\"member\":{}},\"Sh\":{\"type\":\"map\",\"key\":{},\"value\":{}},\"Sk\":{\"type\":\"structure\",\"required\":[\"IdentityPoolId\",\"IdentityPoolName\",\"AllowUnauthenticatedIdentities\"],\"members\":{\"IdentityPoolId\":{},\"IdentityPoolName\":{},\"AllowUnauthenticatedIdentities\":{\"type\":\"boolean\"},\"AllowClassicFlow\":{\"type\":\"boolean\"},\"SupportedLoginProviders\":{\"shape\":\"S5\"},\"DeveloperProviderName\":{},\"OpenIdConnectProviderARNs\":{\"shape\":\"S9\"},\"CognitoIdentityProviders\":{\"shape\":\"Sb\"},\"SamlProviderARNs\":{\"shape\":\"Sg\"},\"IdentityPoolTags\":{\"shape\":\"Sh\"}}},\"Sv\":{\"type\":\"structure\",\"members\":{\"IdentityId\":{},\"Logins\":{\"shape\":\"Sw\"},\"CreationDate\":{\"type\":\"timestamp\"},\"LastModifiedDate\":{\"type\":\"timestamp\"}}},\"Sw\":{\"type\":\"list\",\"member\":{}},\"S10\":{\"type\":\"map\",\"key\":{},\"value\":{}},\"S1c\":{\"type\":\"map\",\"key\":{},\"value\":{}},\"S1e\":{\"type\":\"map\",\"key\":{},\"value\":{\"type\":\"structure\",\"required\":[\"Type\"],\"members\":{\"Type\":{},\"AmbiguousRoleResolution\":{},\"RulesConfiguration\":{\"type\":\"structure\",\"required\":[\"Rules\"],\"members\":{\"Rules\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"required\":[\"Claim\",\"MatchType\",\"Value\",\"RoleARN\"],\"members\":{\"Claim\":{},\"MatchType\":{},\"Value\":{},\"RoleARN\":{}}}}}}}}},\"S1s\":{\"type\":\"map\",\"key\":{},\"value\":{}}}}");
 
 });
 
-parcelRegister("7umcb", function(module, exports) {
+parcelRegister("8fnJf", function(module, exports) {
 module.exports = JSON.parse("{\"pagination\":{\"ListIdentityPools\":{\"input_token\":\"NextToken\",\"limit_key\":\"MaxResults\",\"output_token\":\"NextToken\",\"result_key\":\"IdentityPools\"}}}");
 
 });
 
-parcelRegister("leND0", function(module, exports) {
+parcelRegister("b7zbv", function(module, exports) {
 
-var $1TgFO = parcelRequire("1TgFO");
-var $f76166e9f311d2ba$var$util = $1TgFO.util;
-var $f76166e9f311d2ba$var$Shape = $1TgFO.Model.Shape;
+var $3ty2n = parcelRequire("3ty2n");
+var $818ba41859ca2ff1$var$util = $3ty2n.util;
+var $818ba41859ca2ff1$var$Shape = $3ty2n.Model.Shape;
 
-var $6mBZr = parcelRequire("6mBZr");
+var $420qk = parcelRequire("420qk");
 /**
  * @api private
- */ var $f76166e9f311d2ba$var$options = {
+ */ var $818ba41859ca2ff1$var$options = {
     explicitCharkey: false,
     trim: false,
     normalize: false,
@@ -10764,92 +10764,92 @@ var $6mBZr = parcelRequire("6mBZr");
     mergeAttrs: false,
     validator: null // a callable validator
 };
-function $f76166e9f311d2ba$var$NodeXmlParser() {}
-$f76166e9f311d2ba$var$NodeXmlParser.prototype.parse = function(xml, shape) {
+function $818ba41859ca2ff1$var$NodeXmlParser() {}
+$818ba41859ca2ff1$var$NodeXmlParser.prototype.parse = function(xml, shape) {
     shape = shape || {};
     var result = null;
     var error = null;
-    var parser = new $6mBZr.Parser($f76166e9f311d2ba$var$options);
+    var parser = new $420qk.Parser($818ba41859ca2ff1$var$options);
     parser.parseString(xml, function(e, r) {
         error = e;
         result = r;
     });
     if (result) {
-        var data = $f76166e9f311d2ba$var$parseXml(result, shape);
-        if (result.ResponseMetadata) data.ResponseMetadata = $f76166e9f311d2ba$var$parseXml(result.ResponseMetadata[0], {});
+        var data = $818ba41859ca2ff1$var$parseXml(result, shape);
+        if (result.ResponseMetadata) data.ResponseMetadata = $818ba41859ca2ff1$var$parseXml(result.ResponseMetadata[0], {});
         return data;
-    } else if (error) throw $f76166e9f311d2ba$var$util.error(error, {
+    } else if (error) throw $818ba41859ca2ff1$var$util.error(error, {
         code: 'XMLParserError',
         retryable: true
     });
-    else return $f76166e9f311d2ba$var$parseXml({}, shape);
+    else return $818ba41859ca2ff1$var$parseXml({}, shape);
 };
-function $f76166e9f311d2ba$var$parseXml(xml, shape) {
+function $818ba41859ca2ff1$var$parseXml(xml, shape) {
     switch(shape.type){
         case 'structure':
-            return $f76166e9f311d2ba$var$parseStructure(xml, shape);
+            return $818ba41859ca2ff1$var$parseStructure(xml, shape);
         case 'map':
-            return $f76166e9f311d2ba$var$parseMap(xml, shape);
+            return $818ba41859ca2ff1$var$parseMap(xml, shape);
         case 'list':
-            return $f76166e9f311d2ba$var$parseList(xml, shape);
+            return $818ba41859ca2ff1$var$parseList(xml, shape);
         case undefined:
         case null:
-            return $f76166e9f311d2ba$var$parseUnknown(xml);
+            return $818ba41859ca2ff1$var$parseUnknown(xml);
         default:
-            return $f76166e9f311d2ba$var$parseScalar(xml, shape);
+            return $818ba41859ca2ff1$var$parseScalar(xml, shape);
     }
 }
-function $f76166e9f311d2ba$var$parseStructure(xml, shape) {
+function $818ba41859ca2ff1$var$parseStructure(xml, shape) {
     var data = {};
     if (xml === null) return data;
-    $f76166e9f311d2ba$var$util.each(shape.members, function(memberName, memberShape) {
+    $818ba41859ca2ff1$var$util.each(shape.members, function(memberName, memberShape) {
         var xmlName = memberShape.name;
         if (Object.prototype.hasOwnProperty.call(xml, xmlName) && Array.isArray(xml[xmlName])) {
             var xmlChild = xml[xmlName];
             if (!memberShape.flattened) xmlChild = xmlChild[0];
-            data[memberName] = $f76166e9f311d2ba$var$parseXml(xmlChild, memberShape);
-        } else if (memberShape.isXmlAttribute && xml.$ && Object.prototype.hasOwnProperty.call(xml.$, xmlName)) data[memberName] = $f76166e9f311d2ba$var$parseScalar(xml.$[xmlName], memberShape);
+            data[memberName] = $818ba41859ca2ff1$var$parseXml(xmlChild, memberShape);
+        } else if (memberShape.isXmlAttribute && xml.$ && Object.prototype.hasOwnProperty.call(xml.$, xmlName)) data[memberName] = $818ba41859ca2ff1$var$parseScalar(xml.$[xmlName], memberShape);
         else if (memberShape.type === 'list' && !shape.api.xmlNoDefaultLists) data[memberName] = memberShape.defaultValue;
     });
     return data;
 }
-function $f76166e9f311d2ba$var$parseMap(xml, shape) {
+function $818ba41859ca2ff1$var$parseMap(xml, shape) {
     var data = {};
     if (xml === null) return data;
     var xmlKey = shape.key.name || 'key';
     var xmlValue = shape.value.name || 'value';
     var iterable = shape.flattened ? xml : xml.entry;
-    if (Array.isArray(iterable)) $f76166e9f311d2ba$var$util.arrayEach(iterable, function(child) {
-        data[child[xmlKey][0]] = $f76166e9f311d2ba$var$parseXml(child[xmlValue][0], shape.value);
+    if (Array.isArray(iterable)) $818ba41859ca2ff1$var$util.arrayEach(iterable, function(child) {
+        data[child[xmlKey][0]] = $818ba41859ca2ff1$var$parseXml(child[xmlValue][0], shape.value);
     });
     return data;
 }
-function $f76166e9f311d2ba$var$parseList(xml, shape) {
+function $818ba41859ca2ff1$var$parseList(xml, shape) {
     var data = [];
     var name = shape.member.name || 'member';
-    if (shape.flattened) $f76166e9f311d2ba$var$util.arrayEach(xml, function(xmlChild) {
-        data.push($f76166e9f311d2ba$var$parseXml(xmlChild, shape.member));
+    if (shape.flattened) $818ba41859ca2ff1$var$util.arrayEach(xml, function(xmlChild) {
+        data.push($818ba41859ca2ff1$var$parseXml(xmlChild, shape.member));
     });
-    else if (xml && Array.isArray(xml[name])) $f76166e9f311d2ba$var$util.arrayEach(xml[name], function(child) {
-        data.push($f76166e9f311d2ba$var$parseXml(child, shape.member));
+    else if (xml && Array.isArray(xml[name])) $818ba41859ca2ff1$var$util.arrayEach(xml[name], function(child) {
+        data.push($818ba41859ca2ff1$var$parseXml(child, shape.member));
     });
     return data;
 }
-function $f76166e9f311d2ba$var$parseScalar(text, shape) {
-    if (text && text.$ && text.$.encoding === 'base64') shape = new $f76166e9f311d2ba$var$Shape.create({
+function $818ba41859ca2ff1$var$parseScalar(text, shape) {
+    if (text && text.$ && text.$.encoding === 'base64') shape = new $818ba41859ca2ff1$var$Shape.create({
         type: text.$.encoding
     });
     if (text && text._) text = text._;
     if (typeof shape.toType === 'function') return shape.toType(text);
     else return text;
 }
-function $f76166e9f311d2ba$var$parseUnknown(xml) {
+function $818ba41859ca2ff1$var$parseUnknown(xml) {
     if (xml === undefined || xml === null) return '';
     if (typeof xml === 'string') return xml;
     // parse a list
     if (Array.isArray(xml)) {
         var arr = [];
-        for(i = 0; i < xml.length; i++)arr.push($f76166e9f311d2ba$var$parseXml(xml[i], {}));
+        for(i = 0; i < xml.length; i++)arr.push($818ba41859ca2ff1$var$parseXml(xml[i], {}));
         return arr;
     }
     // empty object
@@ -10860,19 +10860,19 @@ function $f76166e9f311d2ba$var$parseUnknown(xml) {
     for(i = 0; i < keys.length; i++){
         var key = keys[i], value = xml[key];
         if (key === '$') continue;
-        if (value.length > 1) data[key] = $f76166e9f311d2ba$var$parseList(value, {
+        if (value.length > 1) data[key] = $818ba41859ca2ff1$var$parseList(value, {
             member: {}
         });
-        else data[key] = $f76166e9f311d2ba$var$parseXml(value[0], {});
+        else data[key] = $818ba41859ca2ff1$var$parseXml(value[0], {});
     }
     return data;
 }
 /**
  * @api private
- */ module.exports = $f76166e9f311d2ba$var$NodeXmlParser;
+ */ module.exports = $818ba41859ca2ff1$var$NodeXmlParser;
 
 });
-parcelRegister("6mBZr", function(module, exports) {
+parcelRegister("420qk", function(module, exports) {
 
 
 
@@ -10890,10 +10890,10 @@ parcelRegister("6mBZr", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    defaults = (parcelRequire("8BIzm"));
-    builder = (parcelRequire("iraZz"));
-    parser = (parcelRequire("3R2QC"));
-    processors = (parcelRequire("6FlK1"));
+    defaults = (parcelRequire("c2U9A"));
+    builder = (parcelRequire("3EaoS"));
+    parser = (parcelRequire("c7bFT"));
+    processors = (parcelRequire("5JJSe"));
     module.exports.defaults = defaults.defaults;
     module.exports.processors = processors;
     module.exports.ValidationError = function(superClass) {
@@ -10910,7 +10910,7 @@ parcelRegister("6mBZr", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("8BIzm", function(module, exports) {
+parcelRegister("c2U9A", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     module.exports.defaults = {
@@ -10985,15 +10985,15 @@ parcelRegister("8BIzm", function(module, exports) {
 
 });
 
-parcelRegister("iraZz", function(module, exports) {
+parcelRegister("3EaoS", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
 (function() {
     "use strict";
     var builder, defaults, escapeCDATA, requiresCDATA, wrapCDATA, hasProp = {}.hasOwnProperty;
-    builder = (parcelRequire("fYxjv"));
-    defaults = (parcelRequire("8BIzm")).defaults;
+    builder = (parcelRequire("gJMm9"));
+    defaults = (parcelRequire("c2U9A")).defaults;
     requiresCDATA = function(entry) {
         return typeof entry === "string" && (entry.indexOf('&') >= 0 || entry.indexOf('>') >= 0 || entry.indexOf('<') >= 0);
     };
@@ -11081,7 +11081,7 @@ parcelRegister("iraZz", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("fYxjv", function(module, exports) {
+parcelRegister("gJMm9", function(module, exports) {
 
 
 
@@ -11093,14 +11093,14 @@ parcelRegister("fYxjv", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var NodeType, WriterState, XMLDOMImplementation, XMLDocument, XMLDocumentCB, XMLStreamWriter, XMLStringWriter, assign, isFunction, ref;
-    ref = (parcelRequire("61JjS")), assign = ref.assign, isFunction = ref.isFunction;
-    XMLDOMImplementation = (parcelRequire("ieGPF"));
-    XMLDocument = (parcelRequire("2HETj"));
-    XMLDocumentCB = (parcelRequire("gsjmY"));
-    XMLStringWriter = (parcelRequire("fqcKR"));
-    XMLStreamWriter = (parcelRequire("9iC3w"));
-    NodeType = (parcelRequire("cani6"));
-    WriterState = (parcelRequire("lhdtf"));
+    ref = (parcelRequire("743Vx")), assign = ref.assign, isFunction = ref.isFunction;
+    XMLDOMImplementation = (parcelRequire("8sMOL"));
+    XMLDocument = (parcelRequire("jF8Kg"));
+    XMLDocumentCB = (parcelRequire("gL8jw"));
+    XMLStringWriter = (parcelRequire("dY6TH"));
+    XMLStreamWriter = (parcelRequire("Ez3J7"));
+    NodeType = (parcelRequire("jskAv"));
+    WriterState = (parcelRequire("egEK1"));
     module.exports.create = function(name, xmldec, doctype, options) {
         var doc, root;
         if (name == null) throw new Error("Root element needs a name.");
@@ -11137,7 +11137,7 @@ parcelRegister("fYxjv", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("61JjS", function(module, exports) {
+parcelRegister("743Vx", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var assign, getValue, isArray, isEmpty, isFunction, isObject, isPlainObject, slice = [].slice, hasProp = {}.hasOwnProperty;
@@ -11195,7 +11195,7 @@ parcelRegister("61JjS", function(module, exports) {
 
 });
 
-parcelRegister("ieGPF", function(module, exports) {
+parcelRegister("8sMOL", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLDOMImplementation;
@@ -11222,7 +11222,7 @@ parcelRegister("ieGPF", function(module, exports) {
 
 });
 
-parcelRegister("2HETj", function(module, exports) {
+parcelRegister("jF8Kg", function(module, exports) {
 
 
 
@@ -11242,13 +11242,13 @@ parcelRegister("2HETj", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    isPlainObject = (parcelRequire("61JjS")).isPlainObject;
-    XMLDOMImplementation = (parcelRequire("ieGPF"));
-    XMLDOMConfiguration = (parcelRequire("4tnNC"));
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
-    XMLStringifier = (parcelRequire("36sHv"));
-    XMLStringWriter = (parcelRequire("fqcKR"));
+    isPlainObject = (parcelRequire("743Vx")).isPlainObject;
+    XMLDOMImplementation = (parcelRequire("8sMOL"));
+    XMLDOMConfiguration = (parcelRequire("9ZYF2"));
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLStringifier = (parcelRequire("dlESV"));
+    XMLStringWriter = (parcelRequire("dY6TH"));
     module.exports = XMLDocument = function(superClass) {
         extend(XMLDocument, superClass);
         function XMLDocument(options) {
@@ -11418,14 +11418,14 @@ parcelRegister("2HETj", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("4tnNC", function(module, exports) {
+parcelRegister("9ZYF2", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLDOMConfiguration, XMLDOMErrorHandler, XMLDOMStringList;
-    XMLDOMErrorHandler = (parcelRequire("d9jWK"));
-    XMLDOMStringList = (parcelRequire("9wUGF"));
+    XMLDOMErrorHandler = (parcelRequire("ecIZ6"));
+    XMLDOMStringList = (parcelRequire("5DtBf"));
     module.exports = XMLDOMConfiguration = function() {
         function XMLDOMConfiguration() {
             var clonedSelf;
@@ -11471,7 +11471,7 @@ parcelRegister("4tnNC", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("d9jWK", function(module, exports) {
+parcelRegister("ecIZ6", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLDOMErrorHandler;
@@ -11486,7 +11486,7 @@ parcelRegister("d9jWK", function(module, exports) {
 
 });
 
-parcelRegister("9wUGF", function(module, exports) {
+parcelRegister("5DtBf", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLDOMStringList;
@@ -11512,7 +11512,7 @@ parcelRegister("9wUGF", function(module, exports) {
 });
 
 
-parcelRegister("53ied", function(module, exports) {
+parcelRegister("dy1RQ", function(module, exports) {
 
 
 
@@ -11530,7 +11530,7 @@ parcelRegister("53ied", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var DocumentPosition, NodeType, XMLCData, XMLComment, XMLDeclaration, XMLDocType, XMLDummy, XMLElement, XMLNamedNodeMap, XMLNode, XMLNodeList, XMLProcessingInstruction, XMLRaw, XMLText, getValue, isEmpty, isFunction, isObject, ref1, hasProp = {}.hasOwnProperty;
-    ref1 = (parcelRequire("61JjS")), isObject = ref1.isObject, isFunction = ref1.isFunction, isEmpty = ref1.isEmpty, getValue = ref1.getValue;
+    ref1 = (parcelRequire("743Vx")), isObject = ref1.isObject, isFunction = ref1.isFunction, isEmpty = ref1.isEmpty, getValue = ref1.getValue;
     XMLElement = null;
     XMLCData = null;
     XMLComment = null;
@@ -11555,19 +11555,19 @@ parcelRegister("53ied", function(module, exports) {
             this.children = [];
             this.baseURI = null;
             if (!XMLElement) {
-                XMLElement = (parcelRequire("dKJP2"));
-                XMLCData = (parcelRequire("b6evZ"));
-                XMLComment = (parcelRequire("gejSl"));
-                XMLDeclaration = (parcelRequire("ky0Sq"));
-                XMLDocType = (parcelRequire("kzp9h"));
-                XMLRaw = (parcelRequire("bT0Sn"));
-                XMLText = (parcelRequire("dBjXD"));
-                XMLProcessingInstruction = (parcelRequire("5X4LQ"));
-                XMLDummy = (parcelRequire("h6Hg4"));
-                NodeType = (parcelRequire("cani6"));
-                XMLNodeList = (parcelRequire("6Mcfm"));
-                XMLNamedNodeMap = (parcelRequire("45emo"));
-                DocumentPosition = (parcelRequire("62F6C"));
+                XMLElement = (parcelRequire("iA0QJ"));
+                XMLCData = (parcelRequire("8Coyh"));
+                XMLComment = (parcelRequire("ktoBH"));
+                XMLDeclaration = (parcelRequire("1CvR5"));
+                XMLDocType = (parcelRequire("iP11T"));
+                XMLRaw = (parcelRequire("92kr6"));
+                XMLText = (parcelRequire("g5WrM"));
+                XMLProcessingInstruction = (parcelRequire("jnNEO"));
+                XMLDummy = (parcelRequire("3SNwO"));
+                NodeType = (parcelRequire("jskAv"));
+                XMLNodeList = (parcelRequire("5E4jj"));
+                XMLNamedNodeMap = (parcelRequire("8mwAK"));
+                DocumentPosition = (parcelRequire("4vxYR"));
             }
         }
         Object.defineProperty(XMLNode.prototype, 'nodeName', {
@@ -12111,7 +12111,7 @@ parcelRegister("53ied", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("dKJP2", function(module, exports) {
+parcelRegister("iA0QJ", function(module, exports) {
 
 
 
@@ -12129,11 +12129,11 @@ parcelRegister("dKJP2", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    ref = (parcelRequire("61JjS")), isObject = ref.isObject, isFunction = ref.isFunction, getValue = ref.getValue;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
-    XMLAttribute = (parcelRequire("iX0CI"));
-    XMLNamedNodeMap = (parcelRequire("45emo"));
+    ref = (parcelRequire("743Vx")), isObject = ref.isObject, isFunction = ref.isFunction, getValue = ref.getValue;
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLAttribute = (parcelRequire("3225b"));
+    XMLNamedNodeMap = (parcelRequire("8mwAK"));
     module.exports = XMLElement = function(superClass) {
         extend(XMLElement, superClass);
         function XMLElement(parent, name, attributes) {
@@ -12337,7 +12337,7 @@ parcelRegister("dKJP2", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("cani6", function(module, exports) {
+parcelRegister("jskAv", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     module.exports = {
@@ -12363,14 +12363,14 @@ parcelRegister("cani6", function(module, exports) {
 
 });
 
-parcelRegister("iX0CI", function(module, exports) {
+parcelRegister("3225b", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
 (function() {
     var NodeType, XMLAttribute, XMLNode;
-    NodeType = (parcelRequire("cani6"));
-    XMLNode = (parcelRequire("53ied"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLNode = (parcelRequire("dy1RQ"));
     module.exports = XMLAttribute = function() {
         function XMLAttribute(parent, name, value) {
             this.parent = parent;
@@ -12447,7 +12447,7 @@ parcelRegister("iX0CI", function(module, exports) {
 
 });
 
-parcelRegister("45emo", function(module, exports) {
+parcelRegister("8mwAK", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLNamedNodeMap;
@@ -12497,7 +12497,7 @@ parcelRegister("45emo", function(module, exports) {
 });
 
 
-parcelRegister("b6evZ", function(module, exports) {
+parcelRegister("8Coyh", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -12512,8 +12512,8 @@ parcelRegister("b6evZ", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    NodeType = (parcelRequire("cani6"));
-    XMLCharacterData = (parcelRequire("1aPug"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLCharacterData = (parcelRequire("en2Ay"));
     module.exports = XMLCData = function(superClass) {
         extend(XMLCData, superClass);
         function XMLCData(parent, text) {
@@ -12534,7 +12534,7 @@ parcelRegister("b6evZ", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("1aPug", function(module, exports) {
+parcelRegister("en2Ay", function(module, exports) {
 
 // Generated by CoffeeScript 1.12.7
 (function() {
@@ -12548,7 +12548,7 @@ parcelRegister("1aPug", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    XMLNode = (parcelRequire("53ied"));
+    XMLNode = (parcelRequire("dy1RQ"));
     module.exports = XMLCharacterData = function(superClass) {
         extend(XMLCharacterData, superClass);
         function XMLCharacterData(parent) {
@@ -12606,7 +12606,7 @@ parcelRegister("1aPug", function(module, exports) {
 });
 
 
-parcelRegister("gejSl", function(module, exports) {
+parcelRegister("ktoBH", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -12621,8 +12621,8 @@ parcelRegister("gejSl", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    NodeType = (parcelRequire("cani6"));
-    XMLCharacterData = (parcelRequire("1aPug"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLCharacterData = (parcelRequire("en2Ay"));
     module.exports = XMLComment = function(superClass) {
         extend(XMLComment, superClass);
         function XMLComment(parent, text) {
@@ -12644,7 +12644,7 @@ parcelRegister("gejSl", function(module, exports) {
 
 });
 
-parcelRegister("ky0Sq", function(module, exports) {
+parcelRegister("1CvR5", function(module, exports) {
 
 
 
@@ -12660,9 +12660,9 @@ parcelRegister("ky0Sq", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    isObject = (parcelRequire("61JjS")).isObject;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
+    isObject = (parcelRequire("743Vx")).isObject;
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
     module.exports = XMLDeclaration = function(superClass) {
         extend(XMLDeclaration, superClass);
         function XMLDeclaration(parent, version, encoding, standalone) {
@@ -12684,7 +12684,7 @@ parcelRegister("ky0Sq", function(module, exports) {
 
 });
 
-parcelRegister("kzp9h", function(module, exports) {
+parcelRegister("iP11T", function(module, exports) {
 
 
 
@@ -12705,14 +12705,14 @@ parcelRegister("kzp9h", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    isObject = (parcelRequire("61JjS")).isObject;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
-    XMLDTDAttList = (parcelRequire("ic7YP"));
-    XMLDTDEntity = (parcelRequire("hz0gn"));
-    XMLDTDElement = (parcelRequire("6925a"));
-    XMLDTDNotation = (parcelRequire("v3o8I"));
-    XMLNamedNodeMap = (parcelRequire("45emo"));
+    isObject = (parcelRequire("743Vx")).isObject;
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLDTDAttList = (parcelRequire("dJIz1"));
+    XMLDTDEntity = (parcelRequire("9dq42"));
+    XMLDTDElement = (parcelRequire("4ANqR"));
+    XMLDTDNotation = (parcelRequire("eTS9l"));
+    XMLNamedNodeMap = (parcelRequire("8mwAK"));
     module.exports = XMLDocType = function(superClass) {
         extend(XMLDocType, superClass);
         function XMLDocType(parent, pubID, sysID) {
@@ -12840,7 +12840,7 @@ parcelRegister("kzp9h", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("ic7YP", function(module, exports) {
+parcelRegister("dJIz1", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -12855,8 +12855,8 @@ parcelRegister("ic7YP", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
     module.exports = XMLDTDAttList = function(superClass) {
         extend(XMLDTDAttList, superClass);
         function XMLDTDAttList(parent, elementName, attributeName, attributeType, defaultValueType, defaultValue) {
@@ -12884,7 +12884,7 @@ parcelRegister("ic7YP", function(module, exports) {
 
 });
 
-parcelRegister("hz0gn", function(module, exports) {
+parcelRegister("9dq42", function(module, exports) {
 
 
 
@@ -12900,9 +12900,9 @@ parcelRegister("hz0gn", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    isObject = (parcelRequire("61JjS")).isObject;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
+    isObject = (parcelRequire("743Vx")).isObject;
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
     module.exports = XMLDTDEntity = function(superClass) {
         extend(XMLDTDEntity, superClass);
         function XMLDTDEntity(parent, pe, name, value) {
@@ -12964,7 +12964,7 @@ parcelRegister("hz0gn", function(module, exports) {
 
 });
 
-parcelRegister("6925a", function(module, exports) {
+parcelRegister("4ANqR", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -12979,8 +12979,8 @@ parcelRegister("6925a", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
     module.exports = XMLDTDElement = function(superClass) {
         extend(XMLDTDElement, superClass);
         function XMLDTDElement(parent, name, value) {
@@ -13001,7 +13001,7 @@ parcelRegister("6925a", function(module, exports) {
 
 });
 
-parcelRegister("v3o8I", function(module, exports) {
+parcelRegister("eTS9l", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -13016,8 +13016,8 @@ parcelRegister("v3o8I", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
     module.exports = XMLDTDNotation = function(superClass) {
         extend(XMLDTDNotation, superClass);
         function XMLDTDNotation(parent, name, value) {
@@ -13049,7 +13049,7 @@ parcelRegister("v3o8I", function(module, exports) {
 });
 
 
-parcelRegister("bT0Sn", function(module, exports) {
+parcelRegister("92kr6", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -13064,8 +13064,8 @@ parcelRegister("bT0Sn", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    NodeType = (parcelRequire("cani6"));
-    XMLNode = (parcelRequire("53ied"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLNode = (parcelRequire("dy1RQ"));
     module.exports = XMLRaw = function(superClass) {
         extend(XMLRaw, superClass);
         function XMLRaw(parent, text) {
@@ -13086,7 +13086,7 @@ parcelRegister("bT0Sn", function(module, exports) {
 
 });
 
-parcelRegister("dBjXD", function(module, exports) {
+parcelRegister("g5WrM", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -13101,8 +13101,8 @@ parcelRegister("dBjXD", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    NodeType = (parcelRequire("cani6"));
-    XMLCharacterData = (parcelRequire("1aPug"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLCharacterData = (parcelRequire("en2Ay"));
     module.exports = XMLText = function(superClass) {
         extend(XMLText, superClass);
         function XMLText(parent, text) {
@@ -13153,7 +13153,7 @@ parcelRegister("dBjXD", function(module, exports) {
 
 });
 
-parcelRegister("5X4LQ", function(module, exports) {
+parcelRegister("jnNEO", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -13168,8 +13168,8 @@ parcelRegister("5X4LQ", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    NodeType = (parcelRequire("cani6"));
-    XMLCharacterData = (parcelRequire("1aPug"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLCharacterData = (parcelRequire("en2Ay"));
     module.exports = XMLProcessingInstruction = function(superClass) {
         extend(XMLProcessingInstruction, superClass);
         function XMLProcessingInstruction(parent, target, value) {
@@ -13197,7 +13197,7 @@ parcelRegister("5X4LQ", function(module, exports) {
 
 });
 
-parcelRegister("h6Hg4", function(module, exports) {
+parcelRegister("3SNwO", function(module, exports) {
 
 
 // Generated by CoffeeScript 1.12.7
@@ -13212,8 +13212,8 @@ parcelRegister("h6Hg4", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    XMLNode = (parcelRequire("53ied"));
-    NodeType = (parcelRequire("cani6"));
+    XMLNode = (parcelRequire("dy1RQ"));
+    NodeType = (parcelRequire("jskAv"));
     module.exports = XMLDummy = function(superClass) {
         extend(XMLDummy, superClass);
         function XMLDummy(parent) {
@@ -13232,7 +13232,7 @@ parcelRegister("h6Hg4", function(module, exports) {
 
 });
 
-parcelRegister("6Mcfm", function(module, exports) {
+parcelRegister("5E4jj", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLNodeList;
@@ -13257,7 +13257,7 @@ parcelRegister("6Mcfm", function(module, exports) {
 
 });
 
-parcelRegister("62F6C", function(module, exports) {
+parcelRegister("4vxYR", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     module.exports = {
@@ -13273,7 +13273,7 @@ parcelRegister("62F6C", function(module, exports) {
 });
 
 
-parcelRegister("36sHv", function(module, exports) {
+parcelRegister("dlESV", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var XMLStringifier, bind = function(fn, me) {
@@ -13424,7 +13424,7 @@ parcelRegister("36sHv", function(module, exports) {
 
 });
 
-parcelRegister("fqcKR", function(module, exports) {
+parcelRegister("dY6TH", function(module, exports) {
 
 // Generated by CoffeeScript 1.12.7
 (function() {
@@ -13438,7 +13438,7 @@ parcelRegister("fqcKR", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    XMLWriterBase = (parcelRequire("58t2A"));
+    XMLWriterBase = (parcelRequire("lYvhA"));
     module.exports = XMLStringWriter = function(superClass) {
         extend(XMLStringWriter, superClass);
         function XMLStringWriter(options) {
@@ -13461,7 +13461,7 @@ parcelRegister("fqcKR", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("58t2A", function(module, exports) {
+parcelRegister("lYvhA", function(module, exports) {
 
 
 
@@ -13481,22 +13481,22 @@ parcelRegister("58t2A", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var NodeType, WriterState, XMLCData, XMLComment, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLDeclaration, XMLDocType, XMLDummy, XMLElement, XMLProcessingInstruction, XMLRaw, XMLText, XMLWriterBase, assign, hasProp = {}.hasOwnProperty;
-    assign = (parcelRequire("61JjS")).assign;
-    NodeType = (parcelRequire("cani6"));
-    XMLDeclaration = (parcelRequire("ky0Sq"));
-    XMLDocType = (parcelRequire("kzp9h"));
-    XMLCData = (parcelRequire("b6evZ"));
-    XMLComment = (parcelRequire("gejSl"));
-    XMLElement = (parcelRequire("dKJP2"));
-    XMLRaw = (parcelRequire("bT0Sn"));
-    XMLText = (parcelRequire("dBjXD"));
-    XMLProcessingInstruction = (parcelRequire("5X4LQ"));
-    XMLDummy = (parcelRequire("h6Hg4"));
-    XMLDTDAttList = (parcelRequire("ic7YP"));
-    XMLDTDElement = (parcelRequire("6925a"));
-    XMLDTDEntity = (parcelRequire("hz0gn"));
-    XMLDTDNotation = (parcelRequire("v3o8I"));
-    WriterState = (parcelRequire("lhdtf"));
+    assign = (parcelRequire("743Vx")).assign;
+    NodeType = (parcelRequire("jskAv"));
+    XMLDeclaration = (parcelRequire("1CvR5"));
+    XMLDocType = (parcelRequire("iP11T"));
+    XMLCData = (parcelRequire("8Coyh"));
+    XMLComment = (parcelRequire("ktoBH"));
+    XMLElement = (parcelRequire("iA0QJ"));
+    XMLRaw = (parcelRequire("92kr6"));
+    XMLText = (parcelRequire("g5WrM"));
+    XMLProcessingInstruction = (parcelRequire("jnNEO"));
+    XMLDummy = (parcelRequire("3SNwO"));
+    XMLDTDAttList = (parcelRequire("dJIz1"));
+    XMLDTDElement = (parcelRequire("4ANqR"));
+    XMLDTDEntity = (parcelRequire("9dq42"));
+    XMLDTDNotation = (parcelRequire("eTS9l"));
+    WriterState = (parcelRequire("egEK1"));
     module.exports = XMLWriterBase = function() {
         function XMLWriterBase(options) {
             var key, ref, value;
@@ -13831,7 +13831,7 @@ parcelRegister("58t2A", function(module, exports) {
 }).call(module.exports);
 
 });
-parcelRegister("lhdtf", function(module, exports) {
+parcelRegister("egEK1", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     module.exports = {
@@ -13847,7 +13847,7 @@ parcelRegister("lhdtf", function(module, exports) {
 
 
 
-parcelRegister("gsjmY", function(module, exports) {
+parcelRegister("gL8jw", function(module, exports) {
 
 
 
@@ -13870,25 +13870,25 @@ parcelRegister("gsjmY", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     var NodeType, WriterState, XMLAttribute, XMLCData, XMLComment, XMLDTDAttList, XMLDTDElement, XMLDTDEntity, XMLDTDNotation, XMLDeclaration, XMLDocType, XMLDocument, XMLDocumentCB, XMLElement, XMLProcessingInstruction, XMLRaw, XMLStringWriter, XMLStringifier, XMLText, getValue, isFunction, isObject, isPlainObject, ref, hasProp = {}.hasOwnProperty;
-    ref = (parcelRequire("61JjS")), isObject = ref.isObject, isFunction = ref.isFunction, isPlainObject = ref.isPlainObject, getValue = ref.getValue;
-    NodeType = (parcelRequire("cani6"));
-    XMLDocument = (parcelRequire("2HETj"));
-    XMLElement = (parcelRequire("dKJP2"));
-    XMLCData = (parcelRequire("b6evZ"));
-    XMLComment = (parcelRequire("gejSl"));
-    XMLRaw = (parcelRequire("bT0Sn"));
-    XMLText = (parcelRequire("dBjXD"));
-    XMLProcessingInstruction = (parcelRequire("5X4LQ"));
-    XMLDeclaration = (parcelRequire("ky0Sq"));
-    XMLDocType = (parcelRequire("kzp9h"));
-    XMLDTDAttList = (parcelRequire("ic7YP"));
-    XMLDTDEntity = (parcelRequire("hz0gn"));
-    XMLDTDElement = (parcelRequire("6925a"));
-    XMLDTDNotation = (parcelRequire("v3o8I"));
-    XMLAttribute = (parcelRequire("iX0CI"));
-    XMLStringifier = (parcelRequire("36sHv"));
-    XMLStringWriter = (parcelRequire("fqcKR"));
-    WriterState = (parcelRequire("lhdtf"));
+    ref = (parcelRequire("743Vx")), isObject = ref.isObject, isFunction = ref.isFunction, isPlainObject = ref.isPlainObject, getValue = ref.getValue;
+    NodeType = (parcelRequire("jskAv"));
+    XMLDocument = (parcelRequire("jF8Kg"));
+    XMLElement = (parcelRequire("iA0QJ"));
+    XMLCData = (parcelRequire("8Coyh"));
+    XMLComment = (parcelRequire("ktoBH"));
+    XMLRaw = (parcelRequire("92kr6"));
+    XMLText = (parcelRequire("g5WrM"));
+    XMLProcessingInstruction = (parcelRequire("jnNEO"));
+    XMLDeclaration = (parcelRequire("1CvR5"));
+    XMLDocType = (parcelRequire("iP11T"));
+    XMLDTDAttList = (parcelRequire("dJIz1"));
+    XMLDTDEntity = (parcelRequire("9dq42"));
+    XMLDTDElement = (parcelRequire("4ANqR"));
+    XMLDTDNotation = (parcelRequire("eTS9l"));
+    XMLAttribute = (parcelRequire("3225b"));
+    XMLStringifier = (parcelRequire("dlESV"));
+    XMLStringWriter = (parcelRequire("dY6TH"));
+    WriterState = (parcelRequire("egEK1"));
     module.exports = XMLDocumentCB = function() {
         function XMLDocumentCB(options, onData, onEnd) {
             var writerOptions;
@@ -14262,7 +14262,7 @@ parcelRegister("gsjmY", function(module, exports) {
 
 });
 
-parcelRegister("9iC3w", function(module, exports) {
+parcelRegister("Ez3J7", function(module, exports) {
 
 
 
@@ -14278,9 +14278,9 @@ parcelRegister("9iC3w", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    NodeType = (parcelRequire("cani6"));
-    XMLWriterBase = (parcelRequire("58t2A"));
-    WriterState = (parcelRequire("lhdtf"));
+    NodeType = (parcelRequire("jskAv"));
+    XMLWriterBase = (parcelRequire("lYvhA"));
+    WriterState = (parcelRequire("egEK1"));
     module.exports = XMLStreamWriter = function(superClass) {
         extend(XMLStreamWriter, superClass);
         function XMLStreamWriter(stream, options) {
@@ -14425,7 +14425,7 @@ parcelRegister("9iC3w", function(module, exports) {
 
 
 
-parcelRegister("3R2QC", function(module, exports) {
+parcelRegister("c7bFT", function(module, exports) {
 
 
 
@@ -14449,12 +14449,12 @@ parcelRegister("3R2QC", function(module, exports) {
         child.__super__ = parent.prototype;
         return child;
     }, hasProp = {}.hasOwnProperty;
-    sax = (parcelRequire("137yd"));
-    events = $8OLUh$events;
-    bom = (parcelRequire("ioM3B"));
-    processors = (parcelRequire("6FlK1"));
-    setImmediate = $8OLUh$timers.setImmediate;
-    defaults = (parcelRequire("8BIzm")).defaults;
+    sax = (parcelRequire("4FxML"));
+    events = $bPiTa$events;
+    bom = (parcelRequire("1VoAM"));
+    processors = (parcelRequire("5JJSe"));
+    setImmediate = $bPiTa$timers.setImmediate;
+    defaults = (parcelRequire("c2U9A")).defaults;
     isEmpty = function(thing) {
         return typeof thing === "object" && thing != null && Object.keys(thing).length === 0;
     };
@@ -14771,7 +14771,7 @@ parcelRegister("3R2QC", function(module, exports) {
 }).call(this);
 
 });
-parcelRegister("137yd", function(module, exports) {
+parcelRegister("4FxML", function(module, exports) {
 
 
 (function(sax) {
@@ -14929,7 +14929,7 @@ parcelRegister("137yd", function(module, exports) {
     };
     var Stream;
     try {
-        Stream = $0c3bedae2525e424$import$dac342ec58acbb66$6a4eb2e7fc9e8903;
+        Stream = $366532d85854624f$import$dac342ec58acbb66$6a4eb2e7fc9e8903;
     } catch (ex) {
         Stream = function() {};
     }
@@ -14983,7 +14983,7 @@ parcelRegister("137yd", function(module, exports) {
     SAXStream.prototype.write = function(data) {
         if (typeof Buffer === 'function' && typeof Buffer.isBuffer === 'function' && Buffer.isBuffer(data)) {
             if (!this._decoder) {
-                var SD = $8OLUh$string_decoder.StringDecoder;
+                var SD = $bPiTa$string_decoder.StringDecoder;
                 this._decoder = new SD('utf8');
             }
             data = this._decoder.write(data);
@@ -16100,7 +16100,7 @@ parcelRegister("137yd", function(module, exports) {
 
 });
 
-parcelRegister("ioM3B", function(module, exports) {
+parcelRegister("1VoAM", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     "use strict";
@@ -16112,7 +16112,7 @@ parcelRegister("ioM3B", function(module, exports) {
 
 });
 
-parcelRegister("6FlK1", function(module, exports) {
+parcelRegister("5JJSe", function(module, exports) {
 // Generated by CoffeeScript 1.12.7
 (function() {
     "use strict";
@@ -16142,146 +16142,146 @@ parcelRegister("6FlK1", function(module, exports) {
 
 
 
-parcelRegister("hkAIX", function(module, exports) {
-var $c9e0ca957c1ade2d$var$getEndpoint = function() {
+parcelRegister("dGc3U", function(module, exports) {
+var $9f588de159526865$var$getEndpoint = function() {
     return {
         IPv4: 'http://169.254.169.254',
         IPv6: 'http://[fd00:ec2::254]'
     };
 };
-module.exports = $c9e0ca957c1ade2d$var$getEndpoint;
+module.exports = $9f588de159526865$var$getEndpoint;
 
 });
 
-parcelRegister("5rrrN", function(module, exports) {
-var $3f64c3d3c333425b$var$getEndpointMode = function() {
+parcelRegister("cko55", function(module, exports) {
+var $8f9a08439045e018$var$getEndpointMode = function() {
     return {
         IPv4: 'IPv4',
         IPv6: 'IPv6'
     };
 };
-module.exports = $3f64c3d3c333425b$var$getEndpointMode;
+module.exports = $8f9a08439045e018$var$getEndpointMode;
 
 });
 
-parcelRegister("c6cMt", function(module, exports) {
-var $8ceff590270cd045$var$ENV_ENDPOINT_NAME = 'AWS_EC2_METADATA_SERVICE_ENDPOINT';
-var $8ceff590270cd045$var$CONFIG_ENDPOINT_NAME = 'ec2_metadata_service_endpoint';
-var $8ceff590270cd045$var$getEndpointConfigOptions = function() {
+parcelRegister("hGFrZ", function(module, exports) {
+var $ce06831be7a6ca62$var$ENV_ENDPOINT_NAME = 'AWS_EC2_METADATA_SERVICE_ENDPOINT';
+var $ce06831be7a6ca62$var$CONFIG_ENDPOINT_NAME = 'ec2_metadata_service_endpoint';
+var $ce06831be7a6ca62$var$getEndpointConfigOptions = function() {
     return {
         environmentVariableSelector: function(env) {
-            return env[$8ceff590270cd045$var$ENV_ENDPOINT_NAME];
+            return env[$ce06831be7a6ca62$var$ENV_ENDPOINT_NAME];
         },
         configFileSelector: function(profile) {
-            return profile[$8ceff590270cd045$var$CONFIG_ENDPOINT_NAME];
+            return profile[$ce06831be7a6ca62$var$CONFIG_ENDPOINT_NAME];
         },
         default: undefined
     };
 };
-module.exports = $8ceff590270cd045$var$getEndpointConfigOptions;
+module.exports = $ce06831be7a6ca62$var$getEndpointConfigOptions;
 
 });
 
-parcelRegister("7oKZV", function(module, exports) {
+parcelRegister("jQsXn", function(module, exports) {
 
-var $562f3b113efb8d4c$var$EndpointMode = (parcelRequire("5rrrN"))();
-var $562f3b113efb8d4c$var$ENV_ENDPOINT_MODE_NAME = 'AWS_EC2_METADATA_SERVICE_ENDPOINT_MODE';
-var $562f3b113efb8d4c$var$CONFIG_ENDPOINT_MODE_NAME = 'ec2_metadata_service_endpoint_mode';
-var $562f3b113efb8d4c$var$getEndpointModeConfigOptions = function() {
+var $e72955d9ae6a2bb0$var$EndpointMode = (parcelRequire("cko55"))();
+var $e72955d9ae6a2bb0$var$ENV_ENDPOINT_MODE_NAME = 'AWS_EC2_METADATA_SERVICE_ENDPOINT_MODE';
+var $e72955d9ae6a2bb0$var$CONFIG_ENDPOINT_MODE_NAME = 'ec2_metadata_service_endpoint_mode';
+var $e72955d9ae6a2bb0$var$getEndpointModeConfigOptions = function() {
     return {
         environmentVariableSelector: function(env) {
-            return env[$562f3b113efb8d4c$var$ENV_ENDPOINT_MODE_NAME];
+            return env[$e72955d9ae6a2bb0$var$ENV_ENDPOINT_MODE_NAME];
         },
         configFileSelector: function(profile) {
-            return profile[$562f3b113efb8d4c$var$CONFIG_ENDPOINT_MODE_NAME];
+            return profile[$e72955d9ae6a2bb0$var$CONFIG_ENDPOINT_MODE_NAME];
         },
-        default: $562f3b113efb8d4c$var$EndpointMode.IPv4
+        default: $e72955d9ae6a2bb0$var$EndpointMode.IPv4
     };
 };
-module.exports = $562f3b113efb8d4c$var$getEndpointModeConfigOptions;
+module.exports = $e72955d9ae6a2bb0$var$getEndpointModeConfigOptions;
 
 });
 
-parcelRegister("3uUKq", function(module, exports) {
+parcelRegister("ikZsI", function(module, exports) {
 module.exports = JSON.parse("{\"version\":\"2.0\",\"metadata\":{\"apiVersion\":\"2011-06-15\",\"endpointPrefix\":\"sts\",\"globalEndpoint\":\"sts.amazonaws.com\",\"protocol\":\"query\",\"serviceAbbreviation\":\"AWS STS\",\"serviceFullName\":\"AWS Security Token Service\",\"serviceId\":\"STS\",\"signatureVersion\":\"v4\",\"uid\":\"sts-2011-06-15\",\"xmlNamespace\":\"https://sts.amazonaws.com/doc/2011-06-15/\"},\"operations\":{\"AssumeRole\":{\"input\":{\"type\":\"structure\",\"required\":[\"RoleArn\",\"RoleSessionName\"],\"members\":{\"RoleArn\":{},\"RoleSessionName\":{},\"PolicyArns\":{\"shape\":\"S4\"},\"Policy\":{},\"DurationSeconds\":{\"type\":\"integer\"},\"Tags\":{\"shape\":\"S8\"},\"TransitiveTagKeys\":{\"type\":\"list\",\"member\":{}},\"ExternalId\":{},\"SerialNumber\":{},\"TokenCode\":{},\"SourceIdentity\":{},\"ProvidedContexts\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"members\":{\"ProviderArn\":{},\"ContextAssertion\":{}}}}}},\"output\":{\"resultWrapper\":\"AssumeRoleResult\",\"type\":\"structure\",\"members\":{\"Credentials\":{\"shape\":\"Sl\"},\"AssumedRoleUser\":{\"shape\":\"Sq\"},\"PackedPolicySize\":{\"type\":\"integer\"},\"SourceIdentity\":{}}}},\"AssumeRoleWithSAML\":{\"input\":{\"type\":\"structure\",\"required\":[\"RoleArn\",\"PrincipalArn\",\"SAMLAssertion\"],\"members\":{\"RoleArn\":{},\"PrincipalArn\":{},\"SAMLAssertion\":{\"type\":\"string\",\"sensitive\":true},\"PolicyArns\":{\"shape\":\"S4\"},\"Policy\":{},\"DurationSeconds\":{\"type\":\"integer\"}}},\"output\":{\"resultWrapper\":\"AssumeRoleWithSAMLResult\",\"type\":\"structure\",\"members\":{\"Credentials\":{\"shape\":\"Sl\"},\"AssumedRoleUser\":{\"shape\":\"Sq\"},\"PackedPolicySize\":{\"type\":\"integer\"},\"Subject\":{},\"SubjectType\":{},\"Issuer\":{},\"Audience\":{},\"NameQualifier\":{},\"SourceIdentity\":{}}}},\"AssumeRoleWithWebIdentity\":{\"input\":{\"type\":\"structure\",\"required\":[\"RoleArn\",\"RoleSessionName\",\"WebIdentityToken\"],\"members\":{\"RoleArn\":{},\"RoleSessionName\":{},\"WebIdentityToken\":{\"type\":\"string\",\"sensitive\":true},\"ProviderId\":{},\"PolicyArns\":{\"shape\":\"S4\"},\"Policy\":{},\"DurationSeconds\":{\"type\":\"integer\"}}},\"output\":{\"resultWrapper\":\"AssumeRoleWithWebIdentityResult\",\"type\":\"structure\",\"members\":{\"Credentials\":{\"shape\":\"Sl\"},\"SubjectFromWebIdentityToken\":{},\"AssumedRoleUser\":{\"shape\":\"Sq\"},\"PackedPolicySize\":{\"type\":\"integer\"},\"Provider\":{},\"Audience\":{},\"SourceIdentity\":{}}}},\"DecodeAuthorizationMessage\":{\"input\":{\"type\":\"structure\",\"required\":[\"EncodedMessage\"],\"members\":{\"EncodedMessage\":{}}},\"output\":{\"resultWrapper\":\"DecodeAuthorizationMessageResult\",\"type\":\"structure\",\"members\":{\"DecodedMessage\":{}}}},\"GetAccessKeyInfo\":{\"input\":{\"type\":\"structure\",\"required\":[\"AccessKeyId\"],\"members\":{\"AccessKeyId\":{}}},\"output\":{\"resultWrapper\":\"GetAccessKeyInfoResult\",\"type\":\"structure\",\"members\":{\"Account\":{}}}},\"GetCallerIdentity\":{\"input\":{\"type\":\"structure\",\"members\":{}},\"output\":{\"resultWrapper\":\"GetCallerIdentityResult\",\"type\":\"structure\",\"members\":{\"UserId\":{},\"Account\":{},\"Arn\":{}}}},\"GetFederationToken\":{\"input\":{\"type\":\"structure\",\"required\":[\"Name\"],\"members\":{\"Name\":{},\"Policy\":{},\"PolicyArns\":{\"shape\":\"S4\"},\"DurationSeconds\":{\"type\":\"integer\"},\"Tags\":{\"shape\":\"S8\"}}},\"output\":{\"resultWrapper\":\"GetFederationTokenResult\",\"type\":\"structure\",\"members\":{\"Credentials\":{\"shape\":\"Sl\"},\"FederatedUser\":{\"type\":\"structure\",\"required\":[\"FederatedUserId\",\"Arn\"],\"members\":{\"FederatedUserId\":{},\"Arn\":{}}},\"PackedPolicySize\":{\"type\":\"integer\"}}}},\"GetSessionToken\":{\"input\":{\"type\":\"structure\",\"members\":{\"DurationSeconds\":{\"type\":\"integer\"},\"SerialNumber\":{},\"TokenCode\":{}}},\"output\":{\"resultWrapper\":\"GetSessionTokenResult\",\"type\":\"structure\",\"members\":{\"Credentials\":{\"shape\":\"Sl\"}}}}},\"shapes\":{\"S4\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"members\":{\"arn\":{}}}},\"S8\":{\"type\":\"list\",\"member\":{\"type\":\"structure\",\"required\":[\"Key\",\"Value\"],\"members\":{\"Key\":{},\"Value\":{}}}},\"Sl\":{\"type\":\"structure\",\"required\":[\"AccessKeyId\",\"SecretAccessKey\",\"SessionToken\",\"Expiration\"],\"members\":{\"AccessKeyId\":{},\"SecretAccessKey\":{\"type\":\"string\",\"sensitive\":true},\"SessionToken\":{},\"Expiration\":{\"type\":\"timestamp\"}}},\"Sq\":{\"type\":\"structure\",\"required\":[\"AssumedRoleId\",\"Arn\"],\"members\":{\"AssumedRoleId\":{},\"Arn\":{}}}}}");
 
 });
 
-parcelRegister("a7Qds", function(module, exports) {
+parcelRegister("jwypX", function(module, exports) {
 module.exports = JSON.parse("{\"pagination\":{}}");
 
 });
 
 
-$parcel$export(module.exports, "handler", () => $8284df8ed7bca224$export$c3c52e219617878);
-var $6994db0a3b25c214$exports = {};
-var $6c04b041a5f935e8$exports = {};
+$parcel$export(module.exports, "handler", () => $33a92af1f0d806bb$export$c3c52e219617878);
+var $1d7b795e21cccba4$exports = {};
+var $60e31571e9a15610$exports = {};
 
-var $jfMGq = parcelRequire("jfMGq");
+var $KHT0q = parcelRequire("KHT0q");
 
-var $dlQvn = parcelRequire("dlQvn");
-var $6c04b041a5f935e8$var$isFipsRegion = $dlQvn.isFipsRegion;
-var $6c04b041a5f935e8$var$getRealRegion = $dlQvn.getRealRegion;
-$jfMGq.isBrowser = function() {
+var $hTkKp = parcelRequire("hTkKp");
+var $60e31571e9a15610$var$isFipsRegion = $hTkKp.isFipsRegion;
+var $60e31571e9a15610$var$getRealRegion = $hTkKp.getRealRegion;
+$KHT0q.isBrowser = function() {
     return false;
 };
-$jfMGq.isNode = function() {
+$KHT0q.isNode = function() {
     return true;
 };
 
 // node.js specific modules
-$jfMGq.crypto.lib = $8OLUh$crypto;
+$KHT0q.crypto.lib = $bPiTa$crypto;
 
-$jfMGq.Buffer = $8OLUh$buffer.Buffer;
+$KHT0q.Buffer = $bPiTa$buffer.Buffer;
 
-$jfMGq.domain = $8OLUh$domain;
+$KHT0q.domain = $bPiTa$domain;
 
-$jfMGq.stream = $8OLUh$stream;
+$KHT0q.stream = $bPiTa$stream;
 
-$jfMGq.url = $8OLUh$url;
+$KHT0q.url = $bPiTa$url;
 
-$jfMGq.querystring = $8OLUh$querystring;
-$jfMGq.environment = 'nodejs';
-
-
-$jfMGq.createEventStream = $jfMGq.stream.Readable ? (parcelRequire("6QzbJ")).createEventStream : (parcelRequire("enf0o")).createEventStream;
-
-$jfMGq.realClock = (parcelRequire("leOrx"));
+$KHT0q.querystring = $bPiTa$querystring;
+$KHT0q.environment = 'nodejs';
 
 
-$jfMGq.clientSideMonitoring = {
-    Publisher: (parcelRequire("7rpVl")).Publisher,
-    configProvider: (parcelRequire("1HUyC"))
+$KHT0q.createEventStream = $KHT0q.stream.Readable ? (parcelRequire("gqeMc")).createEventStream : (parcelRequire("72V6p")).createEventStream;
+
+$KHT0q.realClock = (parcelRequire("iFpjJ"));
+
+
+$KHT0q.clientSideMonitoring = {
+    Publisher: (parcelRequire("1UQpO")).Publisher,
+    configProvider: (parcelRequire("7I9gU"))
 };
 
-$jfMGq.iniLoader = (parcelRequire("a1rNP")).iniLoader;
+$KHT0q.iniLoader = (parcelRequire("lOe0T")).iniLoader;
 
-$jfMGq.getSystemErrorName = $8OLUh$util.getSystemErrorName;
-$jfMGq.loadConfig = function(options) {
+$KHT0q.getSystemErrorName = $bPiTa$util.getSystemErrorName;
+$KHT0q.loadConfig = function(options) {
     var envValue = options.environmentVariableSelector(process.env);
     if (envValue !== undefined) return envValue;
     var configFile = {};
     try {
-        configFile = $jfMGq.iniLoader ? $jfMGq.iniLoader.loadFrom({
+        configFile = $KHT0q.iniLoader ? $KHT0q.iniLoader.loadFrom({
             isConfig: true,
-            filename: process.env[$jfMGq.sharedConfigFileEnv]
+            filename: process.env[$KHT0q.sharedConfigFileEnv]
         }) : {};
     } catch (e) {}
-    var sharedFileConfig = configFile[process.env.AWS_PROFILE || $jfMGq.defaultProfile] || {};
+    var sharedFileConfig = configFile[process.env.AWS_PROFILE || $KHT0q.defaultProfile] || {};
     var configValue = options.configFileSelector(sharedFileConfig);
     if (configValue !== undefined) return configValue;
     if (typeof options.default === 'function') return options.default();
     return options.default;
 };
-var $6c04b041a5f935e8$var$AWS;
+var $60e31571e9a15610$var$AWS;
 
 /**
  * @api private
- */ $6c04b041a5f935e8$exports = $6c04b041a5f935e8$var$AWS = (parcelRequire("1TgFO"));
-parcelRequire("dupZh");
-parcelRequire("dHQAs");
+ */ $60e31571e9a15610$exports = $60e31571e9a15610$var$AWS = (parcelRequire("3ty2n"));
+parcelRequire("bqAch");
+parcelRequire("7U7Ye");
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 /**
  * Represents temporary credentials retrieved from {AWS.STS}. Without any
@@ -16315,7 +16315,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @return [AWS.Credentials] the master (non-temporary) credentials used to
  *     get and refresh temporary credentials from AWS STS.
  * @note (see constructor)
- */ $1TgFO.TemporaryCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.TemporaryCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new temporary credentials object.
    *
@@ -16338,7 +16338,7 @@ var $1TgFO = parcelRequire("1TgFO");
    * @see AWS.STS.assumeRole
    * @see AWS.STS.getSessionToken
    */ constructor: function TemporaryCredentials(params, masterCredentials) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.loadMasterCredentials(masterCredentials);
         this.expired = true;
         this.params = params || {};
@@ -16357,7 +16357,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -16376,14 +16376,14 @@ var $1TgFO = parcelRequire("1TgFO");
     /**
    * @api private
    */ loadMasterCredentials: function loadMasterCredentials(masterCredentials) {
-        this.masterCredentials = masterCredentials || $1TgFO.config.credentials;
+        this.masterCredentials = masterCredentials || $3ty2n.config.credentials;
         while(this.masterCredentials.masterCredentials)this.masterCredentials = this.masterCredentials.masterCredentials;
-        if (typeof this.masterCredentials.get !== 'function') this.masterCredentials = new $1TgFO.Credentials(this.masterCredentials);
+        if (typeof this.masterCredentials.get !== 'function') this.masterCredentials = new $3ty2n.Credentials(this.masterCredentials);
     },
     /**
    * @api private
    */ createClients: function() {
-        this.service = this.service || new $6994db0a3b25c214$exports({
+        this.service = this.service || new $1d7b795e21cccba4$exports({
             params: this.params
         });
     }
@@ -16391,7 +16391,7 @@ var $1TgFO = parcelRequire("1TgFO");
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 /**
  * Represents temporary credentials retrieved from {AWS.STS}. Without any
@@ -16460,7 +16460,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @return [AWS.STS] the STS service instance used to
  *     get and refresh temporary credentials from AWS STS.
  * @note (see constructor)
- */ $1TgFO.ChainableTemporaryCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.ChainableTemporaryCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new temporary credentials object.
    *
@@ -16489,24 +16489,24 @@ var $1TgFO = parcelRequire("1TgFO");
    * @see AWS.STS.assumeRole
    * @see AWS.STS.getSessionToken
    */ constructor: function ChainableTemporaryCredentials(options) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         options = options || {};
         this.errorCode = 'ChainableTemporaryCredentialsProviderFailure';
         this.expired = true;
         this.tokenCodeFn = null;
-        var params = $1TgFO.util.copy(options.params) || {};
+        var params = $3ty2n.util.copy(options.params) || {};
         if (params.RoleArn) params.RoleSessionName = params.RoleSessionName || 'temporary-credentials';
         if (params.SerialNumber) {
-            if (!options.tokenCodeFn || typeof options.tokenCodeFn !== 'function') throw new $1TgFO.util.error(new Error('tokenCodeFn must be a function when params.SerialNumber is given'), {
+            if (!options.tokenCodeFn || typeof options.tokenCodeFn !== 'function') throw new $3ty2n.util.error(new Error('tokenCodeFn must be a function when params.SerialNumber is given'), {
                 code: this.errorCode
             });
             else this.tokenCodeFn = options.tokenCodeFn;
         }
-        var config = $1TgFO.util.merge({
+        var config = $3ty2n.util.merge({
             params: params,
-            credentials: options.masterCredentials || $1TgFO.config.credentials
+            credentials: options.masterCredentials || $3ty2n.config.credentials
         }, options.stsConfig || {});
-        this.service = new $6994db0a3b25c214$exports(config);
+        this.service = new $1d7b795e21cccba4$exports(config);
     },
     /**
    * Refreshes credentials using {AWS.STS.assumeRole} or
@@ -16521,7 +16521,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *   @param err [Error] if an error occurred, this value will be filled
    * @see AWS.Credentials.get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -16550,7 +16550,7 @@ var $1TgFO = parcelRequire("1TgFO");
             if (err) {
                 var message = err;
                 if (err instanceof Error) message = err.message;
-                callback($1TgFO.util.error(new Error('Error fetching MFA token: ' + message), {
+                callback($3ty2n.util.error(new Error('Error fetching MFA token: ' + message), {
                     code: self.errorCode
                 }));
                 return;
@@ -16563,7 +16563,7 @@ var $1TgFO = parcelRequire("1TgFO");
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 /**
  * Represents credentials retrieved from STS Web Identity Federation support.
@@ -16603,7 +16603,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @return [map] the raw data response from the call to
  *     {AWS.STS.assumeRoleWithWebIdentity}. Use this if you want to get
  *     access to other properties from the response.
- */ $1TgFO.WebIdentityCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.WebIdentityCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new credentials object.
    * @param (see AWS.STS.assumeRoleWithWebIdentity)
@@ -16624,12 +16624,12 @@ var $1TgFO = parcelRequire("1TgFO");
    * @see AWS.STS.assumeRoleWithWebIdentity
    * @see AWS.Config
    */ constructor: function WebIdentityCredentials(params, clientConfig) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.expired = true;
         this.params = params;
         this.params.RoleSessionName = this.params.RoleSessionName || 'web-identity';
         this.data = null;
-        this._clientConfig = $1TgFO.util.copy(clientConfig || {});
+        this._clientConfig = $3ty2n.util.copy(clientConfig || {});
     },
     /**
    * Refreshes credentials using {AWS.STS.assumeRoleWithWebIdentity}
@@ -16642,7 +16642,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -16662,38 +16662,38 @@ var $1TgFO = parcelRequire("1TgFO");
    * @api private
    */ createClients: function() {
         if (!this.service) {
-            var stsConfig = $1TgFO.util.merge({}, this._clientConfig);
+            var stsConfig = $3ty2n.util.merge({}, this._clientConfig);
             stsConfig.params = this.params;
-            this.service = new $6994db0a3b25c214$exports(stsConfig);
+            this.service = new $1d7b795e21cccba4$exports(stsConfig);
         }
     }
 });
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
-var $a2e9710dd9ea93f6$exports = {};
+var $3ty2n = parcelRequire("3ty2n");
+var $e36bb009ed94ee63$exports = {};
 
 
-var $1TgFO = parcelRequire("1TgFO");
-var $a2e9710dd9ea93f6$var$Service = $1TgFO.Service;
-var $a2e9710dd9ea93f6$var$apiLoader = $1TgFO.apiLoader;
-$a2e9710dd9ea93f6$var$apiLoader.services['cognitoidentity'] = {};
-$1TgFO.CognitoIdentity = $a2e9710dd9ea93f6$var$Service.defineService('cognitoidentity', [
+var $3ty2n = parcelRequire("3ty2n");
+var $e36bb009ed94ee63$var$Service = $3ty2n.Service;
+var $e36bb009ed94ee63$var$apiLoader = $3ty2n.apiLoader;
+$e36bb009ed94ee63$var$apiLoader.services['cognitoidentity'] = {};
+$3ty2n.CognitoIdentity = $e36bb009ed94ee63$var$Service.defineService('cognitoidentity', [
     '2014-06-30'
 ]);
 
 
-Object.defineProperty($a2e9710dd9ea93f6$var$apiLoader.services['cognitoidentity'], '2014-06-30', {
+Object.defineProperty($e36bb009ed94ee63$var$apiLoader.services['cognitoidentity'], '2014-06-30', {
     get: function get() {
-        var model = (parcelRequire("bEcgx"));
-        model.paginators = (parcelRequire("7umcb")).pagination;
+        var model = (parcelRequire("ZuR8A"));
+        model.paginators = (parcelRequire("8fnJf")).pagination;
         return model;
     },
     enumerable: true,
     configurable: true
 });
-$a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
+$e36bb009ed94ee63$exports = $3ty2n.CognitoIdentity;
 
 
 
@@ -16761,7 +16761,7 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
  *   @return [String] the Cognito ID returned by the last call to
  *     {AWS.CognitoIdentity.getOpenIdToken}. This ID represents the actual
  *     final resolved identity ID from Amazon Cognito.
- */ $1TgFO.CognitoIdentityCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.CognitoIdentityCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * @api private
    */ localStorageKey: {
@@ -16825,12 +16825,12 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
    *   constructor, you may encounter a 'Missing credentials in config' error
    *   when calling making a service call.
    */ constructor: function CognitoIdentityCredentials(params, clientConfig) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.expired = true;
         this.params = params;
         this.data = null;
         this._identityId = null;
-        this._clientConfig = $1TgFO.util.copy(clientConfig || {});
+        this._clientConfig = $3ty2n.util.copy(clientConfig || {});
         this.loadCachedId();
         var self = this;
         Object.defineProperty(this, 'identityId', {
@@ -16855,7 +16855,7 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
    *   @param err [Error] if an error occurred, this value will be filled
    * @see AWS.Credentials.get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -16964,7 +16964,7 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
    */ loadCachedId: function loadCachedId() {
         var self = this;
         // in the browser we source default IdentityId from localStorage
-        if ($1TgFO.util.isBrowser() && !self.params.IdentityId) {
+        if ($3ty2n.util.isBrowser() && !self.params.IdentityId) {
             var id = self.getStorage('id');
             if (id && self.params.Logins) {
                 var actualProviders = Object.keys(self.params.Logins);
@@ -16981,13 +16981,13 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
    * @api private
    */ createClients: function() {
         var clientConfig = this._clientConfig;
-        this.webIdentityCredentials = this.webIdentityCredentials || new $1TgFO.WebIdentityCredentials(this.params, clientConfig);
+        this.webIdentityCredentials = this.webIdentityCredentials || new $3ty2n.WebIdentityCredentials(this.params, clientConfig);
         if (!this.cognito) {
-            var cognitoConfig = $1TgFO.util.merge({}, clientConfig);
+            var cognitoConfig = $3ty2n.util.merge({}, clientConfig);
             cognitoConfig.params = this.params;
-            this.cognito = new $a2e9710dd9ea93f6$exports(cognitoConfig);
+            this.cognito = new $e36bb009ed94ee63$exports(cognitoConfig);
         }
-        this.sts = this.sts || new $6994db0a3b25c214$exports(clientConfig);
+        this.sts = this.sts || new $1d7b795e21cccba4$exports(clientConfig);
     },
     /**
    * @api private
@@ -16995,7 +16995,7 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
         this._identityId = data.IdentityId;
         this.params.IdentityId = this._identityId;
         // cache this IdentityId in browser localStorage if possible
-        if ($1TgFO.util.isBrowser()) {
+        if ($3ty2n.util.isBrowser()) {
             this.setStorage('id', data.IdentityId);
             if (this.params.Logins) this.setStorage('providers', Object.keys(this.params.Logins).join(','));
         }
@@ -17016,7 +17016,7 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
    * @api private
    */ storage: function() {
         try {
-            var storage = $1TgFO.util.isBrowser() && window.localStorage !== null && typeof window.localStorage === 'object' ? window.localStorage : {};
+            var storage = $3ty2n.util.isBrowser() && window.localStorage !== null && typeof window.localStorage === 'object' ? window.localStorage : {};
             // Test set/remove which would throw an error in Safari's private browsing
             storage['aws.test-storage'] = 'foobar';
             delete storage['aws.test-storage'];
@@ -17029,7 +17029,7 @@ $a2e9710dd9ea93f6$exports = $1TgFO.CognitoIdentity;
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 /**
  * Represents credentials retrieved from STS SAML support.
@@ -17066,7 +17066,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @return [map] the map of params passed to
  *     {AWS.STS.assumeRoleWithSAML}. To update the token, set the
  *     `params.SAMLAssertion` property.
- */ $1TgFO.SAMLCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.SAMLCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new credentials object.
    * @param (see AWS.STS.assumeRoleWithSAML)
@@ -17078,7 +17078,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *   });
    * @see AWS.STS.assumeRoleWithSAML
    */ constructor: function SAMLCredentials(params) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.expired = true;
         this.params = params;
     },
@@ -17093,7 +17093,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -17108,7 +17108,7 @@ var $1TgFO = parcelRequire("1TgFO");
     /**
    * @api private
    */ createClients: function() {
-        this.service = this.service || new $6994db0a3b25c214$exports({
+        this.service = this.service || new $1d7b795e21cccba4$exports({
             params: this.params
         });
     }
@@ -17116,9 +17116,9 @@ var $1TgFO = parcelRequire("1TgFO");
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $47ebc6514eaddf06$var$iniLoader = $1TgFO.util.iniLoader;
+var $da53063b9e569e80$var$iniLoader = $3ty2n.util.iniLoader;
 /**
  * Represents credentials loaded from shared credentials file
  * (defaulting to ~/.aws/credentials or defined by the
@@ -17158,7 +17158,7 @@ var $47ebc6514eaddf06$var$iniLoader = $1TgFO.util.iniLoader;
  * ```
  *
  * @!macro nobrowser
- */ $1TgFO.ProcessCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.ProcessCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new ProcessCredentials object.
    *
@@ -17172,20 +17172,20 @@ var $47ebc6514eaddf06$var$iniLoader = $1TgFO.util.iniLoader;
    *   by the constructor. When the callback is called with no error, the
    *   credentials have been loaded successfully.
    */ constructor: function ProcessCredentials(options) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         options = options || {};
         this.filename = options.filename;
-        this.profile = options.profile || process.env.AWS_PROFILE || $1TgFO.util.defaultProfile;
-        this.get(options.callback || $1TgFO.util.fn.noop);
+        this.profile = options.profile || process.env.AWS_PROFILE || $3ty2n.util.defaultProfile;
+        this.get(options.callback || $3ty2n.util.fn.noop);
     },
     /**
    * @api private
    */ load: function load(callback) {
         var self = this;
         try {
-            var profiles = $1TgFO.util.getProfilesFromSharedConfig($47ebc6514eaddf06$var$iniLoader, this.filename);
+            var profiles = $3ty2n.util.getProfilesFromSharedConfig($da53063b9e569e80$var$iniLoader, this.filename);
             var profile = profiles[this.profile] || {};
-            if (Object.keys(profile).length === 0) throw $1TgFO.util.error(new Error('Profile ' + this.profile + ' not found'), {
+            if (Object.keys(profile).length === 0) throw $3ty2n.util.error(new Error('Profile ' + this.profile + ' not found'), {
                 code: 'ProcessCredentialsProviderFailure'
             });
             if (profile['credential_process']) this.loadViaCredentialProcess(profile, function(err, data) {
@@ -17199,7 +17199,7 @@ var $47ebc6514eaddf06$var$iniLoader = $1TgFO.util.iniLoader;
                     callback(null);
                 }
             });
-            else throw $1TgFO.util.error(new Error('Profile ' + this.profile + ' did not include credential process'), {
+            else throw $3ty2n.util.error(new Error('Profile ' + this.profile + ' did not include credential process'), {
                 code: 'ProcessCredentialsProviderFailure'
             });
         } catch (err) {
@@ -17213,23 +17213,23 @@ var $47ebc6514eaddf06$var$iniLoader = $1TgFO.util.iniLoader;
   * @param profile [map] credentials profile
   * @throws ProcessCredentialsProviderFailure
   */ loadViaCredentialProcess: function loadViaCredentialProcess(profile, callback) {
-        $8OLUh$child_process.exec(profile['credential_process'], {
+        $bPiTa$child_process.exec(profile['credential_process'], {
             env: process.env
         }, function(err, stdOut, stdErr) {
-            if (err) callback($1TgFO.util.error(new Error('credential_process returned error'), {
+            if (err) callback($3ty2n.util.error(new Error('credential_process returned error'), {
                 code: 'ProcessCredentialsProviderFailure'
             }), null);
             else try {
                 var credData = JSON.parse(stdOut);
                 if (credData.Expiration) {
-                    var currentTime = $1TgFO.util.date.getDate();
+                    var currentTime = $3ty2n.util.date.getDate();
                     var expireTime = new Date(credData.Expiration);
                     if (expireTime < currentTime) throw Error('credential_process returned expired credentials');
                 }
                 if (credData.Version !== 1) throw Error('credential_process does not return Version == 1');
                 callback(null, credData);
             } catch (err) {
-                callback($1TgFO.util.error(new Error(err.message), {
+                callback($3ty2n.util.error(new Error(err.message), {
                     code: 'ProcessCredentialsProviderFailure'
                 }), null);
             }
@@ -17246,29 +17246,29 @@ var $47ebc6514eaddf06$var$iniLoader = $1TgFO.util.iniLoader;
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        $47ebc6514eaddf06$var$iniLoader.clearCachedFiles();
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        $da53063b9e569e80$var$iniLoader.clearCachedFiles();
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     }
 });
 
 
 
 // Load the xml2js XML parser
-$6c04b041a5f935e8$var$AWS.XML.Parser = (parcelRequire("leND0"));
+$60e31571e9a15610$var$AWS.XML.Parser = (parcelRequire("b7zbv"));
 
-var $1TgFO = parcelRequire("1TgFO");
-var $4b4ea1c7eb74669f$var$Stream = $1TgFO.util.stream.Stream;
-var $4b4ea1c7eb74669f$var$TransformStream = $1TgFO.util.stream.Transform;
-var $4b4ea1c7eb74669f$var$ReadableStream = $1TgFO.util.stream.Readable;
-parcelRequire("7DCha");
-var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REUSE_ENABLED';
+var $3ty2n = parcelRequire("3ty2n");
+var $a1c994ed3b49887b$var$Stream = $3ty2n.util.stream.Stream;
+var $a1c994ed3b49887b$var$TransformStream = $3ty2n.util.stream.Transform;
+var $a1c994ed3b49887b$var$ReadableStream = $3ty2n.util.stream.Readable;
+parcelRequire("bpL55");
+var $a1c994ed3b49887b$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REUSE_ENABLED';
 
 
 
 
 /**
  * @api private
- */ $1TgFO.NodeHttpClient = $1TgFO.util.inherit({
+ */ $3ty2n.NodeHttpClient = $3ty2n.util.inherit({
     handleRequest: function handleRequest(httpRequest, httpOptions, callback, errCallback) {
         var self = this;
         var endpoint = httpRequest.endpoint;
@@ -17277,10 +17277,10 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
         if (httpOptions.proxy) {
             pathPrefix = endpoint.protocol + '//' + endpoint.hostname;
             if (endpoint.port !== 80 && endpoint.port !== 443) pathPrefix += ':' + endpoint.port;
-            endpoint = new $1TgFO.Endpoint(httpOptions.proxy);
+            endpoint = new $3ty2n.Endpoint(httpOptions.proxy);
         }
         var useSSL = endpoint.protocol === 'https:';
-        var http = useSSL ? $8OLUh$https : $8OLUh$http;
+        var http = useSSL ? $bPiTa$https : $bPiTa$http;
         var options = {
             host: endpoint.hostname,
             port: endpoint.port,
@@ -17288,9 +17288,9 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
             headers: httpRequest.headers,
             path: pathPrefix + httpRequest.path
         };
-        $1TgFO.util.update(options, httpOptions);
+        $3ty2n.util.update(options, httpOptions);
         if (!httpOptions.agent) options.agent = this.getAgent(useSSL, {
-            keepAlive: process.env[$4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME] === '1' ? true : false
+            keepAlive: process.env[$a1c994ed3b49887b$var$CONNECTION_REUSE_ENV_NAME] === '1' ? true : false
         });
         delete options.proxy; // proxy isn't an HTTP option
         delete options.timeout; // timeout isn't an HTTP option
@@ -17310,7 +17310,7 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
                         if (stream.didCallback) return;
                         stream.didCallback = true;
                         stream.abort();
-                        errCallback($1TgFO.util.error(new Error('Socket timed out without establishing a connection'), {
+                        errCallback($3ty2n.util.error(new Error('Socket timed out without establishing a connection'), {
                             code: 'TimeoutError'
                         }));
                     }, httpOptions.connectTimeout);
@@ -17326,7 +17326,7 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
             if (stream.didCallback) return;
             stream.didCallback = true;
             var msg = 'Connection timed out after ' + httpOptions.timeout + 'ms';
-            errCallback($1TgFO.util.error(new Error(msg), {
+            errCallback($3ty2n.util.error(new Error(msg), {
                 code: 'TimeoutError'
             }));
             stream.abort();
@@ -17338,7 +17338,7 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
             }
             if (stream.didCallback) return;
             stream.didCallback = true;
-            if ('ECONNRESET' === err.code || 'EPIPE' === err.code || 'ETIMEDOUT' === err.code) errCallback($1TgFO.util.error(err, {
+            if ('ECONNRESET' === err.code || 'EPIPE' === err.code || 'ETIMEDOUT' === err.code) errCallback($3ty2n.util.error(err, {
                 code: 'TimeoutError'
             }));
             else errCallback(err);
@@ -17353,7 +17353,7 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
     writeBody: function writeBody(stream, httpRequest) {
         var body = httpRequest.body;
         var totalBytes = parseInt(httpRequest.headers['Content-Length'], 10);
-        if (body instanceof $4b4ea1c7eb74669f$var$Stream) {
+        if (body instanceof $a1c994ed3b49887b$var$Stream) {
             // For progress support of streaming content -
             // pipe the data through a transform stream to emit 'sendProgress' events
             var progressStream = this.progressStream(stream, totalBytes);
@@ -17379,16 +17379,16 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
     /**
    * Create the https.Agent or http.Agent according to the request schema.
    */ getAgent: function getAgent(useSSL, agentOptions) {
-        var http = useSSL ? $8OLUh$https : $8OLUh$http;
+        var http = useSSL ? $bPiTa$https : $bPiTa$http;
         if (useSSL) {
-            if (!$1TgFO.NodeHttpClient.sslAgent) {
-                $1TgFO.NodeHttpClient.sslAgent = new http.Agent($1TgFO.util.merge({
+            if (!$3ty2n.NodeHttpClient.sslAgent) {
+                $3ty2n.NodeHttpClient.sslAgent = new http.Agent($3ty2n.util.merge({
                     rejectUnauthorized: process.env.NODE_TLS_REJECT_UNAUTHORIZED === '0' ? false : true
                 }, agentOptions || {}));
-                $1TgFO.NodeHttpClient.sslAgent.setMaxListeners(0);
+                $3ty2n.NodeHttpClient.sslAgent.setMaxListeners(0);
                 // delegate maxSockets to globalAgent, set a default limit of 50 if current value is Infinity.
                 // Users can bypass this default by supplying their own Agent as part of SDK configuration.
-                Object.defineProperty($1TgFO.NodeHttpClient.sslAgent, 'maxSockets', {
+                Object.defineProperty($3ty2n.NodeHttpClient.sslAgent, 'maxSockets', {
                     enumerable: true,
                     get: function() {
                         var defaultMaxSockets = 50;
@@ -17398,17 +17398,17 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
                     }
                 });
             }
-            return $1TgFO.NodeHttpClient.sslAgent;
+            return $3ty2n.NodeHttpClient.sslAgent;
         } else {
-            if (!$1TgFO.NodeHttpClient.agent) $1TgFO.NodeHttpClient.agent = new http.Agent(agentOptions);
-            return $1TgFO.NodeHttpClient.agent;
+            if (!$3ty2n.NodeHttpClient.agent) $3ty2n.NodeHttpClient.agent = new http.Agent(agentOptions);
+            return $3ty2n.NodeHttpClient.agent;
         }
     },
     progressStream: function progressStream(stream, totalBytes) {
-        if (typeof $4b4ea1c7eb74669f$var$TransformStream === 'undefined') // for node 0.8 there is no streaming progress
+        if (typeof $a1c994ed3b49887b$var$TransformStream === 'undefined') // for node 0.8 there is no streaming progress
         return;
         var loadedBytes = 0;
-        var reporter = new $4b4ea1c7eb74669f$var$TransformStream();
+        var reporter = new $a1c994ed3b49887b$var$TransformStream();
         reporter._transform = function(chunk, encoding, callback) {
             if (chunk) {
                 loadedBytes += chunk.length;
@@ -17427,18 +17427,18 @@ var $4b4ea1c7eb74669f$var$CONNECTION_REUSE_ENV_NAME = 'AWS_NODEJS_CONNECTION_REU
  * @!ignore
  */ /**
  * @api private
- */ $1TgFO.HttpClient.prototype = $1TgFO.NodeHttpClient.prototype;
+ */ $3ty2n.HttpClient.prototype = $3ty2n.NodeHttpClient.prototype;
 /**
  * @api private
- */ $1TgFO.HttpClient.streamsApiVersion = $4b4ea1c7eb74669f$var$ReadableStream ? 2 : 1;
+ */ $3ty2n.HttpClient.streamsApiVersion = $a1c994ed3b49887b$var$ReadableStream ? 2 : 1;
 
 
-parcelRequire("PJvZ6");
+parcelRequire("b8QLt");
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 
-var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
+var $a39b494f0edae099$var$iniLoader = $3ty2n.util.iniLoader;
 /**
  * Represents OIDC credentials from a file on disk
  * If the credentials expire, the SDK can {refresh} the credentials
@@ -17464,7 +17464,7 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
  * service operation
  *
  * @!macro nobrowser
- */ $1TgFO.TokenFileWebIdentityCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.TokenFileWebIdentityCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * @example Creating a new credentials object
    *  AWS.config.credentials = new AWS.TokenFileWebIdentityCredentials(
@@ -17478,9 +17478,9 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
    *   });
    * @see AWS.Config
    */ constructor: function TokenFileWebIdentityCredentials(clientConfig) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.data = null;
-        this.clientConfig = $1TgFO.util.copy(clientConfig || {});
+        this.clientConfig = $3ty2n.util.copy(clientConfig || {});
     },
     /**
    * Returns params from environment variables
@@ -17501,10 +17501,10 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
    *
    * @api private
    */ getParamsFromSharedConfig: function getParamsFromSharedConfig() {
-        var profiles = $1TgFO.util.getProfilesFromSharedConfig($ab6e46f0f9bb2a4a$var$iniLoader);
-        var profileName = process.env.AWS_PROFILE || $1TgFO.util.defaultProfile;
+        var profiles = $3ty2n.util.getProfilesFromSharedConfig($a39b494f0edae099$var$iniLoader);
+        var profileName = process.env.AWS_PROFILE || $3ty2n.util.defaultProfile;
         var profile = profiles[profileName] || {};
-        if (Object.keys(profile).length === 0) throw $1TgFO.util.error(new Error('Profile ' + profileName + ' not found'), {
+        if (Object.keys(profile).length === 0) throw $3ty2n.util.error(new Error('Profile ' + profileName + ' not found'), {
             code: 'TokenFileWebIdentityCredentialsProviderFailure'
         });
         var paramsArray = [];
@@ -17534,7 +17534,7 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
    *   @param err [Error] if an error occurred, this value will be filled
    * @see AWS.Credentials.get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -17568,7 +17568,7 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
             if (!paramsArray) paramsArray = self.getParamsFromSharedConfig();
             if (paramsArray) {
                 var params = paramsArray.shift();
-                var oidcToken = $8OLUh$fs.readFileSync(params.envTokenFile, {
+                var oidcToken = $bPiTa$fs.readFileSync(params.envTokenFile, {
                     encoding: 'ascii'
                 });
                 if (!self.service) self.createClients();
@@ -17593,12 +17593,12 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
    * @api private
    */ createClients: function() {
         if (!this.service) {
-            var stsConfig = $1TgFO.util.merge({}, this.clientConfig);
-            this.service = new $6994db0a3b25c214$exports(stsConfig);
+            var stsConfig = $3ty2n.util.merge({}, this.clientConfig);
+            this.service = new $1d7b795e21cccba4$exports(stsConfig);
             // Retry in case of IDPCommunicationErrorException or InvalidIdentityToken
             this.service.retryableError = function(error) {
                 if (error.code === 'IDPCommunicationErrorException' || error.code === 'InvalidIdentityToken') return true;
-                else return $1TgFO.Service.prototype.retryableError.call(this, error);
+                else return $3ty2n.Service.prototype.retryableError.call(this, error);
             };
         }
     }
@@ -17606,41 +17606,41 @@ var $ab6e46f0f9bb2a4a$var$iniLoader = $1TgFO.util.iniLoader;
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
-var $b53e41603fa7e773$exports = {};
+var $3ty2n = parcelRequire("3ty2n");
+var $1fed2564eb349a74$exports = {};
 
-var $1TgFO = parcelRequire("1TgFO");
-parcelRequire("7DCha");
-var $b53e41603fa7e773$var$inherit = $1TgFO.util.inherit;
-var $5c6e4da38755aaa7$exports = {};
+var $3ty2n = parcelRequire("3ty2n");
+parcelRequire("bpL55");
+var $1fed2564eb349a74$var$inherit = $3ty2n.util.inherit;
+var $ea6d9560d3174e90$exports = {};
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $5c6e4da38755aaa7$var$Endpoint = (parcelRequire("hkAIX"))();
+var $ea6d9560d3174e90$var$Endpoint = (parcelRequire("dGc3U"))();
 
-var $5c6e4da38755aaa7$var$EndpointMode = (parcelRequire("5rrrN"))();
+var $ea6d9560d3174e90$var$EndpointMode = (parcelRequire("cko55"))();
 
-var $5c6e4da38755aaa7$var$ENDPOINT_CONFIG_OPTIONS = (parcelRequire("c6cMt"))();
+var $ea6d9560d3174e90$var$ENDPOINT_CONFIG_OPTIONS = (parcelRequire("hGFrZ"))();
 
-var $5c6e4da38755aaa7$var$ENDPOINT_MODE_CONFIG_OPTIONS = (parcelRequire("7oKZV"))();
-var $5c6e4da38755aaa7$var$getMetadataServiceEndpoint = function() {
-    var endpoint = $1TgFO.util.loadConfig($5c6e4da38755aaa7$var$ENDPOINT_CONFIG_OPTIONS);
+var $ea6d9560d3174e90$var$ENDPOINT_MODE_CONFIG_OPTIONS = (parcelRequire("jQsXn"))();
+var $ea6d9560d3174e90$var$getMetadataServiceEndpoint = function() {
+    var endpoint = $3ty2n.util.loadConfig($ea6d9560d3174e90$var$ENDPOINT_CONFIG_OPTIONS);
     if (endpoint !== undefined) return endpoint;
-    var endpointMode = $1TgFO.util.loadConfig($5c6e4da38755aaa7$var$ENDPOINT_MODE_CONFIG_OPTIONS);
+    var endpointMode = $3ty2n.util.loadConfig($ea6d9560d3174e90$var$ENDPOINT_MODE_CONFIG_OPTIONS);
     switch(endpointMode){
-        case $5c6e4da38755aaa7$var$EndpointMode.IPv4:
-            return $5c6e4da38755aaa7$var$Endpoint.IPv4;
-        case $5c6e4da38755aaa7$var$EndpointMode.IPv6:
-            return $5c6e4da38755aaa7$var$Endpoint.IPv6;
+        case $ea6d9560d3174e90$var$EndpointMode.IPv4:
+            return $ea6d9560d3174e90$var$Endpoint.IPv4;
+        case $ea6d9560d3174e90$var$EndpointMode.IPv6:
+            return $ea6d9560d3174e90$var$Endpoint.IPv6;
         default:
             throw new Error('Unsupported endpoint mode: ' + endpointMode);
     }
 };
-$5c6e4da38755aaa7$exports = $5c6e4da38755aaa7$var$getMetadataServiceEndpoint;
+$ea6d9560d3174e90$exports = $ea6d9560d3174e90$var$getMetadataServiceEndpoint;
 
 
 
-var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
+var $1fed2564eb349a74$require$URL = $bPiTa$url.URL;
 /**
  * Represents a metadata service available on EC2 instances. Using the
  * {request} method, you can receieve metadata about any available resource
@@ -17656,10 +17656,10 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
  *       before aborting the connection. Set to 0 for no timeout.
  *
  * @!macro nobrowser
- */ $1TgFO.MetadataService = $b53e41603fa7e773$var$inherit({
+ */ $3ty2n.MetadataService = $1fed2564eb349a74$var$inherit({
     /**
    * @return [String] the endpoint of the instance metadata service
-   */ endpoint: $5c6e4da38755aaa7$exports(),
+   */ endpoint: $ea6d9560d3174e90$exports(),
     /**
    * @!ignore
    */ /**
@@ -17696,10 +17696,10 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
             options.endpoint = 'http://' + options.host;
             delete options.host;
         }
-        this.profile = options && options.profile || process.env.AWS_PROFILE || $1TgFO.util.defaultProfile;
+        this.profile = options && options.profile || process.env.AWS_PROFILE || $3ty2n.util.defaultProfile;
         this.ec2MetadataV1Disabled = !!(options && options.ec2MetadataV1Disabled);
         this.filename = options && options.filename;
-        $1TgFO.util.update(this, options);
+        $3ty2n.util.update(this, options);
     },
     /**
    * Sends a request to the instance metadata service for a given resource.
@@ -17722,17 +17722,17 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
             callback = options;
             options = {};
         }
-        if (process.env[$1TgFO.util.imdsDisabledEnv]) {
+        if (process.env[$3ty2n.util.imdsDisabledEnv]) {
             callback(new Error('EC2 Instance Metadata Service access disabled'));
             return;
         }
         path = path || '/';
         // Verify that host is a valid URL
-        if ($b53e41603fa7e773$require$URL) new $b53e41603fa7e773$require$URL(this.endpoint);
-        var httpRequest = new $1TgFO.HttpRequest(this.endpoint + path);
+        if ($1fed2564eb349a74$require$URL) new $1fed2564eb349a74$require$URL(this.endpoint);
+        var httpRequest = new $3ty2n.HttpRequest(this.endpoint + path);
         httpRequest.method = options.method || 'GET';
         if (options.headers) httpRequest.headers = options.headers;
-        $1TgFO.util.handleRequestWithRetries(httpRequest, this, callback);
+        $3ty2n.util.handleRequestWithRetries(httpRequest, this, callback);
     },
     /**
   * @api private
@@ -17764,19 +17764,19 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
         var isImdsV1Fallback = self.disableFetchToken || !(options && options.headers && options.headers['x-aws-ec2-metadata-token']);
         if (isImdsV1Fallback && !process.env.AWS_EC2_METADATA_DISABLED) {
             try {
-                var profiles = $1TgFO.util.getProfilesFromSharedConfig($1TgFO.util.iniLoader, this.filename);
+                var profiles = $3ty2n.util.getProfilesFromSharedConfig($3ty2n.util.iniLoader, this.filename);
                 var profileSettings = profiles[this.profile] || {};
             } catch (e) {
                 profileSettings = {};
             }
-            if (profileSettings.ec2_metadata_v1_disabled && profileSettings.ec2_metadata_v1_disabled !== 'false') return cb($1TgFO.util.error(new Error('AWS EC2 Metadata v1 fallback has been blocked by AWS config file profile.')));
-            if (self.ec2MetadataV1Disabled) return cb($1TgFO.util.error(new Error('AWS EC2 Metadata v1 fallback has been blocked by AWS.MetadataService::options.ec2MetadataV1Disabled=true.')));
-            if (process.env.AWS_EC2_METADATA_V1_DISABLED && process.env.AWS_EC2_METADATA_V1_DISABLED !== 'false') return cb($1TgFO.util.error(new Error('AWS EC2 Metadata v1 fallback has been blocked by process.env.AWS_EC2_METADATA_V1_DISABLED.')));
+            if (profileSettings.ec2_metadata_v1_disabled && profileSettings.ec2_metadata_v1_disabled !== 'false') return cb($3ty2n.util.error(new Error('AWS EC2 Metadata v1 fallback has been blocked by AWS config file profile.')));
+            if (self.ec2MetadataV1Disabled) return cb($3ty2n.util.error(new Error('AWS EC2 Metadata v1 fallback has been blocked by AWS.MetadataService::options.ec2MetadataV1Disabled=true.')));
+            if (process.env.AWS_EC2_METADATA_V1_DISABLED && process.env.AWS_EC2_METADATA_V1_DISABLED !== 'false') return cb($3ty2n.util.error(new Error('AWS EC2 Metadata v1 fallback has been blocked by process.env.AWS_EC2_METADATA_V1_DISABLED.')));
         }
         self.request(basePath, options, function(err, roleName) {
             if (err) {
                 self.disableFetchToken = !(err.statusCode === 401);
-                cb($1TgFO.util.error(err, {
+                cb($3ty2n.util.error(err, {
                     message: 'EC2 Metadata roleName request returned error'
                 }));
                 return;
@@ -17785,7 +17785,7 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
             self.request(basePath + roleName, options, function(credErr, credData) {
                 if (credErr) {
                     self.disableFetchToken = !(credErr.statusCode === 401);
-                    cb($1TgFO.util.error(credErr, {
+                    cb($3ty2n.util.error(credErr, {
                         message: 'EC2 Metadata creds request returned error'
                     }));
                     return;
@@ -17821,12 +17821,12 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
             if (tokenError) {
                 if (tokenError.code === 'TimeoutError') self.disableFetchToken = true;
                 else if (tokenError.retryable === true) {
-                    callbacks($1TgFO.util.error(tokenError, {
+                    callbacks($3ty2n.util.error(tokenError, {
                         message: 'EC2 Metadata token request returned error'
                     }));
                     return;
                 } else if (tokenError.statusCode === 400) {
-                    callbacks($1TgFO.util.error(tokenError, {
+                    callbacks($3ty2n.util.error(tokenError, {
                         message: 'EC2 Metadata token request returned 400'
                     }));
                     return;
@@ -17842,7 +17842,7 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
 });
 /**
  * @api private
- */ $b53e41603fa7e773$exports = $1TgFO.MetadataService;
+ */ $1fed2564eb349a74$exports = $3ty2n.MetadataService;
 
 
 /**
@@ -17886,20 +17886,20 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
  * @see AWS.Config.logger
  *
  * @!macro nobrowser
- */ $1TgFO.EC2MetadataCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.EC2MetadataCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     constructor: function EC2MetadataCredentials(options) {
-        $1TgFO.Credentials.call(this);
-        options = options ? $1TgFO.util.copy(options) : {};
-        options = $1TgFO.util.merge({
+        $3ty2n.Credentials.call(this);
+        options = options ? $3ty2n.util.copy(options) : {};
+        options = $3ty2n.util.merge({
             maxRetries: this.defaultMaxRetries
         }, options);
         if (!options.httpOptions) options.httpOptions = {};
-        options.httpOptions = $1TgFO.util.merge({
+        options.httpOptions = $3ty2n.util.merge({
             timeout: this.defaultTimeout,
             connectTimeout: this.defaultConnectTimeout
         }, options.httpOptions);
-        this.metadataService = new $1TgFO.MetadataService(options);
-        this.logger = options.logger || $1TgFO.config && $1TgFO.config.logger;
+        this.metadataService = new $3ty2n.MetadataService(options);
+        this.logger = options.logger || $3ty2n.config && $3ty2n.config.logger;
     },
     /**
    * @api private
@@ -17926,7 +17926,7 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -17961,7 +17961,7 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
             this.originalExpiration = this.originalExpiration || this.expireTime;
             this.expired = false;
             var nextTimeout = 900 + Math.floor(Math.random() * 300);
-            var currentTime = $1TgFO.util.date.getDate().getTime();
+            var currentTime = $3ty2n.util.date.getDate().getTime();
             this.expireTime = new Date(currentTime + nextTimeout * 1000);
             // TODO: add doc link;
             this.logger.warn("Attempting credential expiration extension due to a credential service availability issue. A refresh of these credentials will be attempted again at " + this.expireTime + '\nFor more information, please visit: https://docs.aws.amazon.com/sdkref/latest/guide/feature-static-credentials.html');
@@ -17972,7 +17972,7 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
    * service.
    * @api private
    */ setCredentials: function setCredentials(creds) {
-        var currentTime = $1TgFO.util.date.getDate().getTime();
+        var currentTime = $3ty2n.util.date.getDate().getTime();
         var expireTime = new Date(creds.Expiration);
         this.expired = currentTime >= expireTime ? true : false;
         this.metadata = creds;
@@ -17986,17 +17986,17 @@ var $b53e41603fa7e773$require$URL = $8OLUh$url.URL;
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
-var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI', $7bff08abf1c52e91$var$ENV_FULL_URI = 'AWS_CONTAINER_CREDENTIALS_FULL_URI', $7bff08abf1c52e91$var$ENV_AUTH_TOKEN = 'AWS_CONTAINER_AUTHORIZATION_TOKEN', $7bff08abf1c52e91$var$ENV_AUTH_TOKEN_FILE = 'AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE', $7bff08abf1c52e91$var$FULL_URI_UNRESTRICTED_PROTOCOLS = [
+var $3ty2n = parcelRequire("3ty2n");
+var $8d2583c0995aa6c6$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE_URI', $8d2583c0995aa6c6$var$ENV_FULL_URI = 'AWS_CONTAINER_CREDENTIALS_FULL_URI', $8d2583c0995aa6c6$var$ENV_AUTH_TOKEN = 'AWS_CONTAINER_AUTHORIZATION_TOKEN', $8d2583c0995aa6c6$var$ENV_AUTH_TOKEN_FILE = 'AWS_CONTAINER_AUTHORIZATION_TOKEN_FILE', $8d2583c0995aa6c6$var$FULL_URI_UNRESTRICTED_PROTOCOLS = [
     'https:'
-], $7bff08abf1c52e91$var$FULL_URI_ALLOWED_PROTOCOLS = [
+], $8d2583c0995aa6c6$var$FULL_URI_ALLOWED_PROTOCOLS = [
     'http:',
     'https:'
-], $7bff08abf1c52e91$var$FULL_URI_ALLOWED_HOSTNAMES = [
+], $8d2583c0995aa6c6$var$FULL_URI_ALLOWED_HOSTNAMES = [
     'localhost',
     '127.0.0.1',
     '169.254.170.23'
-], $7bff08abf1c52e91$var$RELATIVE_URI_HOST = '169.254.170.2';
+], $8d2583c0995aa6c6$var$RELATIVE_URI_HOST = '169.254.170.2';
 /**
  * Represents credentials received from specified URI.
  *
@@ -18021,13 +18021,13 @@ var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE
  * @see AWS.Config.retryDelayOptions
  *
  * @!macro nobrowser
- */ $1TgFO.RemoteCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.RemoteCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     constructor: function RemoteCredentials(options) {
-        $1TgFO.Credentials.call(this);
-        options = options ? $1TgFO.util.copy(options) : {};
+        $3ty2n.Credentials.call(this);
+        options = options ? $3ty2n.util.copy(options) : {};
         if (!options.httpOptions) options.httpOptions = {};
-        options.httpOptions = $1TgFO.util.merge(this.httpOptions, options.httpOptions);
-        $1TgFO.util.update(this, options);
+        options.httpOptions = $3ty2n.util.merge(this.httpOptions, options.httpOptions);
+        $3ty2n.util.update(this, options);
     },
     /**
    * @api private
@@ -18040,42 +18040,42 @@ var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE
     /**
    * @api private
    */ isConfiguredForEcsCredentials: function isConfiguredForEcsCredentials() {
-        return Boolean(process && process.env && (process.env[$7bff08abf1c52e91$var$ENV_RELATIVE_URI] || process.env[$7bff08abf1c52e91$var$ENV_FULL_URI]));
+        return Boolean(process && process.env && (process.env[$8d2583c0995aa6c6$var$ENV_RELATIVE_URI] || process.env[$8d2583c0995aa6c6$var$ENV_FULL_URI]));
     },
     /**
    * @api private
    */ getECSFullUri: function getECSFullUri() {
         if (process && process.env) {
-            var relative = process.env[$7bff08abf1c52e91$var$ENV_RELATIVE_URI], full = process.env[$7bff08abf1c52e91$var$ENV_FULL_URI];
-            if (relative) return 'http://' + $7bff08abf1c52e91$var$RELATIVE_URI_HOST + relative;
+            var relative = process.env[$8d2583c0995aa6c6$var$ENV_RELATIVE_URI], full = process.env[$8d2583c0995aa6c6$var$ENV_FULL_URI];
+            if (relative) return 'http://' + $8d2583c0995aa6c6$var$RELATIVE_URI_HOST + relative;
             else if (full) {
-                var parsed = $1TgFO.util.urlParse(full);
-                if ($7bff08abf1c52e91$var$FULL_URI_ALLOWED_PROTOCOLS.indexOf(parsed.protocol) < 0) throw $1TgFO.util.error(new Error('Unsupported protocol:  AWS.RemoteCredentials supports ' + $7bff08abf1c52e91$var$FULL_URI_ALLOWED_PROTOCOLS.join(',') + ' only; ' + parsed.protocol + ' requested.'), {
+                var parsed = $3ty2n.util.urlParse(full);
+                if ($8d2583c0995aa6c6$var$FULL_URI_ALLOWED_PROTOCOLS.indexOf(parsed.protocol) < 0) throw $3ty2n.util.error(new Error('Unsupported protocol:  AWS.RemoteCredentials supports ' + $8d2583c0995aa6c6$var$FULL_URI_ALLOWED_PROTOCOLS.join(',') + ' only; ' + parsed.protocol + ' requested.'), {
                     code: 'ECSCredentialsProviderFailure'
                 });
-                if ($7bff08abf1c52e91$var$FULL_URI_UNRESTRICTED_PROTOCOLS.indexOf(parsed.protocol) < 0 && $7bff08abf1c52e91$var$FULL_URI_ALLOWED_HOSTNAMES.indexOf(parsed.hostname) < 0) throw $1TgFO.util.error(new Error('Unsupported hostname: AWS.RemoteCredentials only supports ' + $7bff08abf1c52e91$var$FULL_URI_ALLOWED_HOSTNAMES.join(',') + ' for ' + parsed.protocol + '; ' + parsed.protocol + '//' + parsed.hostname + ' requested.'), {
+                if ($8d2583c0995aa6c6$var$FULL_URI_UNRESTRICTED_PROTOCOLS.indexOf(parsed.protocol) < 0 && $8d2583c0995aa6c6$var$FULL_URI_ALLOWED_HOSTNAMES.indexOf(parsed.hostname) < 0) throw $3ty2n.util.error(new Error('Unsupported hostname: AWS.RemoteCredentials only supports ' + $8d2583c0995aa6c6$var$FULL_URI_ALLOWED_HOSTNAMES.join(',') + ' for ' + parsed.protocol + '; ' + parsed.protocol + '//' + parsed.hostname + ' requested.'), {
                     code: 'ECSCredentialsProviderFailure'
                 });
                 return full;
-            } else throw $1TgFO.util.error(new Error('Variable ' + $7bff08abf1c52e91$var$ENV_RELATIVE_URI + ' or ' + $7bff08abf1c52e91$var$ENV_FULL_URI + ' must be set to use AWS.RemoteCredentials.'), {
+            } else throw $3ty2n.util.error(new Error('Variable ' + $8d2583c0995aa6c6$var$ENV_RELATIVE_URI + ' or ' + $8d2583c0995aa6c6$var$ENV_FULL_URI + ' must be set to use AWS.RemoteCredentials.'), {
                 code: 'ECSCredentialsProviderFailure'
             });
-        } else throw $1TgFO.util.error(new Error('No process info available'), {
+        } else throw $3ty2n.util.error(new Error('No process info available'), {
             code: 'ECSCredentialsProviderFailure'
         });
     },
     /**
    * @api private
    */ getECSAuthToken: function getECSAuthToken() {
-        if (process && process.env && (process.env[$7bff08abf1c52e91$var$ENV_FULL_URI] || process.env[$7bff08abf1c52e91$var$ENV_AUTH_TOKEN_FILE])) {
-            if (!process.env[$7bff08abf1c52e91$var$ENV_AUTH_TOKEN] && process.env[$7bff08abf1c52e91$var$ENV_AUTH_TOKEN_FILE]) try {
-                var data = $8OLUh$fs.readFileSync(process.env[$7bff08abf1c52e91$var$ENV_AUTH_TOKEN_FILE]).toString();
+        if (process && process.env && (process.env[$8d2583c0995aa6c6$var$ENV_FULL_URI] || process.env[$8d2583c0995aa6c6$var$ENV_AUTH_TOKEN_FILE])) {
+            if (!process.env[$8d2583c0995aa6c6$var$ENV_AUTH_TOKEN] && process.env[$8d2583c0995aa6c6$var$ENV_AUTH_TOKEN_FILE]) try {
+                var data = $bPiTa$fs.readFileSync(process.env[$8d2583c0995aa6c6$var$ENV_AUTH_TOKEN_FILE]).toString();
                 return data;
             } catch (error) {
                 console.error('Error reading token file:', error);
                 throw error; // Re-throw the error to propagate it
             }
-            return process.env[$7bff08abf1c52e91$var$ENV_AUTH_TOKEN];
+            return process.env[$8d2583c0995aa6c6$var$ENV_AUTH_TOKEN];
         }
     },
     /**
@@ -18098,12 +18098,12 @@ var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE
     /**
    * @api private
    */ request: function request(url, callback) {
-        var httpRequest = new $1TgFO.HttpRequest(url);
+        var httpRequest = new $3ty2n.HttpRequest(url);
         httpRequest.method = 'GET';
         httpRequest.headers.Accept = 'application/json';
         var token = this.getECSAuthToken();
         if (token) httpRequest.headers.Authorization = token;
-        $1TgFO.util.handleRequestWithRetries(httpRequest, this, callback);
+        $3ty2n.util.handleRequestWithRetries(httpRequest, this, callback);
     },
     /**
    * Loads the credentials from the relative URI specified by container
@@ -18116,7 +18116,7 @@ var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     },
     /**
    * @api private
@@ -18133,10 +18133,10 @@ var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE
             if (!err) try {
                 data = JSON.parse(data);
                 var creds = self.formatCreds(data);
-                if (!self.credsFormatIsValid(creds)) throw $1TgFO.util.error(new Error('Response data is not in valid format'), {
+                if (!self.credsFormatIsValid(creds)) throw $3ty2n.util.error(new Error('Response data is not in valid format'), {
                     code: 'ECSCredentialsProviderFailure'
                 });
-                $1TgFO.util.update(self, creds);
+                $3ty2n.util.update(self, creds);
             } catch (dataError) {
                 err = dataError;
             }
@@ -18147,7 +18147,7 @@ var $7bff08abf1c52e91$var$ENV_RELATIVE_URI = 'AWS_CONTAINER_CREDENTIALS_RELATIVE
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Represents credentials received from relative URI specified in the ECS container.
  *
@@ -18172,11 +18172,11 @@ var $1TgFO = parcelRequire("1TgFO");
  * @see AWS.Config.retryDelayOptions
  *
  * @!macro nobrowser
- */ $1TgFO.ECSCredentials = $1TgFO.RemoteCredentials;
+ */ $3ty2n.ECSCredentials = $3ty2n.RemoteCredentials;
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Represents credentials from the environment.
  *
@@ -18198,7 +18198,7 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @readonly
  *   @return [String] the prefix for the environment variable names excluding
  *     the separating underscore ('_').
- */ $1TgFO.EnvironmentCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.EnvironmentCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new EnvironmentCredentials class with a given variable
    * prefix {envPrefix}. For example, to load credentials using the 'AWS'
@@ -18212,7 +18212,7 @@ var $1TgFO = parcelRequire("1TgFO");
    * @param envPrefix [String] the prefix to use (e.g., 'AWS') for environment
    *   variables. Do not include the separating underscore.
    */ constructor: function EnvironmentCredentials(envPrefix) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.envPrefix = envPrefix;
         this.get(function() {});
     },
@@ -18229,9 +18229,9 @@ var $1TgFO = parcelRequire("1TgFO");
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        if (!callback) callback = $1TgFO.util.fn.callback;
+        if (!callback) callback = $3ty2n.util.fn.callback;
         if (!process || !process.env) {
-            callback($1TgFO.util.error(new Error('No process info or environment variables available'), {
+            callback($3ty2n.util.error(new Error('No process info or environment variables available'), {
                 code: 'EnvironmentCredentialsProviderFailure'
             }));
             return;
@@ -18247,21 +18247,21 @@ var $1TgFO = parcelRequire("1TgFO");
             if (this.envPrefix) prefix = this.envPrefix + '_';
             values[i] = process.env[prefix + keys[i]];
             if (!values[i] && keys[i] !== 'SESSION_TOKEN') {
-                callback($1TgFO.util.error(new Error('Variable ' + prefix + keys[i] + ' not set.'), {
+                callback($3ty2n.util.error(new Error('Variable ' + prefix + keys[i] + ' not set.'), {
                     code: 'EnvironmentCredentialsProviderFailure'
                 }));
                 return;
             }
         }
         this.expired = false;
-        $1TgFO.Credentials.apply(this, values);
+        $3ty2n.Credentials.apply(this, values);
         callback();
     }
 });
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Represents credentials from a JSON file on disk.
  * If the credentials expire, the SDK can {refresh} the credentials
@@ -18283,14 +18283,14 @@ var $1TgFO = parcelRequire("1TgFO");
  *   @return [String] the path to the JSON file on disk containing the
  *     credentials.
  * @!macro nobrowser
- */ $1TgFO.FileSystemCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.FileSystemCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * @overload AWS.FileSystemCredentials(filename)
    *   Creates a new FileSystemCredentials object from a filename
    *
    *   @param filename [String] the path on disk to the JSON file to load.
    */ constructor: function FileSystemCredentials(filename) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         this.filename = filename;
         this.get(function() {});
     },
@@ -18305,11 +18305,11 @@ var $1TgFO = parcelRequire("1TgFO");
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        if (!callback) callback = $1TgFO.util.fn.callback;
+        if (!callback) callback = $3ty2n.util.fn.callback;
         try {
-            var creds = JSON.parse($1TgFO.util.readFileSync(this.filename));
-            $1TgFO.Credentials.call(this, creds);
-            if (!this.accessKeyId || !this.secretAccessKey) throw $1TgFO.util.error(new Error('Credentials not set in ' + this.filename), {
+            var creds = JSON.parse($3ty2n.util.readFileSync(this.filename));
+            $3ty2n.Credentials.call(this, creds);
+            if (!this.accessKeyId || !this.secretAccessKey) throw $3ty2n.util.error(new Error('Credentials not set in ' + this.filename), {
                 code: 'FileSystemCredentialsProviderFailure'
             });
             this.expired = false;
@@ -18322,10 +18322,10 @@ var $1TgFO = parcelRequire("1TgFO");
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
-var $614c73c7afe50129$var$iniLoader = $1TgFO.util.iniLoader;
-var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
+var $b5c3a96abc8ea3a8$var$iniLoader = $3ty2n.util.iniLoader;
+var $b5c3a96abc8ea3a8$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
 /**
  * Represents credentials loaded from shared credentials file
  * (defaulting to ~/.aws/credentials or defined by the
@@ -18356,7 +18356,7 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
  * ```
  *
  * @!macro nobrowser
- */ $1TgFO.SharedIniFileCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.SharedIniFileCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new SharedIniFileCredentials object.
    *
@@ -18396,24 +18396,24 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
    *     take before automatically being terminated.
    *     Defaults to two minutes (120000).
    */ constructor: function SharedIniFileCredentials(options) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         options = options || {};
         this.filename = options.filename;
-        this.profile = options.profile || process.env.AWS_PROFILE || $1TgFO.util.defaultProfile;
+        this.profile = options.profile || process.env.AWS_PROFILE || $3ty2n.util.defaultProfile;
         this.disableAssumeRole = Boolean(options.disableAssumeRole);
         this.preferStaticCredentials = Boolean(options.preferStaticCredentials);
         this.tokenCodeFn = options.tokenCodeFn || null;
         this.httpOptions = options.httpOptions || null;
-        this.get(options.callback || $1TgFO.util.fn.noop);
+        this.get(options.callback || $3ty2n.util.fn.noop);
     },
     /**
    * @api private
    */ load: function load(callback) {
         var self = this;
         try {
-            var profiles = $1TgFO.util.getProfilesFromSharedConfig($614c73c7afe50129$var$iniLoader, this.filename);
+            var profiles = $3ty2n.util.getProfilesFromSharedConfig($b5c3a96abc8ea3a8$var$iniLoader, this.filename);
             var profile = profiles[this.profile] || {};
-            if (Object.keys(profile).length === 0) throw $1TgFO.util.error(new Error('Profile ' + this.profile + ' not found'), {
+            if (Object.keys(profile).length === 0) throw $3ty2n.util.error(new Error('Profile ' + this.profile + ' not found'), {
                 code: 'SharedIniFileCredentialsProviderFailure'
             });
             /*
@@ -18443,7 +18443,7 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
             this.accessKeyId = profile['aws_access_key_id'];
             this.secretAccessKey = profile['aws_secret_access_key'];
             this.sessionToken = profile['aws_session_token'];
-            if (!this.accessKeyId || !this.secretAccessKey) throw $1TgFO.util.error(new Error('Credentials not set for profile ' + this.profile), {
+            if (!this.accessKeyId || !this.secretAccessKey) throw $3ty2n.util.error(new Error('Credentials not set for profile ' + this.profile), {
                 code: 'SharedIniFileCredentialsProviderFailure'
             });
             this.expired = false;
@@ -18463,13 +18463,13 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        $614c73c7afe50129$var$iniLoader.clearCachedFiles();
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback, this.disableAssumeRole);
+        $b5c3a96abc8ea3a8$var$iniLoader.clearCachedFiles();
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback, this.disableAssumeRole);
     },
     /**
    * @api private
    */ loadRoleProfile: function loadRoleProfile(creds, roleProfile, callback) {
-        if (this.disableAssumeRole) throw $1TgFO.util.error(new Error("Role assumption profiles are disabled. Failed to load profile " + this.profile + ' from ' + creds.filename), {
+        if (this.disableAssumeRole) throw $3ty2n.util.error(new Error("Role assumption profiles are disabled. Failed to load profile " + this.profile + ' from ' + creds.filename), {
             code: 'SharedIniFileCredentialsProviderFailure'
         });
         var self = this;
@@ -18498,20 +18498,20 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
         // Ignoring the [default] profile for the purposes of AssumeRole is arguably
         // a bug in the CLI since it does use the [default] region for service
         // calls... but right now we're matching behavior of the other tool.
-        var profileRegion = roleProfile['region'] || $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION;
-        if (!sourceProfileName) throw $1TgFO.util.error(new Error('source_profile is not set using profile ' + this.profile), {
+        var profileRegion = roleProfile['region'] || $b5c3a96abc8ea3a8$var$ASSUME_ROLE_DEFAULT_REGION;
+        if (!sourceProfileName) throw $3ty2n.util.error(new Error('source_profile is not set using profile ' + this.profile), {
             code: 'SharedIniFileCredentialsProviderFailure'
         });
         var sourceProfileExistanceTest = creds[sourceProfileName];
-        if (typeof sourceProfileExistanceTest !== 'object') throw $1TgFO.util.error(new Error('source_profile ' + sourceProfileName + ' using profile ' + this.profile + ' does not exist'), {
+        if (typeof sourceProfileExistanceTest !== 'object') throw $3ty2n.util.error(new Error('source_profile ' + sourceProfileName + ' using profile ' + this.profile + ' does not exist'), {
             code: 'SharedIniFileCredentialsProviderFailure'
         });
-        var sourceCredentials = new $1TgFO.SharedIniFileCredentials($1TgFO.util.merge(this.options || {}, {
+        var sourceCredentials = new $3ty2n.SharedIniFileCredentials($3ty2n.util.merge(this.options || {}, {
             profile: sourceProfileName,
             preferStaticCredentials: true
         }));
         this.roleArn = roleArn;
-        var sts = new $6994db0a3b25c214$exports({
+        var sts = new $1d7b795e21cccba4$exports({
             credentials: sourceCredentials,
             region: profileRegion,
             httpOptions: this.httpOptions
@@ -18529,7 +18529,7 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
                     var message;
                     if (err instanceof Error) message = err.message;
                     else message = err;
-                    callback($1TgFO.util.error(new Error('Error fetching MFA token: ' + message), {
+                    callback($3ty2n.util.error(new Error('Error fetching MFA token: ' + message), {
                         code: 'SharedIniFileCredentialsProviderFailure'
                     }));
                     return;
@@ -18546,10 +18546,10 @@ var $614c73c7afe50129$var$ASSUME_ROLE_DEFAULT_REGION = 'us-east-1';
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 
-var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
+var $3f588f803bf02fcf$var$iniLoader = $3ty2n.util.iniLoader;
 /**
  *  Represents credentials from sso.getRoleCredentials API for
  * `sso_*` values defined in shared credentials file.
@@ -18593,7 +18593,7 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
  * ```
  *
  * @!macro nobrowser
- */ $1TgFO.SsoCredentials = $1TgFO.util.inherit($1TgFO.Credentials, {
+ */ $3ty2n.SsoCredentials = $3ty2n.util.inherit($3ty2n.Credentials, {
     /**
    * Creates a new SsoCredentials object.
    *
@@ -18607,32 +18607,32 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
    *   by the constructor. When the callback is called with no error, the
    *   credentials have been loaded successfully.
    */ constructor: function SsoCredentials(options) {
-        $1TgFO.Credentials.call(this);
+        $3ty2n.Credentials.call(this);
         options = options || {};
         this.errorCode = 'SsoCredentialsProviderFailure';
         this.expired = true;
         this.filename = options.filename;
-        this.profile = options.profile || process.env.AWS_PROFILE || $1TgFO.util.defaultProfile;
+        this.profile = options.profile || process.env.AWS_PROFILE || $3ty2n.util.defaultProfile;
         this.service = options.ssoClient;
         this.httpOptions = options.httpOptions || null;
-        this.get(options.callback || $1TgFO.util.fn.noop);
+        this.get(options.callback || $3ty2n.util.fn.noop);
     },
     /**
    * @api private
    */ load: function load(callback) {
         var self = this;
         try {
-            var profiles = $1TgFO.util.getProfilesFromSharedConfig($f78083a7feda5b64$var$iniLoader, this.filename);
+            var profiles = $3ty2n.util.getProfilesFromSharedConfig($3f588f803bf02fcf$var$iniLoader, this.filename);
             var profile = profiles[this.profile] || {};
-            if (Object.keys(profile).length === 0) throw $1TgFO.util.error(new Error('Profile ' + this.profile + ' not found'), {
+            if (Object.keys(profile).length === 0) throw $3ty2n.util.error(new Error('Profile ' + this.profile + ' not found'), {
                 code: self.errorCode
             });
             if (profile.sso_session) {
-                if (!profile.sso_account_id || !profile.sso_role_name) throw $1TgFO.util.error(new Error('Profile ' + this.profile + ' with session ' + profile.sso_session + ' does not have valid SSO credentials. Required parameters "sso_account_id", "sso_session", ' + '"sso_role_name". Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html'), {
+                if (!profile.sso_account_id || !profile.sso_role_name) throw $3ty2n.util.error(new Error('Profile ' + this.profile + ' with session ' + profile.sso_session + ' does not have valid SSO credentials. Required parameters "sso_account_id", "sso_session", ' + '"sso_role_name". Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html'), {
                     code: self.errorCode
                 });
             } else {
-                if (!profile.sso_start_url || !profile.sso_account_id || !profile.sso_region || !profile.sso_role_name) throw $1TgFO.util.error(new Error('Profile ' + this.profile + ' does not have valid SSO credentials. Required parameters "sso_account_id", "sso_region", ' + '"sso_role_name", "sso_start_url". Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html'), {
+                if (!profile.sso_start_url || !profile.sso_account_id || !profile.sso_region || !profile.sso_role_name) throw $3ty2n.util.error(new Error('Profile ' + this.profile + ' does not have valid SSO credentials. Required parameters "sso_account_id", "sso_region", ' + '"sso_role_name", "sso_start_url". Reference: https://docs.aws.amazon.com/cli/latest/userguide/cli-configure-sso.html'), {
                     code: self.errorCode
                 });
             }
@@ -18643,15 +18643,15 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
                     accountId: profile.sso_account_id,
                     roleName: profile.sso_role_name
                 };
-                if (!self.service || self.service.config.region !== profile.sso_region) self.service = new $1TgFO.SSO({
+                if (!self.service || self.service.config.region !== profile.sso_region) self.service = new $3ty2n.SSO({
                     region: profile.sso_region,
                     httpOptions: self.httpOptions
                 });
                 self.service.getRoleCredentials(request, function(err, data) {
-                    if (err || !data || !data.roleCredentials) callback($1TgFO.util.error(err || new Error('Please log in using "aws sso login"'), {
+                    if (err || !data || !data.roleCredentials) callback($3ty2n.util.error(err || new Error('Please log in using "aws sso login"'), {
                         code: self.errorCode
                     }), null);
-                    else if (!data.roleCredentials.accessKeyId || !data.roleCredentials.secretAccessKey || !data.roleCredentials.sessionToken || !data.roleCredentials.expiration) throw $1TgFO.util.error(new Error('SSO returns an invalid temporary credential.'));
+                    else if (!data.roleCredentials.accessKeyId || !data.roleCredentials.secretAccessKey || !data.roleCredentials.sessionToken || !data.roleCredentials.expiration) throw $3ty2n.util.error(new Error('SSO returns an invalid temporary credential.'));
                     else {
                         self.expired = false;
                         self.accessKeyId = data.roleCredentials.accessKeyId;
@@ -18679,11 +18679,11 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
    */ getToken: function getToken(profileName, profile, callback) {
         var self = this;
         if (profile.sso_session) {
-            var _iniLoader = $1TgFO.util.iniLoader;
+            var _iniLoader = $3ty2n.util.iniLoader;
             var ssoSessions = _iniLoader.loadSsoSessionsFrom();
             var ssoSession = ssoSessions[profile.sso_session];
             Object.assign(profile, ssoSession);
-            var ssoTokenProvider = new $1TgFO.SSOTokenProvider({
+            var ssoTokenProvider = new $3ty2n.SSOTokenProvider({
                 profile: profileName
             });
             ssoTokenProvider.get(function(err) {
@@ -18697,17 +18697,17 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
        * The time window (15 mins) that SDK will treat the SSO token expires in before the defined expiration date in token.
        * This is needed because server side may have invalidated the token before the defined expiration date.
        */ var EXPIRE_WINDOW_MS = 900000;
-            var hasher = $8OLUh$crypto.createHash('sha1');
+            var hasher = $bPiTa$crypto.createHash('sha1');
             var fileName = hasher.update(profile.sso_start_url).digest('hex') + '.json';
-            var cachePath = $8OLUh$path.join($f78083a7feda5b64$var$iniLoader.getHomeDir(), '.aws', 'sso', 'cache', fileName);
-            var cacheFile = $1TgFO.util.readFileSync(cachePath);
+            var cachePath = $bPiTa$path.join($3f588f803bf02fcf$var$iniLoader.getHomeDir(), '.aws', 'sso', 'cache', fileName);
+            var cacheFile = $3ty2n.util.readFileSync(cachePath);
             var cacheContent = null;
             if (cacheFile) cacheContent = JSON.parse(cacheFile);
-            if (!cacheContent) throw $1TgFO.util.error(new Error('Cached credentials not found under ' + this.profile + ' profile. Please make sure you log in with aws sso login first'), {
+            if (!cacheContent) throw $3ty2n.util.error(new Error('Cached credentials not found under ' + this.profile + ' profile. Please make sure you log in with aws sso login first'), {
                 code: self.errorCode
             });
-            if (!cacheContent.startUrl || !cacheContent.region || !cacheContent.accessToken || !cacheContent.expiresAt) throw $1TgFO.util.error(new Error('Cached credentials are missing required properties. Try running aws sso login.'));
-            if (new Date(cacheContent.expiresAt).getTime() - Date.now() <= EXPIRE_WINDOW_MS) throw $1TgFO.util.error(new Error('The SSO session associated with this profile has expired. To refresh this SSO session run aws sso login with the corresponding profile.'));
+            if (!cacheContent.startUrl || !cacheContent.region || !cacheContent.accessToken || !cacheContent.expiresAt) throw $3ty2n.util.error(new Error('Cached credentials are missing required properties. Try running aws sso login.'));
+            if (new Date(cacheContent.expiresAt).getTime() - Date.now() <= EXPIRE_WINDOW_MS) throw $3ty2n.util.error(new Error('The SSO session associated with this profile has expired. To refresh this SSO session run aws sso login with the corresponding profile.'));
             return callback(null, cacheContent.accessToken);
         } catch (err) {
             return callback(err, null);
@@ -18724,8 +18724,8 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
    *   @param err [Error] if an error occurred, this value will be filled
    * @see get
    */ refresh: function refresh(callback) {
-        $f78083a7feda5b64$var$iniLoader.clearCachedFiles();
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        $3f588f803bf02fcf$var$iniLoader.clearCachedFiles();
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     }
 });
 
@@ -18734,34 +18734,34 @@ var $f78083a7feda5b64$var$iniLoader = $1TgFO.util.iniLoader;
 // If this changes, please update documentation for
 // AWS.CredentialProviderChain.defaultProviders in
 // credentials/credential_provider_chain.js
-$6c04b041a5f935e8$var$AWS.CredentialProviderChain.defaultProviders = [
+$60e31571e9a15610$var$AWS.CredentialProviderChain.defaultProviders = [
     function() {
-        return new $6c04b041a5f935e8$var$AWS.EnvironmentCredentials('AWS');
+        return new $60e31571e9a15610$var$AWS.EnvironmentCredentials('AWS');
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.EnvironmentCredentials('AMAZON');
+        return new $60e31571e9a15610$var$AWS.EnvironmentCredentials('AMAZON');
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.SsoCredentials();
+        return new $60e31571e9a15610$var$AWS.SsoCredentials();
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.SharedIniFileCredentials();
+        return new $60e31571e9a15610$var$AWS.SharedIniFileCredentials();
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.ECSCredentials();
+        return new $60e31571e9a15610$var$AWS.ECSCredentials();
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.ProcessCredentials();
+        return new $60e31571e9a15610$var$AWS.ProcessCredentials();
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.TokenFileWebIdentityCredentials();
+        return new $60e31571e9a15610$var$AWS.TokenFileWebIdentityCredentials();
     },
     function() {
-        return new $6c04b041a5f935e8$var$AWS.EC2MetadataCredentials();
+        return new $60e31571e9a15610$var$AWS.EC2MetadataCredentials();
     }
 ];
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Represents AWS token object, which contains {token}, and optional
  * {expireTime}.
@@ -18796,7 +18796,7 @@ var $1TgFO = parcelRequire("1TgFO");
  * @!attribute expired
  *   @return [Boolean] whether the token is expired and require a refresh. Used
  *     in conjunction with {expireTime}.
- */ $1TgFO.Token = $1TgFO.util.inherit({
+ */ $3ty2n.Token = $3ty2n.util.inherit({
     /**
    * Creates a Token object with a given set of information in options hash.
    * @option options token [String] represents the literal token string.
@@ -18806,7 +18806,7 @@ var $1TgFO = parcelRequire("1TgFO");
    *   var token = new AWS.Token({ token: 'token' });
    */ constructor: function Token(options) {
         // hide token from being displayed with util.inspect
-        $1TgFO.util.hideProperties(this, [
+        $3ty2n.util.hideProperties(this, [
             'token'
         ]);
         this.expired = false;
@@ -18827,7 +18827,7 @@ var $1TgFO = parcelRequire("1TgFO");
    * @note Subclasses should override this method to provide custom refresh
    *   logic.
    */ needsRefresh: function needsRefresh() {
-        var currentTime = $1TgFO.util.date.getDate().getTime();
+        var currentTime = $3ty2n.util.date.getDate().getTime();
         var adjustedTime = new Date(currentTime + this.expiryWindow * 1000);
         if (this.expireTime && adjustedTime > this.expireTime) return true;
         return this.expired || !this.token;
@@ -18916,10 +18916,10 @@ var $1TgFO = parcelRequire("1TgFO");
    */ coalesceRefresh: function coalesceRefresh(callback, sync) {
         var self = this;
         if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
-            $1TgFO.util.arrayEach(self.refreshCallbacks, function(callback) {
+            $3ty2n.util.arrayEach(self.refreshCallbacks, function(callback) {
                 if (sync) callback(err);
                 else // callback could throw, so defer to ensure all callbacks are notified
-                $1TgFO.util.defer(function() {
+                $3ty2n.util.defer(function() {
                     callback(err);
                 });
             });
@@ -18935,21 +18935,21 @@ var $1TgFO = parcelRequire("1TgFO");
 });
 /**
  * @api private
- */ $1TgFO.Token.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
-    this.prototype.getPromise = $1TgFO.util.promisifyMethod('get', PromiseDependency);
-    this.prototype.refreshPromise = $1TgFO.util.promisifyMethod('refresh', PromiseDependency);
+ */ $3ty2n.Token.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+    this.prototype.getPromise = $3ty2n.util.promisifyMethod('get', PromiseDependency);
+    this.prototype.refreshPromise = $3ty2n.util.promisifyMethod('refresh', PromiseDependency);
 };
 /**
  * @api private
- */ $1TgFO.Token.deletePromisesFromClass = function deletePromisesFromClass() {
+ */ $3ty2n.Token.deletePromisesFromClass = function deletePromisesFromClass() {
     delete this.prototype.getPromise;
     delete this.prototype.refreshPromise;
 };
-$1TgFO.util.addPromises($1TgFO.Token);
+$3ty2n.util.addPromises($3ty2n.Token);
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * Creates a token provider chain that searches for token in a list of
  * token providers specified by the {providers} property.
@@ -18988,13 +18988,13 @@ var $1TgFO = parcelRequire("1TgFO");
  *     executed lazily when the provider needs to be checked for valid
  *     token. By default, this object will be set to the {defaultProviders}.
  *   @see defaultProviders
- */ $1TgFO.TokenProviderChain = $1TgFO.util.inherit($1TgFO.Token, {
+ */ $3ty2n.TokenProviderChain = $3ty2n.util.inherit($3ty2n.Token, {
     /**
    * Creates a new TokenProviderChain with a default set of providers
    * specified by {defaultProviders}.
    */ constructor: function TokenProviderChain(providers) {
         if (providers) this.providers = providers;
-        else this.providers = $1TgFO.TokenProviderChain.defaultProviders.slice(0);
+        else this.providers = $3ty2n.TokenProviderChain.defaultProviders.slice(0);
         this.resolveCallbacks = [];
     },
     /**
@@ -19037,7 +19037,7 @@ var $1TgFO = parcelRequire("1TgFO");
             var providers = self.providers.slice(0);
             function resolveNext(err, token) {
                 if (!err && token || index === providers.length) {
-                    $1TgFO.util.arrayEach(self.resolveCallbacks, function(callback) {
+                    $3ty2n.util.arrayEach(self.resolveCallbacks, function(callback) {
                         callback(err, token);
                     });
                     self.resolveCallbacks.length = 0;
@@ -19072,35 +19072,35 @@ var $1TgFO = parcelRequire("1TgFO");
  *   function () { return new AWS.SSOTokenProvider(); },
  * ]
  * ```
- */ $1TgFO.TokenProviderChain.defaultProviders = [];
+ */ $3ty2n.TokenProviderChain.defaultProviders = [];
 /**
  * @api private
- */ $1TgFO.TokenProviderChain.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
-    this.prototype.resolvePromise = $1TgFO.util.promisifyMethod('resolve', PromiseDependency);
+ */ $3ty2n.TokenProviderChain.addPromisesToClass = function addPromisesToClass(PromiseDependency) {
+    this.prototype.resolvePromise = $3ty2n.util.promisifyMethod('resolve', PromiseDependency);
 };
 /**
  * @api private
- */ $1TgFO.TokenProviderChain.deletePromisesFromClass = function deletePromisesFromClass() {
+ */ $3ty2n.TokenProviderChain.deletePromisesFromClass = function deletePromisesFromClass() {
     delete this.prototype.resolvePromise;
 };
-$1TgFO.util.addPromises($1TgFO.TokenProviderChain);
+$3ty2n.util.addPromises($3ty2n.TokenProviderChain);
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 
 
 
-var $1813c072f2d44053$var$iniLoader = $1TgFO.util.iniLoader;
+var $670e48369c36a731$var$iniLoader = $3ty2n.util.iniLoader;
 // Tracking refresh attempt to ensure refresh is not attempted more than once every 30 seconds.
-var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
+var $670e48369c36a731$var$lastRefreshAttemptTime = 0;
 /**
  * Throws error is key is not present in token object.
  *
  * @param token [Object] Object to be validated.
  * @param key [String] The key to be validated on the object.
- */ var $1813c072f2d44053$var$validateTokenKey = function validateTokenKey(token, key) {
-    if (!token[key]) throw $1TgFO.util.error(new Error('Key "' + key + '" not present in SSO Token'), {
+ */ var $670e48369c36a731$var$validateTokenKey = function validateTokenKey(token, key) {
+    if (!token[key]) throw $3ty2n.util.error(new Error('Key "' + key + '" not present in SSO Token'), {
         code: 'SSOTokenProviderFailure'
     });
 };
@@ -19111,11 +19111,11 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
  * @param currentTime [number] current time in milliseconds since ECMAScript epoch.
  * @param tokenExpireTime [number] token expire time in milliseconds since ECMAScript epoch.
  * @param callback [Function] Callback to call in case of error.
- */ var $1813c072f2d44053$var$refreshUnsuccessful = function refreshUnsuccessful(currentTime, tokenExpireTime, callback) {
+ */ var $670e48369c36a731$var$refreshUnsuccessful = function refreshUnsuccessful(currentTime, tokenExpireTime, callback) {
     if (tokenExpireTime > currentTime) // Cached token is still valid, return.
     callback(null);
     else // Token invalid, throw error requesting user to sso login.
-    throw $1TgFO.util.error(new Error('SSO Token refresh failed. Please log in using "aws sso login"'), {
+    throw $3ty2n.util.error(new Error('SSO Token refresh failed. Please log in using "aws sso login"'), {
         code: 'SSOTokenProviderFailure'
     });
 };
@@ -19144,7 +19144,7 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
  * ```
  *
  * @!macro nobrowser
- */ $1TgFO.SSOTokenProvider = $1TgFO.util.inherit($1TgFO.Token, {
+ */ $3ty2n.SSOTokenProvider = $3ty2n.util.inherit($3ty2n.Token, {
     /**
    * Expiry window of five minutes.
    */ expiryWindow: 300,
@@ -19158,11 +19158,11 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
    *   by the constructor. When the callback is called with no error, the
    *   token has been loaded successfully.
    */ constructor: function SSOTokenProvider(options) {
-        $1TgFO.Token.call(this);
+        $3ty2n.Token.call(this);
         options = options || {};
         this.expired = true;
-        this.profile = options.profile || process.env.AWS_PROFILE || $1TgFO.util.defaultProfile;
-        this.get(options.callback || $1TgFO.util.fn.noop);
+        this.profile = options.profile || process.env.AWS_PROFILE || $3ty2n.util.defaultProfile;
+        this.get(options.callback || $3ty2n.util.fn.noop);
     },
     /**
    * Reads sso_start_url from provided profile, and reads token from
@@ -19176,38 +19176,38 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
    * @api private
    */ load: function load(callback) {
         var self = this;
-        var profiles = $1813c072f2d44053$var$iniLoader.loadFrom({
+        var profiles = $670e48369c36a731$var$iniLoader.loadFrom({
             isConfig: true
         });
         var profile = profiles[this.profile] || {};
-        if (Object.keys(profile).length === 0) throw $1TgFO.util.error(new Error('Profile "' + this.profile + '" not found'), {
+        if (Object.keys(profile).length === 0) throw $3ty2n.util.error(new Error('Profile "' + this.profile + '" not found'), {
             code: 'SSOTokenProviderFailure'
         });
-        else if (!profile['sso_session']) throw $1TgFO.util.error(new Error('Profile "' + this.profile + '" is missing required property "sso_session".'), {
+        else if (!profile['sso_session']) throw $3ty2n.util.error(new Error('Profile "' + this.profile + '" is missing required property "sso_session".'), {
             code: 'SSOTokenProviderFailure'
         });
         var ssoSessionName = profile['sso_session'];
-        var ssoSessions = $1813c072f2d44053$var$iniLoader.loadSsoSessionsFrom();
+        var ssoSessions = $670e48369c36a731$var$iniLoader.loadSsoSessionsFrom();
         var ssoSession = ssoSessions[ssoSessionName];
-        if (!ssoSession) throw $1TgFO.util.error(new Error('Sso session "' + ssoSessionName + '" not found'), {
+        if (!ssoSession) throw $3ty2n.util.error(new Error('Sso session "' + ssoSessionName + '" not found'), {
             code: 'SSOTokenProviderFailure'
         });
-        else if (!ssoSession['sso_start_url']) throw $1TgFO.util.error(new Error('Sso session "' + this.profile + '" is missing required property "sso_start_url".'), {
+        else if (!ssoSession['sso_start_url']) throw $3ty2n.util.error(new Error('Sso session "' + this.profile + '" is missing required property "sso_start_url".'), {
             code: 'SSOTokenProviderFailure'
         });
-        else if (!ssoSession['sso_region']) throw $1TgFO.util.error(new Error('Sso session "' + this.profile + '" is missing required property "sso_region".'), {
+        else if (!ssoSession['sso_region']) throw $3ty2n.util.error(new Error('Sso session "' + this.profile + '" is missing required property "sso_region".'), {
             code: 'SSOTokenProviderFailure'
         });
-        var hasher = $8OLUh$crypto.createHash('sha1');
+        var hasher = $bPiTa$crypto.createHash('sha1');
         var fileName = hasher.update(ssoSessionName).digest('hex') + '.json';
-        var cachePath = $8OLUh$path.join($1813c072f2d44053$var$iniLoader.getHomeDir(), '.aws', 'sso', 'cache', fileName);
-        var tokenFromCache = JSON.parse($8OLUh$fs.readFileSync(cachePath));
-        if (!tokenFromCache) throw $1TgFO.util.error(new Error('Cached token not found. Please log in using "aws sso login" for profile "' + this.profile + '".'), {
+        var cachePath = $bPiTa$path.join($670e48369c36a731$var$iniLoader.getHomeDir(), '.aws', 'sso', 'cache', fileName);
+        var tokenFromCache = JSON.parse($bPiTa$fs.readFileSync(cachePath));
+        if (!tokenFromCache) throw $3ty2n.util.error(new Error('Cached token not found. Please log in using "aws sso login" for profile "' + this.profile + '".'), {
             code: 'SSOTokenProviderFailure'
         });
-        $1813c072f2d44053$var$validateTokenKey(tokenFromCache, 'accessToken');
-        $1813c072f2d44053$var$validateTokenKey(tokenFromCache, 'expiresAt');
-        var currentTime = $1TgFO.util.date.getDate().getTime();
+        $670e48369c36a731$var$validateTokenKey(tokenFromCache, 'accessToken');
+        $670e48369c36a731$var$validateTokenKey(tokenFromCache, 'expiresAt');
+        var currentTime = $3ty2n.util.date.getDate().getTime();
         var adjustedTime = new Date(currentTime + this.expiryWindow * 1000);
         var tokenExpireTime = new Date(tokenFromCache['expiresAt']);
         if (tokenExpireTime > adjustedTime) {
@@ -19219,15 +19219,15 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
             return;
         }
         // Skip new refresh, if last refresh was done within 30 seconds.
-        if (currentTime - $1813c072f2d44053$var$lastRefreshAttemptTime < 30000) {
-            $1813c072f2d44053$var$refreshUnsuccessful(currentTime, tokenExpireTime, callback);
+        if (currentTime - $670e48369c36a731$var$lastRefreshAttemptTime < 30000) {
+            $670e48369c36a731$var$refreshUnsuccessful(currentTime, tokenExpireTime, callback);
             return;
         }
         // Token is in expiry window, refresh from SSOOIDC.createToken() call.
-        $1813c072f2d44053$var$validateTokenKey(tokenFromCache, 'clientId');
-        $1813c072f2d44053$var$validateTokenKey(tokenFromCache, 'clientSecret');
-        $1813c072f2d44053$var$validateTokenKey(tokenFromCache, 'refreshToken');
-        if (!self.service || self.service.config.region !== ssoSession.sso_region) self.service = new $1TgFO.SSOOIDC({
+        $670e48369c36a731$var$validateTokenKey(tokenFromCache, 'clientId');
+        $670e48369c36a731$var$validateTokenKey(tokenFromCache, 'clientSecret');
+        $670e48369c36a731$var$validateTokenKey(tokenFromCache, 'refreshToken');
+        if (!self.service || self.service.config.region !== ssoSession.sso_region) self.service = new $3ty2n.SSOOIDC({
             region: ssoSession.sso_region
         });
         var params = {
@@ -19236,12 +19236,12 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
             refreshToken: tokenFromCache.refreshToken,
             grantType: 'refresh_token'
         };
-        $1813c072f2d44053$var$lastRefreshAttemptTime = $1TgFO.util.date.getDate().getTime();
+        $670e48369c36a731$var$lastRefreshAttemptTime = $3ty2n.util.date.getDate().getTime();
         self.service.createToken(params, function(err, data) {
-            if (err || !data) $1813c072f2d44053$var$refreshUnsuccessful(currentTime, tokenExpireTime, callback);
+            if (err || !data) $670e48369c36a731$var$refreshUnsuccessful(currentTime, tokenExpireTime, callback);
             else try {
-                $1813c072f2d44053$var$validateTokenKey(data, 'accessToken');
-                $1813c072f2d44053$var$validateTokenKey(data, 'expiresIn');
+                $670e48369c36a731$var$validateTokenKey(data, 'accessToken');
+                $670e48369c36a731$var$validateTokenKey(data, 'expiresIn');
                 self.expired = false;
                 self.token = data.accessToken;
                 self.expireTime = new Date(Date.now() + data.expiresIn * 1000);
@@ -19251,12 +19251,12 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
                     tokenFromCache.accessToken = data.accessToken;
                     tokenFromCache.expiresAt = self.expireTime.toISOString();
                     tokenFromCache.refreshToken = data.refreshToken;
-                    $8OLUh$fs.writeFileSync(cachePath, JSON.stringify(tokenFromCache, null, 2));
+                    $bPiTa$fs.writeFileSync(cachePath, JSON.stringify(tokenFromCache, null, 2));
                 } catch (error) {
                 // Swallow error if unable to write token to file.
                 }
             } catch (error) {
-                $1813c072f2d44053$var$refreshUnsuccessful(currentTime, tokenExpireTime, callback);
+                $670e48369c36a731$var$refreshUnsuccessful(currentTime, tokenExpireTime, callback);
             }
         });
     },
@@ -19270,8 +19270,8 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
    *   @param err [Error] if an error occurred, this value will be filled.
    * @see get
    */ refresh: function refresh(callback) {
-        $1813c072f2d44053$var$iniLoader.clearCachedFiles();
-        this.coalesceRefresh(callback || $1TgFO.util.fn.callback);
+        $670e48369c36a731$var$iniLoader.clearCachedFiles();
+        this.coalesceRefresh(callback || $3ty2n.util.fn.callback);
     }
 });
 
@@ -19280,25 +19280,25 @@ var $1813c072f2d44053$var$lastRefreshAttemptTime = 0;
 // If this changes, please update documentation for
 // AWS.TokenProviderChain.defaultProviders in
 // token/token_provider_chain.js
-$6c04b041a5f935e8$var$AWS.TokenProviderChain.defaultProviders = [
+$60e31571e9a15610$var$AWS.TokenProviderChain.defaultProviders = [
     function() {
-        return new $6c04b041a5f935e8$var$AWS.SSOTokenProvider();
+        return new $60e31571e9a15610$var$AWS.SSOTokenProvider();
     }
 ];
-var $6c04b041a5f935e8$var$getRegion = function() {
+var $60e31571e9a15610$var$getRegion = function() {
     var env = process.env;
     var region = env.AWS_REGION || env.AMAZON_REGION;
-    if (env[$6c04b041a5f935e8$var$AWS.util.configOptInEnv]) {
+    if (env[$60e31571e9a15610$var$AWS.util.configOptInEnv]) {
         var toCheck = [
             {
-                filename: env[$6c04b041a5f935e8$var$AWS.util.sharedCredentialsFileEnv]
+                filename: env[$60e31571e9a15610$var$AWS.util.sharedCredentialsFileEnv]
             },
             {
                 isConfig: true,
-                filename: env[$6c04b041a5f935e8$var$AWS.util.sharedConfigFileEnv]
+                filename: env[$60e31571e9a15610$var$AWS.util.sharedConfigFileEnv]
             }
         ];
-        var iniLoader = $6c04b041a5f935e8$var$AWS.util.iniLoader;
+        var iniLoader = $60e31571e9a15610$var$AWS.util.iniLoader;
         while(!region && toCheck.length){
             var configFile = {};
             var fileInfo = toCheck.shift();
@@ -19307,46 +19307,46 @@ var $6c04b041a5f935e8$var$getRegion = function() {
             } catch (err) {
                 if (fileInfo.isConfig) throw err;
             }
-            var profile = configFile[env.AWS_PROFILE || $6c04b041a5f935e8$var$AWS.util.defaultProfile];
+            var profile = configFile[env.AWS_PROFILE || $60e31571e9a15610$var$AWS.util.defaultProfile];
             region = profile && profile.region;
         }
     }
     return region;
 };
-var $6c04b041a5f935e8$var$getBooleanValue = function(value) {
+var $60e31571e9a15610$var$getBooleanValue = function(value) {
     return value === 'true' ? true : value === 'false' ? false : undefined;
 };
-var $6c04b041a5f935e8$var$USE_FIPS_ENDPOINT_CONFIG_OPTIONS = {
+var $60e31571e9a15610$var$USE_FIPS_ENDPOINT_CONFIG_OPTIONS = {
     environmentVariableSelector: function(env) {
-        return $6c04b041a5f935e8$var$getBooleanValue(env['AWS_USE_FIPS_ENDPOINT']);
+        return $60e31571e9a15610$var$getBooleanValue(env['AWS_USE_FIPS_ENDPOINT']);
     },
     configFileSelector: function(profile) {
-        return $6c04b041a5f935e8$var$getBooleanValue(profile['use_fips_endpoint']);
+        return $60e31571e9a15610$var$getBooleanValue(profile['use_fips_endpoint']);
     },
     default: false
 };
-var $6c04b041a5f935e8$var$USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS = {
+var $60e31571e9a15610$var$USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS = {
     environmentVariableSelector: function(env) {
-        return $6c04b041a5f935e8$var$getBooleanValue(env['AWS_USE_DUALSTACK_ENDPOINT']);
+        return $60e31571e9a15610$var$getBooleanValue(env['AWS_USE_DUALSTACK_ENDPOINT']);
     },
     configFileSelector: function(profile) {
-        return $6c04b041a5f935e8$var$getBooleanValue(profile['use_dualstack_endpoint']);
+        return $60e31571e9a15610$var$getBooleanValue(profile['use_dualstack_endpoint']);
     },
     default: false
 };
 // Update configuration keys
-$6c04b041a5f935e8$var$AWS.util.update($6c04b041a5f935e8$var$AWS.Config.prototype.keys, {
+$60e31571e9a15610$var$AWS.util.update($60e31571e9a15610$var$AWS.Config.prototype.keys, {
     credentials: function() {
         var credentials = null;
-        new $6c04b041a5f935e8$var$AWS.CredentialProviderChain([
+        new $60e31571e9a15610$var$AWS.CredentialProviderChain([
             function() {
-                return new $6c04b041a5f935e8$var$AWS.EnvironmentCredentials('AWS');
+                return new $60e31571e9a15610$var$AWS.EnvironmentCredentials('AWS');
             },
             function() {
-                return new $6c04b041a5f935e8$var$AWS.EnvironmentCredentials('AMAZON');
+                return new $60e31571e9a15610$var$AWS.EnvironmentCredentials('AMAZON');
             },
             function() {
-                return new $6c04b041a5f935e8$var$AWS.SharedIniFileCredentials({
+                return new $60e31571e9a15610$var$AWS.SharedIniFileCredentials({
                     disableAssumeRole: true
                 });
             }
@@ -19356,52 +19356,52 @@ $6c04b041a5f935e8$var$AWS.util.update($6c04b041a5f935e8$var$AWS.Config.prototype
         return credentials;
     },
     credentialProvider: function() {
-        return new $6c04b041a5f935e8$var$AWS.CredentialProviderChain();
+        return new $60e31571e9a15610$var$AWS.CredentialProviderChain();
     },
     logger: function() {
         return process.env.AWSJS_DEBUG ? console : null;
     },
     region: function() {
-        var region = $6c04b041a5f935e8$var$getRegion();
-        return region ? $6c04b041a5f935e8$var$getRealRegion(region) : undefined;
+        var region = $60e31571e9a15610$var$getRegion();
+        return region ? $60e31571e9a15610$var$getRealRegion(region) : undefined;
     },
     tokenProvider: function() {
-        return new $6c04b041a5f935e8$var$AWS.TokenProviderChain();
+        return new $60e31571e9a15610$var$AWS.TokenProviderChain();
     },
     useFipsEndpoint: function() {
-        var region = $6c04b041a5f935e8$var$getRegion();
-        return $6c04b041a5f935e8$var$isFipsRegion(region) ? true : $jfMGq.loadConfig($6c04b041a5f935e8$var$USE_FIPS_ENDPOINT_CONFIG_OPTIONS);
+        var region = $60e31571e9a15610$var$getRegion();
+        return $60e31571e9a15610$var$isFipsRegion(region) ? true : $KHT0q.loadConfig($60e31571e9a15610$var$USE_FIPS_ENDPOINT_CONFIG_OPTIONS);
     },
     useDualstackEndpoint: function() {
-        return $jfMGq.loadConfig($6c04b041a5f935e8$var$USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS);
+        return $KHT0q.loadConfig($60e31571e9a15610$var$USE_DUALSTACK_ENDPOINT_CONFIG_OPTIONS);
     }
 });
 // Reset configuration
-$6c04b041a5f935e8$var$AWS.config = new $6c04b041a5f935e8$var$AWS.Config();
+$60e31571e9a15610$var$AWS.config = new $60e31571e9a15610$var$AWS.Config();
 
 
 
-var $1TgFO = parcelRequire("1TgFO");
-var $6994db0a3b25c214$var$Service = $1TgFO.Service;
-var $6994db0a3b25c214$var$apiLoader = $1TgFO.apiLoader;
-$6994db0a3b25c214$var$apiLoader.services['sts'] = {};
-$1TgFO.STS = $6994db0a3b25c214$var$Service.defineService('sts', [
+var $3ty2n = parcelRequire("3ty2n");
+var $1d7b795e21cccba4$var$Service = $3ty2n.Service;
+var $1d7b795e21cccba4$var$apiLoader = $3ty2n.apiLoader;
+$1d7b795e21cccba4$var$apiLoader.services['sts'] = {};
+$3ty2n.STS = $1d7b795e21cccba4$var$Service.defineService('sts', [
     '2011-06-15'
 ]);
 
-var $1TgFO = parcelRequire("1TgFO");
-var $d8a4cec525f7b0a5$exports = {};
+var $3ty2n = parcelRequire("3ty2n");
+var $3142bf43aac79757$exports = {};
 
-var $1TgFO = parcelRequire("1TgFO");
+var $3ty2n = parcelRequire("3ty2n");
 /**
  * @api private
- */ function $d8a4cec525f7b0a5$var$validateRegionalEndpointsFlagValue(configValue, errorOptions) {
+ */ function $3142bf43aac79757$var$validateRegionalEndpointsFlagValue(configValue, errorOptions) {
     if (typeof configValue !== 'string') return undefined;
     else if ([
         'legacy',
         'regional'
     ].indexOf(configValue.toLowerCase()) >= 0) return configValue.toLowerCase();
-    else throw $1TgFO.util.error(new Error(), errorOptions);
+    else throw $3ty2n.util.error(new Error(), errorOptions);
 }
 /**
  * Resolve the configuration value for regional endpoint from difference sources: client
@@ -19414,22 +19414,22 @@ var $1TgFO = parcelRequire("1TgFO");
  *  - clientConfig: name of client configuration property that refers to the config
  *
  * @api private
- */ function $d8a4cec525f7b0a5$var$resolveRegionalEndpointsFlag(originalConfig, options) {
+ */ function $3142bf43aac79757$var$resolveRegionalEndpointsFlag(originalConfig, options) {
     originalConfig = originalConfig || {};
     //validate config value
     var resolved;
     if (originalConfig[options.clientConfig]) {
-        resolved = $d8a4cec525f7b0a5$var$validateRegionalEndpointsFlagValue(originalConfig[options.clientConfig], {
+        resolved = $3142bf43aac79757$var$validateRegionalEndpointsFlagValue(originalConfig[options.clientConfig], {
             code: 'InvalidConfiguration',
             message: 'invalid "' + options.clientConfig + '" configuration. Expect "legacy" ' + ' or "regional". Got "' + originalConfig[options.clientConfig] + '".'
         });
         if (resolved) return resolved;
     }
-    if (!$1TgFO.util.isNode()) return resolved;
+    if (!$3ty2n.util.isNode()) return resolved;
     //validate environmental variable
     if (Object.prototype.hasOwnProperty.call(process.env, options.env)) {
         var envFlag = process.env[options.env];
-        resolved = $d8a4cec525f7b0a5$var$validateRegionalEndpointsFlagValue(envFlag, {
+        resolved = $3142bf43aac79757$var$validateRegionalEndpointsFlagValue(envFlag, {
             code: 'InvalidEnvironmentalVariable',
             message: 'invalid ' + options.env + ' environmental variable. Expect "legacy" ' + ' or "regional". Got "' + process.env[options.env] + '".'
         });
@@ -19438,12 +19438,12 @@ var $1TgFO = parcelRequire("1TgFO");
     //validate shared config file
     var profile = {};
     try {
-        var profiles = $1TgFO.util.getProfilesFromSharedConfig($1TgFO.util.iniLoader);
-        profile = profiles[process.env.AWS_PROFILE || $1TgFO.util.defaultProfile];
+        var profiles = $3ty2n.util.getProfilesFromSharedConfig($3ty2n.util.iniLoader);
+        profile = profiles[process.env.AWS_PROFILE || $3ty2n.util.defaultProfile];
     } catch (e) {}
     if (profile && Object.prototype.hasOwnProperty.call(profile, options.sharedConfig)) {
         var fileFlag = profile[options.sharedConfig];
-        resolved = $d8a4cec525f7b0a5$var$validateRegionalEndpointsFlagValue(fileFlag, {
+        resolved = $3142bf43aac79757$var$validateRegionalEndpointsFlagValue(fileFlag, {
             code: 'InvalidConfiguration',
             message: 'invalid ' + options.sharedConfig + ' profile config. Expect "legacy" ' + ' or "regional". Got "' + profile[options.sharedConfig] + '".'
         });
@@ -19451,12 +19451,12 @@ var $1TgFO = parcelRequire("1TgFO");
     }
     return resolved;
 }
-$d8a4cec525f7b0a5$exports = $d8a4cec525f7b0a5$var$resolveRegionalEndpointsFlag;
+$3142bf43aac79757$exports = $3142bf43aac79757$var$resolveRegionalEndpointsFlag;
 
 
-var $8c45167c41ec47df$var$ENV_REGIONAL_ENDPOINT_ENABLED = 'AWS_STS_REGIONAL_ENDPOINTS';
-var $8c45167c41ec47df$var$CONFIG_REGIONAL_ENDPOINT_ENABLED = 'sts_regional_endpoints';
-$1TgFO.util.update($1TgFO.STS.prototype, {
+var $f4fcfe008ceed281$var$ENV_REGIONAL_ENDPOINT_ENABLED = 'AWS_STS_REGIONAL_ENDPOINTS';
+var $f4fcfe008ceed281$var$CONFIG_REGIONAL_ENDPOINT_ENABLED = 'sts_regional_endpoints';
+$3ty2n.util.update($3ty2n.STS.prototype, {
     /**
    * @overload credentialsFrom(data, credentials = null)
    *   Creates a credentials object from STS response data containing
@@ -19483,7 +19483,7 @@ $1TgFO.util.update($1TgFO.STS.prototype, {
    *   @see AWS.TemporaryCredentials
    */ credentialsFrom: function credentialsFrom(data, credentials) {
         if (!data) return null;
-        if (!credentials) credentials = new $1TgFO.TemporaryCredentials();
+        if (!credentials) credentials = new $3ty2n.TemporaryCredentials();
         credentials.expired = false;
         credentials.accessKeyId = data.Credentials.AccessKeyId;
         credentials.secretAccessKey = data.Credentials.SecretAccessKey;
@@ -19507,14 +19507,14 @@ $1TgFO.util.update($1TgFO.STS.prototype, {
    */ optInRegionalEndpoint: function optInRegionalEndpoint(req) {
         var service = req.service;
         var config = service.config;
-        config.stsRegionalEndpoints = $d8a4cec525f7b0a5$exports(service._originalConfig, {
-            env: $8c45167c41ec47df$var$ENV_REGIONAL_ENDPOINT_ENABLED,
-            sharedConfig: $8c45167c41ec47df$var$CONFIG_REGIONAL_ENDPOINT_ENABLED,
+        config.stsRegionalEndpoints = $3142bf43aac79757$exports(service._originalConfig, {
+            env: $f4fcfe008ceed281$var$ENV_REGIONAL_ENDPOINT_ENABLED,
+            sharedConfig: $f4fcfe008ceed281$var$CONFIG_REGIONAL_ENDPOINT_ENABLED,
             clientConfig: 'stsRegionalEndpoints'
         });
         if (config.stsRegionalEndpoints === 'regional' && service.isGlobalEndpoint) {
             //client will throw if region is not supplied; request will be signed with specified region
-            if (!config.region) throw $1TgFO.util.error(new Error(), {
+            if (!config.region) throw $3ty2n.util.error(new Error(), {
                 code: 'ConfigError',
                 message: 'Missing region in config'
             });
@@ -19529,19 +19529,19 @@ $1TgFO.util.update($1TgFO.STS.prototype, {
 
 
 
-Object.defineProperty($6994db0a3b25c214$var$apiLoader.services['sts'], '2011-06-15', {
+Object.defineProperty($1d7b795e21cccba4$var$apiLoader.services['sts'], '2011-06-15', {
     get: function get() {
-        var model = (parcelRequire("3uUKq"));
-        model.paginators = (parcelRequire("a7Qds")).pagination;
+        var model = (parcelRequire("ikZsI"));
+        model.paginators = (parcelRequire("jwypX")).pagination;
         return model;
     },
     enumerable: true,
     configurable: true
 });
-$6994db0a3b25c214$exports = $1TgFO.STS;
+$1d7b795e21cccba4$exports = $3ty2n.STS;
 
 
-const $8284df8ed7bca224$var$client = new (0, (/*@__PURE__*/$parcel$interopDefault($6994db0a3b25c214$exports)))();
-const $8284df8ed7bca224$export$c3c52e219617878 = async ()=>$8284df8ed7bca224$var$client.getCallerIdentity().promise();
+const $33a92af1f0d806bb$var$client = new (0, (/*@__PURE__*/$parcel$interopDefault($1d7b795e21cccba4$exports)))();
+const $33a92af1f0d806bb$export$c3c52e219617878 = async ()=>$33a92af1f0d806bb$var$client.getCallerIdentity().promise();
 
 
