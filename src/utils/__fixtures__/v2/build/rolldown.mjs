@@ -18410,7 +18410,7 @@ var require_sts = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 
 //#endregion
 //#region src/utils/__fixtures__/v2/index.js
-var import_sts = /* @__PURE__ */ __toESM(require_sts());
+var import_sts = /* @__PURE__ */ __toESM(require_sts(), 1);
 const client = new import_sts.default();
 const handler = async () => client.getCallerIdentity().promise();
 

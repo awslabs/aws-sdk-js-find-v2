@@ -24841,7 +24841,7 @@ var require_dist_cjs56 = __commonJS({
 });
 
 // src/utils/__fixtures__/v3/index.js
-var import_client_sts = __toESM(require_dist_cjs56());
+var import_client_sts = __toESM(require_dist_cjs56(), 1);
 var client = new import_client_sts.STSClient();
 var handler = async () => client.send(new import_client_sts.GetCallerIdentityCommand());
 export {

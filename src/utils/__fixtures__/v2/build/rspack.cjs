@@ -23600,18 +23600,6 @@ return module.exports;
 
 }
 
-// webpack/runtime/compat_get_default_export
-(() => {
-// getDefaultExport function for compatibility with non-ESM modules
-__webpack_require__.n = (module) => {
-	var getter = module && module.__esModule ?
-		() => (module['default']) :
-		() => (module);
-	__webpack_require__.d(getter, { a: getter });
-	return getter;
-};
-
-})();
 // webpack/runtime/define_property_getters
 (() => {
 __webpack_require__.d = (exports, definition) => {
@@ -23645,10 +23633,9 @@ __webpack_require__.d(__webpack_exports__, {
   handler: () => (handler)
 });
 /* import */ var aws_sdk_clients_sts_js__rspack_import_0 = __webpack_require__(2788);
-/* import */ var aws_sdk_clients_sts_js__rspack_import_0_default = /*#__PURE__*/__webpack_require__.n(aws_sdk_clients_sts_js__rspack_import_0);
 
 
-const client = new (aws_sdk_clients_sts_js__rspack_import_0_default())();
+const client = new aws_sdk_clients_sts_js__rspack_import_0();
 
 const handler = async () => client.getCallerIdentity().promise();
 

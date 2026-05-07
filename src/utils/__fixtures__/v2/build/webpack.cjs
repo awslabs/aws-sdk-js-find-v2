@@ -24107,18 +24107,6 @@ module.exports = /*#__PURE__*/JSON.parse('{"rules":{"*/*":{"endpoint":"{service}
 /******/ 	}
 /******/ 	
 /************************************************************************/
-/******/ 	/* webpack/runtime/compat get default export */
-/******/ 	(() => {
-/******/ 		// getDefaultExport function for compatibility with non-harmony modules
-/******/ 		__webpack_require__.n = (module) => {
-/******/ 			var getter = module && module.__esModule ?
-/******/ 				() => (module['default']) :
-/******/ 				() => (module);
-/******/ 			__webpack_require__.d(getter, { a: getter });
-/******/ 			return getter;
-/******/ 		};
-/******/ 	})();
-/******/ 	
 /******/ 	/* webpack/runtime/define property getters */
 /******/ 	(() => {
 /******/ 		// define getter functions for harmony exports
@@ -24157,10 +24145,9 @@ __webpack_require__.r(__webpack_exports__);
 /* harmony export */   handler: () => (/* binding */ handler)
 /* harmony export */ });
 /* harmony import */ var aws_sdk_clients_sts_js__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(2788);
-/* harmony import */ var aws_sdk_clients_sts_js__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(aws_sdk_clients_sts_js__WEBPACK_IMPORTED_MODULE_0__);
 
 
-const client = new (aws_sdk_clients_sts_js__WEBPACK_IMPORTED_MODULE_0___default())();
+const client = new aws_sdk_clients_sts_js__WEBPACK_IMPORTED_MODULE_0__();
 
 const handler = async () => client.getCallerIdentity().promise();
 
