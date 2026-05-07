@@ -1,1 +1,0 @@
-import{STSClient as e,GetCallerIdentityCommand as t}from"@aws-sdk/client-sts";Object.defineProperty({},"handler",{get:()=>a,set:void 0,enumerable:!0,configurable:!0});let n=new e,a=async()=>n.send(new t);export{a as handler};
