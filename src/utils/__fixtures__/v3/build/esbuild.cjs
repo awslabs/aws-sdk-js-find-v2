@@ -24841,7 +24841,7 @@ __export(index_exports, {
   handler: () => handler
 });
 module.exports = __toCommonJS(index_exports);
-var import_client_sts = __toESM(require_dist_cjs56());
+var import_client_sts = __toESM(require_dist_cjs56(), 1);
 var client = new import_client_sts.STSClient();
 var handler = async () => client.send(new import_client_sts.GetCallerIdentityCommand());
 // Annotate the CommonJS export names for ESM import in node:

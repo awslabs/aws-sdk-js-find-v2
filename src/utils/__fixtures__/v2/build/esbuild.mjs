@@ -22303,7 +22303,7 @@ var require_sts2 = __commonJS({
 });
 
 // src/utils/__fixtures__/v2/index.js
-var import_sts = __toESM(require_sts2());
+var import_sts = __toESM(require_sts2(), 1);
 var client = new import_sts.default();
 var handler = async () => client.getCallerIdentity().promise();
 export {

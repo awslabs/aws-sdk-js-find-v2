@@ -22308,7 +22308,7 @@ __export(index_exports, {
   handler: () => handler
 });
 module.exports = __toCommonJS(index_exports);
-var import_sts = __toESM(require_sts2());
+var import_sts = __toESM(require_sts2(), 1);
 var client = new import_sts.default();
 var handler = async () => client.getCallerIdentity().promise();
 // Annotate the CommonJS export names for ESM import in node:

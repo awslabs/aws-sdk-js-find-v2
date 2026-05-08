@@ -3,9 +3,6 @@ import { readdir } from "node:fs/promises";
 import { join } from "node:path";
 import { promisify } from "node:util";
 
-import { Version } from "./configs/utils/constants.js";
-import { getFixturesDir } from "./configs/utils/getFixturesDir.js";
-
 const execAsync = promisify(exec);
 
 const configDir = join(import.meta.dirname, "configs");
@@ -24,11 +21,4 @@ for (const fileName of jsFiles) {
 
   console.log(`[${bundlerName}] Running with config '${fileName}'`);
   await execAsync(`npx ${bundlerName} -c ${filePath}`);
-}
-
-// Parcel uses configuration from package.json
-for (const version of Object.values(Version)) {
-  const bundlerName = "parcel";
-  console.log(`[${bundlerName}] Running for '${version}'`);
-  await execAsync(`npx parcel build ${join(getFixturesDir(), version)}`);
 }
