@@ -9820,9 +9820,9 @@ var require_core = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/rng.js
+// node_modules/uuid/dist/rng.js
 var require_rng = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/rng.js"(exports2) {
+  "node_modules/uuid/dist/rng.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -9838,9 +9838,9 @@ var require_rng = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/bytesToUuid.js
+// node_modules/uuid/dist/bytesToUuid.js
 var require_bytesToUuid = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/bytesToUuid.js"(exports2) {
+  "node_modules/uuid/dist/bytesToUuid.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -9861,9 +9861,9 @@ var require_bytesToUuid = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/v1.js
+// node_modules/uuid/dist/v1.js
 var require_v1 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/v1.js"(exports2) {
+  "node_modules/uuid/dist/v1.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -9931,9 +9931,9 @@ var require_v1 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/v35.js
+// node_modules/uuid/dist/v35.js
 var require_v35 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/v35.js"(exports2) {
+  "node_modules/uuid/dist/v35.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -9991,9 +9991,9 @@ var require_v35 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/md5.js
+// node_modules/uuid/dist/md5.js
 var require_md5 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/md5.js"(exports2) {
+  "node_modules/uuid/dist/md5.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -10016,9 +10016,9 @@ var require_md5 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/v3.js
+// node_modules/uuid/dist/v3.js
 var require_v32 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/v3.js"(exports2) {
+  "node_modules/uuid/dist/v3.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -10035,9 +10035,9 @@ var require_v32 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/v4.js
+// node_modules/uuid/dist/v4.js
 var require_v42 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/v4.js"(exports2) {
+  "node_modules/uuid/dist/v4.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -10070,9 +10070,9 @@ var require_v42 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/sha1.js
+// node_modules/uuid/dist/sha1.js
 var require_sha1 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/sha1.js"(exports2) {
+  "node_modules/uuid/dist/sha1.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -10095,9 +10095,9 @@ var require_sha1 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/v5.js
+// node_modules/uuid/dist/v5.js
 var require_v5 = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/v5.js"(exports2) {
+  "node_modules/uuid/dist/v5.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true
@@ -10114,9 +10114,9 @@ var require_v5 = __commonJS({
   }
 });
 
-// node_modules/aws-sdk/node_modules/uuid/dist/index.js
+// node_modules/uuid/dist/index.js
 var require_dist = __commonJS({
-  "node_modules/aws-sdk/node_modules/uuid/dist/index.js"(exports2) {
+  "node_modules/uuid/dist/index.js"(exports2) {
     "use strict";
     Object.defineProperty(exports2, "__esModule", {
       value: true

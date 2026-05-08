@@ -8301,7 +8301,7 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/rng.js
+//#region node_modules/uuid/dist/rng.js
 var require_rng = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = rng;
@@ -8315,7 +8315,7 @@ var require_rng = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/bytesToUuid.js
+//#region node_modules/uuid/dist/bytesToUuid.js
 var require_bytesToUuid = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8356,7 +8356,7 @@ var require_bytesToUuid = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/v1.js
+//#region node_modules/uuid/dist/v1.js
 var require_v1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8417,7 +8417,7 @@ var require_v1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/v35.js
+//#region node_modules/uuid/dist/v35.js
 var require_v35 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = _default;
@@ -8466,7 +8466,7 @@ var require_v35 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/md5.js
+//#region node_modules/uuid/dist/md5.js
 var require_md5 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8484,7 +8484,7 @@ var require_md5 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/v3.js
+//#region node_modules/uuid/dist/v3.js
 var require_v3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8498,7 +8498,7 @@ var require_v3 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/v4.js
+//#region node_modules/uuid/dist/v4.js
 var require_v4 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8525,7 +8525,7 @@ var require_v4 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/sha1.js
+//#region node_modules/uuid/dist/sha1.js
 var require_sha1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8543,7 +8543,7 @@ var require_sha1 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/v5.js
+//#region node_modules/uuid/dist/v5.js
 var require_v5 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	exports.default = void 0;
@@ -8557,7 +8557,7 @@ var require_v5 = /* @__PURE__ */ __commonJSMin(((exports) => {
 }));
 
 //#endregion
-//#region node_modules/aws-sdk/node_modules/uuid/dist/index.js
+//#region node_modules/uuid/dist/index.js
 var require_dist = /* @__PURE__ */ __commonJSMin(((exports) => {
 	Object.defineProperty(exports, "__esModule", { value: true });
 	Object.defineProperty(exports, "v1", {
