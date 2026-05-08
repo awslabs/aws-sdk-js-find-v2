@@ -43,7 +43,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* import */ var _smithy_protocol_http__rspack_import_1 = __webpack_require__(7324);
 /* import */ var _utils__rspack_import_2 = __webpack_require__(369);
-/* import */ var _AwsSdkSigV4Signer__rspack_import_0 = __webpack_require__(1253);
+/* import */ var _AwsSdkSigV4Signer__rspack_import_0 = __webpack_require__(5719);
 
 
 
@@ -67,12 +67,12 @@ class AwsSdkSigV4ASigner extends _AwsSdkSigV4Signer__rspack_import_0/* .AwsSdkSi
 
 
 },
-1253(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5719(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  pz: () => (/* binding */ validateSigningProperties),
-  f2: () => (/* binding */ AwsSdkSigV4Signer)
+  f2: () => (/* binding */ AwsSdkSigV4Signer),
+  pz: () => (/* binding */ validateSigningProperties)
 });
 
 // UNUSED EXPORTS: AWSSDKSigV4Signer
@@ -177,7 +177,7 @@ const AWSSDKSigV4Signer = (/* unused pure expression or super */ null && (AwsSdk
 
 
 },
-834(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3854(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -251,7 +251,7 @@ const NODE_SIGV4A_CONFIG_OPTIONS = {
 
 
 },
-2709(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+923(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -322,7 +322,7 @@ const memoizeIdentityProvider = (provider, isExpired, requiresRefresh) => {
 };
 
 // EXTERNAL MODULE: ./node_modules/@smithy/signature-v4/dist-es/SignatureV4.js + 11 modules
-var SignatureV4 = __webpack_require__(93);
+var SignatureV4 = __webpack_require__(1815);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js
 
 
@@ -671,7 +671,7 @@ class UnionSerde {
 
 
 },
-6594(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5140(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -716,9 +716,9 @@ var split_header = __webpack_require__(8269);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpRequest.js
 var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-stream/dist-es/sdk-stream-mixin.js + 3 modules
-var sdk_stream_mixin = __webpack_require__(8838);
+var sdk_stream_mixin = __webpack_require__(3207);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/collect-stream-body.js + 1 modules
-var collect_stream_body = __webpack_require__(9253);
+var collect_stream_body = __webpack_require__(5790);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/extended-encode-uri-component.js
 var extended_encode_uri_component = __webpack_require__(7916);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/HttpProtocol.js
@@ -1017,7 +1017,7 @@ class HttpBindingProtocol extends HttpProtocol/* .HttpProtocol */.t {
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/date-utils.js + 1 modules
-var date_utils = __webpack_require__(1885);
+var date_utils = __webpack_require__(3694);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/quote-header.js
 function quoteHeader(part) {
     if (part.includes(",") || part.includes('"')) {
@@ -1029,7 +1029,7 @@ function quoteHeader(part) {
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/lazy-json.js
 var lazy_json = __webpack_require__(6724);
 // EXTERNAL MODULE: ./node_modules/@smithy/uuid/dist-es/v4.js + 1 modules
-var v4 = __webpack_require__(3983);
+var v4 = __webpack_require__(1040);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
 var toBase64 = __webpack_require__(9718);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/SerdeContext.js
@@ -1169,7 +1169,7 @@ var toUtf8 = __webpack_require__(7638);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-utf8/dist-es/fromUtf8.js
 var fromUtf8 = __webpack_require__(7459);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/serde/FromStringShapeDeserializer.js + 1 modules
-var FromStringShapeDeserializer = __webpack_require__(8990);
+var FromStringShapeDeserializer = __webpack_require__(5865);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/serde/HttpInterceptingShapeDeserializer.js
 
 
@@ -1800,7 +1800,7 @@ class AwsRestJsonProtocol extends HttpBindingProtocol {
 
 
 },
-3392(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1364(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -1812,7 +1812,7 @@ var NormalizedSchema = __webpack_require__(8754);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpRequest.js
 var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/collect-stream-body.js + 1 modules
-var collect_stream_body = __webpack_require__(9253);
+var collect_stream_body = __webpack_require__(5790);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/HttpProtocol.js
 var HttpProtocol = __webpack_require__(6935);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/RpcProtocol.js
@@ -7402,7 +7402,7 @@ function parseXML(xmlString) {
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/serde/FromStringShapeDeserializer.js + 1 modules
-var FromStringShapeDeserializer = __webpack_require__(8990);
+var FromStringShapeDeserializer = __webpack_require__(5865);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/smithy-client/dist-es/get-value-from-text-node.js
 const getValueFromTextNode = (obj) => {
     const textNodeName = "#text";
@@ -7583,11 +7583,11 @@ var determineTimestampFormat = __webpack_require__(5761);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/protocols/extended-encode-uri-component.js
 var extended_encode_uri_component = __webpack_require__(7916);
 // EXTERNAL MODULE: ./node_modules/@smithy/uuid/dist-es/v4.js + 1 modules
-var v4 = __webpack_require__(3983);
+var v4 = __webpack_require__(1040);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/value/NumericValue.js
 var NumericValue = __webpack_require__(5121);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/date-utils.js + 1 modules
-var date_utils = __webpack_require__(1885);
+var date_utils = __webpack_require__(3694);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
 var toBase64 = __webpack_require__(9718);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/QueryShapeSerializer.js
@@ -7969,7 +7969,7 @@ __webpack_require__.d(__webpack_exports__, {
 
 
 },
-4161(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+8525(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -7979,7 +7979,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
-var node_http_handler = __webpack_require__(3437);
+var node_http_handler = __webpack_require__(934);
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
 var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: external "node:fs/promises"
@@ -8032,9 +8032,9 @@ const checkUrl = (url, logger) => {
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpRequest.js
 var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/date-utils.js + 1 modules
-var date_utils = __webpack_require__(1885);
+var date_utils = __webpack_require__(3694);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-stream/dist-es/sdk-stream-mixin.js + 3 modules
-var sdk_stream_mixin = __webpack_require__(8838);
+var sdk_stream_mixin = __webpack_require__(3207);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/credential-provider-http/dist-es/fromHttp/requestHelpers.js
 
 
@@ -8173,7 +8173,7 @@ Set AWS_CONTAINER_CREDENTIALS_FULL_URI or AWS_CONTAINER_CREDENTIALS_RELATIVE_URI
 
 
 },
-6690(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5291(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -8181,7 +8181,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseKnownFiles.js + 1 modules
-var parseKnownFiles = __webpack_require__(8444);
+var parseKnownFiles = __webpack_require__(5040);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getProfileName.js
 var getProfileName = __webpack_require__(6437);
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
@@ -8196,14 +8196,14 @@ var chain = __webpack_require__(8062);
 const resolveCredentialSource = (credentialSource, profileName, logger) => {
     const sourceProvidersMap = {
         EcsContainer: async (options) => {
-            const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 4161));
-            const { fromContainerMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
+            const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8525));
+            const { fromContainerMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8019));
             logger?.debug("@aws-sdk/credential-provider-ini - credential_source is EcsContainer");
             return async () => (0,chain/* .chain */.c)(fromHttp(options ?? {}), fromContainerMetadata(options))().then(setNamedProvider);
         },
         Ec2InstanceMetadata: async (options) => {
             logger?.debug("@aws-sdk/credential-provider-ini - credential_source is Ec2InstanceMetadata");
-            const { fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
+            const { fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8019));
             return async () => fromInstanceMetadata(options)().then(setNamedProvider);
         },
         Environment: async (options) => {
@@ -8255,7 +8255,7 @@ const resolveAssumeRoleCredentials = async (profileName, profiles, options, call
     const profileData = profiles[profileName];
     const { source_profile, region } = profileData;
     if (!options.roleAssumer) {
-        const { getDefaultRoleAssumer } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6383));
+        const { getDefaultRoleAssumer } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5756));
         options.roleAssumer = getDefaultRoleAssumer({
             ...options.clientConfig,
             credentialProviderLogger: options.logger,
@@ -8361,7 +8361,7 @@ class LoginCredentialsFetcher {
         return this.profileData.login_session;
     }
     async refresh(token) {
-        const { SigninClient, CreateOAuth2TokenCommand } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 9900));
+        const { SigninClient, CreateOAuth2TokenCommand } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6890));
         const { logger, userAgentAppId } = this.callerClientConfig ?? {};
         const isH2 = (requestHandler) => {
             return requestHandler?.metadata?.handlerProtocol === "h2";
@@ -8620,7 +8620,7 @@ const resolveLoginCredentials = async (profileName, options, callerClientConfig)
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/credential-provider-ini/dist-es/resolveProcessCredentials.js
 
 const isProcessProfile = (arg) => Boolean(arg) && typeof arg === "object" && typeof arg.credential_process === "string";
-const resolveProcessCredentials = async (options, profile) => Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1799)).then(({ fromProcess }) => fromProcess({
+const resolveProcessCredentials = async (options, profile) => Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 3995)).then(({ fromProcess }) => fromProcess({
     ...options,
     profile,
 })().then((creds) => (0,setCredentialFeature/* .setCredentialFeature */.g)(creds, "CREDENTIALS_PROFILE_PROCESS", "v")));
@@ -8628,7 +8628,7 @@ const resolveProcessCredentials = async (options, profile) => Promise.resolve(/*
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/credential-provider-ini/dist-es/resolveSsoCredentials.js
 
 const resolveSsoCredentials = async (profile, profileData, options = {}, callerClientConfig) => {
-    const { fromSSO } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 7773));
+    const { fromSSO } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1489));
     return fromSSO({
         profile,
         logger: options.logger,
@@ -8679,7 +8679,7 @@ const isWebIdentityProfile = (arg) => Boolean(arg) &&
     typeof arg.web_identity_token_file === "string" &&
     typeof arg.role_arn === "string" &&
     ["undefined", "string"].indexOf(typeof arg.role_session_name) > -1;
-const resolveWebIdentityCredentials = async (profile, options, callerClientConfig) => Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5521)).then(({ fromTokenFile }) => fromTokenFile({
+const resolveWebIdentityCredentials = async (profile, options, callerClientConfig) => Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 3521)).then(({ fromTokenFile }) => fromTokenFile({
     webIdentityTokenFile: profile.web_identity_token_file,
     roleArn: profile.role_arn,
     roleSessionName: profile.role_session_name,
@@ -8740,7 +8740,7 @@ const fromIni = (init = {}) => async ({ callerClientConfig } = {}) => {
 
 
 },
-1799(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3995(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -8748,7 +8748,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseKnownFiles.js + 1 modules
-var parseKnownFiles = __webpack_require__(8444);
+var parseKnownFiles = __webpack_require__(5040);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getProfileName.js
 var getProfileName = __webpack_require__(6437);
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
@@ -8847,7 +8847,7 @@ const fromProcess = (init = {}) => async ({ callerClientConfig } = {}) => {
 
 
 },
-7773(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1489(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -8861,7 +8861,7 @@ var CredentialsProviderError = __webpack_require__(3052);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getProfileName.js
 var getProfileName = __webpack_require__(6437);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/parseKnownFiles.js + 1 modules
-var parseKnownFiles = __webpack_require__(8444);
+var parseKnownFiles = __webpack_require__(5040);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getConfigFilepath.js
 var getConfigFilepath = __webpack_require__(2432);
 // EXTERNAL MODULE: ./node_modules/@smithy/types/dist-es/profile.js
@@ -8911,14 +8911,14 @@ class TokenProviderError extends ProviderError/* .ProviderError */.m {
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getSSOTokenFromFile.js + 1 modules
-var getSSOTokenFromFile = __webpack_require__(6011);
+var getSSOTokenFromFile = __webpack_require__(4415);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/token-providers/dist-es/constants.js
 const EXPIRE_WINDOW_MS = 5 * 60 * 1000;
 const REFRESH_MESSAGE = `To refresh this SSO session run 'aws sso login' with the corresponding profile.`;
 
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/token-providers/dist-es/getSsoOidcClient.js
 const getSsoOidcClient = async (ssoRegion, init = {}, callerClientConfig) => {
-    const { SSOOIDCClient } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8566));
+    const { SSOOIDCClient } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1785));
     const coalesce = (prop) => init.clientConfig?.[prop] ?? init.parentClientConfig?.[prop] ?? callerClientConfig?.[prop];
     const ssoOidcClient = new SSOOIDCClient(Object.assign({}, init.clientConfig ?? {}, {
         region: ssoRegion ?? init.clientConfig?.region,
@@ -8931,7 +8931,7 @@ const getSsoOidcClient = async (ssoRegion, init = {}, callerClientConfig) => {
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/token-providers/dist-es/getNewSsoOidcToken.js
 
 const getNewSsoOidcToken = async (ssoToken, ssoRegion, init = {}, callerClientConfig) => {
-    const { CreateTokenCommand } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8566));
+    const { CreateTokenCommand } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1785));
     const ssoOidcClient = await getSsoOidcClient(ssoRegion, init, callerClientConfig);
     return ssoOidcClient.send(new CreateTokenCommand({
         clientId: ssoToken.clientId,
@@ -9103,7 +9103,7 @@ const resolveSSOCredentials = async ({ ssoStartUrl, ssoSession, ssoAccountId, ss
         });
     }
     const { accessToken } = token;
-    const { SSOClient, GetRoleCredentialsCommand } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 9424));
+    const { SSOClient, GetRoleCredentialsCommand } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 312));
     const sso = ssoClient ||
         new SSOClient(Object.assign({}, clientConfig ?? {}, {
             logger: clientConfig?.logger ?? callerClientConfig?.logger ?? parentClientConfig?.logger,
@@ -9252,18 +9252,18 @@ const fromSSO = (init = {}) => async ({ callerClientConfig } = {}) => {
 
 
 },
-9424(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+312(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  SSOClient: () => (/* reexport */ SSOClient),
-  GetRoleCredentialsCommand: () => (/* reexport */ GetRoleCredentialsCommand)
+  GetRoleCredentialsCommand: () => (/* reexport */ GetRoleCredentialsCommand),
+  SSOClient: () => (/* reexport */ SSOClient)
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 3 modules
-var getEndpointPlugin = __webpack_require__(9588);
+var getEndpointPlugin = __webpack_require__(8560);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
+var command = __webpack_require__(8103);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso/endpoint/EndpointParameters.js
 const resolveClientEndpointParameters = (options) => {
     return Object.assign(options, {
@@ -9455,33 +9455,33 @@ var dist_es = __webpack_require__(1095);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-logger/dist-es/loggerMiddleware.js
 var loggerMiddleware = __webpack_require__(7813);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js + 3 modules
-var getRecursionDetectionPlugin = __webpack_require__(8278);
+var getRecursionDetectionPlugin = __webpack_require__(6326);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/configurations.js
 var configurations = __webpack_require__(7287);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/user-agent-middleware.js + 4 modules
-var user_agent_middleware = __webpack_require__(8601);
+var user_agent_middleware = __webpack_require__(5507);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/resolveRegionConfig.js + 3 modules
-var resolveRegionConfig = __webpack_require__(5423);
+var resolveRegionConfig = __webpack_require__(5335);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/getHttpAuthSchemeEndpointRuleSetPlugin.js + 2 modules
-var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
+var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(6486);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/DefaultIdentityProviderConfig.js
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
-var getHttpSigningMiddleware = __webpack_require__(7764);
+var getHttpSigningMiddleware = __webpack_require__(7300);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
-var getSchemaSerdePlugin = __webpack_require__(1920);
+var getSchemaSerdePlugin = __webpack_require__(7806);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
-var dist_es_configurations = __webpack_require__(1021);
+var dist_es_configurations = __webpack_require__(6970);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 4 modules
-var retryMiddleware = __webpack_require__(5253);
+var retryMiddleware = __webpack_require__(1443);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 1 modules
-var resolveAwsSdkSigV4Config = __webpack_require__(2709);
+var resolveAwsSdkSigV4Config = __webpack_require__(923);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
 var getSmithyContext = __webpack_require__(6116);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
@@ -9543,9 +9543,9 @@ var nested_clients_package = __webpack_require__(9955);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
-var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
+var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(3854);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
-var defaultUserAgent = __webpack_require__(6371);
+var defaultUserAgent = __webpack_require__(5940);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -9557,11 +9557,11 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
-var node_http_handler = __webpack_require__(3437);
+var node_http_handler = __webpack_require__(934);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
-var stream_collector = __webpack_require__(4622);
+var stream_collector = __webpack_require__(3439);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
 var dist_es_emitWarningIfUnsupportedVersion = __webpack_require__(2339);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/defaults-mode.js
@@ -9569,19 +9569,19 @@ var defaults_mode = __webpack_require__(666);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-body-length-node/dist-es/calculateBodyLength.js
 var calculateBodyLength = __webpack_require__(2291);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-defaults-mode-node/dist-es/resolveDefaultsModeConfig.js + 2 modules
-var resolveDefaultsModeConfig = __webpack_require__(320);
+var resolveDefaultsModeConfig = __webpack_require__(2099);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 3 modules
-var AwsSdkSigV4Signer = __webpack_require__(1253);
+var AwsSdkSigV4Signer = __webpack_require__(5719);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/AwsRestJsonProtocol.js + 13 modules
-var AwsRestJsonProtocol = __webpack_require__(6594);
+var AwsRestJsonProtocol = __webpack_require__(5140);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/httpAuthSchemes/noAuth.js
 var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var url_parser_dist_es = __webpack_require__(3871);
+var url_parser_dist_es = __webpack_require__(1866);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
@@ -9591,11 +9591,11 @@ var fromUtf8 = __webpack_require__(7459);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-utf8/dist-es/toUtf8.js
 var toUtf8 = __webpack_require__(7638);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var util_endpoints_dist_es = __webpack_require__(3886);
+var util_endpoints_dist_es = __webpack_require__(5400);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
 var EndpointCache = __webpack_require__(7461);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/decideEndpoint.js + 24 modules
-var decideEndpoint = __webpack_require__(88);
+var decideEndpoint = __webpack_require__(3802);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
 var customEndpointFunctions = __webpack_require__(468);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/bdd/BinaryDecisionDiagram.js
@@ -9798,7 +9798,7 @@ var dist_es_extensions = __webpack_require__(4163);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
 var httpExtensionConfiguration = __webpack_require__(2927);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
+var defaultExtensionConfiguration = __webpack_require__(307);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso/auth/httpAuthExtensionConfiguration.js
 const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
     const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
@@ -9908,7 +9908,7 @@ class SSOClient extends client/* .Client */.K {
 
 
 },
-5521(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3521(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -9931,7 +9931,7 @@ const fromWebToken = (init) => async (awsIdentityProperties) => {
     const { roleArn, roleSessionName, webIdentityToken, providerId, policyArns, policy, durationSeconds } = init;
     let { roleAssumerWithWebIdentity } = init;
     if (!roleAssumerWithWebIdentity) {
-        const { getDefaultRoleAssumerWithWebIdentity } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6383));
+        const { getDefaultRoleAssumerWithWebIdentity } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5756));
         roleAssumerWithWebIdentity = getDefaultRoleAssumerWithWebIdentity({
             ...init.clientConfig,
             credentialProviderLogger: init.logger,
@@ -10081,7 +10081,7 @@ const getLoggerPlugin = (options) => ({
 
 
 },
-8278(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6326(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -10297,17 +10297,17 @@ function resolveUserAgentConfig(input) {
 
 
 },
-8601(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5507(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   sM: () => (/* binding */ getUserAgentPlugin)
 });
 
-// UNUSED EXPORTS: userAgentMiddleware, getUserAgentMiddlewareOptions
+// UNUSED EXPORTS: getUserAgentMiddlewareOptions, userAgentMiddleware
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var dist_es = __webpack_require__(3886);
+var dist_es = __webpack_require__(5400);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpRequest.js
 var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/retries-2026-config.js
@@ -10495,7 +10495,7 @@ const getUserAgentPlugin = (config) => ({
 
 
 },
-9900(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6890(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -10503,40 +10503,40 @@ __webpack_require__.d(__webpack_exports__, {
   SigninClient: () => (/* reexport */ SigninClient)
 });
 
-// UNUSED EXPORTS: Signin, __Client, AccessDeniedException, CreateOAuth2TokenResponse$, CreateOAuth2TokenRequestBody$, AccessToken$, SigninServiceException, InternalServerException, SigninServiceException$, TooManyRequestsError, TooManyRequestsError$, ValidationException$, errorTypeRegistries, OAuth2ErrorCode, CreateOAuth2Token$, InternalServerException$, CreateOAuth2TokenResponseBody$, $Command, CreateOAuth2TokenRequest$, AccessDeniedException$, ValidationException
+// UNUSED EXPORTS: $Command, AccessDeniedException, AccessDeniedException$, AccessToken$, CreateOAuth2Token$, CreateOAuth2TokenRequest$, CreateOAuth2TokenRequestBody$, CreateOAuth2TokenResponse$, CreateOAuth2TokenResponseBody$, InternalServerException, InternalServerException$, OAuth2ErrorCode, Signin, SigninServiceException, SigninServiceException$, TooManyRequestsError, TooManyRequestsError$, ValidationException, ValidationException$, __Client, errorTypeRegistries
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-host-header/dist-es/index.js
 var dist_es = __webpack_require__(1095);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-logger/dist-es/loggerMiddleware.js
 var loggerMiddleware = __webpack_require__(7813);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js + 3 modules
-var getRecursionDetectionPlugin = __webpack_require__(8278);
+var getRecursionDetectionPlugin = __webpack_require__(6326);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/configurations.js
 var configurations = __webpack_require__(7287);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/user-agent-middleware.js + 4 modules
-var user_agent_middleware = __webpack_require__(8601);
+var user_agent_middleware = __webpack_require__(5507);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/resolveRegionConfig.js + 3 modules
-var resolveRegionConfig = __webpack_require__(5423);
+var resolveRegionConfig = __webpack_require__(5335);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/getHttpAuthSchemeEndpointRuleSetPlugin.js + 2 modules
-var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
+var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(6486);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/DefaultIdentityProviderConfig.js
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
-var getHttpSigningMiddleware = __webpack_require__(7764);
+var getHttpSigningMiddleware = __webpack_require__(7300);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
-var getSchemaSerdePlugin = __webpack_require__(1920);
+var getSchemaSerdePlugin = __webpack_require__(7806);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
-var dist_es_configurations = __webpack_require__(1021);
+var dist_es_configurations = __webpack_require__(6970);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 4 modules
-var retryMiddleware = __webpack_require__(5253);
+var retryMiddleware = __webpack_require__(1443);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 1 modules
-var resolveAwsSdkSigV4Config = __webpack_require__(2709);
+var resolveAwsSdkSigV4Config = __webpack_require__(923);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
 var getSmithyContext = __webpack_require__(6116);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
@@ -10613,9 +10613,9 @@ var nested_clients_package = __webpack_require__(9955);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
-var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
+var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(3854);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
-var defaultUserAgent = __webpack_require__(6371);
+var defaultUserAgent = __webpack_require__(5940);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -10627,11 +10627,11 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
-var node_http_handler = __webpack_require__(3437);
+var node_http_handler = __webpack_require__(934);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
-var stream_collector = __webpack_require__(4622);
+var stream_collector = __webpack_require__(3439);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
 var dist_es_emitWarningIfUnsupportedVersion = __webpack_require__(2339);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/defaults-mode.js
@@ -10639,19 +10639,19 @@ var defaults_mode = __webpack_require__(666);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-body-length-node/dist-es/calculateBodyLength.js
 var calculateBodyLength = __webpack_require__(2291);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-defaults-mode-node/dist-es/resolveDefaultsModeConfig.js + 2 modules
-var resolveDefaultsModeConfig = __webpack_require__(320);
+var resolveDefaultsModeConfig = __webpack_require__(2099);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 3 modules
-var AwsSdkSigV4Signer = __webpack_require__(1253);
+var AwsSdkSigV4Signer = __webpack_require__(5719);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/AwsRestJsonProtocol.js + 13 modules
-var AwsRestJsonProtocol = __webpack_require__(6594);
+var AwsRestJsonProtocol = __webpack_require__(5140);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/httpAuthSchemes/noAuth.js
 var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var url_parser_dist_es = __webpack_require__(3871);
+var url_parser_dist_es = __webpack_require__(1866);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
@@ -10661,11 +10661,11 @@ var fromUtf8 = __webpack_require__(7459);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-utf8/dist-es/toUtf8.js
 var toUtf8 = __webpack_require__(7638);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var util_endpoints_dist_es = __webpack_require__(3886);
+var util_endpoints_dist_es = __webpack_require__(5400);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
 var EndpointCache = __webpack_require__(7461);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/decideEndpoint.js + 24 modules
-var decideEndpoint = __webpack_require__(88);
+var decideEndpoint = __webpack_require__(3802);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
 var customEndpointFunctions = __webpack_require__(468);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/bdd/BinaryDecisionDiagram.js
@@ -11075,7 +11075,7 @@ var dist_es_extensions = __webpack_require__(4163);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
 var httpExtensionConfiguration = __webpack_require__(2927);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
+var defaultExtensionConfiguration = __webpack_require__(307);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/auth/httpAuthExtensionConfiguration.js
 const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
     const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
@@ -11180,9 +11180,9 @@ class SigninClient extends client/* .Client */.K {
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 3 modules
-var getEndpointPlugin = __webpack_require__(9588);
+var getEndpointPlugin = __webpack_require__(8560);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
+var command = __webpack_require__(8103);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/signin/commands/CreateOAuth2TokenCommand.js
 
 
@@ -11215,7 +11215,7 @@ class CreateOAuth2TokenCommand extends command/* .Command.classBuilder */.u.clas
 
 
 },
-8566(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1785(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -11223,40 +11223,40 @@ __webpack_require__.d(__webpack_exports__, {
   SSOOIDCClient: () => (/* reexport */ SSOOIDCClient)
 });
 
-// UNUSED EXPORTS: CreateToken$, AccessDeniedException, errorTypeRegistries, SlowDownException, InternalServerException, AccessDeniedExceptionReason, UnauthorizedClientException, InvalidClientException$, InternalServerException$, InvalidRequestException$, InvalidRequestExceptionReason, InvalidScopeException, $Command, UnsupportedGrantTypeException$, SlowDownException$, UnauthorizedClientException$, ExpiredTokenException$, CreateTokenResponse$, __Client, UnsupportedGrantTypeException, SSOOIDCServiceException$, ExpiredTokenException, CreateTokenRequest$, AuthorizationPendingException$, AuthorizationPendingException, InvalidRequestException, SSOOIDCServiceException, SSOOIDC, InvalidScopeException$, InvalidClientException, InvalidGrantException, InvalidGrantException$, AccessDeniedException$
+// UNUSED EXPORTS: $Command, AccessDeniedException, AccessDeniedException$, AccessDeniedExceptionReason, AuthorizationPendingException, AuthorizationPendingException$, CreateToken$, CreateTokenRequest$, CreateTokenResponse$, ExpiredTokenException, ExpiredTokenException$, InternalServerException, InternalServerException$, InvalidClientException, InvalidClientException$, InvalidGrantException, InvalidGrantException$, InvalidRequestException, InvalidRequestException$, InvalidRequestExceptionReason, InvalidScopeException, InvalidScopeException$, SSOOIDC, SSOOIDCServiceException, SSOOIDCServiceException$, SlowDownException, SlowDownException$, UnauthorizedClientException, UnauthorizedClientException$, UnsupportedGrantTypeException, UnsupportedGrantTypeException$, __Client, errorTypeRegistries
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-host-header/dist-es/index.js
 var dist_es = __webpack_require__(1095);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-logger/dist-es/loggerMiddleware.js
 var loggerMiddleware = __webpack_require__(7813);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js + 3 modules
-var getRecursionDetectionPlugin = __webpack_require__(8278);
+var getRecursionDetectionPlugin = __webpack_require__(6326);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/configurations.js
 var configurations = __webpack_require__(7287);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/user-agent-middleware.js + 4 modules
-var user_agent_middleware = __webpack_require__(8601);
+var user_agent_middleware = __webpack_require__(5507);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/resolveRegionConfig.js + 3 modules
-var resolveRegionConfig = __webpack_require__(5423);
+var resolveRegionConfig = __webpack_require__(5335);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/getHttpAuthSchemeEndpointRuleSetPlugin.js + 2 modules
-var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
+var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(6486);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/DefaultIdentityProviderConfig.js
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
-var getHttpSigningMiddleware = __webpack_require__(7764);
+var getHttpSigningMiddleware = __webpack_require__(7300);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
-var getSchemaSerdePlugin = __webpack_require__(1920);
+var getSchemaSerdePlugin = __webpack_require__(7806);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
-var dist_es_configurations = __webpack_require__(1021);
+var dist_es_configurations = __webpack_require__(6970);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 4 modules
-var retryMiddleware = __webpack_require__(5253);
+var retryMiddleware = __webpack_require__(1443);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 1 modules
-var resolveAwsSdkSigV4Config = __webpack_require__(2709);
+var resolveAwsSdkSigV4Config = __webpack_require__(923);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
 var getSmithyContext = __webpack_require__(6116);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
@@ -11333,9 +11333,9 @@ var nested_clients_package = __webpack_require__(9955);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
-var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
+var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(3854);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
-var defaultUserAgent = __webpack_require__(6371);
+var defaultUserAgent = __webpack_require__(5940);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -11347,11 +11347,11 @@ var NodeUseFipsEndpointConfigOptions = __webpack_require__(4570);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
-var node_http_handler = __webpack_require__(3437);
+var node_http_handler = __webpack_require__(934);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
-var stream_collector = __webpack_require__(4622);
+var stream_collector = __webpack_require__(3439);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
 var dist_es_emitWarningIfUnsupportedVersion = __webpack_require__(2339);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/defaults-mode.js
@@ -11359,19 +11359,19 @@ var defaults_mode = __webpack_require__(666);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-body-length-node/dist-es/calculateBodyLength.js
 var calculateBodyLength = __webpack_require__(2291);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-defaults-mode-node/dist-es/resolveDefaultsModeConfig.js + 2 modules
-var resolveDefaultsModeConfig = __webpack_require__(320);
+var resolveDefaultsModeConfig = __webpack_require__(2099);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 3 modules
-var AwsSdkSigV4Signer = __webpack_require__(1253);
+var AwsSdkSigV4Signer = __webpack_require__(5719);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/json/AwsRestJsonProtocol.js + 13 modules
-var AwsRestJsonProtocol = __webpack_require__(6594);
+var AwsRestJsonProtocol = __webpack_require__(5140);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/httpAuthSchemes/noAuth.js
 var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var url_parser_dist_es = __webpack_require__(3871);
+var url_parser_dist_es = __webpack_require__(1866);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
@@ -11381,11 +11381,11 @@ var fromUtf8 = __webpack_require__(7459);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-utf8/dist-es/toUtf8.js
 var toUtf8 = __webpack_require__(7638);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var util_endpoints_dist_es = __webpack_require__(3886);
+var util_endpoints_dist_es = __webpack_require__(5400);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
 var EndpointCache = __webpack_require__(7461);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/decideEndpoint.js + 24 modules
-var decideEndpoint = __webpack_require__(88);
+var decideEndpoint = __webpack_require__(3802);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
 var customEndpointFunctions = __webpack_require__(468);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/bdd/BinaryDecisionDiagram.js
@@ -11924,7 +11924,7 @@ var dist_es_extensions = __webpack_require__(4163);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
 var httpExtensionConfiguration = __webpack_require__(2927);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
+var defaultExtensionConfiguration = __webpack_require__(307);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/auth/httpAuthExtensionConfiguration.js
 const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
     const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
@@ -12029,9 +12029,9 @@ class SSOOIDCClient extends client/* .Client */.K {
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 3 modules
-var getEndpointPlugin = __webpack_require__(9588);
+var getEndpointPlugin = __webpack_require__(8560);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
+var command = __webpack_require__(8103);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sso-oidc/commands/CreateTokenCommand.js
 
 
@@ -12064,22 +12064,22 @@ class CreateTokenCommand extends command/* .Command.classBuilder */.u.classBuild
 
 
 },
-6383(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5756(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  getDefaultRoleAssumerWithWebIdentity: () => (/* reexport */ defaultRoleAssumers_getDefaultRoleAssumerWithWebIdentity),
-  getDefaultRoleAssumer: () => (/* reexport */ defaultRoleAssumers_getDefaultRoleAssumer)
+  getDefaultRoleAssumer: () => (/* reexport */ defaultRoleAssumers_getDefaultRoleAssumer),
+  getDefaultRoleAssumerWithWebIdentity: () => (/* reexport */ defaultRoleAssumers_getDefaultRoleAssumerWithWebIdentity)
 });
 
-// UNUSED EXPORTS: decorateDefaultCredentialProvider, errorTypeRegistries, MalformedPolicyDocumentException$, IDPCommunicationErrorException$, AssumeRoleWithWebIdentityRequest$, Tag$, MalformedPolicyDocumentException, Credentials$, PackedPolicyTooLargeException$, STSServiceException$, $Command, PolicyDescriptorType$, RegionDisabledException$, AssumeRoleWithWebIdentityResponse$, AssumedRoleUser$, ExpiredTokenException$, RegionDisabledException, AssumeRoleRequest$, __Client, AssumeRoleCommand, IDPRejectedClaimException$, ExpiredTokenException, PackedPolicyTooLargeException, IDPCommunicationErrorException, STS, STSClient, AssumeRoleResponse$, STSServiceException, IDPRejectedClaimException, InvalidIdentityTokenException$, ProvidedContext$, AssumeRole$, AssumeRoleWithWebIdentityCommand, AssumeRoleWithWebIdentity$, InvalidIdentityTokenException
+// UNUSED EXPORTS: $Command, AssumeRole$, AssumeRoleCommand, AssumeRoleRequest$, AssumeRoleResponse$, AssumeRoleWithWebIdentity$, AssumeRoleWithWebIdentityCommand, AssumeRoleWithWebIdentityRequest$, AssumeRoleWithWebIdentityResponse$, AssumedRoleUser$, Credentials$, ExpiredTokenException, ExpiredTokenException$, IDPCommunicationErrorException, IDPCommunicationErrorException$, IDPRejectedClaimException, IDPRejectedClaimException$, InvalidIdentityTokenException, InvalidIdentityTokenException$, MalformedPolicyDocumentException, MalformedPolicyDocumentException$, PackedPolicyTooLargeException, PackedPolicyTooLargeException$, PolicyDescriptorType$, ProvidedContext$, RegionDisabledException, RegionDisabledException$, STS, STSClient, STSServiceException, STSServiceException$, Tag$, __Client, decorateDefaultCredentialProvider, errorTypeRegistries
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/setCredentialFeature.js
 var setCredentialFeature = __webpack_require__(244);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
 var regionConfig_config = __webpack_require__(4836);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/region-config-resolver/dist-es/regionConfig/stsRegionDefaultResolver.js
 
 
@@ -12099,9 +12099,9 @@ const warning = {
 };
 
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 3 modules
-var getEndpointPlugin = __webpack_require__(9588);
+var getEndpointPlugin = __webpack_require__(8560);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
+var command = __webpack_require__(8103);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/endpoint/EndpointParameters.js
 const resolveClientEndpointParameters = (options) => {
     return Object.assign(options, {
@@ -12563,49 +12563,49 @@ var dist_es = __webpack_require__(1095);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-logger/dist-es/loggerMiddleware.js
 var loggerMiddleware = __webpack_require__(7813);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js + 3 modules
-var getRecursionDetectionPlugin = __webpack_require__(8278);
+var getRecursionDetectionPlugin = __webpack_require__(6326);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/configurations.js
 var configurations = __webpack_require__(7287);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/user-agent-middleware.js + 4 modules
-var user_agent_middleware = __webpack_require__(8601);
+var user_agent_middleware = __webpack_require__(5507);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/resolveRegionConfig.js + 3 modules
-var resolveRegionConfig = __webpack_require__(5423);
+var resolveRegionConfig = __webpack_require__(5335);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/getHttpAuthSchemeEndpointRuleSetPlugin.js + 2 modules
-var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
+var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(6486);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/DefaultIdentityProviderConfig.js
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
-var getHttpSigningMiddleware = __webpack_require__(7764);
+var getHttpSigningMiddleware = __webpack_require__(7300);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
-var getSchemaSerdePlugin = __webpack_require__(1920);
+var getSchemaSerdePlugin = __webpack_require__(7806);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
-var dist_es_configurations = __webpack_require__(1021);
+var dist_es_configurations = __webpack_require__(6970);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 4 modules
-var retryMiddleware = __webpack_require__(5253);
+var retryMiddleware = __webpack_require__(1443);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 1 modules
-var resolveAwsSdkSigV4Config = __webpack_require__(2709);
+var resolveAwsSdkSigV4Config = __webpack_require__(923);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4AConfig.js
 var resolveAwsSdkSigV4AConfig = __webpack_require__(1942);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/signature-v4-multi-region/dist-es/SignatureV4MultiRegion.js + 4 modules
-var SignatureV4MultiRegion = __webpack_require__(2909);
+var SignatureV4MultiRegion = __webpack_require__(583);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromInstructions.js + 2 modules
-var getEndpointFromInstructions = __webpack_require__(4812);
+var getEndpointFromInstructions = __webpack_require__(303);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
 var getSmithyContext = __webpack_require__(6116);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
 var normalizeProvider = __webpack_require__(8947);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var util_endpoints_dist_es = __webpack_require__(3886);
+var util_endpoints_dist_es = __webpack_require__(5400);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
 var EndpointCache = __webpack_require__(7461);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/decideEndpoint.js + 24 modules
-var decideEndpoint = __webpack_require__(88);
+var decideEndpoint = __webpack_require__(3802);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
 var customEndpointFunctions = __webpack_require__(468);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/bdd/BinaryDecisionDiagram.js
@@ -12921,13 +12921,13 @@ var nested_clients_package = __webpack_require__(9955);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
-var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
+var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(3854);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 3 modules
-var AwsSdkSigV4Signer = __webpack_require__(1253);
+var AwsSdkSigV4Signer = __webpack_require__(5719);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4ASigner.js
 var AwsSdkSigV4ASigner = __webpack_require__(1006);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
-var defaultUserAgent = __webpack_require__(6371);
+var defaultUserAgent = __webpack_require__(5940);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/endpointsConfig/NodeUseDualstackEndpointConfigOptions.js
@@ -12939,9 +12939,9 @@ var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
-var node_http_handler = __webpack_require__(3437);
+var node_http_handler = __webpack_require__(934);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
-var stream_collector = __webpack_require__(4622);
+var stream_collector = __webpack_require__(3439);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
 var dist_es_emitWarningIfUnsupportedVersion = __webpack_require__(2339);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/defaults-mode.js
@@ -12949,15 +12949,15 @@ var defaults_mode = __webpack_require__(666);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-body-length-node/dist-es/calculateBodyLength.js
 var calculateBodyLength = __webpack_require__(2291);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-defaults-mode-node/dist-es/resolveDefaultsModeConfig.js + 2 modules
-var resolveDefaultsModeConfig = __webpack_require__(320);
+var resolveDefaultsModeConfig = __webpack_require__(2099);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/AwsQueryProtocol.js + 21 modules
-var AwsQueryProtocol = __webpack_require__(3392);
+var AwsQueryProtocol = __webpack_require__(1364);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var url_parser_dist_es = __webpack_require__(3871);
+var url_parser_dist_es = __webpack_require__(1866);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
@@ -13097,7 +13097,7 @@ var dist_es_extensions = __webpack_require__(4163);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
 var httpExtensionConfiguration = __webpack_require__(2927);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
+var defaultExtensionConfiguration = __webpack_require__(307);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/nested-clients/dist-es/submodules/sts/auth/httpAuthExtensionConfiguration.js
 const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
     const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
@@ -13261,7 +13261,7 @@ const resolveAwsRegionExtensionConfiguration = (awsRegionExtensionConfiguration)
 
 
 },
-2909(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+583(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -13269,7 +13269,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/signature-v4/dist-es/SignatureV4.js + 11 modules
-var SignatureV4 = __webpack_require__(93);
+var SignatureV4 = __webpack_require__(1815);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/middleware-sdk-s3/dist-es/s3-express/constants.js
 
 const S3_EXPRESS_BUCKET_TYPE = "Directory";
@@ -13454,7 +13454,7 @@ class SignatureV4MultiRegion {
 
 
 },
-3886(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5400(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -13462,7 +13462,7 @@ __webpack_require__.d(__webpack_exports__, {
   vL: () => (/* reexport */ getUserAgentPrefix)
 });
 
-// UNUSED EXPORTS: resolveDefaultAwsRegionalEndpointsConfig, useDefaultPartitionInfo, setPartitionInfo, resolveEndpoint, isIpAddress, toEndpointV1, EndpointError, partition
+// UNUSED EXPORTS: EndpointError, isIpAddress, partition, resolveDefaultAwsRegionalEndpointsConfig, resolveEndpoint, setPartitionInfo, toEndpointV1, useDefaultPartitionInfo
 
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
 var customEndpointFunctions = __webpack_require__(468);
@@ -13639,7 +13639,7 @@ const toEndpointV1 = (endpoint) => parseUrl(endpoint.url);
 
 
 },
-6371(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5940(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -13930,7 +13930,7 @@ const NODE_REGION_CONFIG_FILE_OPTIONS = {
 
 
 },
-5423(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5335(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -13995,7 +13995,7 @@ const resolveRegionConfig = (input) => {
 
 
 },
-5318(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6486(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -14093,7 +14093,7 @@ const getHttpAuthSchemeEndpointRuleSetPlugin = (config, { httpAuthSchemeParamete
 
 
 },
-7764(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+7300(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -14163,7 +14163,7 @@ const normalizeProvider = (input) => {
 
 
 },
-9378(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+7311(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -14567,7 +14567,7 @@ class HttpProtocol extends _SerdeContext__rspack_import_0/* .SerdeContext */.f {
         });
     }
     async loadEventStreamCapability() {
-        const { EventStreamSerde } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 9378));
+        const { EventStreamSerde } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 7311));
         return new EventStreamSerde({
             marshaller: this.getEventStreamMarshaller(),
             serializer: this.serializer,
@@ -14611,7 +14611,7 @@ class SerdeContext {
 
 
 },
-9253(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5790(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -14678,7 +14678,7 @@ function extendedEncodeURIComponent(str) {
 
 
 },
-8990(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5865(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -15009,14 +15009,14 @@ const deref = (schemaRef) => {
 
 
 },
-1920(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+7806(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   wq: () => (/* binding */ getSchemaSerdePlugin)
 });
 
-// UNUSED EXPORTS: serializerMiddlewareOption, deserializerMiddlewareOption
+// UNUSED EXPORTS: deserializerMiddlewareOption, serializerMiddlewareOption
 
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpResponse.js
 var httpResponse = __webpack_require__(4094);
@@ -15099,7 +15099,7 @@ const findHeader = (pattern, headers) => {
 };
 
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var dist_es = __webpack_require__(3871);
+var dist_es = __webpack_require__(1866);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/endpoints/toEndpointV1.js
 
 const toEndpointV1 = (endpoint) => {
@@ -15512,15 +15512,15 @@ function translateTraits(indicator) {
 
 
 },
-1885(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3694(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
   JV: () => (/* binding */ dateToUtcString),
-  EI: () => (/* binding */ parseRfc3339DateTime),
-  xE: () => (/* binding */ parseRfc7231DateTime),
   l3: () => (/* binding */ parseEpochTimestamp),
-  t_: () => (/* binding */ parseRfc3339DateTimeWithOffset)
+  EI: () => (/* binding */ parseRfc3339DateTime),
+  t_: () => (/* binding */ parseRfc3339DateTimeWithOffset),
+  xE: () => (/* binding */ parseRfc7231DateTime)
 });
 
 ;// CONCATENATED MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/parse-utils.js
@@ -16092,19 +16092,19 @@ class NoAuthSigner {
 
 
 },
-6579(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+8019(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  httpRequest: () => (/* reexport */ httpRequest),
   ENV_CMDS_FULL_URI: () => (/* reexport */ ENV_CMDS_FULL_URI),
-  getInstanceMetadataEndpoint: () => (/* reexport */ getInstanceMetadataEndpoint),
   ENV_CMDS_RELATIVE_URI: () => (/* reexport */ ENV_CMDS_RELATIVE_URI),
   fromContainerMetadata: () => (/* reexport */ fromContainerMetadata),
-  fromInstanceMetadata: () => (/* reexport */ fromInstanceMetadata)
+  fromInstanceMetadata: () => (/* reexport */ fromInstanceMetadata),
+  getInstanceMetadataEndpoint: () => (/* reexport */ getInstanceMetadataEndpoint),
+  httpRequest: () => (/* reexport */ httpRequest)
 });
 
-// UNUSED EXPORTS: DEFAULT_TIMEOUT, DEFAULT_MAX_RETRIES, providerConfigFromInit, ENV_CMDS_AUTH_TOKEN, Endpoint
+// UNUSED EXPORTS: DEFAULT_MAX_RETRIES, DEFAULT_TIMEOUT, ENV_CMDS_AUTH_TOKEN, Endpoint, providerConfigFromInit
 
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/CredentialsProviderError.js
 var CredentialsProviderError = __webpack_require__(3052);
@@ -16263,7 +16263,7 @@ const getCmdsUri = async ({ logger }) => {
 };
 
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/credential-provider-imds/dist-es/error/InstanceMetadataV1FallbackError.js
 
 class InstanceMetadataV1FallbackError extends CredentialsProviderError/* .CredentialsProviderError */.C {
@@ -16277,7 +16277,7 @@ class InstanceMetadataV1FallbackError extends CredentialsProviderError/* .Creden
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var dist_es = __webpack_require__(3871);
+var dist_es = __webpack_require__(1866);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/credential-provider-imds/dist-es/config/Endpoint.js
 var Endpoint_Endpoint;
 (function (Endpoint) {
@@ -16631,7 +16631,7 @@ const getContentLengthPlugin = (options) => ({
 
 
 },
-4225(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+838(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -16639,7 +16639,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointUrlConfig.js
 
 const ENV_ENDPOINT_URL = "AWS_ENDPOINT_URL";
@@ -16680,7 +16680,7 @@ const getEndpointFromConfig = async (serviceId) => (0,configLoader/* .loadConfig
 
 
 },
-4812(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+303(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -16780,7 +16780,7 @@ const createConfigValueProvider = (configKey, canonicalEndpointParamKey, config,
 };
 
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromConfig.js + 1 modules
-var getEndpointFromConfig = __webpack_require__(4225);
+var getEndpointFromConfig = __webpack_require__(838);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/toEndpointV1.js
 var toEndpointV1 = __webpack_require__(8462);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromInstructions.js
@@ -16855,7 +16855,7 @@ const resolveParams = async (commandInput, instructionsSupplier, clientConfig) =
 __webpack_require__.d(__webpack_exports__, {
   a: () => (toEndpointV1)
 });
-/* import */ var _smithy_url_parser__rspack_import_0 = __webpack_require__(3871);
+/* import */ var _smithy_url_parser__rspack_import_0 = __webpack_require__(1866);
 
 const toEndpointV1 = (endpoint) => {
     if (typeof endpoint === "object") {
@@ -16876,7 +16876,7 @@ const toEndpointV1 = (endpoint) => {
 
 
 },
-9588(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+8560(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -16925,7 +16925,7 @@ function setFeature(context, feature, value) {
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
 var getSmithyContext = __webpack_require__(6116);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromInstructions.js + 2 modules
-var getEndpointFromInstructions = __webpack_require__(4812);
+var getEndpointFromInstructions = __webpack_require__(303);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/endpointMiddleware.js
 
 
@@ -16991,7 +16991,7 @@ __webpack_require__.d(__webpack_exports__, {
   C: () => (resolveEndpointConfig)
 });
 /* import */ var _smithy_util_middleware__rspack_import_1 = __webpack_require__(8947);
-/* import */ var _adaptors_getEndpointFromConfig__rspack_import_2 = __webpack_require__(4225);
+/* import */ var _adaptors_getEndpointFromConfig__rspack_import_2 = __webpack_require__(838);
 /* import */ var _adaptors_toEndpointV1__rspack_import_0 = __webpack_require__(8462);
 
 
@@ -17020,13 +17020,13 @@ const resolveEndpointConfig = (input) => {
 
 
 },
-1021(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6970(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  $z: () => (/* binding */ resolveRetryConfig),
+  qs: () => (/* binding */ NODE_MAX_ATTEMPT_CONFIG_OPTIONS),
   kN: () => (/* binding */ NODE_RETRY_MODE_CONFIG_OPTIONS),
-  qs: () => (/* binding */ NODE_MAX_ATTEMPT_CONFIG_OPTIONS)
+  $z: () => (/* binding */ resolveRetryConfig)
 });
 
 // UNUSED EXPORTS: CONFIG_MAX_ATTEMPTS, CONFIG_RETRY_MODE, ENV_MAX_ATTEMPTS, ENV_RETRY_MODE
@@ -17036,7 +17036,7 @@ var normalizeProvider = __webpack_require__(8947);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var config = __webpack_require__(7355);
 // EXTERNAL MODULE: ./node_modules/@smithy/service-error-classification/dist-es/index.js + 1 modules
-var dist_es = __webpack_require__(9819);
+var dist_es = __webpack_require__(6992);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/util-retry/dist-es/DefaultRateLimiter.js
 
 class DefaultRateLimiter {
@@ -17380,7 +17380,7 @@ const NODE_RETRY_MODE_CONFIG_OPTIONS = {
 
 
 },
-5253(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1443(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -17392,7 +17392,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpRequest.js
 var httpRequest = __webpack_require__(7324);
 // EXTERNAL MODULE: ./node_modules/@smithy/service-error-classification/dist-es/index.js + 1 modules
-var dist_es = __webpack_require__(9819);
+var dist_es = __webpack_require__(6992);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/util-retry/dist-es/constants.js
@@ -17407,7 +17407,7 @@ const INVOCATION_ID_HEADER = "amz-sdk-invocation-id";
 const REQUEST_HEADER = "amz-sdk-request";
 
 // EXTERNAL MODULE: ./node_modules/@smithy/uuid/dist-es/v4.js + 1 modules
-var v4 = __webpack_require__(3983);
+var v4 = __webpack_require__(1040);
 // EXTERNAL MODULE: external "stream"
 var external_stream_ = __webpack_require__(2203);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/middleware-retry/dist-es/isStreamingPayload/isStreamingPayload.js
@@ -17416,7 +17416,7 @@ const isStreamingPayload = (request) => request?.body instanceof external_stream
     (typeof ReadableStream !== "undefined" && request?.body instanceof ReadableStream);
 
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/serde/date-utils.js + 1 modules
-var date_utils = __webpack_require__(1885);
+var date_utils = __webpack_require__(3694);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/httpResponse.js
 var httpResponse = __webpack_require__(4094);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/middleware-retry/dist-es/parseRetryAfterHeader.js
@@ -17878,7 +17878,7 @@ const priorityWeights = {
 
 
 },
-9614(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+7073(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -17924,7 +17924,7 @@ const fromEnv = (envVarSelector, options) => async () => {
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getProfileName.js
 var getProfileName = __webpack_require__(6437);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/loadSharedConfigFiles.js + 2 modules
-var loadSharedConfigFiles = __webpack_require__(8227);
+var loadSharedConfigFiles = __webpack_require__(259);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/node-config-provider/dist-es/fromSharedConfigFiles.js
 
 
@@ -17971,7 +17971,7 @@ const loadConfig = ({ environmentVariableSelector, configFileSelector, default: 
 
 
 },
-3437(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+934(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -18461,7 +18461,7 @@ or increase socketAcquisitionWarningTimeout=(millis) in the NodeHttpHandler conf
 
 
 },
-4622(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3439(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -18777,16 +18777,16 @@ class HttpResponse {
 
 
 },
-9819(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+6992(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  bV: () => (/* binding */ isTransientError),
   GQ: () => (/* binding */ isServerError),
-  Qb: () => (/* binding */ isThrottlingError)
+  Qb: () => (/* binding */ isThrottlingError),
+  bV: () => (/* binding */ isTransientError)
 });
 
-// UNUSED EXPORTS: isRetryableByTrait, isClockSkewError, isNodeJsHttp2TransientError, isBrowserNetworkError, isClockSkewCorrectedError
+// UNUSED EXPORTS: isBrowserNetworkError, isClockSkewCorrectedError, isClockSkewError, isNodeJsHttp2TransientError, isRetryableByTrait
 
 ;// CONCATENATED MODULE: ./node_modules/@smithy/service-error-classification/dist-es/constants.js
 const constants_CLOCK_SKEW_ERROR_CODES = (/* unused pure expression or super */ null && ([
@@ -18870,7 +18870,7 @@ function isNodeJsHttp2TransientError(error) {
 __webpack_require__.d(__webpack_exports__, {
   Z: () => (externalDataInterceptor)
 });
-/* import */ var _getSSOTokenFromFile__rspack_import_1 = __webpack_require__(6011);
+/* import */ var _getSSOTokenFromFile__rspack_import_1 = __webpack_require__(4415);
 /* import */ var _readFile__rspack_import_0 = __webpack_require__(733);
 
 
@@ -18897,7 +18897,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 /* import */ var path__rspack_import_0 = __webpack_require__(6928);
 /* import */ var path__rspack_import_0_default = /*#__PURE__*/__webpack_require__.n(path__rspack_import_0);
-/* import */ var _getHomeDir__rspack_import_1 = __webpack_require__(6024);
+/* import */ var _getHomeDir__rspack_import_1 = __webpack_require__(4350);
 
 
 const ENV_CONFIG_PATH = "AWS_CONFIG_FILE";
@@ -18905,7 +18905,7 @@ const getConfigFilepath = () => process.env[ENV_CONFIG_PATH] || (0,path__rspack_
 
 
 },
-6024(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+4350(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -18961,7 +18961,7 @@ __webpack_require__.d(__webpack_exports__, {
 /* import */ var crypto__rspack_import_0_default = /*#__PURE__*/__webpack_require__.n(crypto__rspack_import_0);
 /* import */ var path__rspack_import_1 = __webpack_require__(6928);
 /* import */ var path__rspack_import_1_default = /*#__PURE__*/__webpack_require__.n(path__rspack_import_1);
-/* import */ var _getHomeDir__rspack_import_2 = __webpack_require__(6024);
+/* import */ var _getHomeDir__rspack_import_2 = __webpack_require__(4350);
 
 
 
@@ -18973,12 +18973,12 @@ const getSSOTokenFilepath = (id) => {
 
 
 },
-6011(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+4415(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  a: () => (/* binding */ tokenIntercept),
-  v: () => (/* binding */ getSSOTokenFromFile)
+  v: () => (/* binding */ getSSOTokenFromFile),
+  a: () => (/* binding */ tokenIntercept)
 });
 
 ;// CONCATENATED MODULE: external "fs/promises"
@@ -19000,7 +19000,7 @@ const getSSOTokenFromFile = async (id) => {
 
 
 },
-8227(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+259(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -19036,7 +19036,7 @@ const getConfigData = (data) => Object.entries(data)
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getConfigFilepath.js
 var getConfigFilepath = __webpack_require__(2432);
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getHomeDir.js + 1 modules
-var getHomeDir = __webpack_require__(6024);
+var getHomeDir = __webpack_require__(4350);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/getCredentialsFilepath.js
 
 
@@ -19150,7 +19150,7 @@ const parseIni = (iniData) => {
 
 
 },
-8444(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+5040(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -19158,7 +19158,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/loadSharedConfigFiles.js + 2 modules
-var loadSharedConfigFiles = __webpack_require__(8227);
+var loadSharedConfigFiles = __webpack_require__(259);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/shared-ini-file-loader/dist-es/mergeConfigFiles.js
 const mergeConfigFiles = (...files) => {
     const merged = {};
@@ -19207,7 +19207,7 @@ const readFile = (path, options) => {
 
 
 },
-93(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1815(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -19887,7 +19887,7 @@ class Client {
 
 
 },
-4388(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+8103(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -20175,12 +20175,12 @@ const decorateServiceException = (exception, additions = {}) => {
 
 
 },
-5724(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+307(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
-  uv: () => (/* binding */ resolveDefaultRuntimeConfig),
-  xA: () => (/* binding */ getDefaultExtensionConfiguration)
+  xA: () => (/* binding */ getDefaultExtensionConfiguration),
+  uv: () => (/* binding */ resolveDefaultRuntimeConfig)
 });
 
 // UNUSED EXPORTS: getDefaultClientConfiguration
@@ -20327,7 +20327,7 @@ var IniSectionType;
 
 
 },
-3871(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1866(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -20514,7 +20514,7 @@ var SelectorType;
 
 
 },
-320(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+2099(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -20524,7 +20524,7 @@ __webpack_require__.d(__webpack_exports__, {
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
 var config = __webpack_require__(4836);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 // EXTERNAL MODULE: ./node_modules/@smithy/property-provider/dist-es/memoize.js
 var memoize = __webpack_require__(3783);
 ;// CONCATENATED MODULE: ./node_modules/@smithy/util-defaults-mode-node/dist-es/constants.js
@@ -20593,7 +20593,7 @@ const inferPhysicalRegion = async () => {
     }
     if (!process.env[ENV_IMDS_DISABLED]) {
         try {
-            const { getInstanceMetadataEndpoint, httpRequest } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
+            const { getInstanceMetadataEndpoint, httpRequest } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8019));
             const endpoint = await getInstanceMetadataEndpoint();
             return (await httpRequest({ ...endpoint, path: IMDS_REGION_PATH })).toString();
         }
@@ -20683,7 +20683,7 @@ class EndpointCache {
 
 
 },
-88(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3802(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -21249,7 +21249,7 @@ class Retry {
 
 
 },
-8838(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+3207(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -21257,7 +21257,7 @@ __webpack_require__.d(__webpack_exports__, {
 });
 
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
-var stream_collector = __webpack_require__(4622);
+var stream_collector = __webpack_require__(3439);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-buffer-from/dist-es/index.js
 var dist_es = __webpack_require__(9290);
 // EXTERNAL MODULE: external "stream"
@@ -21510,7 +21510,7 @@ const toUtf8 = (input) => {
 
 
 },
-3983(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
+1040(__unused_rspack_module, __webpack_exports__, __webpack_require__) {
 
 // EXPORTS
 __webpack_require__.d(__webpack_exports__, {
@@ -21713,49 +21713,49 @@ var dist_es = __webpack_require__(1095);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-logger/dist-es/loggerMiddleware.js
 var loggerMiddleware = __webpack_require__(7813);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-recursion-detection/dist-es/getRecursionDetectionPlugin.js + 3 modules
-var getRecursionDetectionPlugin = __webpack_require__(8278);
+var getRecursionDetectionPlugin = __webpack_require__(6326);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/configurations.js
 var configurations = __webpack_require__(7287);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/middleware-user-agent/dist-es/user-agent-middleware.js + 4 modules
-var user_agent_middleware = __webpack_require__(8601);
+var user_agent_middleware = __webpack_require__(5507);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/resolveRegionConfig.js + 3 modules
-var resolveRegionConfig = __webpack_require__(5423);
+var resolveRegionConfig = __webpack_require__(5335);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-auth-scheme/getHttpAuthSchemeEndpointRuleSetPlugin.js + 2 modules
-var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(5318);
+var getHttpAuthSchemeEndpointRuleSetPlugin = __webpack_require__(6486);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/util-identity-and-auth/DefaultIdentityProviderConfig.js
 var DefaultIdentityProviderConfig = __webpack_require__(612);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/middleware-http-signing/getHttpSigningMiddleware.js + 1 modules
-var getHttpSigningMiddleware = __webpack_require__(7764);
+var getHttpSigningMiddleware = __webpack_require__(7300);
 // EXTERNAL MODULE: ./node_modules/@smithy/core/dist-es/submodules/schema/middleware/getSchemaSerdePlugin.js + 4 modules
-var getSchemaSerdePlugin = __webpack_require__(1920);
+var getSchemaSerdePlugin = __webpack_require__(7806);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-content-length/dist-es/index.js
 var middleware_content_length_dist_es = __webpack_require__(649);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/resolveEndpointConfig.js
 var resolveEndpointConfig = __webpack_require__(2795);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/configurations.js + 5 modules
-var dist_es_configurations = __webpack_require__(1021);
+var dist_es_configurations = __webpack_require__(6970);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-retry/dist-es/retryMiddleware.js + 4 modules
-var retryMiddleware = __webpack_require__(5253);
+var retryMiddleware = __webpack_require__(1443);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/client.js
 var client = __webpack_require__(7821);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4Config.js + 1 modules
-var resolveAwsSdkSigV4Config = __webpack_require__(2709);
+var resolveAwsSdkSigV4Config = __webpack_require__(923);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/resolveAwsSdkSigV4AConfig.js
 var resolveAwsSdkSigV4AConfig = __webpack_require__(1942);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/signature-v4-multi-region/dist-es/SignatureV4MultiRegion.js + 4 modules
-var SignatureV4MultiRegion = __webpack_require__(2909);
+var SignatureV4MultiRegion = __webpack_require__(583);
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/adaptors/getEndpointFromInstructions.js + 2 modules
-var getEndpointFromInstructions = __webpack_require__(4812);
+var getEndpointFromInstructions = __webpack_require__(303);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/getSmithyContext.js
 var getSmithyContext = __webpack_require__(6116);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-middleware/dist-es/normalizeProvider.js
 var normalizeProvider = __webpack_require__(8947);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-endpoints/dist-es/index.js + 15 modules
-var util_endpoints_dist_es = __webpack_require__(3886);
+var util_endpoints_dist_es = __webpack_require__(5400);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/cache/EndpointCache.js
 var EndpointCache = __webpack_require__(7461);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/decideEndpoint.js + 24 modules
-var decideEndpoint = __webpack_require__(88);
+var decideEndpoint = __webpack_require__(3802);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/utils/customEndpointFunctions.js
 var customEndpointFunctions = __webpack_require__(468);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-endpoints/dist-es/bdd/BinaryDecisionDiagram.js
@@ -22030,9 +22030,9 @@ var package_namespaceObject = {"rE":"3.1040.0"}
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/client/emitWarningIfUnsupportedVersion.js
 var emitWarningIfUnsupportedVersion = __webpack_require__(5122);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/NODE_AUTH_SCHEME_PREFERENCE_OPTIONS.js + 2 modules
-var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(834);
+var NODE_AUTH_SCHEME_PREFERENCE_OPTIONS = __webpack_require__(3854);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4Signer.js + 3 modules
-var AwsSdkSigV4Signer = __webpack_require__(1253);
+var AwsSdkSigV4Signer = __webpack_require__(5719);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/httpAuthSchemes/aws_sdk/AwsSdkSigV4ASigner.js
 var AwsSdkSigV4ASigner = __webpack_require__(1006);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/credential-provider-env/dist-es/fromEnv.js
@@ -22047,10 +22047,10 @@ var dist_es_chain = __webpack_require__(8062);
 
 const ENV_IMDS_DISABLED = "AWS_EC2_METADATA_DISABLED";
 const remoteProvider = async (init) => {
-    const { ENV_CMDS_FULL_URI, ENV_CMDS_RELATIVE_URI, fromContainerMetadata, fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6579));
+    const { ENV_CMDS_FULL_URI, ENV_CMDS_RELATIVE_URI, fromContainerMetadata, fromInstanceMetadata } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8019));
     if (process.env[ENV_CMDS_RELATIVE_URI] || process.env[ENV_CMDS_FULL_URI]) {
         init.logger?.debug("@aws-sdk/credential-provider-node - remoteProvider::fromHttp/fromContainerMetadata");
-        const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 4161));
+        const { fromHttp } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 8525));
         return (0,dist_es_chain/* .chain */.c)(fromHttp(init), fromContainerMetadata(init));
     }
     if (process.env[ENV_IMDS_DISABLED] && process.env[ENV_IMDS_DISABLED] !== "false") {
@@ -22167,22 +22167,22 @@ const defaultProvider = (init = {}) => memoizeChain([
         if (!ssoStartUrl && !ssoAccountId && !ssoRegion && !ssoRoleName && !ssoSession) {
             throw new CredentialsProviderError/* .CredentialsProviderError */.C("Skipping SSO provider in default chain (inputs do not include SSO fields).", { logger: init.logger });
         }
-        const { fromSSO } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 7773));
+        const { fromSSO } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1489));
         return fromSSO(init)(awsIdentityProperties);
     },
     async (awsIdentityProperties) => {
         init.logger?.debug("@aws-sdk/credential-provider-node - defaultProvider::fromIni");
-        const { fromIni } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 6690));
+        const { fromIni } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5291));
         return fromIni(init)(awsIdentityProperties);
     },
     async (awsIdentityProperties) => {
         init.logger?.debug("@aws-sdk/credential-provider-node - defaultProvider::fromProcess");
-        const { fromProcess } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 1799));
+        const { fromProcess } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 3995));
         return fromProcess(init)(awsIdentityProperties);
     },
     async (awsIdentityProperties) => {
         init.logger?.debug("@aws-sdk/credential-provider-node - defaultProvider::fromTokenFile");
-        const { fromTokenFile } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 5521));
+        const { fromTokenFile } = await Promise.resolve(/* import() */).then(__webpack_require__.bind(__webpack_require__, 3521));
         return fromTokenFile(init)(awsIdentityProperties);
     },
     async () => {
@@ -22200,7 +22200,7 @@ const credentialsWillNeedRefresh = (credentials) => credentials?.expiration !== 
 const credentialsTreatedAsExpired = (credentials) => credentials?.expiration !== undefined && credentials.expiration.getTime() - Date.now() < 300000;
 
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/defaultUserAgent.js + 8 modules
-var defaultUserAgent = __webpack_require__(6371);
+var defaultUserAgent = __webpack_require__(5940);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/util-user-agent-node/dist-es/nodeAppIdConfigOptions.js
 var nodeAppIdConfigOptions = __webpack_require__(9915);
 // EXTERNAL MODULE: ./node_modules/@smithy/config-resolver/dist-es/regionConfig/config.js
@@ -22214,11 +22214,11 @@ var noAuth = __webpack_require__(5536);
 // EXTERNAL MODULE: ./node_modules/@smithy/hash-node/dist-es/index.js
 var hash_node_dist_es = __webpack_require__(1701);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-config-provider/dist-es/configLoader.js + 5 modules
-var configLoader = __webpack_require__(9614);
+var configLoader = __webpack_require__(7073);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/node-http-handler.js + 11 modules
-var node_http_handler = __webpack_require__(3437);
+var node_http_handler = __webpack_require__(934);
 // EXTERNAL MODULE: ./node_modules/@smithy/node-http-handler/dist-es/stream-collector/index.js + 1 modules
-var stream_collector = __webpack_require__(4622);
+var stream_collector = __webpack_require__(3439);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/emitWarningIfUnsupportedVersion.js
 var dist_es_emitWarningIfUnsupportedVersion = __webpack_require__(2339);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/defaults-mode.js
@@ -22226,15 +22226,15 @@ var defaults_mode = __webpack_require__(666);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-body-length-node/dist-es/calculateBodyLength.js
 var calculateBodyLength = __webpack_require__(2291);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-defaults-mode-node/dist-es/resolveDefaultsModeConfig.js + 2 modules
-var resolveDefaultsModeConfig = __webpack_require__(320);
+var resolveDefaultsModeConfig = __webpack_require__(2099);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-retry/dist-es/config.js
 var dist_es_config = __webpack_require__(7355);
 // EXTERNAL MODULE: ./node_modules/@aws-sdk/core/dist-es/submodules/protocols/query/AwsQueryProtocol.js + 21 modules
-var AwsQueryProtocol = __webpack_require__(3392);
+var AwsQueryProtocol = __webpack_require__(1364);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/NoOpLogger.js
 var NoOpLogger = __webpack_require__(4098);
 // EXTERNAL MODULE: ./node_modules/@smithy/url-parser/dist-es/index.js + 1 modules
-var url_parser_dist_es = __webpack_require__(3871);
+var url_parser_dist_es = __webpack_require__(1866);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/fromBase64.js
 var fromBase64 = __webpack_require__(1395);
 // EXTERNAL MODULE: ./node_modules/@smithy/util-base64/dist-es/toBase64.js
@@ -22921,7 +22921,7 @@ var dist_es_extensions = __webpack_require__(4163);
 // EXTERNAL MODULE: ./node_modules/@smithy/protocol-http/dist-es/extensions/httpExtensionConfiguration.js
 var httpExtensionConfiguration = __webpack_require__(2927);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/extensions/defaultExtensionConfiguration.js + 3 modules
-var defaultExtensionConfiguration = __webpack_require__(5724);
+var defaultExtensionConfiguration = __webpack_require__(307);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/auth/httpAuthExtensionConfiguration.js
 const getHttpAuthExtensionConfiguration = (runtimeConfig) => {
     const _httpAuthSchemes = runtimeConfig.httpAuthSchemes;
@@ -23027,9 +23027,9 @@ class STSClient extends client/* .Client */.K {
 }
 
 // EXTERNAL MODULE: ./node_modules/@smithy/middleware-endpoint/dist-es/getEndpointPlugin.js + 3 modules
-var getEndpointPlugin = __webpack_require__(9588);
+var getEndpointPlugin = __webpack_require__(8560);
 // EXTERNAL MODULE: ./node_modules/@smithy/smithy-client/dist-es/command.js + 1 modules
-var command = __webpack_require__(4388);
+var command = __webpack_require__(8103);
 ;// CONCATENATED MODULE: ./node_modules/@aws-sdk/client-sts/dist-es/commands/GetCallerIdentityCommand.js
 
 
