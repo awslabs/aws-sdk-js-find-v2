@@ -10,7 +10,7 @@
     "commander": "^14.0.2",
     "compare-versions": "^6.1.1",
     "node-stream-zip": "^1.15.0",
-    "oxc-parser": "^0.107.0",
+    "oxc-parser": "^0.129.0",
     "p-limit": "^7.2.0"
   },
   "devDependencies": {
@@ -29,8 +29,8 @@
     "esbuild": "~0.27.2",
     "husky": "^9.1.7",
     "lint-staged": "^16.2.7",
-    "oxfmt": "^0.36.0",
-    "oxlint": "^1.33.0",
+    "oxfmt": "^0.48.0",
+    "oxlint": "^1.63.0",
     "rolldown": "^1.0.0",
     "rollup": "^4.56.0",
     "typescript": "^6.0.2",
