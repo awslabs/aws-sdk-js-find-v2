@@ -1,4 +1,5 @@
-//#region rolldown:runtime
+Object.defineProperty(exports, Symbol.toStringTag, { value: 'Module' });
+//#region \0rolldown/runtime.js
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
@@ -6,8 +7,8 @@ var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
 var __esmMin = (fn, res) => () => (fn && (res = fn(fn = 0)), res);
-var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
-var __exportAll = (all, symbols) => {
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
+var __exportAll = (all, no_symbols) => {
 	let target = {};
 	for (var name in all) {
 		__defProp(target, name, {
@@ -15,7 +16,7 @@ var __exportAll = (all, symbols) => {
 			enumerable: true
 		});
 	}
-	if (symbols) {
+	if (!no_symbols) {
 		__defProp(target, Symbol.toStringTag, { value: "Module" });
 	}
 	return target;
@@ -3288,8 +3289,7 @@ var init_parse_utils = __esmMin((() => {
 	expectObject = (value) => {
 		if (value === null || value === void 0) return;
 		if (typeof value === "object" && !Array.isArray(value)) return value;
-		const receivedType = Array.isArray(value) ? "array" : typeof value;
-		throw new TypeError(`Expected object, got ${receivedType}: ${value}`);
+		throw new TypeError(`Expected object, got ${Array.isArray(value) ? "array" : typeof value}: ${value}`);
 	};
 	expectString = (value) => {
 		if (value === null || value === void 0) return;
@@ -7781,12 +7781,10 @@ var require_dist_cjs$24 = /* @__PURE__ */ __commonJSMin(((exports) => {
 	const resolveEndpointConfig = (input) => {
 		const tls = input.tls ?? true;
 		const { endpoint, useDualstackEndpoint, useFipsEndpoint } = input;
-		const customEndpointProvider = endpoint != null ? async () => toEndpointV1(await utilMiddleware.normalizeProvider(endpoint)()) : void 0;
-		const isCustomEndpoint = !!endpoint;
 		const resolvedConfig = Object.assign(input, {
-			endpoint: customEndpointProvider,
+			endpoint: endpoint != null ? async () => toEndpointV1(await utilMiddleware.normalizeProvider(endpoint)()) : void 0,
 			tls,
-			isCustomEndpoint,
+			isCustomEndpoint: !!endpoint,
 			useDualstackEndpoint: utilMiddleware.normalizeProvider(useDualstackEndpoint ?? false),
 			useFipsEndpoint: utilMiddleware.normalizeProvider(useFipsEndpoint ?? false)
 		});
@@ -9726,25 +9724,8 @@ function tag(data) {
 	data[tagSymbol] = true;
 	return data;
 }
-var majorUint64, majorNegativeInt64, majorUnstructuredByteString, majorUtf8String, majorList, majorMap, majorTag, majorSpecial, specialFalse, specialTrue, specialNull, specialUndefined, extendedOneByte, extendedFloat16, extendedFloat32, extendedFloat64, minorIndefinite, tagSymbol;
+var tagSymbol;
 var init_cbor_types = __esmMin((() => {
-	majorUint64 = 0;
-	majorNegativeInt64 = 1;
-	majorUnstructuredByteString = 2;
-	majorUtf8String = 3;
-	majorList = 4;
-	majorMap = 5;
-	majorTag = 6;
-	majorSpecial = 7;
-	specialFalse = 20;
-	specialTrue = 21;
-	specialNull = 22;
-	specialUndefined = 23;
-	extendedOneByte = 24;
-	extendedFloat16 = 25;
-	extendedFloat32 = 26;
-	extendedFloat64 = 27;
-	minorIndefinite = 31;
 	tagSymbol = Symbol("@smithy/core/cbor::tagSymbol");
 }));
 
@@ -9759,19 +9740,19 @@ function decode(at, to) {
 	const major = (payload[at] & 224) >> 5;
 	const minor = payload[at] & 31;
 	switch (major) {
-		case majorUint64:
-		case majorNegativeInt64:
-		case majorTag:
+		case 0:
+		case 1:
+		case 6:
 			let unsignedInt;
 			let offset;
 			if (minor < 24) {
 				unsignedInt = minor;
 				offset = 1;
 			} else switch (minor) {
-				case extendedOneByte:
-				case extendedFloat16:
-				case extendedFloat32:
-				case extendedFloat64:
+				case 24:
+				case 25:
+				case 26:
+				case 27:
 					const countLength = minorValueToArgumentLength[minor];
 					const countOffset = countLength + 1;
 					offset = countOffset;
@@ -9784,10 +9765,10 @@ function decode(at, to) {
 					break;
 				default: throw new Error(`unexpected minor value ${minor}.`);
 			}
-			if (major === majorUint64) {
+			if (major === 0) {
 				_offset = offset;
 				return castBigInt(unsignedInt);
-			} else if (major === majorNegativeInt64) {
+			} else if (major === 1) {
 				let negativeInt;
 				if (typeof unsignedInt === "bigint") negativeInt = BigInt(-1) - unsignedInt;
 				else negativeInt = -1 - unsignedInt;
@@ -9821,20 +9802,20 @@ function decode(at, to) {
 					value
 				});
 			}
-		case majorUtf8String:
-		case majorMap:
-		case majorList:
-		case majorUnstructuredByteString: if (minor === minorIndefinite) switch (major) {
-			case majorUtf8String: return decodeUtf8StringIndefinite(at, to);
-			case majorMap: return decodeMapIndefinite(at, to);
-			case majorList: return decodeListIndefinite(at, to);
-			case majorUnstructuredByteString: return decodeUnstructuredByteStringIndefinite(at, to);
+		case 3:
+		case 5:
+		case 4:
+		case 2: if (minor === 31) switch (major) {
+			case 3: return decodeUtf8StringIndefinite(at, to);
+			case 5: return decodeMapIndefinite(at, to);
+			case 4: return decodeListIndefinite(at, to);
+			case 2: return decodeUnstructuredByteStringIndefinite(at, to);
 		}
 		else switch (major) {
-			case majorUtf8String: return decodeUtf8String(at, to);
-			case majorMap: return decodeMap(at, to);
-			case majorList: return decodeList(at, to);
-			case majorUnstructuredByteString: return decodeUnstructuredByteString(at, to);
+			case 3: return decodeUtf8String(at, to);
+			case 5: return decodeMap(at, to);
+			case 4: return decodeList(at, to);
+			case 2: return decodeUnstructuredByteString(at, to);
 		}
 		default: return decodeSpecial(at, to);
 	}
@@ -9876,7 +9857,7 @@ function decodeCount(at, to) {
 		_offset = 1;
 		return minor;
 	}
-	if (minor === extendedOneByte || minor === extendedFloat16 || minor === extendedFloat32 || minor === extendedFloat64) {
+	if (minor === 24 || minor === 25 || minor === 26 || minor === 27) {
 		const countLength = minorValueToArgumentLength[minor];
 		_offset = countLength + 1;
 		if (to - at < _offset) throw new Error(`countLength ${countLength} greater than remaining buf len.`);
@@ -9909,8 +9890,8 @@ function decodeUtf8StringIndefinite(at, to) {
 		}
 		const major = (payload[at] & 224) >> 5;
 		const minor = payload[at] & 31;
-		if (major !== majorUtf8String) throw new Error(`unexpected major type ${major} in indefinite string.`);
-		if (minor === minorIndefinite) throw new Error("nested indefinite string.");
+		if (major !== 3) throw new Error(`unexpected major type ${major} in indefinite string.`);
+		if (minor === 31) throw new Error("nested indefinite string.");
 		const bytes = decodeUnstructuredByteString(at, to);
 		at += _offset;
 		for (let i = 0; i < bytes.length; ++i) vector.push(bytes[i]);
@@ -9938,8 +9919,8 @@ function decodeUnstructuredByteStringIndefinite(at, to) {
 		}
 		const major = (payload[at] & 224) >> 5;
 		const minor = payload[at] & 31;
-		if (major !== majorUnstructuredByteString) throw new Error(`unexpected major type ${major} in indefinite string.`);
-		if (minor === minorIndefinite) throw new Error("nested indefinite string.");
+		if (major !== 2) throw new Error(`unexpected major type ${major} in indefinite string.`);
+		if (minor === 31) throw new Error("nested indefinite string.");
 		const bytes = decodeUnstructuredByteString(at, to);
 		at += _offset;
 		for (let i = 0; i < bytes.length; ++i) vector.push(bytes[i]);
@@ -9984,7 +9965,7 @@ function decodeMap(at, to) {
 	for (let i = 0; i < mapDataLength; ++i) {
 		if (at >= to) throw new Error("unexpected end of map payload.");
 		const major = (payload[at] & 224) >> 5;
-		if (major !== majorUtf8String) throw new Error(`unexpected major type ${major} for map key at index ${at}.`);
+		if (major !== 3) throw new Error(`unexpected major type ${major} for map key at index ${at}.`);
 		const key = decode(at, to);
 		at += _offset;
 		const value = decode(at, to);
@@ -10005,7 +9986,7 @@ function decodeMapIndefinite(at, to) {
 			return map;
 		}
 		const major = (payload[at] & 224) >> 5;
-		if (major !== majorUtf8String) throw new Error(`unexpected major type ${major} for map key.`);
+		if (major !== 3) throw new Error(`unexpected major type ${major} for map key.`);
 		const key = decode(at, to);
 		at += _offset;
 		const value = decode(at, to);
@@ -10017,25 +9998,25 @@ function decodeMapIndefinite(at, to) {
 function decodeSpecial(at, to) {
 	const minor = payload[at] & 31;
 	switch (minor) {
-		case specialTrue:
-		case specialFalse:
+		case 21:
+		case 20:
 			_offset = 1;
-			return minor === specialTrue;
-		case specialNull:
-			_offset = 1;
-			return null;
-		case specialUndefined:
+			return minor === 21;
+		case 22:
 			_offset = 1;
 			return null;
-		case extendedFloat16:
+		case 23:
+			_offset = 1;
+			return null;
+		case 25:
 			if (to - at < 3) throw new Error("incomplete float16 at end of buf.");
 			_offset = 3;
 			return bytesToFloat16(payload[at + 1], payload[at + 2]);
-		case extendedFloat32:
+		case 26:
 			if (to - at < 5) throw new Error("incomplete float32 at end of buf.");
 			_offset = 5;
 			return dataView$1.getFloat32(at + 1);
-		case extendedFloat64:
+		case 27:
 			if (to - at < 9) throw new Error("incomplete float64 at end of buf.");
 			_offset = 9;
 			return dataView$1.getFloat64(at + 1);
@@ -10060,10 +10041,10 @@ var init_cbor_decode = __esmMin((() => {
 	textDecoder = USE_TEXT_DECODER ? new TextDecoder() : null;
 	_offset = 0;
 	minorValueToArgumentLength = {
-		[extendedOneByte]: 1,
-		[extendedFloat16]: 2,
-		[extendedFloat32]: 4,
-		[extendedFloat64]: 8
+		[24]: 1,
+		[25]: 2,
+		[26]: 4,
+		[27]: 8
 	};
 }));
 
@@ -10092,15 +10073,15 @@ function encodeHeader(major, value) {
 		data[cursor++] = major << 5 | 24;
 		data[cursor++] = value;
 	} else if (value < 65536) {
-		data[cursor++] = major << 5 | extendedFloat16;
+		data[cursor++] = major << 5 | 25;
 		dataView.setUint16(cursor, value);
 		cursor += 2;
 	} else if (value < 2 ** 32) {
-		data[cursor++] = major << 5 | extendedFloat32;
+		data[cursor++] = major << 5 | 26;
 		dataView.setUint32(cursor, value);
 		cursor += 4;
 	} else {
-		data[cursor++] = major << 5 | extendedFloat64;
+		data[cursor++] = major << 5 | 27;
 		dataView.setBigUint64(cursor, typeof value === "bigint" ? value : BigInt(value));
 		cursor += 8;
 	}
@@ -10112,11 +10093,11 @@ function encode(_input) {
 		ensureSpace(typeof input === "string" ? input.length * 4 : 64);
 		if (typeof input === "string") {
 			if (USE_BUFFER) {
-				encodeHeader(majorUtf8String, Buffer.byteLength(input));
+				encodeHeader(3, Buffer.byteLength(input));
 				cursor += data.write(input, cursor);
 			} else {
 				const bytes = (0, import_dist_cjs$161.fromUtf8)(input);
-				encodeHeader(majorUtf8String, bytes.byteLength);
+				encodeHeader(3, bytes.byteLength);
 				data.set(bytes, cursor);
 				cursor += bytes.byteLength;
 			}
@@ -10124,34 +10105,34 @@ function encode(_input) {
 		} else if (typeof input === "number") {
 			if (Number.isInteger(input)) {
 				const nonNegative = input >= 0;
-				const major = nonNegative ? majorUint64 : majorNegativeInt64;
+				const major = nonNegative ? 0 : 1;
 				const value = nonNegative ? input : -input - 1;
 				if (value < 24) data[cursor++] = major << 5 | value;
 				else if (value < 256) {
 					data[cursor++] = major << 5 | 24;
 					data[cursor++] = value;
 				} else if (value < 65536) {
-					data[cursor++] = major << 5 | extendedFloat16;
+					data[cursor++] = major << 5 | 25;
 					data[cursor++] = value >> 8;
 					data[cursor++] = value;
 				} else if (value < 4294967296) {
-					data[cursor++] = major << 5 | extendedFloat32;
+					data[cursor++] = major << 5 | 26;
 					dataView.setUint32(cursor, value);
 					cursor += 4;
 				} else {
-					data[cursor++] = major << 5 | extendedFloat64;
+					data[cursor++] = major << 5 | 27;
 					dataView.setBigUint64(cursor, BigInt(value));
 					cursor += 8;
 				}
 				continue;
 			}
-			data[cursor++] = majorSpecial << 5 | extendedFloat64;
+			data[cursor++] = 7 << 5 | 27;
 			dataView.setFloat64(cursor, input);
 			cursor += 8;
 			continue;
 		} else if (typeof input === "bigint") {
 			const nonNegative = input >= 0;
-			const major = nonNegative ? majorUint64 : majorNegativeInt64;
+			const major = nonNegative ? 0 : 1;
 			const value = nonNegative ? input : -input - BigInt(1);
 			const n = Number(value);
 			if (n < 24) data[cursor++] = major << 5 | n;
@@ -10159,15 +10140,15 @@ function encode(_input) {
 				data[cursor++] = major << 5 | 24;
 				data[cursor++] = n;
 			} else if (n < 65536) {
-				data[cursor++] = major << 5 | extendedFloat16;
+				data[cursor++] = major << 5 | 25;
 				data[cursor++] = n >> 8;
 				data[cursor++] = n & 255;
 			} else if (n < 4294967296) {
-				data[cursor++] = major << 5 | extendedFloat32;
+				data[cursor++] = major << 5 | 26;
 				dataView.setUint32(cursor, n);
 				cursor += 4;
 			} else if (value < BigInt("18446744073709551616")) {
-				data[cursor++] = major << 5 | extendedFloat64;
+				data[cursor++] = major << 5 | 27;
 				dataView.setBigUint64(cursor, value);
 				cursor += 8;
 			} else {
@@ -10181,26 +10162,26 @@ function encode(_input) {
 				}
 				ensureSpace(bigIntBytes.byteLength * 2);
 				data[cursor++] = nonNegative ? 194 : 195;
-				if (USE_BUFFER) encodeHeader(majorUnstructuredByteString, Buffer.byteLength(bigIntBytes));
-				else encodeHeader(majorUnstructuredByteString, bigIntBytes.byteLength);
+				if (USE_BUFFER) encodeHeader(2, Buffer.byteLength(bigIntBytes));
+				else encodeHeader(2, bigIntBytes.byteLength);
 				data.set(bigIntBytes, cursor);
 				cursor += bigIntBytes.byteLength;
 			}
 			continue;
 		} else if (input === null) {
-			data[cursor++] = majorSpecial << 5 | specialNull;
+			data[cursor++] = 7 << 5 | 22;
 			continue;
 		} else if (typeof input === "boolean") {
-			data[cursor++] = majorSpecial << 5 | (input ? specialTrue : specialFalse);
+			data[cursor++] = 7 << 5 | (input ? 21 : 20);
 			continue;
 		} else if (typeof input === "undefined") throw new Error("@smithy/core/cbor: client may not serialize undefined value.");
 		else if (Array.isArray(input)) {
 			for (let i = input.length - 1; i >= 0; --i) encodeStack.push(input[i]);
-			encodeHeader(majorList, input.length);
+			encodeHeader(4, input.length);
 			continue;
 		} else if (typeof input.byteLength === "number") {
 			ensureSpace(input.length * 2);
-			encodeHeader(majorUnstructuredByteString, input.length);
+			encodeHeader(2, input.length);
 			data.set(input, cursor);
 			cursor += input.byteLength;
 			continue;
@@ -10212,12 +10193,12 @@ function encode(_input) {
 				data[cursor++] = 196;
 				encodeStack.push(mantissa);
 				encodeStack.push(exponent);
-				encodeHeader(majorList, 2);
+				encodeHeader(4, 2);
 				continue;
 			}
 			if (input[tagSymbol]) if ("tag" in input && "value" in input) {
 				encodeStack.push(input.value);
-				encodeHeader(majorTag, input.tag);
+				encodeHeader(6, input.tag);
 				continue;
 			} else throw new Error("tag encountered with missing fields, need 'tag' and 'value', found: " + JSON.stringify(input));
 			const keys = Object.keys(input);
@@ -10226,7 +10207,7 @@ function encode(_input) {
 				encodeStack.push(input[key]);
 				encodeStack.push(key);
 			}
-			encodeHeader(majorMap, keys.length);
+			encodeHeader(5, keys.length);
 			continue;
 		}
 		throw new Error(`data type ${input?.constructor?.name ?? typeof input} not compatible for encoding.`);
@@ -10548,6 +10529,8 @@ var init_SmithyRpcV2CborProtocol = __esmMin((() => {
 //#endregion
 //#region node_modules/@smithy/core/dist-es/submodules/cbor/index.js
 var init_cbor = __esmMin((() => {
+	init_cbor$1();
+	init_cbor_types();
 	init_parseCborBody();
 	init_SmithyRpcV2CborProtocol();
 	init_CborCodec();
@@ -17278,7 +17261,8 @@ var init_SSOOIDCClient = __esmMin((() => {
 			const _config_0 = getRuntimeConfig$6(configuration || {});
 			super(_config_0);
 			this.initConfig = _config_0;
-			this.config = resolveRuntimeExtensions$3(resolveHttpAuthSchemeConfig$3((0, import_dist_cjs$118.resolveEndpointConfig)((0, import_dist_cjs$112.resolveHostHeaderConfig)((0, import_dist_cjs$116.resolveRegionConfig)((0, import_dist_cjs$119.resolveRetryConfig)((0, import_dist_cjs$115.resolveUserAgentConfig)(resolveClientEndpointParameters$3(_config_0))))))), configuration?.extensions || []);
+			const _config_8 = resolveRuntimeExtensions$3(resolveHttpAuthSchemeConfig$3((0, import_dist_cjs$118.resolveEndpointConfig)((0, import_dist_cjs$112.resolveHostHeaderConfig)((0, import_dist_cjs$116.resolveRegionConfig)((0, import_dist_cjs$119.resolveRetryConfig)((0, import_dist_cjs$115.resolveUserAgentConfig)(resolveClientEndpointParameters$3(_config_0))))))), configuration?.extensions || []);
+			this.config = _config_8;
 			this.middlewareStack.use(getSchemaSerdePlugin(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$115.getUserAgentPlugin)(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$119.getRetryPlugin)(this.config));
@@ -18142,7 +18126,8 @@ var init_SSOClient = __esmMin((() => {
 			const _config_0 = getRuntimeConfig$4(configuration || {});
 			super(_config_0);
 			this.initConfig = _config_0;
-			this.config = resolveRuntimeExtensions$2(resolveHttpAuthSchemeConfig$2((0, import_dist_cjs$84.resolveEndpointConfig)((0, import_dist_cjs$78.resolveHostHeaderConfig)((0, import_dist_cjs$82.resolveRegionConfig)((0, import_dist_cjs$85.resolveRetryConfig)((0, import_dist_cjs$81.resolveUserAgentConfig)(resolveClientEndpointParameters$2(_config_0))))))), configuration?.extensions || []);
+			const _config_8 = resolveRuntimeExtensions$2(resolveHttpAuthSchemeConfig$2((0, import_dist_cjs$84.resolveEndpointConfig)((0, import_dist_cjs$78.resolveHostHeaderConfig)((0, import_dist_cjs$82.resolveRegionConfig)((0, import_dist_cjs$85.resolveRetryConfig)((0, import_dist_cjs$81.resolveUserAgentConfig)(resolveClientEndpointParameters$2(_config_0))))))), configuration?.extensions || []);
+			this.config = _config_8;
 			this.middlewareStack.use(getSchemaSerdePlugin(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$81.getUserAgentPlugin)(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$85.getRetryPlugin)(this.config));
@@ -19065,7 +19050,8 @@ var init_SigninClient = __esmMin((() => {
 			const _config_0 = getRuntimeConfig$2(configuration || {});
 			super(_config_0);
 			this.initConfig = _config_0;
-			this.config = resolveRuntimeExtensions$1(resolveHttpAuthSchemeConfig$1((0, import_dist_cjs$50.resolveEndpointConfig)((0, import_dist_cjs$44.resolveHostHeaderConfig)((0, import_dist_cjs$48.resolveRegionConfig)((0, import_dist_cjs$51.resolveRetryConfig)((0, import_dist_cjs$47.resolveUserAgentConfig)(resolveClientEndpointParameters$1(_config_0))))))), configuration?.extensions || []);
+			const _config_8 = resolveRuntimeExtensions$1(resolveHttpAuthSchemeConfig$1((0, import_dist_cjs$50.resolveEndpointConfig)((0, import_dist_cjs$44.resolveHostHeaderConfig)((0, import_dist_cjs$48.resolveRegionConfig)((0, import_dist_cjs$51.resolveRetryConfig)((0, import_dist_cjs$47.resolveUserAgentConfig)(resolveClientEndpointParameters$1(_config_0))))))), configuration?.extensions || []);
+			this.config = _config_8;
 			this.middlewareStack.use(getSchemaSerdePlugin(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$47.getUserAgentPlugin)(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$51.getRetryPlugin)(this.config));
@@ -20481,7 +20467,8 @@ var init_STSClient = __esmMin((() => {
 			const _config_0 = getRuntimeConfig(configuration || {});
 			super(_config_0);
 			this.initConfig = _config_0;
-			this.config = resolveRuntimeExtensions(resolveHttpAuthSchemeConfig((0, import_dist_cjs$13.resolveEndpointConfig)((0, import_dist_cjs$7.resolveHostHeaderConfig)((0, import_dist_cjs$11.resolveRegionConfig)((0, import_dist_cjs$14.resolveRetryConfig)((0, import_dist_cjs$10.resolveUserAgentConfig)(resolveClientEndpointParameters(_config_0))))))), configuration?.extensions || []);
+			const _config_8 = resolveRuntimeExtensions(resolveHttpAuthSchemeConfig((0, import_dist_cjs$13.resolveEndpointConfig)((0, import_dist_cjs$7.resolveHostHeaderConfig)((0, import_dist_cjs$11.resolveRegionConfig)((0, import_dist_cjs$14.resolveRetryConfig)((0, import_dist_cjs$10.resolveUserAgentConfig)(resolveClientEndpointParameters(_config_0))))))), configuration?.extensions || []);
+			this.config = _config_8;
 			this.middlewareStack.use(getSchemaSerdePlugin(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$10.getUserAgentPlugin)(this.config));
 			this.middlewareStack.use((0, import_dist_cjs$14.getRetryPlugin)(this.config));
@@ -22479,7 +22466,8 @@ var require_STSClient = /* @__PURE__ */ __commonJSMin(((exports) => {
 			const _config_5 = (0, middleware_host_header_1.resolveHostHeaderConfig)(_config_4);
 			const _config_6 = (0, middleware_endpoint_1.resolveEndpointConfig)(_config_5);
 			const _config_7 = (0, httpAuthSchemeProvider_1.resolveHttpAuthSchemeConfig)(_config_6);
-			this.config = (0, runtimeExtensions_1.resolveRuntimeExtensions)(_config_7, configuration?.extensions || []);
+			const _config_8 = (0, runtimeExtensions_1.resolveRuntimeExtensions)(_config_7, configuration?.extensions || []);
+			this.config = _config_8;
 			this.middlewareStack.use((0, schema_1.getSchemaSerdePlugin)(this.config));
 			this.middlewareStack.use((0, middleware_user_agent_1.getUserAgentPlugin)(this.config));
 			this.middlewareStack.use((0, middleware_retry_1.getRetryPlugin)(this.config));

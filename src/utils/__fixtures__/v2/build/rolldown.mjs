@@ -1,13 +1,13 @@
 import { createRequire } from "node:module";
 
-//#region rolldown:runtime
+//#region \0rolldown/runtime.js
 var __create = Object.create;
 var __defProp = Object.defineProperty;
 var __getOwnPropDesc = Object.getOwnPropertyDescriptor;
 var __getOwnPropNames = Object.getOwnPropertyNames;
 var __getProtoOf = Object.getPrototypeOf;
 var __hasOwnProp = Object.prototype.hasOwnProperty;
-var __commonJSMin = (cb, mod) => () => (mod || cb((mod = { exports: {} }).exports, mod), mod.exports);
+var __commonJSMin = (cb, mod) => () => (mod || (cb((mod = { exports: {} }).exports, mod), cb = null), mod.exports);
 var __copyProps = (to, from, except, desc) => {
 	if (from && typeof from === "object" || typeof from === "function") {
 		for (var keys = __getOwnPropNames(from), i = 0, n = keys.length, key; i < n; i++) {
@@ -2673,6 +2673,9 @@ var require_sequential_executor = /* @__PURE__ */ __commonJSMin(((exports, modul
 		constructor: function SequentialExecutor() {
 			this._events = {};
 		},
+		/**
+		* @api private
+		*/
 		listeners: function listeners(eventName) {
 			return this._events[eventName] ? this._events[eventName].slice(0) : [];
 		},
@@ -2700,6 +2703,9 @@ var require_sequential_executor = /* @__PURE__ */ __commonJSMin(((exports, modul
 			else this._events = {};
 			return this;
 		},
+		/**
+		* @api private
+		*/
 		emit: function emit(eventName, eventArgs, doneCallback) {
 			if (!doneCallback) doneCallback = function() {};
 			var listeners = this.listeners(eventName);
@@ -2707,6 +2713,9 @@ var require_sequential_executor = /* @__PURE__ */ __commonJSMin(((exports, modul
 			this.callListeners(listeners, eventArgs, doneCallback);
 			return count > 0;
 		},
+		/**
+		* @api private
+		*/
 		callListeners: function callListeners(listeners, args, doneCallback, prevError) {
 			var self = this;
 			var error = prevError || null;
@@ -2736,6 +2745,30 @@ var require_sequential_executor = /* @__PURE__ */ __commonJSMin(((exports, modul
 			}
 			doneCallback.call(self, error);
 		},
+		/**
+		* Adds or copies a set of listeners from another list of
+		* listeners or SequentialExecutor object.
+		*
+		* @param listeners [map<String,Array<Function>>, AWS.SequentialExecutor]
+		*   a list of events and callbacks, or an event emitter object
+		*   containing listeners to add to this emitter object.
+		* @return [AWS.SequentialExecutor] the emitter object, for chaining.
+		* @example Adding listeners from a map of listeners
+		*   emitter.addListeners({
+		*     event1: [function() { ... }, function() { ... }],
+		*     event2: [function() { ... }]
+		*   });
+		*   emitter.emit('event1'); // emitter has event1
+		*   emitter.emit('event2'); // emitter has event2
+		* @example Adding listeners from another emitter object
+		*   var emitter1 = new AWS.SequentialExecutor();
+		*   emitter1.on('event1', function() { ... });
+		*   emitter1.on('event2', function() { ... });
+		*   var emitter2 = new AWS.SequentialExecutor();
+		*   emitter2.addListeners(emitter1);
+		*   emitter2.emit('event1'); // emitter2 has event1
+		*   emitter2.emit('event2'); // emitter2 has event2
+		*/
 		addListeners: function addListeners(listeners) {
 			var self = this;
 			if (listeners._events) listeners = listeners._events;
@@ -2747,15 +2780,57 @@ var require_sequential_executor = /* @__PURE__ */ __commonJSMin(((exports, modul
 			});
 			return self;
 		},
+		/**
+		* Registers an event with {on} and saves the callback handle function
+		* as a property on the emitter object using a given `name`.
+		*
+		* @param name [String] the property name to set on this object containing
+		*   the callback function handle so that the listener can be removed in
+		*   the future.
+		* @param (see on)
+		* @return (see on)
+		* @example Adding a named listener DATA_CALLBACK
+		*   var listener = function() { doSomething(); };
+		*   emitter.addNamedListener('DATA_CALLBACK', 'data', listener);
+		*
+		*   // the following prints: true
+		*   console.log(emitter.DATA_CALLBACK == listener);
+		*/
 		addNamedListener: function addNamedListener(name, eventName, callback, toHead) {
 			this[name] = callback;
 			this.addListener(eventName, callback, toHead);
 			return this;
 		},
+		/**
+		* @api private
+		*/
 		addNamedAsyncListener: function addNamedAsyncListener(name, eventName, callback, toHead) {
 			callback._isAsync = true;
 			return this.addNamedListener(name, eventName, callback, toHead);
 		},
+		/**
+		* Helper method to add a set of named listeners using
+		* {addNamedListener}. The callback contains a parameter
+		* with a handle to the `addNamedListener` method.
+		*
+		* @callback callback function(add)
+		*   The callback function is called immediately in order to provide
+		*   the `add` function to the block. This simplifies the addition of
+		*   a large group of named listeners.
+		*   @param add [Function] the {addNamedListener} function to call
+		*     when registering listeners.
+		* @example Adding a set of named listeners
+		*   emitter.addNamedListeners(function(add) {
+		*     add('DATA_CALLBACK', 'data', function() { ... });
+		*     add('OTHER', 'otherEvent', function() { ... });
+		*     add('LAST', 'lastEvent', function() { ... });
+		*   });
+		*
+		*   // these properties are now set:
+		*   emitter.DATA_CALLBACK;
+		*   emitter.OTHER;
+		*   emitter.LAST;
+		*/
 		addNamedListeners: function addNamedListeners(callback) {
 			var self = this;
 			callback(function() {
@@ -3148,6 +3223,11 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*   @readonly
 	*/
 	AWS.Service = inherit({
+		/**
+		* Create a new service object with a configuration object
+		*
+		* @param config [map] a map of configuration options
+		*/
 		constructor: function Service(config) {
 			if (!this.loadServiceClass) throw AWS.util.error(/* @__PURE__ */ new Error(), "Service must be constructed with `new' operator");
 			if (config) {
@@ -3177,6 +3257,9 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			this.initialize(config);
 		},
+		/**
+		* @api private
+		*/
 		initialize: function initialize(config) {
 			var svcConfig = AWS.config[this.serviceIdentifier];
 			this.config = new AWS.Config(AWS.config);
@@ -3202,7 +3285,13 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				});
 			}
 		},
+		/**
+		* @api private
+		*/
 		validateService: function validateService() {},
+		/**
+		* @api private
+		*/
 		loadServiceClass: function loadServiceClass(serviceConfig) {
 			var config = serviceConfig;
 			if (!AWS.util.isEmpty(this.api)) return null;
@@ -3216,11 +3305,17 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				return this.getLatestServiceClass(version);
 			}
 		},
+		/**
+		* @api private
+		*/
 		getLatestServiceClass: function getLatestServiceClass(version) {
 			version = this.getLatestServiceVersion(version);
 			if (this.constructor.services[version] === null) AWS.Service.defineServiceApi(this.constructor, version);
 			return this.constructor.services[version];
 		},
+		/**
+		* @api private
+		*/
 		getLatestServiceVersion: function getLatestServiceVersion(version) {
 			if (!this.constructor.services || this.constructor.services.length === 0) throw new Error("No services defined on " + this.constructor.serviceIdentifier);
 			if (!version) version = "latest";
@@ -3234,13 +3329,35 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			throw new Error("Could not find " + this.constructor.serviceIdentifier + " API to satisfy version constraint `" + version + "'");
 		},
+		/**
+		* @api private
+		*/
 		api: {},
+		/**
+		* @api private
+		*/
 		defaultRetryCount: 3,
+		/**
+		* @api private
+		*/
 		customizeRequests: function customizeRequests(callback) {
 			if (!callback) this.customRequestHandler = null;
 			else if (typeof callback === "function") this.customRequestHandler = callback;
 			else throw new Error("Invalid callback type '" + typeof callback + "' provided in customizeRequests");
 		},
+		/**
+		* Calls an operation on a service with the given input parameters.
+		*
+		* @param operation [String] the name of the operation to call on the service.
+		* @param params [map] a map of input options for the operation
+		* @callback callback function(err, data)
+		*   If a callback is supplied, it is called when a response is returned
+		*   from the service.
+		*   @param err [Error] the error object returned from the request.
+		*     Set to `null` if the request is successful.
+		*   @param data [Object] the de-serialized data returned from
+		*     the request. Set to `null` if a request error occurs.
+		*/
 		makeRequest: function makeRequest(operation, params, callback) {
 			if (typeof params === "function") {
 				callback = params;
@@ -3264,6 +3381,20 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (callback) request.send(callback);
 			return request;
 		},
+		/**
+		* Calls an operation on a service with the given input parameters, without
+		* any authentication data. This method is useful for "public" API operations.
+		*
+		* @param operation [String] the name of the operation to call on the service.
+		* @param params [map] a map of input options for the operation
+		* @callback callback function(err, data)
+		*   If a callback is supplied, it is called when a response is returned
+		*   from the service.
+		*   @param err [Error] the error object returned from the request.
+		*     Set to `null` if the request is successful.
+		*   @param data [Object] the de-serialized data returned from
+		*     the request. Set to `null` if a request error occurs.
+		*/
 		makeUnauthenticatedRequest: function makeUnauthenticatedRequest(operation, params, callback) {
 			if (typeof params === "function") {
 				callback = params;
@@ -3272,9 +3403,30 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			var request = this.makeRequest(operation, params).toUnauthenticated();
 			return callback ? request.send(callback) : request;
 		},
+		/**
+		* Waits for a given state
+		*
+		* @param state [String] the state on the service to wait for
+		* @param params [map] a map of parameters to pass with each request
+		* @option params $waiter [map] a map of configuration options for the waiter
+		* @option params $waiter.delay [Number] The number of seconds to wait between
+		*                                       requests
+		* @option params $waiter.maxAttempts [Number] The maximum number of requests
+		*                                             to send while waiting
+		* @callback callback function(err, data)
+		*   If a callback is supplied, it is called when a response is returned
+		*   from the service.
+		*   @param err [Error] the error object returned from the request.
+		*     Set to `null` if the request is successful.
+		*   @param data [Object] the de-serialized data returned from
+		*     the request. Set to `null` if a request error occurs.
+		*/
 		waitFor: function waitFor(state, params, callback) {
 			return new AWS.ResourceWaiter(this, state).wait(params, callback);
 		},
+		/**
+		* @api private
+		*/
 		addAllRequestListeners: function addAllRequestListeners(request) {
 			var list = [
 				AWS.events,
@@ -3289,6 +3441,11 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (typeof this.constructor.prototype.customRequestHandler === "function") this.constructor.prototype.customRequestHandler(request);
 			if (Object.prototype.hasOwnProperty.call(this, "customRequestHandler") && typeof this.customRequestHandler === "function") this.customRequestHandler(request);
 		},
+		/**
+		* Event recording metrics for a whole API call.
+		* @returns {object} a subset of api call metrics
+		* @api private
+		*/
 		apiCallEvent: function apiCallEvent(request) {
 			var api = request.service.api.operations[request.operation];
 			var monitoringEvent = {
@@ -3314,6 +3471,11 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			return monitoringEvent;
 		},
+		/**
+		* Event recording metrics for an API call attempt.
+		* @returns {object} a subset of api call attempt metrics
+		* @api private
+		*/
 		apiAttemptEvent: function apiAttemptEvent(request) {
 			var api = request.service.api.operations[request.operation];
 			var monitoringEvent = {
@@ -3334,6 +3496,10 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (response.httpResponse.headers["x-amz-id-2"]) monitoringEvent.XAmzId2 = response.httpResponse.headers["x-amz-id-2"];
 			return monitoringEvent;
 		},
+		/**
+		* Add metrics of failed request.
+		* @api private
+		*/
 		attemptFailEvent: function attemptFailEvent(request) {
 			var monitoringEvent = this.apiAttemptEvent(request);
 			var response = request.response;
@@ -3347,6 +3513,11 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			return monitoringEvent;
 		},
+		/**
+		* Attach listeners to request object to fetch metrics of each request
+		* and emit data object through \'ApiCall\' and \'ApiCallAttempt\' events.
+		* @api private
+		*/
 		attachMonitoringEmitter: function attachMonitoringEmitter(request) {
 			var attemptTimestamp;
 			var attemptStartRealTime;
@@ -3397,10 +3568,24 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				self.emit("apiCall", [apiCallEvent]);
 			});
 		},
+		/**
+		* Override this method to setup any custom request listeners for each
+		* new request to the service.
+		*
+		* @method_abstract This is an abstract method.
+		*/
 		setupRequestListeners: function setupRequestListeners(request) {},
+		/**
+		* Gets the signing name for a given request
+		* @api private
+		*/
 		getSigningName: function getSigningName() {
 			return this.api.signingName || this.api.endpointPrefix;
 		},
+		/**
+		* Gets the signer class for a given request
+		* @api private
+		*/
 		getSignerClass: function getSignerClass(request) {
 			var version;
 			var operation = null;
@@ -3415,6 +3600,9 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			else version = this.api.signatureVersion;
 			return AWS.Signers.RequestSigner.getVersion(version);
 		},
+		/**
+		* @api private
+		*/
 		serviceInterface: function serviceInterface() {
 			switch (this.api.protocol) {
 				case "ec2": return AWS.EventListeners.Query;
@@ -3425,16 +3613,31 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			if (this.api.protocol) throw new Error("Invalid service `protocol' " + this.api.protocol + " in API config");
 		},
+		/**
+		* @api private
+		*/
 		successfulResponse: function successfulResponse(resp) {
 			return resp.httpResponse.statusCode < 300;
 		},
+		/**
+		* How many times a failed request should be retried before giving up.
+		* the defaultRetryCount can be overriden by service classes.
+		*
+		* @api private
+		*/
 		numRetries: function numRetries() {
 			if (this.config.maxRetries !== void 0) return this.config.maxRetries;
 			else return this.defaultRetryCount;
 		},
+		/**
+		* @api private
+		*/
 		retryDelays: function retryDelays(retryCount, err) {
 			return AWS.util.calculateRetryDelay(retryCount, this.config.retryDelayOptions, err);
 		},
+		/**
+		* @api private
+		*/
 		retryableError: function retryableError(error) {
 			if (this.timeoutError(error)) return true;
 			if (this.networkingError(error)) return true;
@@ -3443,15 +3646,27 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (error.statusCode >= 500) return true;
 			return false;
 		},
+		/**
+		* @api private
+		*/
 		networkingError: function networkingError(error) {
 			return error.code === "NetworkingError";
 		},
+		/**
+		* @api private
+		*/
 		timeoutError: function timeoutError(error) {
 			return error.code === "TimeoutError";
 		},
+		/**
+		* @api private
+		*/
 		expiredCredentialsError: function expiredCredentialsError(error) {
 			return error.code === "ExpiredTokenException";
 		},
+		/**
+		* @api private
+		*/
 		clockSkewError: function clockSkewError(error) {
 			switch (error.code) {
 				case "RequestTimeTooSkewed":
@@ -3463,15 +3678,27 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				default: return false;
 			}
 		},
+		/**
+		* @api private
+		*/
 		getSkewCorrectedDate: function getSkewCorrectedDate() {
 			return new Date(Date.now() + this.config.systemClockOffset);
 		},
+		/**
+		* @api private
+		*/
 		applyClockOffset: function applyClockOffset(newServerTime) {
 			if (newServerTime) this.config.systemClockOffset = newServerTime - Date.now();
 		},
+		/**
+		* @api private
+		*/
 		isClockSkewed: function isClockSkewed(newServerTime) {
 			if (newServerTime) return Math.abs(this.getSkewCorrectedDate().getTime() - newServerTime) >= 3e5;
 		},
+		/**
+		* @api private
+		*/
 		throttledError: function throttledError(error) {
 			if (error.statusCode === 429) return true;
 			switch (error.code) {
@@ -3487,6 +3714,9 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				default: return false;
 			}
 		},
+		/**
+		* @api private
+		*/
 		endpointFromTemplate: function endpointFromTemplate(endpoint) {
 			if (typeof endpoint !== "string") return endpoint;
 			var e = endpoint;
@@ -3495,9 +3725,15 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			e = e.replace(/\{scheme\}/g, this.config.sslEnabled ? "https" : "http");
 			return e;
 		},
+		/**
+		* @api private
+		*/
 		setEndpoint: function setEndpoint(endpoint) {
 			this.endpoint = new AWS.Endpoint(endpoint, this.config);
 		},
+		/**
+		* @api private
+		*/
 		paginationConfig: function paginationConfig(operation, throwException) {
 			var paginator = this.api.operations[operation].paginator;
 			if (!paginator) {
@@ -3511,6 +3747,11 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		}
 	});
 	AWS.util.update(AWS.Service, {
+		/**
+		* Adds one method for each operation described in the api configuration
+		*
+		* @api private
+		*/
 		defineMethods: function defineMethods(svc) {
 			AWS.util.each(svc.prototype.api.operations, function iterator(method) {
 				if (svc.prototype[method]) return;
@@ -3522,6 +3763,17 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				};
 			});
 		},
+		/**
+		* Defines a new Service class using a service identifier and list of versions
+		* including an optional set of features (functions) to apply to the class
+		* prototype.
+		*
+		* @param serviceIdentifier [String] the identifier for the service
+		* @param versions [Array<String>] a list of versions that work with this
+		*   service
+		* @param features [Object] an object to attach to the prototype
+		* @return [Class<Service>] the service class defined by this function.
+		*/
 		defineService: function defineService(serviceIdentifier, versions, features) {
 			AWS.Service._serviceMap[serviceIdentifier] = true;
 			if (!Array.isArray(versions)) {
@@ -3548,12 +3800,18 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			AWS.Service.addDefaultMonitoringListeners(svc.prototype);
 			return svc;
 		},
+		/**
+		* @api private
+		*/
 		addVersions: function addVersions(svc, versions) {
 			if (!Array.isArray(versions)) versions = [versions];
 			svc.services = svc.services || {};
 			for (var i = 0; i < versions.length; i++) if (svc.services[versions[i]] === void 0) svc.services[versions[i]] = null;
 			svc.apiVersions = Object.keys(svc.services).sort();
 		},
+		/**
+		* @api private
+		*/
 		defineServiceApi: function defineServiceApi(superclass, version, apiConfig) {
 			var svc = inherit(superclass, { serviceIdentifier: superclass.serviceIdentifier });
 			function setApi(api) {
@@ -3573,9 +3831,20 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			AWS.Service.defineMethods(svc);
 			return svc;
 		},
+		/**
+		* @api private
+		*/
 		hasService: function(identifier) {
 			return Object.prototype.hasOwnProperty.call(AWS.Service._serviceMap, identifier);
 		},
+		/**
+		* @param attachOn attach default monitoring listeners to object
+		*
+		* Each monitoring event should be emitted from service client to service constructor prototype and then
+		* to global service prototype like bubbling up. These default monitoring events listener will transfer
+		* the monitoring events to the upper layer.
+		* @api private
+		*/
 		addDefaultMonitoringListeners: function addDefaultMonitoringListeners(attachOn) {
 			attachOn.addNamedListener("MONITOR_EVENTS_BUBBLE", "apiCallAttempt", function EVENTS_BUBBLE(event) {
 				var baseClass = Object.getPrototypeOf(attachOn);
@@ -3586,6 +3855,9 @@ var require_service = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				if (baseClass._events) baseClass.emit("apiCall", [event]);
 			});
 		},
+		/**
+		* @api private
+		*/
 		_serviceMap: {}
 	});
 	AWS.util.mixin(AWS.Service, AWS.SequentialExecutor);
@@ -3638,6 +3910,29 @@ var require_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	*   @return [String] an optional AWS session token
 	*/
 	AWS.Credentials = AWS.util.inherit({
+		/**
+		* A credentials object can be created using positional arguments or an options
+		* hash.
+		*
+		* @overload AWS.Credentials(accessKeyId, secretAccessKey, sessionToken=null)
+		*   Creates a Credentials object with a given set of credential information
+		*   as positional arguments.
+		*   @param accessKeyId [String] the AWS access key ID
+		*   @param secretAccessKey [String] the AWS secret access key
+		*   @param sessionToken [String] the optional AWS session token
+		*   @example Create a credentials object with AWS credentials
+		*     var creds = new AWS.Credentials('akid', 'secret', 'session');
+		* @overload AWS.Credentials(options)
+		*   Creates a Credentials object with a given set of credential information
+		*   as an options hash.
+		*   @option options accessKeyId [String] the AWS access key ID
+		*   @option options secretAccessKey [String] the AWS secret access key
+		*   @option options sessionToken [String] the optional AWS session token
+		*   @example Create a credentials object with AWS credentials
+		*     var creds = new AWS.Credentials({
+		*       accessKeyId: 'akid', secretAccessKey: 'secret', sessionToken: 'session'
+		*     });
+		*/
 		constructor: function Credentials() {
 			AWS.util.hideProperties(this, ["secretAccessKey"]);
 			this.expired = false;
@@ -3654,13 +3949,35 @@ var require_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				this.sessionToken = arguments[2];
 			}
 		},
+		/**
+		* @return [Integer] the number of seconds before {expireTime} during which
+		*   the credentials will be considered expired.
+		*/
 		expiryWindow: 15,
+		/**
+		* @return [Boolean] whether the credentials object should call {refresh}
+		* @note Subclasses should override this method to provide custom refresh
+		*   logic.
+		*/
 		needsRefresh: function needsRefresh() {
 			var currentTime = AWS.util.date.getDate().getTime();
 			var adjustedTime = new Date(currentTime + this.expiryWindow * 1e3);
 			if (this.expireTime && adjustedTime > this.expireTime) return true;
 			else return this.expired || !this.accessKeyId || !this.secretAccessKey;
 		},
+		/**
+		* Gets the existing credentials, refreshing them if they are not yet loaded
+		* or have expired. Users should call this method before using {refresh},
+		* as this will not attempt to reload credentials when they are already
+		* loaded into the object.
+		*
+		* @callback callback function(err)
+		*   When this callback is called with no error, it means either credentials
+		*   do not need to be refreshed or refreshed credentials information has
+		*   been loaded into the object (as the `accessKeyId`, `secretAccessKey`,
+		*   and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		*/
 		get: function get(callback) {
 			var self = this;
 			if (this.needsRefresh()) this.refresh(function(err) {
@@ -3669,10 +3986,74 @@ var require_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			});
 			else if (callback) callback();
 		},
+		/**
+		* @!method  getPromise()
+		*   Returns a 'thenable' promise.
+		*   Gets the existing credentials, refreshing them if they are not yet loaded
+		*   or have expired. Users should call this method before using {refresh},
+		*   as this will not attempt to reload credentials when they are already
+		*   loaded into the object.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function()
+		*     Called if the promise is fulfilled. When this callback is called, it
+		*     means either credentials do not need to be refreshed or refreshed
+		*     credentials information has been loaded into the object (as the
+		*     `accessKeyId`, `secretAccessKey`, and `sessionToken` properties).
+		*   @callback rejectedCallback function(err)
+		*     Called if the promise is rejected.
+		*     @param err [Error] if an error occurred, this value will be filled
+		*   @return [Promise] A promise that represents the state of the `get` call.
+		*   @example Calling the `getPromise` method.
+		*     var promise = credProvider.getPromise();
+		*     promise.then(function() { ... }, function(err) { ... });
+		*/
+		/**
+		* @!method  refreshPromise()
+		*   Returns a 'thenable' promise.
+		*   Refreshes the credentials. Users should call {get} before attempting
+		*   to forcibly refresh credentials.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function()
+		*     Called if the promise is fulfilled. When this callback is called, it
+		*     means refreshed credentials information has been loaded into the object
+		*     (as the `accessKeyId`, `secretAccessKey`, and `sessionToken` properties).
+		*   @callback rejectedCallback function(err)
+		*     Called if the promise is rejected.
+		*     @param err [Error] if an error occurred, this value will be filled
+		*   @return [Promise] A promise that represents the state of the `refresh` call.
+		*   @example Calling the `refreshPromise` method.
+		*     var promise = credProvider.refreshPromise();
+		*     promise.then(function() { ... }, function(err) { ... });
+		*/
+		/**
+		* Refreshes the credentials. Users should call {get} before attempting
+		* to forcibly refresh credentials.
+		*
+		* @callback callback function(err)
+		*   When this callback is called with no error, it means refreshed
+		*   credentials information has been loaded into the object (as the
+		*   `accessKeyId`, `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @note Subclasses should override this class to reset the
+		*   {accessKeyId}, {secretAccessKey} and optional {sessionToken}
+		*   on the credentials object and then call the callback with
+		*   any error information.
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.expired = false;
 			callback();
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		coalesceRefresh: function coalesceRefresh(callback, sync) {
 			var self = this;
 			if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
@@ -3685,6 +4066,10 @@ var require_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				self.refreshCallbacks.length = 0;
 			});
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		load: function load(callback) {
 			callback();
 		}
@@ -3753,11 +4138,51 @@ var require_credential_provider_chain = /* @__PURE__ */ __commonJSMin((() => {
 	*   @see defaultProviders
 	*/
 	AWS.CredentialProviderChain = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new CredentialProviderChain with a default set of providers
+		* specified by {defaultProviders}.
+		*/
 		constructor: function CredentialProviderChain(providers) {
 			if (providers) this.providers = providers;
 			else this.providers = AWS.CredentialProviderChain.defaultProviders.slice(0);
 			this.resolveCallbacks = [];
 		},
+		/**
+		* @!method  resolvePromise()
+		*   Returns a 'thenable' promise.
+		*   Resolves the provider chain by searching for the first set of
+		*   credentials in {providers}.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function(credentials)
+		*     Called if the promise is fulfilled and the provider resolves the chain
+		*     to a credentials object
+		*     @param credentials [AWS.Credentials] the credentials object resolved
+		*       by the provider chain.
+		*   @callback rejectedCallback function(error)
+		*     Called if the promise is rejected.
+		*     @param err [Error] the error object returned if no credentials are found.
+		*   @return [Promise] A promise that represents the state of the `resolve` method call.
+		*   @example Calling the `resolvePromise` method.
+		*     var promise = chain.resolvePromise();
+		*     promise.then(function(credentials) { ... }, function(err) { ... });
+		*/
+		/**
+		* Resolves the provider chain by searching for the first set of
+		* credentials in {providers}.
+		*
+		* @callback callback function(err, credentials)
+		*   Called when the provider resolves the chain to a credentials object
+		*   or null if no credentials can be found.
+		*
+		*   @param err [Error] the error object returned if no credentials are
+		*     found.
+		*   @param credentials [AWS.Credentials] the credentials object resolved
+		*     by the provider chain.
+		* @return [AWS.CredentialProviderChain] the provider, for chaining.
+		*/
 		resolve: function resolve(callback) {
 			var self = this;
 			if (self.providers.length === 0) {
@@ -4026,6 +4451,162 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 	*   @return [Boolean] Enables IPv6 dualstack endpoint. Defaults to `false`.
 	*/
 	AWS.Config = AWS.util.inherit({
+		/**
+		* @!endgroup
+		*/
+		/**
+		* Creates a new configuration object. This is the object that passes
+		* option data along to service requests, including credentials, security,
+		* region information, and some service specific settings.
+		*
+		* @example Creating a new configuration object with credentials and region
+		*   var config = new AWS.Config({
+		*     accessKeyId: 'AKID', secretAccessKey: 'SECRET', region: 'us-west-2'
+		*   });
+		* @option options accessKeyId [String] your AWS access key ID.
+		* @option options secretAccessKey [String] your AWS secret access key.
+		* @option options sessionToken [AWS.Credentials] the optional AWS
+		*   session token to sign requests with.
+		* @option options credentials [AWS.Credentials] the AWS credentials
+		*   to sign requests with. You can either specify this object, or
+		*   specify the accessKeyId and secretAccessKey options directly.
+		* @option options credentialProvider [AWS.CredentialProviderChain] the
+		*   provider chain used to resolve credentials if no static `credentials`
+		*   property is set.
+		* @option options region [String] the region to send service requests to.
+		*   See {region} for more information.
+		* @option options maxRetries [Integer] the maximum amount of retries to
+		*   attempt with a request. See {maxRetries} for more information.
+		* @option options maxRedirects [Integer] the maximum amount of redirects to
+		*   follow with a request. See {maxRedirects} for more information.
+		* @option options sslEnabled [Boolean] whether to enable SSL for
+		*   requests.
+		* @option options paramValidation [Boolean|map] whether input parameters
+		*   should be validated against the operation description before sending
+		*   the request. Defaults to true. Pass a map to enable any of the
+		*   following specific validation features:
+		*
+		*   * **min** [Boolean] &mdash; Validates that a value meets the min
+		*     constraint. This is enabled by default when paramValidation is set
+		*     to `true`.
+		*   * **max** [Boolean] &mdash; Validates that a value meets the max
+		*     constraint.
+		*   * **pattern** [Boolean] &mdash; Validates that a string value matches a
+		*     regular expression.
+		*   * **enum** [Boolean] &mdash; Validates that a string value matches one
+		*     of the allowable enum values.
+		* @option options computeChecksums [Boolean] whether to compute checksums
+		*   for payload bodies when the service accepts it (currently supported
+		*   in S3 only)
+		* @option options convertResponseTypes [Boolean] whether types are converted
+		*     when parsing response data. Currently only supported for JSON based
+		*     services. Turning this off may improve performance on large response
+		*     payloads. Defaults to `true`.
+		* @option options correctClockSkew [Boolean] whether to apply a clock skew
+		*     correction and retry requests that fail because of an skewed client
+		*     clock. Defaults to `false`.
+		* @option options s3ForcePathStyle [Boolean] whether to force path
+		*   style URLs for S3 objects.
+		* @option options s3BucketEndpoint [Boolean] whether the provided endpoint
+		*   addresses an individual bucket (false if it addresses the root API
+		*   endpoint). Note that setting this configuration option requires an
+		*   `endpoint` to be provided explicitly to the service constructor.
+		* @option options s3DisableBodySigning [Boolean] whether S3 body signing
+		*   should be disabled when using signature version `v4`. Body signing
+		*   can only be disabled when using https. Defaults to `true`.
+		* @option options s3UsEast1RegionalEndpoint ['legacy'|'regional'] when region
+		*   is set to 'us-east-1', whether to send s3 request to global endpoints or
+		*   'us-east-1' regional endpoints. This config is only applicable to S3 client.
+		*   Defaults to `legacy`
+		* @option options s3UseArnRegion [Boolean] whether to override the request region
+		*   with the region inferred from requested resource's ARN. Only available for S3 buckets
+		*   Defaults to `true`
+		*
+		* @option options retryDelayOptions [map] A set of options to configure
+		*   the retry delay on retryable errors. Currently supported options are:
+		*
+		*   * **base** [Integer] &mdash; The base number of milliseconds to use in the
+		*     exponential backoff for operation retries. Defaults to 100 ms for all
+		*     services except DynamoDB, where it defaults to 50ms.
+		*   * **customBackoff ** [function] &mdash; A custom function that accepts a
+		*     retry count and error and returns the amount of time to delay in
+		*     milliseconds. If the result is a non-zero negative value, no further
+		*     retry attempts will be made. The `base` option will be ignored if this
+		*     option is supplied. The function is only called for retryable errors.
+		* @option options httpOptions [map] A set of options to pass to the low-level
+		*   HTTP request. Currently supported options are:
+		*
+		*   * **proxy** [String] &mdash; the URL to proxy requests through
+		*   * **agent** [http.Agent, https.Agent] &mdash; the Agent object to perform
+		*     HTTP requests with. Used for connection pooling. Defaults to the global
+		*     agent (`http.globalAgent`) for non-SSL connections. Note that for
+		*     SSL connections, a special Agent object is used in order to enable
+		*     peer certificate verification. This feature is only available in the
+		*     Node.js environment.
+		*   * **connectTimeout** [Integer] &mdash; Sets the socket to timeout after
+		*     failing to establish a connection with the server after
+		*     `connectTimeout` milliseconds. This timeout has no effect once a socket
+		*     connection has been established.
+		*   * **timeout** [Integer] &mdash; Sets the socket to timeout after timeout
+		*     milliseconds of inactivity on the socket. Defaults to two minutes
+		*     (120000).
+		*   * **xhrAsync** [Boolean] &mdash; Whether the SDK will send asynchronous
+		*     HTTP requests. Used in the browser environment only. Set to false to
+		*     send requests synchronously. Defaults to true (async on).
+		*   * **xhrWithCredentials** [Boolean] &mdash; Sets the "withCredentials"
+		*     property of an XMLHttpRequest object. Used in the browser environment
+		*     only. Defaults to false.
+		* @option options apiVersion [String, Date] a String in YYYY-MM-DD format
+		*   (or a date) that represents the latest possible API version that can be
+		*   used in all services (unless overridden by `apiVersions`). Specify
+		*   'latest' to use the latest possible version.
+		* @option options apiVersions [map<String, String|Date>] a map of service
+		*   identifiers (the lowercase service class name) with the API version to
+		*   use when instantiating a service. Specify 'latest' for each individual
+		*   that can use the latest available version.
+		* @option options logger [#write,#log] an object that responds to .write()
+		*   (like a stream) or .log() (like the console object) in order to log
+		*   information about requests
+		* @option options systemClockOffset [Number] an offset value in milliseconds
+		*   to apply to all signing times. Use this to compensate for clock skew
+		*   when your system may be out of sync with the service time. Note that
+		*   this configuration option can only be applied to the global `AWS.config`
+		*   object and cannot be overridden in service-specific configuration.
+		*   Defaults to 0 milliseconds.
+		* @option options signatureVersion [String] the signature version to sign
+		*   requests with (overriding the API configuration). Possible values are:
+		*   'v2', 'v3', 'v4'.
+		* @option options signatureCache [Boolean] whether the signature to sign
+		*   requests with (overriding the API configuration) is cached. Only applies
+		*   to the signature version 'v4'. Defaults to `true`.
+		* @option options dynamoDbCrc32 [Boolean] whether to validate the CRC32
+		*   checksum of HTTP response bodies returned by DynamoDB. Default: `true`.
+		* @option options useAccelerateEndpoint [Boolean] Whether to use the
+		*   S3 Transfer Acceleration endpoint with the S3 service. Default: `false`.
+		* @option options clientSideMonitoring [Boolean] whether to collect and
+		*   publish this client's performance metrics of all its API requests.
+		* @option options endpointDiscoveryEnabled [Boolean|undefined] whether to
+		*   call operations with endpoints given by service dynamically. Setting this
+		* config to `true` will enable endpoint discovery for all applicable operations.
+		*   Setting it to `false` will explicitly disable endpoint discovery even though
+		*   operations that require endpoint discovery will presumably fail. Leaving it
+		*   to `undefined` means SDK will only do endpoint discovery when it's required.
+		*   Defaults to `undefined`
+		* @option options endpointCacheSize [Number] the size of the global cache storing
+		*   endpoints from endpoint discovery operations. Once endpoint cache is created,
+		*   updating this setting cannot change existing cache size.
+		*   Defaults to 1000
+		* @option options hostPrefixEnabled [Boolean] whether to marshal request
+		*   parameters to the prefix of hostname.
+		*   Defaults to `true`.
+		* @option options stsRegionalEndpoints ['legacy'|'regional'] whether to send sts request
+		*   to global endpoints or regional endpoints.
+		*   Defaults to 'legacy'.
+		* @option options useFipsEndpoint [Boolean] Enables FIPS compatible endpoints.
+		*   Defaults to `false`.
+		* @option options useDualstackEndpoint [Boolean] Enables IPv6 dualstack endpoint.
+		*   Defaults to `false`.
+		*/
 		constructor: function Config(options) {
 			if (options === void 0) options = {};
 			options = this.extractCredentials(options);
@@ -4033,6 +4614,34 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 				this.set(key, options[key], value);
 			});
 		},
+		/**
+		* @!group Managing Credentials
+		*/
+		/**
+		* Loads credentials from the configuration object. This is used internally
+		* by the SDK to ensure that refreshable {Credentials} objects are properly
+		* refreshed and loaded when sending a request. If you want to ensure that
+		* your credentials are loaded prior to a request, you can use this method
+		* directly to provide accurate credential data stored in the object.
+		*
+		* @note If you configure the SDK with static or environment credentials,
+		*   the credential data should already be present in {credentials} attribute.
+		*   This method is primarily necessary to load credentials from asynchronous
+		*   sources, or sources that can refresh credentials periodically.
+		* @example Getting your access key
+		*   AWS.config.getCredentials(function(err) {
+		*     if (err) console.log(err.stack); // credentials not loaded
+		*     else console.log("Access Key:", AWS.config.credentials.accessKeyId);
+		*   })
+		* @callback callback function(err)
+		*   Called when the {credentials} have been properly set on the configuration
+		*   object.
+		*
+		*   @param err [Error] if this is set, credentials were not successfully
+		*     loaded and this error provides information why.
+		* @see credentials
+		* @see Credentials
+		*/
 		getCredentials: function getCredentials(callback) {
 			var self = this;
 			function finish(err) {
@@ -4065,6 +4674,29 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			});
 			else finish(credError("No credentials to load"));
 		},
+		/**
+		* Loads token from the configuration object. This is used internally
+		* by the SDK to ensure that refreshable {Token} objects are properly
+		* refreshed and loaded when sending a request. If you want to ensure that
+		* your token is loaded prior to a request, you can use this method
+		* directly to provide accurate token data stored in the object.
+		*
+		* @note If you configure the SDK with static token, the token data should
+		*   already be present in {token} attribute. This method is primarily necessary
+		*   to load token from asynchronous sources, or sources that can refresh
+		*   token periodically.
+		* @example Getting your access token
+		*   AWS.config.getToken(function(err) {
+		*     if (err) console.log(err.stack); // token not loaded
+		*     else console.log("Token:", AWS.config.token.token);
+		*   })
+		* @callback callback function(err)
+		*   Called when the {token} have been properly set on the configuration object.
+		*
+		*   @param err [Error] if this is set, token was not successfully loaded and
+		*     this error provides information why.
+		* @see token
+		*/
 		getToken: function getToken(callback) {
 			var self = this;
 			function finish(err) {
@@ -4097,6 +4729,20 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			});
 			else finish(tokenError("No token to load"));
 		},
+		/**
+		* @!group Loading and Setting Configuration Options
+		*/
+		/**
+		* @overload update(options, allowUnknownKeys = false)
+		*   Updates the current configuration object with new options.
+		*
+		*   @example Update maxRetries property of a configuration object
+		*     config.update({maxRetries: 10});
+		*   @param [Object] options a map of option keys and values.
+		*   @param [Boolean] allowUnknownKeys whether unknown keys can be set on
+		*     the configuration object. Defaults to `false`.
+		*   @see constructor
+		*/
 		update: function update(options, allowUnknownKeys) {
 			allowUnknownKeys = allowUnknownKeys || false;
 			options = this.extractCredentials(options);
@@ -4104,6 +4750,15 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 				if (allowUnknownKeys || Object.prototype.hasOwnProperty.call(this.keys, key) || AWS.Service.hasService(key)) this.set(key, value);
 			});
 		},
+		/**
+		* Loads configuration data from a JSON file into this config object.
+		* @note Loading configuration will reset all existing configuration
+		*   on the object.
+		* @!macro nobrowser
+		* @param path [String] the path relative to your process's current
+		*    working directory to load configuration from.
+		* @return [AWS.Config] the same configuration object
+		*/
 		loadFromPath: function loadFromPath(path) {
 			this.clear();
 			var options = JSON.parse(AWS.util.readFileSync(path));
@@ -4117,6 +4772,11 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			this.constructor(options);
 			return this;
 		},
+		/**
+		* Clears configuration data on this object
+		*
+		* @api private
+		*/
 		clear: function clear() {
 			AWS.util.each.call(this, this.keys, function(key) {
 				delete this[key];
@@ -4124,6 +4784,11 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			this.set("credentials", void 0);
 			this.set("credentialProvider", void 0);
 		},
+		/**
+		* Sets a property on the configuration object, allowing for a
+		* default value
+		* @api private
+		*/
 		set: function set(property, value, defaultValue) {
 			if (value === void 0) {
 				if (defaultValue === void 0) defaultValue = this.keys[property];
@@ -4132,6 +4797,12 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			} else if (property === "httpOptions" && this[property]) this[property] = AWS.util.merge(this[property], value);
 			else this[property] = value;
 		},
+		/**
+		* All of the keys with their default values.
+		*
+		* @constant
+		* @api private
+		*/
 		keys: {
 			credentials: null,
 			credentialProvider: null,
@@ -4169,6 +4840,12 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			useDualstackEndpoint: false,
 			token: null
 		},
+		/**
+		* Extracts accessKeyId, secretAccessKey and sessionToken
+		* from a configuration hash.
+		*
+		* @api private
+		*/
 		extractCredentials: function extractCredentials(options) {
 			if (options.accessKeyId && options.secretAccessKey) {
 				options = AWS.util.copy(options);
@@ -4176,6 +4853,12 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			return options;
 		},
+		/**
+		* Sets the promise dependency the SDK will use wherever Promises are returned.
+		* Passing `null` will force the SDK to use native Promises if they are available.
+		* If native Promises are not available, passing `null` will have no effect.
+		* @param [Constructor] dep A reference to a Promise constructor
+		*/
 		setPromisesDependency: function setPromisesDependency(dep) {
 			PromisesDependency = dep;
 			if (dep === null && typeof Promise === "function") PromisesDependency = Promise;
@@ -4190,6 +4873,9 @@ var require_config = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			AWS.util.addPromises(constructors, PromisesDependency);
 		},
+		/**
+		* Gets the promise dependency set by `AWS.config.setPromisesDependency`.
+		*/
 		getPromisesDependency: function getPromisesDependency() {
 			return PromisesDependency;
 		}
@@ -4237,7 +4923,15 @@ var require_http = /* @__PURE__ */ __commonJSMin((() => {
 	* @!attribute href
 	*   @return [String] the full URL of the endpoint
 	*/
-	AWS.Endpoint = inherit({ constructor: function Endpoint(endpoint, config) {
+	AWS.Endpoint = inherit({ 
+	/**
+	* @overload Endpoint(endpoint)
+	*   Constructs a new endpoint given an endpoint URL. If the
+	*   URL omits a protocol (http or https), the default protocol
+	*   set in the global {AWS.config} will be used.
+	*   @param endpoint [String] the URL to construct an endpoint from
+	*/
+constructor: function Endpoint(endpoint, config) {
 		AWS.util.hideProperties(this, [
 			"slashes",
 			"auth",
@@ -4273,6 +4967,9 @@ var require_http = /* @__PURE__ */ __commonJSMin((() => {
 	*   @return [String] the region, for signing purposes only.
 	*/
 	AWS.HttpRequest = inherit({
+		/**
+		* @api private
+		*/
 		constructor: function HttpRequest(endpoint, region) {
 			endpoint = new AWS.Endpoint(endpoint);
 			this.method = "POST";
@@ -4284,22 +4981,38 @@ var require_http = /* @__PURE__ */ __commonJSMin((() => {
 			this._userAgent = "";
 			this.setUserAgent();
 		},
+		/**
+		* @api private
+		*/
 		setUserAgent: function setUserAgent() {
 			this._userAgent = this.headers[this.getUserAgentHeaderName()] = AWS.util.userAgent();
 		},
 		getUserAgentHeaderName: function getUserAgentHeaderName() {
 			return (AWS.util.isBrowser() ? "X-Amz-" : "") + "User-Agent";
 		},
+		/**
+		* @api private
+		*/
 		appendToUserAgent: function appendToUserAgent(agentPartial) {
 			if (typeof agentPartial === "string" && agentPartial) this._userAgent += " " + agentPartial;
 			this.headers[this.getUserAgentHeaderName()] = this._userAgent;
 		},
+		/**
+		* @api private
+		*/
 		getUserAgent: function getUserAgent() {
 			return this._userAgent;
 		},
+		/**
+		* @return [String] the part of the {path} excluding the
+		*   query string
+		*/
 		pathname: function pathname() {
 			return this.path.split("?", 1)[0];
 		},
+		/**
+		* @return [String] the query string portion of the {path}
+		*/
 		search: function search() {
 			var query = this.path.split("?", 2)[1];
 			if (query) {
@@ -4308,6 +5021,10 @@ var require_http = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			return "";
 		},
+		/**
+		* @api private
+		* update httpRequest endpoint with endpoint string
+		*/
 		updateEndpoint: function updateEndpoint(endpointStr) {
 			var newEndpoint = new AWS.Endpoint(endpointStr);
 			this.endpoint = newEndpoint;
@@ -4333,6 +5050,9 @@ var require_http = /* @__PURE__ */ __commonJSMin((() => {
 	*     instead.
 	*/
 	AWS.HttpResponse = inherit({
+		/**
+		* @api private
+		*/
 		constructor: function HttpResponse() {
 			this.statusCode = void 0;
 			this.headers = {};
@@ -4340,6 +5060,27 @@ var require_http = /* @__PURE__ */ __commonJSMin((() => {
 			this.streaming = false;
 			this.stream = null;
 		},
+		/**
+		* Disables buffering on the HTTP response and returns the stream for reading.
+		* @return [Stream, XMLHttpRequest, null] the underlying stream object.
+		*   Use this object to directly read data off of the stream.
+		* @note This object is only available after the {AWS.Request~httpHeaders}
+		*   event has fired. This method must be called prior to
+		*   {AWS.Request~httpData}.
+		* @example Taking control of a stream
+		*   request.on('httpHeaders', function(statusCode, headers) {
+		*     if (statusCode < 300) {
+		*       if (headers.etag === 'xyz') {
+		*         // pipe the stream, disabling buffering
+		*         var stream = this.response.httpResponse.createUnbufferedStream();
+		*         stream.pipe(process.stdout);
+		*       } else { // abort this request and set a better error message
+		*         this.abort();
+		*         this.response.error = new Error('Invalid ETag');
+		*       }
+		*     }
+		*   }).send(console.log);
+		*/
 		createUnbufferedStream: function createUnbufferedStream() {
 			this.streaming = true;
 			return this.stream;
@@ -4667,7 +5408,61 @@ var require_event_listeners = /* @__PURE__ */ __commonJSMin((() => {
 	* The namespace used to register global event listeners for request building
 	* and sending.
 	*/
-	AWS.EventListeners = { Core: {} };
+	AWS.EventListeners = { 
+	/**
+	* @!attribute VALIDATE_CREDENTIALS
+	*   A request listener that validates whether the request is being
+	*   sent with credentials.
+	*   Handles the {AWS.Request~validate 'validate' Request event}
+	*   @example Sending a request without validating credentials
+	*     var listener = AWS.EventListeners.Core.VALIDATE_CREDENTIALS;
+	*     request.removeListener('validate', listener);
+	*   @readonly
+	*   @return [Function]
+	* @!attribute VALIDATE_REGION
+	*   A request listener that validates whether the region is set
+	*   for a request.
+	*   Handles the {AWS.Request~validate 'validate' Request event}
+	*   @example Sending a request without validating region configuration
+	*     var listener = AWS.EventListeners.Core.VALIDATE_REGION;
+	*     request.removeListener('validate', listener);
+	*   @readonly
+	*   @return [Function]
+	* @!attribute VALIDATE_PARAMETERS
+	*   A request listener that validates input parameters in a request.
+	*   Handles the {AWS.Request~validate 'validate' Request event}
+	*   @example Sending a request without validating parameters
+	*     var listener = AWS.EventListeners.Core.VALIDATE_PARAMETERS;
+	*     request.removeListener('validate', listener);
+	*   @example Disable parameter validation globally
+	*     AWS.EventListeners.Core.removeListener('validate',
+	*       AWS.EventListeners.Core.VALIDATE_REGION);
+	*   @readonly
+	*   @return [Function]
+	* @!attribute SEND
+	*   A request listener that initiates the HTTP connection for a
+	*   request being sent. Handles the {AWS.Request~send 'send' Request event}
+	*   @example Replacing the HTTP handler
+	*     var listener = AWS.EventListeners.Core.SEND;
+	*     request.removeListener('send', listener);
+	*     request.on('send', function(response) {
+	*       customHandler.send(response);
+	*     });
+	*   @return [Function]
+	*   @readonly
+	* @!attribute HTTP_DATA
+	*   A request listener that reads data from the HTTP connection in order
+	*   to build the response data.
+	*   Handles the {AWS.Request~httpData 'httpData' Request event}.
+	*   Remove this handler if you are overriding the 'httpData' event and
+	*   do not want extra data processing and buffering overhead.
+	*   @example Disabling default data processing
+	*     var listener = AWS.EventListeners.Core.HTTP_DATA;
+	*     request.removeListener('httpData', listener);
+	*   @return [Function]
+	*   @readonly
+	*/
+Core: {} };
 	/**
 	* @api private
 	*/
@@ -6863,6 +7658,16 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 	* @see AWS.Response
 	*/
 	AWS.Request = inherit({
+		/**
+		* Creates a request for an operation on a given service with
+		* a set of input parameters.
+		*
+		* @param service [AWS.Service] the service to perform the operation on
+		* @param operation [String] the operation to perform on the service
+		* @param params [Object] parameters to send to the operation.
+		*   See the operation's documentation for the format of the
+		*   parameters.
+		*/
 		constructor: function Request(service, operation, params) {
 			var endpoint = service.endpoint;
 			var region = service.config.region;
@@ -6882,6 +7687,29 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			AWS.SequentialExecutor.call(this);
 			this.emit = this.emitEvent;
 		},
+		/**
+		* @!group Sending a Request
+		*/
+		/**
+		* @overload send(callback = null)
+		*   Sends the request object.
+		*
+		*   @callback callback function(err, data)
+		*     If a callback is supplied, it is called when a response is returned
+		*     from the service.
+		*     @context [AWS.Request] the request object being sent.
+		*     @param err [Error] the error object returned from the request.
+		*       Set to `null` if the request is successful.
+		*     @param data [Object] the de-serialized data returned from
+		*       the request. Set to `null` if a request error occurs.
+		*   @example Sending a request with a callback
+		*     request = s3.putObject({Bucket: 'bucket', Key: 'key'});
+		*     request.send(function(err, data) { console.log(err, data); });
+		*   @example Sending a request with no callback (using event handlers)
+		*     request = s3.putObject({Bucket: 'bucket', Key: 'key'});
+		*     request.on('complete', function(response) { ... }); // register a callback
+		*     request.send();
+		*/
 		send: function send(callback) {
 			if (callback) {
 				this.httpRequest.appendToUserAgent("callback");
@@ -6892,13 +7720,60 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			this.runTo();
 			return this.response;
 		},
+		/**
+		* @!method  promise()
+		*   Sends the request and returns a 'thenable' promise.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function(data)
+		*     Called if the promise is fulfilled.
+		*     @param data [Object] the de-serialized data returned from the request.
+		*   @callback rejectedCallback function(error)
+		*     Called if the promise is rejected.
+		*     @param error [Error] the error object returned from the request.
+		*   @return [Promise] A promise that represents the state of the request.
+		*   @example Sending a request using promises.
+		*     var request = s3.putObject({Bucket: 'bucket', Key: 'key'});
+		*     var result = request.promise();
+		*     result.then(function(data) { ... }, function(error) { ... });
+		*/
+		/**
+		* @api private
+		*/
 		build: function build(callback) {
 			return this.runTo("send", callback);
 		},
+		/**
+		* @api private
+		*/
 		runTo: function runTo(state, done) {
 			this._asm.runTo(state, done, this);
 			return this;
 		},
+		/**
+		* Aborts a request, emitting the error and complete events.
+		*
+		* @!macro nobrowser
+		* @example Aborting a request after sending
+		*   var params = {
+		*     Bucket: 'bucket', Key: 'key',
+		*     Body: Buffer.alloc(1024 * 1024 * 5) // 5MB payload
+		*   };
+		*   var request = s3.putObject(params);
+		*   request.send(function (err, data) {
+		*     if (err) console.log("Error:", err.code, err.message);
+		*     else console.log(data);
+		*   });
+		*
+		*   // abort request in 1 second
+		*   setTimeout(request.abort.bind(request), 1000);
+		*
+		*   // prints "Error: RequestAbortedError Request aborted by user"
+		* @return [AWS.Request] the same request object, for chaining.
+		* @since v1.4.0
+		*/
 		abort: function abort() {
 			this.removeAllListeners("validateResponse");
 			this.removeAllListeners("extractError");
@@ -6915,6 +7790,45 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			return this;
 		},
+		/**
+		* Iterates over each page of results given a pageable request, calling
+		* the provided callback with each page of data. After all pages have been
+		* retrieved, the callback is called with `null` data.
+		*
+		* @note This operation can generate multiple requests to a service.
+		* @example Iterating over multiple pages of objects in an S3 bucket
+		*   var pages = 1;
+		*   s3.listObjects().eachPage(function(err, data) {
+		*     if (err) return;
+		*     console.log("Page", pages++);
+		*     console.log(data);
+		*   });
+		* @example Iterating over multiple pages with an asynchronous callback
+		*   s3.listObjects(params).eachPage(function(err, data, done) {
+		*     doSomethingAsyncAndOrExpensive(function() {
+		*       // The next page of results isn't fetched until done is called
+		*       done();
+		*     });
+		*   });
+		* @callback callback function(err, data, [doneCallback])
+		*   Called with each page of resulting data from the request. If the
+		*   optional `doneCallback` is provided in the function, it must be called
+		*   when the callback is complete.
+		*
+		*   @param err [Error] an error object, if an error occurred.
+		*   @param data [Object] a single page of response data. If there is no
+		*     more data, this object will be `null`.
+		*   @param doneCallback [Function] an optional done callback. If this
+		*     argument is defined in the function declaration, it should be called
+		*     when the next page is ready to be retrieved. This is useful for
+		*     controlling serial pagination across asynchronous operations.
+		*   @return [Boolean] if the callback returns `false`, pagination will
+		*     stop.
+		*
+		* @see AWS.Request.eachItem
+		* @see AWS.Response.nextPage
+		* @since v1.4.0
+		*/
 		eachPage: function eachPage(callback) {
 			callback = AWS.util.fn.makeAsync(callback, 3);
 			function wrappedCallback(response) {
@@ -6926,6 +7840,13 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			this.on("complete", wrappedCallback).send();
 		},
+		/**
+		* Enumerates over individual items of a request, paging the responses if
+		* necessary.
+		*
+		* @api experimental
+		* @since v1.4.0
+		*/
 		eachItem: function eachItem(callback) {
 			var self = this;
 			function wrappedCallback(err, data) {
@@ -6943,9 +7864,32 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			this.eachPage(wrappedCallback);
 		},
+		/**
+		* @return [Boolean] whether the operation can return multiple pages of
+		*   response data.
+		* @see AWS.Response.eachPage
+		* @since v1.4.0
+		*/
 		isPageable: function isPageable() {
 			return this.service.paginationConfig(this.operation) ? true : false;
 		},
+		/**
+		* Sends the request and converts the request object into a readable stream
+		* that can be read from or piped into a writable stream.
+		*
+		* @note The data read from a readable stream contains only
+		*   the raw HTTP body contents.
+		* @example Manually reading from a stream
+		*   request.createReadStream().on('data', function(data) {
+		*     console.log("Got data:", data.toString());
+		*   });
+		* @example Piping a request body into a file
+		*   var out = fs.createWriteStream('/path/to/outfile.jpg');
+		*   s3.service.getObject(params).createReadStream().pipe(out);
+		* @return [Stream] the readable stream object that can be piped
+		*   or read from (by registering 'data' event listeners).
+		* @!macro nobrowser
+		*/
 		createReadStream: function createReadStream() {
 			var streams = AWS.util.stream;
 			var req = this;
@@ -7024,6 +7968,11 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			});
 			return stream;
 		},
+		/**
+		* @param [Array,Response] args This should be the response object,
+		*   or an array of args to send to the event.
+		* @api private
+		*/
 		emitEvent: function emit(eventName, args, done) {
 			if (typeof args === "function") {
 				done = args;
@@ -7036,6 +7985,9 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 				done.call(this, err);
 			});
 		},
+		/**
+		* @api private
+		*/
 		eventParameters: function eventParameters(eventName) {
 			switch (eventName) {
 				case "restart":
@@ -7048,6 +8000,9 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 				default: return [this.response];
 			}
 		},
+		/**
+		* @api private
+		*/
 		presign: function presign(expires, callback) {
 			if (!callback && typeof expires === "function") {
 				callback = expires;
@@ -7055,15 +8010,24 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			return new AWS.Signers.Presign().sign(this.toGet(), expires, callback);
 		},
+		/**
+		* @api private
+		*/
 		isPresigned: function isPresigned() {
 			return Object.prototype.hasOwnProperty.call(this.httpRequest.headers, "presigned-expires");
 		},
+		/**
+		* @api private
+		*/
 		toUnauthenticated: function toUnauthenticated() {
 			this._unAuthenticated = true;
 			this.removeListener("validate", AWS.EventListeners.Core.VALIDATE_CREDENTIALS);
 			this.removeListener("sign", AWS.EventListeners.Core.SIGN);
 			return this;
 		},
+		/**
+		* @api private
+		*/
 		toGet: function toGet() {
 			if (this.service.api.protocol === "query" || this.service.api.protocol === "ec2") {
 				this.removeListener("build", this.buildAsGet);
@@ -7071,6 +8035,9 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			}
 			return this;
 		},
+		/**
+		* @api private
+		*/
 		buildAsGet: function buildAsGet(request) {
 			request.httpRequest.method = "GET";
 			request.httpRequest.path = request.service.endpoint.path + "?" + request.httpRequest.body;
@@ -7078,6 +8045,9 @@ var require_request = /* @__PURE__ */ __commonJSMin((() => {
 			delete request.httpRequest.headers["Content-Length"];
 			delete request.httpRequest.headers["Content-Type"];
 		},
+		/**
+		* @api private
+		*/
 		haltHandlersOnError: function haltHandlersOnError() {
 			this._haltHandlersOnError = true;
 		}
@@ -7209,6 +8179,9 @@ var require_response = /* @__PURE__ */ __commonJSMin((() => {
 	* @see AWS.Request
 	*/
 	AWS.Response = inherit({
+		/**
+		* @api private
+		*/
 		constructor: function Response(request) {
 			this.request = request;
 			this.data = null;
@@ -7221,6 +8194,21 @@ var require_response = /* @__PURE__ */ __commonJSMin((() => {
 				this.maxRedirects = request.service.config.maxRedirects;
 			}
 		},
+		/**
+		* Creates a new request for the next page of response data, calling the
+		* callback with the page data if a callback is provided.
+		*
+		* @callback callback function(err, data)
+		*   Called when a page of data is returned from the next request.
+		*
+		*   @param err [Error] an error object, if an error occurred in the request
+		*   @param data [Object] the next page of data, or null, if there are no
+		*     more pages left.
+		* @return [AWS.Request] the request object for the next page of data
+		* @return [null] if no callback is provided and there are no pages left
+		*   to retrieve.
+		* @since v1.4.0
+		*/
 		nextPage: function nextPage(callback) {
 			var config;
 			var service = this.request.service;
@@ -7244,12 +8232,20 @@ var require_response = /* @__PURE__ */ __commonJSMin((() => {
 				return service.makeRequest(this.request.operation, params, callback);
 			}
 		},
+		/**
+		* @return [Boolean] whether more pages of data can be returned by further
+		*   requests
+		* @since v1.4.0
+		*/
 		hasNextPage: function hasNextPage() {
 			this.cacheNextPageTokens();
 			if (this.nextPageTokens) return true;
 			if (this.nextPageTokens === void 0) return void 0;
 			else return false;
 		},
+		/**
+		* @api private
+		*/
 		cacheNextPageTokens: function cacheNextPageTokens() {
 			if (Object.prototype.hasOwnProperty.call(this, "nextPageTokens")) return this.nextPageTokens;
 			this.nextPageTokens = void 0;
@@ -7318,6 +8314,15 @@ var require_resource_waiter = /* @__PURE__ */ __commonJSMin((() => {
 	* @api private
 	*/
 	AWS.ResourceWaiter = inherit({
+		/**
+		* Waits for a given state on a service object
+		* @param service [Service] the service object to wait on
+		* @param state [String] the state (defined in waiter configuration) to wait
+		*   for.
+		* @example Create a waiter for running EC2 instances
+		*   var ec2 = new AWS.EC2;
+		*   var waiter = new AWS.ResourceWaiter(ec2, 'instanceRunning');
+		*/
 		constructor: function constructor(service, state) {
 			this.service = service;
 			this.state = state;
@@ -7375,6 +8380,9 @@ var require_resource_waiter = /* @__PURE__ */ __commonJSMin((() => {
 			add("CHECK_OUTPUT", "extractData", CHECK_ACCEPTORS);
 			add("CHECK_ERROR", "extractError", CHECK_ACCEPTORS);
 		}),
+		/**
+		* @return [AWS.Request]
+		*/
 		wait: function wait(params, callback) {
 			if (typeof params === "function") {
 				callback = params;
@@ -7406,6 +8414,11 @@ var require_resource_waiter = /* @__PURE__ */ __commonJSMin((() => {
 				retryable
 			});
 		},
+		/**
+		* Loads waiter configuration from API configuration
+		*
+		* @api private
+		*/
 		loadWaiterConfig: function loadWaiterConfig(state) {
 			if (!this.service.api.waiters[state]) throw new AWS.util.error(/* @__PURE__ */ new Error(), {
 				code: "StateNotFoundError",
@@ -7562,6 +8575,14 @@ var require_v4_credentials = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 	* @api private
 	*/
 	module.exports = {
+		/**
+		* @api private
+		*
+		* @param date [String]
+		* @param region [String]
+		* @param serviceName [String]
+		* @return [String]
+		*/
 		createScope: function createScope(date, region, serviceName) {
 			return [
 				date.substr(0, 8),
@@ -7570,6 +8591,16 @@ var require_v4_credentials = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 				v4Identifier
 			].join("/");
 		},
+		/**
+		* @api private
+		*
+		* @param credentials [Credentials]
+		* @param date [String]
+		* @param region [String]
+		* @param service [String]
+		* @param shouldCache [Boolean]
+		* @return [String]
+		*/
 		getSigningKey: function getSigningKey(credentials, date, region, service, shouldCache) {
 			var cacheKey = [
 				AWS.util.crypto.hmac(credentials.secretAccessKey, credentials.accessKeyId, "base64"),
@@ -7590,6 +8621,12 @@ var require_v4_credentials = /* @__PURE__ */ __commonJSMin(((exports, module) =>
 			}
 			return signingKey;
 		},
+		/**
+		* @api private
+		*
+		* Empties the derived signing key cache. Made available for testing purposes
+		* only.
+		*/
 		emptyCache: function emptyCache() {
 			cachedSecret = {};
 			cacheQueue = [];
@@ -7759,6 +8796,10 @@ var require_s3 = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	* @api private
 	*/
 	AWS.Signers.S3 = inherit(AWS.Signers.RequestSigner, {
+		/**
+		* When building the stringToSign, these sub resource params should be
+		* part of the canonical resource string with their NON-decoded values
+		*/
 		subResources: {
 			"acl": 1,
 			"accelerate": 1,
@@ -7939,7 +8980,11 @@ var require_presign = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	/**
 	* @api private
 	*/
-	AWS.Signers.Presign = inherit({ sign: function sign(request, expireTime, callback) {
+	AWS.Signers.Presign = inherit({ 
+	/**
+	* @api private
+	*/
+sign: function sign(request, expireTime, callback) {
 		request.httpRequest.headers[expiresHeader] = expireTime || 3600;
 		request.on("build", signedUrlBuilder);
 		request.on("sign", signedUrlSigner);
@@ -8027,6 +9072,24 @@ var require_param_validator = /* @__PURE__ */ __commonJSMin((() => {
 	* @api private
 	*/
 	AWS.ParamValidator = AWS.util.inherit({
+		/**
+		* Create a new validator object.
+		*
+		* @param validation [Boolean|map] whether input parameters should be
+		*     validated against the operation description before sending the
+		*     request. Pass a map to enable any of the following specific
+		*     validation features:
+		*
+		*     * **min** [Boolean] &mdash; Validates that a value meets the min
+		*       constraint. This is enabled by default when paramValidation is set
+		*       to `true`.
+		*     * **max** [Boolean] &mdash; Validates that a value meets the max
+		*       constraint.
+		*     * **pattern** [Boolean] &mdash; Validates that a string value matches a
+		*       regular expression.
+		*     * **enum** [Boolean] &mdash; Validates that a string value matches one
+		*       of the allowable enum values.
+		*/
 		constructor: function ParamValidator(validation) {
 			if (validation === true || validation === void 0) validation = { "min": true };
 			this.validation = validation;
@@ -8241,8 +9304,17 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 	*/
 	module.exports = AWS;
 	AWS.util.update(AWS, {
+		/**
+		* @constant
+		*/
 		VERSION: "2.1693.0",
+		/**
+		* @api private
+		*/
 		Signers: {},
+		/**
+		* @api private
+		*/
 		Protocol: {
 			Json: require_json(),
 			Query: require_query(),
@@ -8250,14 +9322,23 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			RestJson: require_rest_json(),
 			RestXml: require_rest_xml()
 		},
+		/**
+		* @api private
+		*/
 		XML: {
 			Builder: require_builder$1(),
 			Parser: null
 		},
+		/**
+		* @api private
+		*/
 		JSON: {
 			Builder: require_builder$2(),
 			Parser: require_parser$1()
 		},
+		/**
+		* @api private
+		*/
 		Model: {
 			Api: require_api(),
 			Operation: require_operation(),
@@ -8265,7 +9346,13 @@ var require_core = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			Paginator: require_paginator(),
 			ResourceWaiter: require_resource_waiter$1()
 		},
+		/**
+		* @api private
+		*/
 		apiLoader: require_api_loader(),
+		/**
+		* @api private
+		*/
 		EndpointCache: require_endpoint_cache().EndpointCache
 	});
 	require_sequential_executor();
@@ -8687,6 +9774,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 		},
 		buffer: {
+			/**
+			* Buffer constructor for Node buffer and buffer pollyfill
+			*/
 			toBuffer: function(data, encoding) {
 				return typeof util.Buffer.from === "function" && util.Buffer.from !== Uint8Array.from ? util.Buffer.from(data, encoding) : new util.Buffer(data, encoding);
 			},
@@ -8712,6 +9802,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				};
 				return readable;
 			},
+			/**
+			* Concatenates a list of Buffer objects.
+			*/
 			concat: function(buffers) {
 				var length = 0, offset = 0, buffer = null, i;
 				for (i = 0; i < buffers.length; i++) length += buffers[i].length;
@@ -8766,6 +9859,12 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			callback: function(err) {
 				if (err) throw err;
 			},
+			/**
+			* Turn a synchronous function into as "async" function by making it call
+			* a callback. The underlying function is called with all but the last argument,
+			* which is treated as the callback. The callback is passed passed a first argument
+			* of null on success to mimick standard node callbacks.
+			*/
 			makeAsync: function makeAsync(fn, expectedArgs) {
 				if (expectedArgs && expectedArgs <= fn.length) return fn;
 				return function() {
@@ -8774,28 +9873,60 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				};
 			}
 		},
+		/**
+		* Date and time utility functions.
+		*/
 		date: {
+			/**
+			* @return [Date] the current JavaScript date object. Since all
+			*   AWS services rely on this date object, you can override
+			*   this function to provide a special time value to AWS service
+			*   requests.
+			*/
 			getDate: function getDate() {
 				if (!AWS) AWS = require_core();
 				if (AWS.config.systemClockOffset) return new Date((/* @__PURE__ */ new Date()).getTime() + AWS.config.systemClockOffset);
 				else return /* @__PURE__ */ new Date();
 			},
+			/**
+			* @return [String] the date in ISO-8601 format
+			*/
 			iso8601: function iso8601(date) {
 				if (date === void 0) date = util.date.getDate();
 				return date.toISOString().replace(/\.\d{3}Z$/, "Z");
 			},
+			/**
+			* @return [String] the date in RFC 822 format
+			*/
 			rfc822: function rfc822(date) {
 				if (date === void 0) date = util.date.getDate();
 				return date.toUTCString();
 			},
+			/**
+			* @return [Integer] the UNIX timestamp value for the current time
+			*/
 			unixTimestamp: function unixTimestamp(date) {
 				if (date === void 0) date = util.date.getDate();
 				return date.getTime() / 1e3;
 			},
+			/**
+			* @param [String,number,Date] date
+			* @return [Date]
+			*/
 			from: function format(date) {
 				if (typeof date === "number") return /* @__PURE__ */ new Date(date * 1e3);
 				else return new Date(date);
 			},
+			/**
+			* Given a Date or date-like value, this function formats the
+			* date into a string of the requested value.
+			* @param [String,number,Date] date
+			* @param [String] formatter Valid formats are:
+			#   * 'iso8601'
+			#   * 'rfc822'
+			#   * 'unixTimestamp'
+			* @return [String]
+			*/
 			format: function format(date, formatter) {
 				if (!formatter) formatter = "iso8601";
 				return util.date[formatter](util.date.from(date));
@@ -9146,6 +10277,7 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				return util.crypto.lib.createHash(algorithm);
 			}
 		},
+		/** @!ignore */
 		abort: {},
 		each: function each(object, iterFunction) {
 			for (var key in object) if (Object.prototype.hasOwnProperty.call(object, key)) {
@@ -9228,6 +10360,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			return err;
 		},
+		/**
+		* @api private
+		*/
 		inherit: function inherit(klass, features) {
 			var newObject = null;
 			if (features === void 0) {
@@ -9247,6 +10382,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			features.constructor.__super__ = klass;
 			return features.constructor;
 		},
+		/**
+		* @api private
+		*/
 		mixin: function mixin() {
 			var klass = arguments[0];
 			for (var i = 1; i < arguments.length; i++) for (var prop in arguments[i].prototype) {
@@ -9255,6 +10393,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			return klass;
 		},
+		/**
+		* @api private
+		*/
 		hideProperties: function hideProperties(obj, props) {
 			if (typeof Object.defineProperty !== "function") return;
 			util.arrayEach(props, function(key) {
@@ -9265,6 +10406,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				});
 			});
 		},
+		/**
+		* @api private
+		*/
 		property: function property(obj, name, value, enumerable, isValue) {
 			var opts = {
 				configurable: true,
@@ -9277,6 +10421,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			Object.defineProperty(obj, name, opts);
 		},
+		/**
+		* @api private
+		*/
 		memoizedProperty: function memoizedProperty(obj, name, get, enumerable) {
 			var cachedValue = null;
 			util.property(obj, name, function() {
@@ -9284,6 +10431,13 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				return cachedValue;
 			}, enumerable);
 		},
+		/**
+		* TODO Remove in major version revision
+		* This backfill populates response data without the
+		* top-level payload name.
+		*
+		* @api private
+		*/
 		hoistPayloadMember: function hoistPayloadMember(resp) {
 			var req = resp.request;
 			var operationName = req.operation;
@@ -9297,6 +10451,11 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				});
 			}
 		},
+		/**
+		* Compute SHA-256 checksums of streams
+		*
+		* @api private
+		*/
 		computeSha256: function computeSha256(body, done) {
 			if (util.isNode()) {
 				var Stream = util.stream.Stream;
@@ -9313,6 +10472,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				else done(null, sha);
 			});
 		},
+		/**
+		* @api private
+		*/
 		isClockSkewed: function isClockSkewed(serverTime) {
 			if (serverTime) {
 				util.property(AWS.config, "isClockSkewed", Math.abs((/* @__PURE__ */ new Date()).getTime() - serverTime) >= 3e5, false);
@@ -9322,12 +10484,18 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 		applyClockOffset: function applyClockOffset(serverTime) {
 			if (serverTime) AWS.config.systemClockOffset = serverTime - (/* @__PURE__ */ new Date()).getTime();
 		},
+		/**
+		* @api private
+		*/
 		extractRequestId: function extractRequestId(resp) {
 			var requestId = resp.httpResponse.headers["x-amz-request-id"] || resp.httpResponse.headers["x-amzn-requestid"];
 			if (!requestId && resp.data && resp.data.ResponseMetadata) requestId = resp.data.ResponseMetadata.RequestId;
 			if (requestId) resp.requestId = requestId;
 			if (resp.error) resp.error.requestId = requestId;
 		},
+		/**
+		* @api private
+		*/
 		addPromises: function addPromises(constructors, PromiseDependency) {
 			var deletePromises = false;
 			if (PromiseDependency === void 0 && AWS && AWS.config) PromiseDependency = AWS.config.getPromisesDependency();
@@ -9341,6 +10509,14 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				} else if (constructor.addPromisesToClass) constructor.addPromisesToClass(PromiseDependency);
 			}
 		},
+		/**
+		* @api private
+		* Return a function that will return a promise whose fate is decided by the
+		* callback behavior of the given method with `methodName`. The method to be
+		* promisified should conform to node.js convention of accepting a callback as
+		* last argument and calling that callback with error as the first argument
+		* and success value on the second argument.
+		*/
 		promisifyMethod: function promisifyMethod(methodName, PromiseDependency) {
 			return function promise() {
 				var self = this;
@@ -9354,6 +10530,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				});
 			};
 		},
+		/**
+		* @api private
+		*/
 		isDualstackAvailable: function isDualstackAvailable(service) {
 			if (!service) return false;
 			var metadata = require_metadata();
@@ -9361,6 +10540,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			if (typeof service !== "string" || !metadata.hasOwnProperty(service)) return false;
 			return !!metadata[service].dualstackAvailable;
 		},
+		/**
+		* @api private
+		*/
 		calculateRetryDelay: function calculateRetryDelay(retryCount, retryDelayOptions, err) {
 			if (!retryDelayOptions) retryDelayOptions = {};
 			var customBackoff = retryDelayOptions.customBackoff || null;
@@ -9368,6 +10550,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			var base = typeof retryDelayOptions.base === "number" ? retryDelayOptions.base : 100;
 			return Math.random() * (Math.pow(2, retryCount) * base);
 		},
+		/**
+		* @api private
+		*/
 		handleRequestWithRetries: function handleRequestWithRetries(httpRequest, options, cb) {
 			if (!options) options = {};
 			var http = AWS.HttpClient.getInstance();
@@ -9409,20 +10594,32 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			};
 			AWS.util.defer(sendRequest);
 		},
+		/**
+		* @api private
+		*/
 		uuid: { v4: function uuidV4() {
 			return require_dist().v4();
 		} },
+		/**
+		* @api private
+		*/
 		convertPayloadToString: function convertPayloadToString(resp) {
 			var req = resp.request;
 			var operation = req.operation;
 			var rules = req.service.api.operations[operation].output || {};
 			if (rules.payload && resp.data[rules.payload]) resp.data[rules.payload] = resp.data[rules.payload].toString();
 		},
+		/**
+		* @api private
+		*/
 		defer: function defer(callback) {
 			if (typeof process === "object" && typeof process.nextTick === "function") process.nextTick(callback);
 			else if (typeof setImmediate === "function") setImmediate(callback);
 			else setTimeout(callback, 0);
 		},
+		/**
+		* @api private
+		*/
 		getRequestPayloadShape: function getRequestPayloadShape(req) {
 			var operations = req.service.api.operations;
 			if (!operations) return void 0;
@@ -9454,6 +10651,9 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				return target;
 			}
 		},
+		/**
+		* @api private
+		*/
 		ARN: {
 			validate: function validateARN(str) {
 				return str && str.indexOf("arn:") === 0 && str.split(":").length >= 6;
@@ -9473,10 +10673,25 @@ var require_util = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 				return "arn:" + (arnObject.partition || "aws") + ":" + arnObject.service + ":" + arnObject.region + ":" + arnObject.accountId + ":" + arnObject.resource;
 			}
 		},
+		/**
+		* @api private
+		*/
 		defaultProfile: "default",
+		/**
+		* @api private
+		*/
 		configOptInEnv: "AWS_SDK_LOAD_CONFIG",
+		/**
+		* @api private
+		*/
 		sharedCredentialsFileEnv: "AWS_SHARED_CREDENTIALS_FILE",
+		/**
+		* @api private
+		*/
 		sharedConfigFileEnv: "AWS_CONFIG_FILE",
+		/**
+		* @api private
+		*/
 		imdsDisabledEnv: "AWS_EC2_METADATA_DISABLED"
 	};
 	/**
@@ -10166,10 +11381,24 @@ var require_ini_loader = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			this.resolvedProfiles = {};
 			this.resolvedSsoSessions = {};
 		},
+		/** Remove all cached files. Used after config files are updated. */
 		clearCachedFiles: function clearCachedFiles() {
 			this.resolvedProfiles = {};
 			this.resolvedSsoSessions = {};
 		},
+		/**
+		* Load configurations from config/credentials files and cache them
+		* for later use. If no file is specified it will try to load default files.
+		*
+		* @param options [map] information describing the file
+		* @option options filename [String] ('~/.aws/credentials' or defined by
+		*   AWS_SHARED_CREDENTIALS_FILE process env var or '~/.aws/config' if
+		*   isConfig is set to true)
+		*   path to the file to be read.
+		* @option options isConfig [Boolean] (false) True to read config file.
+		* @return [map<String,String>] object containing contents from file in key-value
+		*   pairs.
+		*/
 		loadFrom: function loadFrom(options) {
 			options = options || {};
 			var isConfig = options.isConfig === true;
@@ -10181,6 +11410,16 @@ var require_ini_loader = /* @__PURE__ */ __commonJSMin(((exports, module) => {
 			}
 			return this.resolvedProfiles[filename];
 		},
+		/**
+		* Load sso sessions from config/credentials files and cache them
+		* for later use. If no file is specified it will try to load default file.
+		*
+		* @param options [map] information describing the file
+		* @option options filename [String] ('~/.aws/config' or defined by
+		*   AWS_CONFIG_FILE process env var)
+		* @return [map<String,String>] object containing contents from file in key-value
+		*   pairs.
+		*/
 		loadSsoSessionsFrom: function loadSsoSessionsFrom(options) {
 			options = options || {};
 			var filename = options.filename || this.getDefaultFilePath(true);
@@ -10255,6 +11494,28 @@ var require_temporary_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	* @note (see constructor)
 	*/
 	AWS.TemporaryCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new temporary credentials object.
+		*
+		* @note In order to create temporary credentials, you first need to have
+		*   "master" credentials configured in {AWS.Config.credentials}. These
+		*   master credentials are necessary to retrieve the temporary credentials,
+		*   as well as refresh the credentials when they expire.
+		* @param params [map] a map of options that are passed to the
+		*   {AWS.STS.assumeRole} or {AWS.STS.getSessionToken} operations.
+		*   If a `RoleArn` parameter is passed in, credentials will be based on the
+		*   IAM role.
+		* @param masterCredentials [AWS.Credentials] the master (non-temporary) credentials
+		*  used to get and refresh temporary credentials from AWS STS.
+		* @example Creating a new credentials object for generic temporary credentials
+		*   AWS.config.credentials = new AWS.TemporaryCredentials();
+		* @example Creating a new credentials object for an IAM role
+		*   AWS.config.credentials = new AWS.TemporaryCredentials({
+		*     RoleArn: 'arn:aws:iam::1234567890:role/TemporaryCredentials',
+		*   });
+		* @see AWS.STS.assumeRole
+		* @see AWS.STS.getSessionToken
+		*/
 		constructor: function TemporaryCredentials(params, masterCredentials) {
 			AWS.Credentials.call(this);
 			this.loadMasterCredentials(masterCredentials);
@@ -10262,9 +11523,25 @@ var require_temporary_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			this.params = params || {};
 			if (this.params.RoleArn) this.params.RoleSessionName = this.params.RoleSessionName || "temporary-credentials";
 		},
+		/**
+		* Refreshes credentials using {AWS.STS.assumeRole} or
+		* {AWS.STS.getSessionToken}, depending on whether an IAM role ARN was passed
+		* to the credentials {constructor}.
+		*
+		* @callback callback function(err)
+		*   Called when the STS service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			self.createClients();
@@ -10276,11 +11553,17 @@ var require_temporary_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				});
 			});
 		},
+		/**
+		* @api private
+		*/
 		loadMasterCredentials: function loadMasterCredentials(masterCredentials) {
 			this.masterCredentials = masterCredentials || AWS.config.credentials;
 			while (this.masterCredentials.masterCredentials) this.masterCredentials = this.masterCredentials.masterCredentials;
 			if (typeof this.masterCredentials.get !== "function") this.masterCredentials = new AWS.Credentials(this.masterCredentials);
 		},
+		/**
+		* @api private
+		*/
 		createClients: function() {
 			this.service = this.service || new STS({ params: this.params });
 		}
@@ -10361,6 +11644,34 @@ var require_chainable_temporary_credentials = /* @__PURE__ */ __commonJSMin((() 
 	* @note (see constructor)
 	*/
 	AWS.ChainableTemporaryCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new temporary credentials object.
+		*
+		* @param options [map] a set of options
+		* @option options params [map] ({}) a map of options that are passed to the
+		*   {AWS.STS.assumeRole} or {AWS.STS.getSessionToken} operations.
+		*   If a `RoleArn` parameter is passed in, credentials will be based on the
+		*   IAM role. If a `SerialNumber` parameter is passed in, {tokenCodeFn} must
+		*   also be passed in or an error will be thrown.
+		* @option options masterCredentials [AWS.Credentials] the master credentials
+		*   used to get and refresh temporary credentials from AWS STS. By default,
+		*   AWS.config.credentials or AWS.config.credentialProvider will be used.
+		* @option options tokenCodeFn [Function] (null) Function to provide
+		*   `TokenCode`, if `SerialNumber` is provided for profile in {params}. Function
+		*   is called with value of `SerialNumber` and `callback`, and should provide
+		*   the `TokenCode` or an error to the callback in the format
+		*   `callback(err, token)`.
+		* @example Creating a new credentials object for generic temporary credentials
+		*   AWS.config.credentials = new AWS.ChainableTemporaryCredentials();
+		* @example Creating a new credentials object for an IAM role
+		*   AWS.config.credentials = new AWS.ChainableTemporaryCredentials({
+		*     params: {
+		*       RoleArn: 'arn:aws:iam::1234567890:role/TemporaryCredentials'
+		*     }
+		*   });
+		* @see AWS.STS.assumeRole
+		* @see AWS.STS.getSessionToken
+		*/
 		constructor: function ChainableTemporaryCredentials(options) {
 			AWS.Credentials.call(this);
 			options = options || {};
@@ -10371,14 +11682,32 @@ var require_chainable_temporary_credentials = /* @__PURE__ */ __commonJSMin((() 
 			if (params.RoleArn) params.RoleSessionName = params.RoleSessionName || "temporary-credentials";
 			if (params.SerialNumber) if (!options.tokenCodeFn || typeof options.tokenCodeFn !== "function") throw new AWS.util.error(/* @__PURE__ */ new Error("tokenCodeFn must be a function when params.SerialNumber is given"), { code: this.errorCode });
 			else this.tokenCodeFn = options.tokenCodeFn;
-			this.service = new STS(AWS.util.merge({
+			var config = AWS.util.merge({
 				params,
 				credentials: options.masterCredentials || AWS.config.credentials
-			}, options.stsConfig || {}));
+			}, options.stsConfig || {});
+			this.service = new STS(config);
 		},
+		/**
+		* Refreshes credentials using {AWS.STS.assumeRole} or
+		* {AWS.STS.getSessionToken}, depending on whether an IAM role ARN was passed
+		* to the credentials {constructor}.
+		*
+		* @callback callback function(err)
+		*   Called when the STS service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see AWS.Credentials.get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		load: function load(callback) {
 			var self = this;
 			var operation = self.service.config.params.RoleArn ? "assumeRole" : "getSessionToken";
@@ -10395,6 +11724,9 @@ var require_chainable_temporary_credentials = /* @__PURE__ */ __commonJSMin((() 
 				});
 			});
 		},
+		/**
+		* @api private
+		*/
 		getTokenCode: function getTokenCode(callback) {
 			var self = this;
 			if (this.tokenCodeFn) this.tokenCodeFn(this.service.config.params.SerialNumber, function(err, token) {
@@ -10456,6 +11788,26 @@ var require_web_identity_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	*     access to other properties from the response.
 	*/
 	AWS.WebIdentityCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new credentials object.
+		* @param (see AWS.STS.assumeRoleWithWebIdentity)
+		* @example Creating a new credentials object
+		*   AWS.config.credentials = new AWS.WebIdentityCredentials({
+		*     RoleArn: 'arn:aws:iam::1234567890:role/WebIdentity',
+		*     WebIdentityToken: 'ABCDEFGHIJKLMNOP', // token from identity service
+		*     RoleSessionName: 'web' // optional name, defaults to web-identity
+		*   }, {
+		*     // optionally provide configuration to apply to the underlying AWS.STS service client
+		*     // if configuration is not provided, then configuration will be pulled from AWS.config
+		*
+		*     // specify timeout options
+		*     httpOptions: {
+		*       timeout: 100
+		*     }
+		*   });
+		* @see AWS.STS.assumeRoleWithWebIdentity
+		* @see AWS.Config
+		*/
 		constructor: function WebIdentityCredentials(params, clientConfig) {
 			AWS.Credentials.call(this);
 			this.expired = true;
@@ -10464,9 +11816,23 @@ var require_web_identity_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			this.data = null;
 			this._clientConfig = AWS.util.copy(clientConfig || {});
 		},
+		/**
+		* Refreshes credentials using {AWS.STS.assumeRoleWithWebIdentity}
+		*
+		* @callback callback function(err)
+		*   Called when the STS service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			self.createClients();
@@ -10479,6 +11845,9 @@ var require_web_identity_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				callback(err);
 			});
 		},
+		/**
+		* @api private
+		*/
 		createClients: function() {
 			if (!this.service) {
 				var stsConfig = AWS.util.merge({}, this._clientConfig);
@@ -11111,10 +12480,70 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 	*     final resolved identity ID from Amazon Cognito.
 	*/
 	AWS.CognitoIdentityCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* @api private
+		*/
 		localStorageKey: {
 			id: "aws.cognito.identity-id.",
 			providers: "aws.cognito.identity-providers."
 		},
+		/**
+		* Creates a new credentials object.
+		* @example Creating a new credentials object
+		*   AWS.config.credentials = new AWS.CognitoIdentityCredentials({
+		*
+		*     // either IdentityPoolId or IdentityId is required
+		*     // See the IdentityPoolId param for AWS.CognitoIdentity.getID (linked below)
+		*     // See the IdentityId param for AWS.CognitoIdentity.getCredentialsForIdentity
+		*     // or AWS.CognitoIdentity.getOpenIdToken (linked below)
+		*     IdentityPoolId: 'us-east-1:1699ebc0-7900-4099-b910-2df94f52a030',
+		*     IdentityId: 'us-east-1:128d0a74-c82f-4553-916d-90053e4a8b0f'
+		*
+		*     // optional, only necessary when the identity pool is not configured
+		*     // to use IAM roles in the Amazon Cognito Console
+		*     // See the RoleArn param for AWS.STS.assumeRoleWithWebIdentity (linked below)
+		*     RoleArn: 'arn:aws:iam::1234567890:role/MYAPP-CognitoIdentity',
+		*
+		*     // optional tokens, used for authenticated login
+		*     // See the Logins param for AWS.CognitoIdentity.getID (linked below)
+		*     Logins: {
+		*       'graph.facebook.com': 'FBTOKEN',
+		*       'www.amazon.com': 'AMAZONTOKEN',
+		*       'accounts.google.com': 'GOOGLETOKEN',
+		*       'api.twitter.com': 'TWITTERTOKEN',
+		*       'www.digits.com': 'DIGITSTOKEN'
+		*     },
+		*
+		*     // optional name, defaults to web-identity
+		*     // See the RoleSessionName param for AWS.STS.assumeRoleWithWebIdentity (linked below)
+		*     RoleSessionName: 'web',
+		*
+		*     // optional, only necessary when application runs in a browser
+		*     // and multiple users are signed in at once, used for caching
+		*     LoginId: 'example@gmail.com'
+		*
+		*   }, {
+		*      // optionally provide configuration to apply to the underlying service clients
+		*      // if configuration is not provided, then configuration will be pulled from AWS.config
+		*
+		*      // region should match the region your identity pool is located in
+		*      region: 'us-east-1',
+		*
+		*      // specify timeout options
+		*      httpOptions: {
+		*        timeout: 100
+		*      }
+		*   });
+		* @see AWS.CognitoIdentity.getId
+		* @see AWS.CognitoIdentity.getCredentialsForIdentity
+		* @see AWS.STS.assumeRoleWithWebIdentity
+		* @see AWS.CognitoIdentity.getOpenIdToken
+		* @see AWS.Config
+		* @note If a region is not provided in the global AWS.config, or
+		*   specified in the `clientConfig` to the CognitoIdentityCredentials
+		*   constructor, you may encounter a 'Missing credentials in config' error
+		*   when calling making a service call.
+		*/
 		constructor: function CognitoIdentityCredentials(params, clientConfig) {
 			AWS.Credentials.call(this);
 			this.expired = true;
@@ -11134,9 +12563,25 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				}
 			});
 		},
+		/**
+		* Refreshes credentials using {AWS.CognitoIdentity.getCredentialsForIdentity},
+		* or {AWS.STS.assumeRoleWithWebIdentity}.
+		*
+		* @callback callback function(err)
+		*   Called when the STS service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see AWS.Credentials.get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		load: function load(callback) {
 			var self = this;
 			self.createClients();
@@ -11151,6 +12596,11 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				}
 			});
 		},
+		/**
+		* Clears the cached Cognito ID associated with the currently configured
+		* identity pool ID. Use this to manually invalidate your cache if
+		* the identity pool ID was deleted.
+		*/
 		clearCachedId: function clearCache() {
 			this._identityId = null;
 			delete this.params.IdentityId;
@@ -11159,10 +12609,26 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 			delete this.storage[this.localStorageKey.id + poolId + loginId];
 			delete this.storage[this.localStorageKey.providers + poolId + loginId];
 		},
+		/**
+		* @api private
+		*/
 		clearIdOnNotAuthorized: function clearIdOnNotAuthorized(err) {
 			var self = this;
 			if (err.code == "NotAuthorizedException") self.clearCachedId();
 		},
+		/**
+		* Retrieves a Cognito ID, loading from cache if it was already retrieved
+		* on this device.
+		*
+		* @callback callback function(err, identityId)
+		*   @param err [Error, null] an error object if the call failed or null if
+		*     it succeeded.
+		*   @param identityId [String, null] if successful, the callback will return
+		*     the Cognito ID.
+		* @note If not loaded explicitly, the Cognito ID is loaded and stored in
+		*   localStorage in the browser environment of a device.
+		* @api private
+		*/
 		getId: function getId(callback) {
 			var self = this;
 			if (typeof self.params.IdentityId === "string") return callback(null, self.params.IdentityId);
@@ -11173,6 +12639,9 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				} else callback(err);
 			});
 		},
+		/**
+		* @api private
+		*/
 		loadCredentials: function loadCredentials(data, credentials) {
 			if (!data || !credentials) return;
 			credentials.expired = false;
@@ -11181,6 +12650,9 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 			credentials.sessionToken = data.Credentials.SessionToken;
 			credentials.expireTime = data.Credentials.Expiration;
 		},
+		/**
+		* @api private
+		*/
 		getCredentialsForIdentity: function getCredentialsForIdentity(callback) {
 			var self = this;
 			self.cognito.getCredentialsForIdentity(function(err, data) {
@@ -11192,6 +12664,9 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				callback(err);
 			});
 		},
+		/**
+		* @api private
+		*/
 		getCredentialsFromSTS: function getCredentialsFromSTS(callback) {
 			var self = this;
 			self.cognito.getOpenIdToken(function(err, data) {
@@ -11211,6 +12686,9 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				}
 			});
 		},
+		/**
+		* @api private
+		*/
 		loadCachedId: function loadCachedId() {
 			var self = this;
 			if (AWS.util.isBrowser() && !self.params.IdentityId) {
@@ -11223,6 +12701,9 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				} else if (id) self.params.IdentityId = id;
 			}
 		},
+		/**
+		* @api private
+		*/
 		createClients: function() {
 			var clientConfig = this._clientConfig;
 			this.webIdentityCredentials = this.webIdentityCredentials || new AWS.WebIdentityCredentials(this.params, clientConfig);
@@ -11233,6 +12714,9 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 			}
 			this.sts = this.sts || new STS(clientConfig);
 		},
+		/**
+		* @api private
+		*/
 		cacheId: function cacheId(data) {
 			this._identityId = data.IdentityId;
 			this.params.IdentityId = this._identityId;
@@ -11241,14 +12725,23 @@ var require_cognito_identity_credentials = /* @__PURE__ */ __commonJSMin((() => 
 				if (this.params.Logins) this.setStorage("providers", Object.keys(this.params.Logins).join(","));
 			}
 		},
+		/**
+		* @api private
+		*/
 		getStorage: function getStorage(key) {
 			return this.storage[this.localStorageKey[key] + this.params.IdentityPoolId + (this.params.LoginId || "")];
 		},
+		/**
+		* @api private
+		*/
 		setStorage: function setStorage(key, val) {
 			try {
 				this.storage[this.localStorageKey[key] + this.params.IdentityPoolId + (this.params.LoginId || "")] = val;
 			} catch (_) {}
 		},
+		/**
+		* @api private
+		*/
 		storage: (function() {
 			try {
 				var storage = AWS.util.isBrowser() && window.localStorage !== null && typeof window.localStorage === "object" ? window.localStorage : {};
@@ -11304,14 +12797,39 @@ var require_saml_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	*     `params.SAMLAssertion` property.
 	*/
 	AWS.SAMLCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new credentials object.
+		* @param (see AWS.STS.assumeRoleWithSAML)
+		* @example Creating a new credentials object
+		*   AWS.config.credentials = new AWS.SAMLCredentials({
+		*     RoleArn: 'arn:aws:iam::1234567890:role/SAMLRole',
+		*     PrincipalArn: 'arn:aws:iam::1234567890:role/SAMLPrincipal',
+		*     SAMLAssertion: 'base64-token', // base64-encoded token from IdP
+		*   });
+		* @see AWS.STS.assumeRoleWithSAML
+		*/
 		constructor: function SAMLCredentials(params) {
 			AWS.Credentials.call(this);
 			this.expired = true;
 			this.params = params;
 		},
+		/**
+		* Refreshes credentials using {AWS.STS.assumeRoleWithSAML}
+		*
+		* @callback callback function(err)
+		*   Called when the STS service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			self.createClients();
@@ -11320,6 +12838,9 @@ var require_saml_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				callback(err);
 			});
 		},
+		/**
+		* @api private
+		*/
 		createClients: function() {
 			this.service = this.service || new STS({ params: this.params });
 		}
@@ -11373,6 +12894,19 @@ var require_process_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	* @!macro nobrowser
 	*/
 	AWS.ProcessCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new ProcessCredentials object.
+		*
+		* @param options [map] a set of options
+		* @option options profile [String] (AWS_PROFILE env var or 'default')
+		*   the name of the profile to load.
+		* @option options filename [String] ('~/.aws/credentials' or defined by
+		*   AWS_SHARED_CREDENTIALS_FILE process env var)
+		*   the filename to use when loading credentials.
+		* @option options callback [Function] (err) Credentials are eagerly loaded
+		*   by the constructor. When the callback is called with no error, the
+		*   credentials have been loaded successfully.
+		*/
 		constructor: function ProcessCredentials(options) {
 			AWS.Credentials.call(this);
 			options = options || {};
@@ -11380,6 +12914,9 @@ var require_process_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			this.profile = options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
 			this.get(options.callback || AWS.util.fn.noop);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			try {
@@ -11401,6 +12938,13 @@ var require_process_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				callback(err);
 			}
 		},
+		/**
+		* Executes the credential_process and retrieves
+		* credentials from the output
+		* @api private
+		* @param profile [map] credentials profile
+		* @throws ProcessCredentialsProviderFailure
+		*/
 		loadViaCredentialProcess: function loadViaCredentialProcess(profile, callback) {
 			proc.exec(profile["credential_process"], { env: process.env }, function(err, stdOut, stdErr) {
 				if (err) callback(AWS.util.error(/* @__PURE__ */ new Error("credential_process returned error"), { code: "ProcessCredentialsProviderFailure" }), null);
@@ -11417,6 +12961,17 @@ var require_process_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				}
 			});
 		},
+		/**
+		* Loads the credentials from the credential process
+		*
+		* @callback callback function(err)
+		*   Called after the credential process has been executed. When this
+		*   callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			iniLoader.clearCachedFiles();
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
@@ -16446,6 +18001,9 @@ var require_node = /* @__PURE__ */ __commonJSMin((() => {
 				stream.end(body);
 			} else stream.end();
 		},
+		/**
+		* Create the https.Agent or http.Agent according to the request schema.
+		*/
 		getAgent: function getAgent(useSSL, agentOptions) {
 			var http = useSSL ? __require("https") : __require("http");
 			if (useSSL) {
@@ -16533,11 +18091,29 @@ var require_token_file_web_identity_credentials = /* @__PURE__ */ __commonJSMin(
 	* @!macro nobrowser
 	*/
 	AWS.TokenFileWebIdentityCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* @example Creating a new credentials object
+		*  AWS.config.credentials = new AWS.TokenFileWebIdentityCredentials(
+		*   // optionally provide configuration to apply to the underlying AWS.STS service client
+		*   // if configuration is not provided, then configuration will be pulled from AWS.config
+		*   {
+		*     // specify timeout options
+		*     httpOptions: {
+		*       timeout: 100
+		*     }
+		*   });
+		* @see AWS.Config
+		*/
 		constructor: function TokenFileWebIdentityCredentials(clientConfig) {
 			AWS.Credentials.call(this);
 			this.data = null;
 			this.clientConfig = AWS.util.copy(clientConfig || {});
 		},
+		/**
+		* Returns params from environment variables
+		*
+		* @api private
+		*/
 		getParamsFromEnv: function getParamsFromEnv() {
 			var ENV_TOKEN_FILE = "AWS_WEB_IDENTITY_TOKEN_FILE", ENV_ROLE_ARN = "AWS_ROLE_ARN";
 			if (process.env[ENV_TOKEN_FILE] && process.env[ENV_ROLE_ARN]) return [{
@@ -16546,6 +18122,11 @@ var require_token_file_web_identity_credentials = /* @__PURE__ */ __commonJSMin(
 				roleSessionName: process.env["AWS_ROLE_SESSION_NAME"]
 			}];
 		},
+		/**
+		* Returns params from shared config variables
+		*
+		* @api private
+		*/
 		getParamsFromSharedConfig: function getParamsFromSharedConfig() {
 			var profiles = AWS.util.getProfilesFromSharedConfig(iniLoader);
 			var profileName = process.env.AWS_PROFILE || AWS.util.defaultProfile;
@@ -16566,9 +18147,23 @@ var require_token_file_web_identity_credentials = /* @__PURE__ */ __commonJSMin(
 			});
 			return paramsArray;
 		},
+		/**
+		* Refreshes credentials using {AWS.STS.assumeRoleWithWebIdentity}
+		*
+		* @callback callback function(err)
+		*   Called when the STS service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see AWS.Credentials.get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		*/
 		assumeRoleChaining: function assumeRoleChaining(paramsArray, callback) {
 			var self = this;
 			if (paramsArray.length === 0) {
@@ -16590,6 +18185,9 @@ var require_token_file_web_identity_credentials = /* @__PURE__ */ __commonJSMin(
 				});
 			}
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			try {
@@ -16616,9 +18214,13 @@ var require_token_file_web_identity_credentials = /* @__PURE__ */ __commonJSMin(
 				callback(err);
 			}
 		},
+		/**
+		* @api private
+		*/
 		createClients: function() {
 			if (!this.service) {
-				this.service = new STS(AWS.util.merge({}, this.clientConfig));
+				var stsConfig = AWS.util.merge({}, this.clientConfig);
+				this.service = new STS(stsConfig);
 				this.service.retryableError = function(error) {
 					if (error.code === "IDPCommunicationErrorException" || error.code === "InvalidIdentityToken") return true;
 					else return AWS.Service.prototype.retryableError.call(this, error);
@@ -16737,9 +18339,43 @@ var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) 
 	* @!macro nobrowser
 	*/
 	AWS.MetadataService = inherit({
+		/**
+		* @return [String] the endpoint of the instance metadata service
+		*/
 		endpoint: getMetadataServiceEndpoint(),
+		/**
+		* @!ignore
+		*/
+		/**
+		* Default HTTP options. By default, the metadata service is set to not
+		* timeout on long requests. This means that on non-EC2 machines, this
+		* request will never return. If you are calling this operation from an
+		* environment that may not always run on EC2, set a `timeout` value so
+		* the SDK will abort the request after a given number of milliseconds.
+		*/
 		httpOptions: { timeout: 0 },
+		/**
+		* when enabled, metadata service will not fetch token
+		*/
 		disableFetchToken: false,
+		/**
+		* Creates a new MetadataService object with a given set of options.
+		*
+		* @option options host [String] the hostname of the instance metadata
+		*   service
+		* @option options httpOptions [map] a map of options to pass to the
+		*   underlying HTTP request:
+		*
+		*   * **timeout** (Number) &mdash; a timeout value in milliseconds to wait
+		*     before aborting the connection. Set to 0 for no timeout.
+		* @option options maxRetries [Integer] the maximum number of retries to
+		*   perform for timeout errors
+		* @option options retryDelayOptions [map] A set of options to configure the
+		*   retry delay on retryable errors. See AWS.Config for details.
+		* @option options ec2MetadataV1Disabled [boolean] Whether to block IMDS v1 fallback.
+		* @option options profile [string] A profile to check for IMDSv1 fallback settings.
+		* @option options filename [string] Optional filename for the config file.
+		*/
 		constructor: function MetadataService(options) {
 			if (options && options.host) {
 				options.endpoint = "http://" + options.host;
@@ -16750,6 +18386,23 @@ var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) 
 			this.filename = options && options.filename;
 			AWS.util.update(this, options);
 		},
+		/**
+		* Sends a request to the instance metadata service for a given resource.
+		*
+		* @param path [String] the path of the resource to get
+		*
+		* @param options [map] an optional map used to make request
+		*
+		*   * **method** (String) &mdash; HTTP request method
+		*
+		*   * **headers** (map<String,String>) &mdash; a map of response header keys and their respective values
+		*
+		* @callback callback function(err, data)
+		*   Called when a response is available from the service.
+		*   @param err [Error, null] if an error occurred, this value will be set
+		*   @param data [String, null] if the request was successful, the body of
+		*     the response
+		*/
 		request: function request(path, options, callback) {
 			if (arguments.length === 2) {
 				callback = options;
@@ -16766,13 +18419,29 @@ var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) 
 			if (options.headers) httpRequest.headers = options.headers;
 			AWS.util.handleRequestWithRetries(httpRequest, this, callback);
 		},
+		/**
+		* @api private
+		*/
 		loadCredentialsCallbacks: [],
+		/**
+		* Fetches metadata token used for authenticating against the instance metadata service.
+		*
+		* @callback callback function(err, token)
+		*   Called when token is loaded from the resource
+		*/
 		fetchMetadataToken: function fetchMetadataToken(callback) {
 			this.request("/latest/api/token", {
 				"method": "PUT",
 				"headers": { "x-aws-ec2-metadata-token-ttl-seconds": "21600" }
 			}, callback);
 		},
+		/**
+		* Fetches credentials
+		*
+		* @api private
+		* @callback cb function(err, creds)
+		*   Called when credentials are loaded from the resource
+		*/
 		fetchCredentials: function fetchCredentials(options, cb) {
 			var self = this;
 			var basePath = "/latest/meta-data/iam/security-credentials/";
@@ -16807,6 +18476,16 @@ var require_metadata_service = /* @__PURE__ */ __commonJSMin(((exports, module) 
 				});
 			});
 		},
+		/**
+		* Loads a set of credentials stored in the instance metadata service
+		*
+		* @api private
+		* @callback callback function(err, credentials)
+		*   Called when credentials are loaded from the resource
+		*   @param err [Error] if an error occurred, this value will be set
+		*   @param credentials [Object] the raw JSON object containing all
+		*     metadata from the credentials resource
+		*/
 		loadCredentials: function loadCredentials(callback) {
 			var self = this;
 			self.loadCredentialsCallbacks.push(callback);
@@ -16899,13 +18578,42 @@ var require_ec2_metadata_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			this.metadataService = new AWS.MetadataService(options);
 			this.logger = options.logger || AWS.config && AWS.config.logger;
 		},
+		/**
+		* @api private
+		*/
 		defaultTimeout: 1e3,
+		/**
+		* @api private
+		*/
 		defaultConnectTimeout: 1e3,
+		/**
+		* @api private
+		*/
 		defaultMaxRetries: 3,
+		/**
+		* The original expiration of the current credential. In case of AWS
+		* outage, the EC2 metadata will extend expiration of the existing
+		* credential.
+		*/
 		originalExpiration: void 0,
+		/**
+		* Loads the credentials from the instance metadata service
+		*
+		* @callback callback function(err)
+		*   Called when the instance metadata service responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		load: function load(callback) {
 			var self = this;
 			self.metadataService.loadCredentials(function(err, creds) {
@@ -16920,9 +18628,18 @@ var require_ec2_metadata_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				}
 			});
 		},
+		/**
+		* Whether this credential has been loaded.
+		* @api private
+		*/
 		hasLoadedCredentials: function hasLoadedCredentials() {
 			return this.AccessKeyId && this.secretAccessKey;
 		},
+		/**
+		* if expired, extend the expiration by 15 minutes base plus a jitter of 5
+		* minutes range.
+		* @api private
+		*/
 		extendExpirationIfExpired: function extendExpirationIfExpired() {
 			if (this.needsRefresh()) {
 				this.originalExpiration = this.originalExpiration || this.expireTime;
@@ -16933,6 +18650,11 @@ var require_ec2_metadata_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				this.logger.warn("Attempting credential expiration extension due to a credential service availability issue. A refresh of these credentials will be attempted again at " + this.expireTime + "\nFor more information, please visit: https://docs.aws.amazon.com/sdkref/latest/guide/feature-static-credentials.html");
 			}
 		},
+		/**
+		* Update the credential with new credential responded from EC2 metadata
+		* service.
+		* @api private
+		*/
 		setCredentials: function setCredentials(creds) {
 			var currentTime = AWS.util.date.getDate().getTime();
 			var expireTime = new Date(creds.Expiration);
@@ -16988,11 +18710,23 @@ var require_remote_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			options.httpOptions = AWS.util.merge(this.httpOptions, options.httpOptions);
 			AWS.util.update(this, options);
 		},
+		/**
+		* @api private
+		*/
 		httpOptions: { timeout: 1e3 },
+		/**
+		* @api private
+		*/
 		maxRetries: 3,
+		/**
+		* @api private
+		*/
 		isConfiguredForEcsCredentials: function isConfiguredForEcsCredentials() {
 			return Boolean(process && process.env && (process.env[ENV_RELATIVE_URI] || process.env[ENV_FULL_URI]));
 		},
+		/**
+		* @api private
+		*/
 		getECSFullUri: function getECSFullUri() {
 			if (process && process.env) {
 				var relative = process.env[ENV_RELATIVE_URI], full = process.env[ENV_FULL_URI];
@@ -17005,6 +18739,9 @@ var require_remote_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				} else throw AWS.util.error(/* @__PURE__ */ new Error("Variable " + ENV_RELATIVE_URI + " or " + ENV_FULL_URI + " must be set to use AWS.RemoteCredentials."), { code: "ECSCredentialsProviderFailure" });
 			} else throw AWS.util.error(/* @__PURE__ */ new Error("No process info available"), { code: "ECSCredentialsProviderFailure" });
 		},
+		/**
+		* @api private
+		*/
 		getECSAuthToken: function getECSAuthToken() {
 			if (process && process.env && (process.env[ENV_FULL_URI] || process.env[ENV_AUTH_TOKEN_FILE])) {
 				if (!process.env[ENV_AUTH_TOKEN] && process.env[ENV_AUTH_TOKEN_FILE]) try {
@@ -17016,9 +18753,15 @@ var require_remote_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				return process.env[ENV_AUTH_TOKEN];
 			}
 		},
+		/**
+		* @api private
+		*/
 		credsFormatIsValid: function credsFormatIsValid(credData) {
 			return !!credData.accessKeyId && !!credData.secretAccessKey && !!credData.sessionToken && !!credData.expireTime;
 		},
+		/**
+		* @api private
+		*/
 		formatCreds: function formatCreds(credData) {
 			if (!!credData.credentials) credData = credData.credentials;
 			return {
@@ -17029,6 +18772,9 @@ var require_remote_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				expireTime: new Date(credData.expiration || credData.Expiration)
 			};
 		},
+		/**
+		* @api private
+		*/
 		request: function request(url, callback) {
 			var httpRequest = new AWS.HttpRequest(url);
 			httpRequest.method = "GET";
@@ -17037,9 +18783,23 @@ var require_remote_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			if (token) httpRequest.headers.Authorization = token;
 			AWS.util.handleRequestWithRetries(httpRequest, this, callback);
 		},
+		/**
+		* Loads the credentials from the relative URI specified by container
+		*
+		* @callback callback function(err)
+		*   Called when the request to the relative URI responds (or fails). When
+		*   this callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, `sessionToken`, and `expireTime` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			var fullUri;
@@ -17123,11 +18883,37 @@ var require_environment_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	*     the separating underscore ('_').
 	*/
 	AWS.EnvironmentCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new EnvironmentCredentials class with a given variable
+		* prefix {envPrefix}. For example, to load credentials using the 'AWS'
+		* prefix:
+		*
+		* ```javascript
+		* var creds = new AWS.EnvironmentCredentials('AWS');
+		* creds.accessKeyId == 'AKID' // from AWS_ACCESS_KEY_ID env var
+		* ```
+		*
+		* @param envPrefix [String] the prefix to use (e.g., 'AWS') for environment
+		*   variables. Do not include the separating underscore.
+		*/
 		constructor: function EnvironmentCredentials(envPrefix) {
 			AWS.Credentials.call(this);
 			this.envPrefix = envPrefix;
 			this.get(function() {});
 		},
+		/**
+		* Loads credentials from the environment using the prefixed
+		* environment variables.
+		*
+		* @callback callback function(err)
+		*   Called after the (prefixed) ACCESS_KEY_ID, SECRET_ACCESS_KEY, and
+		*   SESSION_TOKEN environment variables are read. When this callback is
+		*   called with no error, it means that the credentials information has
+		*   been loaded into the object (as the `accessKeyId`, `secretAccessKey`,
+		*   and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			if (!callback) callback = AWS.util.fn.callback;
 			if (!process || !process.env) {
@@ -17183,11 +18969,28 @@ var require_file_system_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	* @!macro nobrowser
 	*/
 	AWS.FileSystemCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* @overload AWS.FileSystemCredentials(filename)
+		*   Creates a new FileSystemCredentials object from a filename
+		*
+		*   @param filename [String] the path on disk to the JSON file to load.
+		*/
 		constructor: function FileSystemCredentials(filename) {
 			AWS.Credentials.call(this);
 			this.filename = filename;
 			this.get(function() {});
 		},
+		/**
+		* Loads the credentials from the {filename} on disk.
+		*
+		* @callback callback function(err)
+		*   Called after the JSON file on disk is read and parsed. When this callback
+		*   is called with no error, it means that the credentials information
+		*   has been loaded into the object (as the `accessKeyId`, `secretAccessKey`,
+		*   and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			if (!callback) callback = AWS.util.fn.callback;
 			try {
@@ -17242,6 +19045,45 @@ var require_shared_ini_file_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	* @!macro nobrowser
 	*/
 	AWS.SharedIniFileCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new SharedIniFileCredentials object.
+		*
+		* @param options [map] a set of options
+		* @option options profile [String] (AWS_PROFILE env var or 'default')
+		*   the name of the profile to load.
+		* @option options filename [String] ('~/.aws/credentials' or defined by
+		*   AWS_SHARED_CREDENTIALS_FILE process env var)
+		*   the filename to use when loading credentials.
+		* @option options disableAssumeRole [Boolean] (false) True to disable
+		*   support for profiles that assume an IAM role. If true, and an assume
+		*   role profile is selected, an error is raised.
+		* @option options preferStaticCredentials [Boolean] (false) True to
+		*   prefer static credentials to role_arn if both are present.
+		* @option options tokenCodeFn [Function] (null) Function to provide
+		*   STS Assume Role TokenCode, if mfa_serial is provided for profile in ini
+		*   file. Function is called with value of mfa_serial and callback, and
+		*   should provide the TokenCode or an error to the callback in the format
+		*   callback(err, token)
+		* @option options callback [Function] (err) Credentials are eagerly loaded
+		*   by the constructor. When the callback is called with no error, the
+		*   credentials have been loaded successfully.
+		* @option options httpOptions [map] A set of options to pass to the low-level
+		*   HTTP request. Currently supported options are:
+		*   * **proxy** [String] &mdash; the URL to proxy requests through
+		*   * **agent** [http.Agent, https.Agent] &mdash; the Agent object to perform
+		*     HTTP requests with. Used for connection pooling. Defaults to the global
+		*     agent (`http.globalAgent`) for non-SSL connections. Note that for
+		*     SSL connections, a special Agent object is used in order to enable
+		*     peer certificate verification. This feature is only available in the
+		*     Node.js environment.
+		*   * **connectTimeout** [Integer] &mdash; Sets the socket to timeout after
+		*     failing to establish a connection with the server after
+		*     `connectTimeout` milliseconds. This timeout has no effect once a socket
+		*     connection has been established.
+		*   * **timeout** [Integer] &mdash; The number of milliseconds a request can
+		*     take before automatically being terminated.
+		*     Defaults to two minutes (120000).
+		*/
 		constructor: function SharedIniFileCredentials(options) {
 			AWS.Credentials.call(this);
 			options = options || {};
@@ -17253,6 +19095,9 @@ var require_shared_ini_file_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			this.httpOptions = options.httpOptions || null;
 			this.get(options.callback || AWS.util.fn.noop);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			try {
@@ -17284,10 +19129,24 @@ var require_shared_ini_file_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				callback(err);
 			}
 		},
+		/**
+		* Loads the credentials from the shared credentials file
+		*
+		* @callback callback function(err)
+		*   Called after the shared INI file on disk is read and parsed. When this
+		*   callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			iniLoader.clearCachedFiles();
 			this.coalesceRefresh(callback || AWS.util.fn.callback, this.disableAssumeRole);
 		},
+		/**
+		* @api private
+		*/
 		loadRoleProfile: function loadRoleProfile(creds, roleProfile, callback) {
 			if (this.disableAssumeRole) throw AWS.util.error(/* @__PURE__ */ new Error("Role assumption profiles are disabled. Failed to load profile " + this.profile + " from " + creds.filename), { code: "SharedIniFileCredentialsProviderFailure" });
 			var self = this;
@@ -17388,6 +19247,19 @@ var require_sso_credentials = /* @__PURE__ */ __commonJSMin((() => {
 	* @!macro nobrowser
 	*/
 	AWS.SsoCredentials = AWS.util.inherit(AWS.Credentials, {
+		/**
+		* Creates a new SsoCredentials object.
+		*
+		* @param options [map] a set of options
+		* @option options profile [String] (AWS_PROFILE env var or 'default')
+		*   the name of the profile to load.
+		* @option options filename [String] ('~/.aws/credentials' or defined by
+		*   AWS_SHARED_CREDENTIALS_FILE process env var)
+		*   the filename to use when loading credentials.
+		* @option options callback [Function] (err) Credentials are eagerly loaded
+		*   by the constructor. When the callback is called with no error, the
+		*   credentials have been loaded successfully.
+		*/
 		constructor: function SsoCredentials(options) {
 			AWS.Credentials.call(this);
 			options = options || {};
@@ -17399,6 +19271,9 @@ var require_sso_credentials = /* @__PURE__ */ __commonJSMin((() => {
 			this.httpOptions = options.httpOptions || null;
 			this.get(options.callback || AWS.util.fn.noop);
 		},
+		/**
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			try {
@@ -17435,6 +19310,17 @@ var require_sso_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				callback(err);
 			}
 		},
+		/**
+		* @private
+		* Uses legacy file system retrieval or if sso-session is set,
+		* use the SSOTokenProvider.
+		*
+		* @param {string} profileName - name of the profile.
+		* @param {object} profile - profile data containing sso_session or sso_start_url etc.
+		* @param {function} callback - called with (err, (string) token).
+		*
+		* @returns {void}
+		*/
 		getToken: function getToken(profileName, profile, callback) {
 			var self = this;
 			if (profile.sso_session) {
@@ -17466,6 +19352,17 @@ var require_sso_credentials = /* @__PURE__ */ __commonJSMin((() => {
 				return callback(err, null);
 			}
 		},
+		/**
+		* Loads the credentials from the AWS SSO process
+		*
+		* @callback callback function(err)
+		*   Called after the AWS SSO process has been executed. When this
+		*   callback is called with no error, it means that the credentials
+		*   information has been loaded into the object (as the `accessKeyId`,
+		*   `secretAccessKey`, and `sessionToken` properties).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			iniLoader.clearCachedFiles();
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
@@ -17513,6 +19410,14 @@ var require_token = /* @__PURE__ */ __commonJSMin((() => {
 	*     in conjunction with {expireTime}.
 	*/
 	AWS.Token = AWS.util.inherit({
+		/**
+		* Creates a Token object with a given set of information in options hash.
+		* @option options token [String] represents the literal token string.
+		* @option options expireTime [Date] field representing the time at which
+		*   the token expires.
+		* @example Create a token object
+		*   var token = new AWS.Token({ token: 'token' });
+		*/
 		constructor: function Token(options) {
 			AWS.util.hideProperties(this, ["token"]);
 			this.expired = false;
@@ -17524,13 +19429,34 @@ var require_token = /* @__PURE__ */ __commonJSMin((() => {
 				this.expireTime = options.expireTime;
 			}
 		},
+		/**
+		* @return [Integer] the number of seconds before {expireTime} during which
+		*   the token will be considered expired.
+		*/
 		expiryWindow: 15,
+		/**
+		* @return [Boolean] whether the Token object should call {refresh}
+		* @note Subclasses should override this method to provide custom refresh
+		*   logic.
+		*/
 		needsRefresh: function needsRefresh() {
 			var currentTime = AWS.util.date.getDate().getTime();
 			var adjustedTime = new Date(currentTime + this.expiryWindow * 1e3);
 			if (this.expireTime && adjustedTime > this.expireTime) return true;
 			return this.expired || !this.token;
 		},
+		/**
+		* Gets the existing token, refreshing them if they are not yet loaded
+		* or have expired. Users should call this method before using {refresh},
+		* as this will not attempt to reload token when they are already
+		* loaded into the object.
+		*
+		* @callback callback function(err)
+		*   When this callback is called with no error, it means either token
+		*   do not need to be refreshed or refreshed token information has
+		*   been loaded into the object (as the `token` property).
+		*   @param err [Error] if an error occurred, this value will be filled
+		*/
 		get: function get(callback) {
 			var self = this;
 			if (this.needsRefresh()) this.refresh(function(err) {
@@ -17539,10 +19465,72 @@ var require_token = /* @__PURE__ */ __commonJSMin((() => {
 			});
 			else if (callback) callback();
 		},
+		/**
+		* @!method  getPromise()
+		*   Returns a 'thenable' promise.
+		*   Gets the existing token, refreshing it if it's not yet loaded
+		*   or have expired. Users should call this method before using {refresh},
+		*   as this will not attempt to reload token when it's already
+		*   loaded into the object.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function()
+		*     Called if the promise is fulfilled. When this callback is called, it means
+		*     either token does not need to be refreshed or refreshed token information
+		*     has been loaded into the object (as the `token` property).
+		*   @callback rejectedCallback function(err)
+		*     Called if the promise is rejected.
+		*     @param err [Error] if an error occurred, this value will be filled.
+		*   @return [Promise] A promise that represents the state of the `get` call.
+		*   @example Calling the `getPromise` method.
+		*     var promise = tokenProvider.getPromise();
+		*     promise.then(function() { ... }, function(err) { ... });
+		*/
+		/**
+		* @!method  refreshPromise()
+		*   Returns a 'thenable' promise.
+		*   Refreshes the token. Users should call {get} before attempting
+		*   to forcibly refresh token.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function()
+		*     Called if the promise is fulfilled. When this callback is called, it
+		*     means refreshed token information has been loaded into the object
+		*     (as the `token` property).
+		*   @callback rejectedCallback function(err)
+		*     Called if the promise is rejected.
+		*     @param err [Error] if an error occurred, this value will be filled.
+		*   @return [Promise] A promise that represents the state of the `refresh` call.
+		*   @example Calling the `refreshPromise` method.
+		*     var promise = tokenProvider.refreshPromise();
+		*     promise.then(function() { ... }, function(err) { ... });
+		*/
+		/**
+		* Refreshes the token. Users should call {get} before attempting
+		* to forcibly refresh token.
+		*
+		* @callback callback function(err)
+		*   When this callback is called with no error, it means refreshed
+		*   token information has been loaded into the object (as the
+		*   `token` property).
+		*   @param err [Error] if an error occurred, this value will be filled
+		* @note Subclasses should override this class to reset the
+		*   {token} on the token object and then call the callback with
+		*   any error information.
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			this.expired = false;
 			callback();
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		coalesceRefresh: function coalesceRefresh(callback, sync) {
 			var self = this;
 			if (self.refreshCallbacks.push(callback) === 1) self.load(function onLoad(err) {
@@ -17555,6 +19543,10 @@ var require_token = /* @__PURE__ */ __commonJSMin((() => {
 				self.refreshCallbacks.length = 0;
 			});
 		},
+		/**
+		* @api private
+		* @param callback
+		*/
 		load: function load(callback) {
 			callback();
 		}
@@ -17620,11 +19612,46 @@ var require_token_provider_chain = /* @__PURE__ */ __commonJSMin((() => {
 	*   @see defaultProviders
 	*/
 	AWS.TokenProviderChain = AWS.util.inherit(AWS.Token, {
+		/**
+		* Creates a new TokenProviderChain with a default set of providers
+		* specified by {defaultProviders}.
+		*/
 		constructor: function TokenProviderChain(providers) {
 			if (providers) this.providers = providers;
 			else this.providers = AWS.TokenProviderChain.defaultProviders.slice(0);
 			this.resolveCallbacks = [];
 		},
+		/**
+		* @!method  resolvePromise()
+		*   Returns a 'thenable' promise.
+		*   Resolves the provider chain by searching for the first token in {providers}.
+		*
+		*   Two callbacks can be provided to the `then` method on the returned promise.
+		*   The first callback will be called if the promise is fulfilled, and the second
+		*   callback will be called if the promise is rejected.
+		*   @callback fulfilledCallback function(token)
+		*     Called if the promise is fulfilled and the provider resolves the chain
+		*     to a token object
+		*     @param token [AWS.Token] the token object resolved by the provider chain.
+		*   @callback rejectedCallback function(error)
+		*     Called if the promise is rejected.
+		*     @param err [Error] the error object returned if no token is found.
+		*   @return [Promise] A promise that represents the state of the `resolve` method call.
+		*   @example Calling the `resolvePromise` method.
+		*     var promise = chain.resolvePromise();
+		*     promise.then(function(token) { ... }, function(err) { ... });
+		*/
+		/**
+		* Resolves the provider chain by searching for the first token in {providers}.
+		*
+		* @callback callback function(err, token)
+		*   Called when the provider resolves the chain to a token object
+		*   or null if no token can be found.
+		*
+		*   @param err [Error] the error object returned if no token is found.
+		*   @param token [AWS.Token] the token object resolved by the provider chain.
+		* @return [AWS.TokenProviderChain] the provider, for chaining.
+		*/
 		resolve: function resolve(callback) {
 			var self = this;
 			if (self.providers.length === 0) {
@@ -17745,7 +19772,20 @@ var require_sso_token_provider = /* @__PURE__ */ __commonJSMin((() => {
 	* @!macro nobrowser
 	*/
 	AWS.SSOTokenProvider = AWS.util.inherit(AWS.Token, {
+		/**
+		* Expiry window of five minutes.
+		*/
 		expiryWindow: 300,
+		/**
+		* Creates a new token object from cached access token.
+		*
+		* @param options [map] a set of options
+		* @option options profile [String] (AWS_PROFILE env var or 'default')
+		*   the name of the profile to load.
+		* @option options callback [Function] (err) Token is eagerly loaded
+		*   by the constructor. When the callback is called with no error, the
+		*   token has been loaded successfully.
+		*/
 		constructor: function SSOTokenProvider(options) {
 			AWS.Token.call(this);
 			options = options || {};
@@ -17753,6 +19793,17 @@ var require_sso_token_provider = /* @__PURE__ */ __commonJSMin((() => {
 			this.profile = options.profile || process.env.AWS_PROFILE || AWS.util.defaultProfile;
 			this.get(options.callback || AWS.util.fn.noop);
 		},
+		/**
+		* Reads sso_start_url from provided profile, and reads token from
+		* ~/.aws/sso/cache/<sha1-of-utf8-encoded-value-from-sso_start_url>.json
+		*
+		* Throws an error if required fields token and expiresAt are missing.
+		* Throws an error if token has expired and metadata to perform refresh is
+		* not available.
+		* Attempts to refresh the token if it's within 5 minutes before expiry time.
+		*
+		* @api private
+		*/
 		load: function load(callback) {
 			var self = this;
 			var profile = iniLoader.loadFrom({ isConfig: true })[this.profile] || {};
@@ -17814,6 +19865,16 @@ var require_sso_token_provider = /* @__PURE__ */ __commonJSMin((() => {
 				}
 			});
 		},
+		/**
+		* Loads the cached access token from disk.
+		*
+		* @callback callback function(err)
+		*   Called after the AWS SSO process has been executed. When this
+		*   callback is called with no error, it means that the token information
+		*   has been loaded into the object (as the `token` property).
+		*   @param err [Error] if an error occurred, this value will be filled.
+		* @see get
+		*/
 		refresh: function refresh(callback) {
 			iniLoader.clearCachedFiles();
 			this.coalesceRefresh(callback || AWS.util.fn.callback);
@@ -18075,6 +20136,31 @@ var require_sts$1 = /* @__PURE__ */ __commonJSMin((() => {
 	var ENV_REGIONAL_ENDPOINT_ENABLED = "AWS_STS_REGIONAL_ENDPOINTS";
 	var CONFIG_REGIONAL_ENDPOINT_ENABLED = "sts_regional_endpoints";
 	AWS.util.update(AWS.STS.prototype, {
+		/**
+		* @overload credentialsFrom(data, credentials = null)
+		*   Creates a credentials object from STS response data containing
+		*   credentials information. Useful for quickly setting AWS credentials.
+		*
+		*   @note This is a low-level utility function. If you want to load temporary
+		*     credentials into your process for subsequent requests to AWS resources,
+		*     you should use {AWS.TemporaryCredentials} instead.
+		*   @param data [map] data retrieved from a call to {getFederatedToken},
+		*     {getSessionToken}, {assumeRole}, or {assumeRoleWithWebIdentity}.
+		*   @param credentials [AWS.Credentials] an optional credentials object to
+		*     fill instead of creating a new object. Useful when modifying an
+		*     existing credentials object from a refresh call.
+		*   @return [AWS.TemporaryCredentials] the set of temporary credentials
+		*     loaded from a raw STS operation response.
+		*   @example Using credentialsFrom to load global AWS credentials
+		*     var sts = new AWS.STS();
+		*     sts.getSessionToken(function (err, data) {
+		*       if (err) console.log("Error getting credentials");
+		*       else {
+		*         AWS.config.credentials = sts.credentialsFrom(data);
+		*       }
+		*     });
+		*   @see AWS.TemporaryCredentials
+		*/
 		credentialsFrom: function credentialsFrom(data, credentials) {
 			if (!data) return null;
 			if (!credentials) credentials = new AWS.TemporaryCredentials();
@@ -18091,9 +20177,15 @@ var require_sts$1 = /* @__PURE__ */ __commonJSMin((() => {
 		assumeRoleWithSAML: function assumeRoleWithSAML(params, callback) {
 			return this.makeUnauthenticatedRequest("assumeRoleWithSAML", params, callback);
 		},
+		/**
+		* @api private
+		*/
 		setupRequestListeners: function setupRequestListeners(request) {
 			request.addListener("validate", this.optInRegionalEndpoint, true);
 		},
+		/**
+		* @api private
+		*/
 		optInRegionalEndpoint: function optInRegionalEndpoint(req) {
 			var service = req.service;
 			var config = service.config;

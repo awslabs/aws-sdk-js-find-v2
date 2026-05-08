@@ -13,7 +13,7 @@ const createConfig = (version, minify, moduleSystem) =>
     output: {
       file: join(getOutputDir(version), getOutputFilename("rolldown", minify, moduleSystem)),
       format: moduleSystem,
-      inlineDynamicImports: true,
+      codeSplitting: false,
       minify,
     },
     // rolldown defaults to "browser" platform for non-cjs formats: https://rolldown.rs/options/platform#platform
